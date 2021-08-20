@@ -15,8 +15,7 @@ namespace ToggleableWateringCan
 
         private void TestMethod(object sender, ButtonPressedEventArgs e)
         {
-            
-
+            Monitor.Log("test", LogLevel.Debug);
         }
     }
 }
