@@ -1,11 +1,9 @@
-﻿using HarmonyLib;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
 using System;
 using StardewValley;
 
 namespace FasterPathSpeed
 {
-    [HarmonyPatch]
     public class FarmerPatches
     {
         private static IMonitor Monitor;
@@ -17,19 +15,23 @@ namespace FasterPathSpeed
             Config = config;
         }
 
-        [HarmonyPatch(typeof(Farmer), nameof(Farmer.getMovementSpeed))]
         public static void GetMovementSpeed_Postfix(Farmer __instance, ref float __result)
         {
             try
             {
-                if ((Game1.CurrentEvent == null || Game1.CurrentEvent.playerControlSequence) && !Game1.eventUp && __instance.isRidingHorse())
+                if ((Game1.CurrentEvent == null || Game1.CurrentEvent.playerControlSequence) && (!(Game1.CurrentEvent == null && __instance.hasBuff(19))) &&
+                    (!Config.IsPathSpeedBuffOnlyOnTheFarm || Game1.currentLocation.IsFarm))
                 {
-                    if (!(Game1.CurrentEvent == null && __instance.hasBuff(19)))
-                    {
-                        // Adapted from original GetMovementSpeed calculation
-                        float mult = Config.HorsePathSpeedBuffModifier * __instance.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds;
+                    bool isOnFeature = Game1.currentLocation.terrainFeatures.TryGetValue(__instance.getTileLocation(), out StardewValley.TerrainFeatures.TerrainFeature terrainFeature);
 
-                        __result += (__instance.movementDirections.Count > 1) ? (0.7f * __instance.temporarySpeedBuff * mult) : (__instance.temporarySpeedBuff * mult);
+                    if (isOnFeature && terrainFeature is StardewValley.TerrainFeatures.Flooring)
+                    {
+                        float pathSpeedBoost = ModEntry.GetPathSpeedBuffByFlooringType(terrainFeature as StardewValley.TerrainFeatures.Flooring);
+
+                        float mult = __instance.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *
+                            ((!Game1.eventUp && __instance.isRidingHorse()) ? Config.HorsePathSpeedBuffModifier : 1);
+
+                        __result += (__instance.movementDirections.Count > 1) ? (0.7f * pathSpeedBoost * mult) : (pathSpeedBoost * mult);
                     }
                 }
                 // Don't mess with ELSE for now, don't want to make any unintentional errors dealing with Event movement

@@ -5,32 +5,58 @@ namespace FasterPathSpeed
 {
     public class ModEntry : Mod
     {
-        public ModConfig Config;
+        public static ModConfig Config;
 
         public override void Entry(IModHelper helper)
         {
-            // Init config
-            Config = Helper.ReadConfig<ModConfig>();
+            Config = helper.ReadConfig<ModConfig>();
 
-            // Handle Harmony patches
-            FlooringPatches.Initialize(Monitor, Config);
             FarmerPatches.Initialize(Monitor, Config);
 
             var harmony = new Harmony(ModManifest.UniqueID);
 
             harmony.Patch(
-                original: AccessTools.Method(typeof(StardewValley.TerrainFeatures.Flooring), nameof(StardewValley.TerrainFeatures.Flooring.doCollisionAction)),
-                postfix: new HarmonyMethod(typeof(FlooringPatches), nameof(FlooringPatches.DoCollisionAction_Postfix))
+                original: AccessTools.Method(typeof(StardewValley.Farmer), nameof(StardewValley.Farmer.getMovementSpeed)),
+                postfix: new HarmonyMethod(typeof(FarmerPatches), nameof(FarmerPatches.GetMovementSpeed_Postfix))
             );
+        }
 
-            // Farmer GetMovementSpeed calculation is not touched unless we want paths to affect horse speed as well
-            if (Config.IsPathAffectHorseSpeed)
+        public static float GetPathSpeedBuffByFlooringType(StardewValley.TerrainFeatures.Flooring flooring)
+        {
+            if (Config.IsUseCustomPathSpeedBuffValues)
             {
-                harmony.Patch(
-                    original: AccessTools.Method(typeof(StardewValley.Farmer), nameof(StardewValley.Farmer.getMovementSpeed)),
-                    postfix: new HarmonyMethod(typeof(FarmerPatches), nameof(FarmerPatches.GetMovementSpeed_Postfix))
-                );
+                switch (flooring.whichFloor.Value)
+                {
+                    case StardewValley.TerrainFeatures.Flooring.wood:
+                        return Config.CustomPathSpeedBuffValues.Wood;
+                    case StardewValley.TerrainFeatures.Flooring.stone:
+                        return Config.CustomPathSpeedBuffValues.Stone;
+                    case StardewValley.TerrainFeatures.Flooring.ghost:
+                        return Config.CustomPathSpeedBuffValues.Ghost;
+                    case StardewValley.TerrainFeatures.Flooring.iceTile:
+                        return Config.CustomPathSpeedBuffValues.IceTile;
+                    case StardewValley.TerrainFeatures.Flooring.straw:
+                        return Config.CustomPathSpeedBuffValues.Straw;
+                    case StardewValley.TerrainFeatures.Flooring.gravel:
+                        return Config.CustomPathSpeedBuffValues.Gravel;
+                    case StardewValley.TerrainFeatures.Flooring.boardwalk:
+                        return Config.CustomPathSpeedBuffValues.Boardwalk;
+                    case StardewValley.TerrainFeatures.Flooring.colored_cobblestone:
+                        return Config.CustomPathSpeedBuffValues.ColoredCobblestone;
+                    case StardewValley.TerrainFeatures.Flooring.cobblestone:
+                        return Config.CustomPathSpeedBuffValues.Cobblestone;
+                    case StardewValley.TerrainFeatures.Flooring.steppingStone:
+                        return Config.CustomPathSpeedBuffValues.SteppingStone;
+                    case StardewValley.TerrainFeatures.Flooring.brick:
+                        return Config.CustomPathSpeedBuffValues.Brick;
+                    case StardewValley.TerrainFeatures.Flooring.plankFlooring:
+                        return Config.CustomPathSpeedBuffValues.PlankFlooring;
+                    case StardewValley.TerrainFeatures.Flooring.townFlooring:
+                        return Config.CustomPathSpeedBuffValues.TownFlooring;
+                }
             }
+
+            return Config.DefaultPathSpeedBuff;
         }
     }
 }
