@@ -21,7 +21,7 @@ namespace FasterPathSpeed
             );
         }
 
-        public static float GetPathSpeedBuffByFlooringType(StardewValley.TerrainFeatures.Flooring flooring)
+        public static float GetPathSpeedBoostByFlooringType(StardewValley.TerrainFeatures.Flooring flooring)
         {
             if (Config.IsUseCustomPathSpeedBuffValues)
             {

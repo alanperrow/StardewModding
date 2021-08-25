@@ -26,7 +26,7 @@ namespace FasterPathSpeed
 
                     if (isOnFeature && terrainFeature is StardewValley.TerrainFeatures.Flooring)
                     {
-                        float pathSpeedBoost = ModEntry.GetPathSpeedBuffByFlooringType(terrainFeature as StardewValley.TerrainFeatures.Flooring);
+                        float pathSpeedBoost = ModEntry.GetPathSpeedBoostByFlooringType(terrainFeature as StardewValley.TerrainFeatures.Flooring);
 
                         float mult = __instance.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *
                             ((!Game1.eventUp && __instance.isRidingHorse()) ? Config.HorsePathSpeedBuffModifier : 1);
