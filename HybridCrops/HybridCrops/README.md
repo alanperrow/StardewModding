@@ -1,9 +1,11 @@
 ﻿# Hybrid Crops
 An expansion to Stardew Valley that adds the ability to create hybrid crops.
 
-## Progress
+## Devlog
 ### 1.0.0
-8/27 - Initial code created. Started developing plan for structure and implementation. Gathering modding resources relevant to what will be necessary for the mod.
+8/27/2021
+ * Initial code created.
+ * Started developing plan for structure and implementation. Gathering modding resources relevant to what will be necessary for the mod.
 
 ## Plan
 ### Hybrid Seed Maker
