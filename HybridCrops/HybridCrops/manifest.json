@@ -1,0 +1,10 @@
+{
+  "Name": "Hybrid Crops",
+  "Author": "gaussfire",
+  "Version": "1.0.0",
+  "Description": "An expansion to the game that adds the ability to create hybrid crops.",
+  "UniqueID": "gaussfire.HybridCrops",
+  "EntryDll": "HybridCrops.dll",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": []
+}
