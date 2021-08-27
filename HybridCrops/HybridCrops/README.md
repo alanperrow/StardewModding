@@ -15,7 +15,7 @@ Benefits to hybrid crops:
  * Better
 
 Details:
- * Max 5 seeds and 5 crops for both types, per hybrid attempt
+ * Input a maximum of 5 seeds and 5 crops (minimum 1 seed and 0 crops) for both types, per hybrid attempt
 
 ### Hybrid Crops Storyline
 Quest involving Wizard and Demetrius that provides a backstory leading up to unlocking the main mod content — the ability to create hybrid crops.
@@ -26,12 +26,19 @@ Prerequisites:
 
 ### Config
 Hybrid Attempt
- * Time needed - for people who don't want to wait
- * Global success chance multiplier - to make succesfully hybriding more/less likely
- * Max amount of input seeds - allows more input seeds and consequently more output seeds
- * Crops count towards output seed amount - makes each input crop provide an additional output seed
- * Additional seed/crop success chance - modify the additional success chance obtained from using multiple seeds/crops
- * Matching seed/crop pair success chance bonus - modify the additional success chance bonus obtained from using matching pair(s) of seeds/crops
+ * Time needed
+   * for people who don't want to wait
+ * Global success chance multiplier
+   * to make succesfully hybriding more/less likely
+ * Max amount of input seeds
+   * allows more input seeds and consequently more output seeds
+ * Crops count towards output seed amount
+   * makes each input crop provide an additional output seed
+ * Additional seed/crop success chance
+   * modify the additional success chance obtained from using multiple seeds/crops
+ * Matching seed/crop pair success chance bonus
+   * modify the additional success chance bonus obtained from using matching pair(s) of seeds/crops
+
 Quest Prerequisites
  * have access to the quest without waiting for Year 2, or
  * skip the story and quest entirely, instantly gaining access to hybriding.
