@@ -47,54 +47,67 @@ Large machine located in Demetrius' lab after completing Hybrid Crops storyline.
 
 Takes in two different types of seeds (and crops, optionally). After some time, has a chance to produce seeds that are a hybrid between both of the input seed types.
 
-Benefits to hybrid crops:
+#### Benefits to hybrid crops:
   * A hybrid of crop A and crop B sells for the price of A + B. (May need to be adjusted for balancing reasons)
   * Grows at the average of A and B growth speed. (May need to be adjusted for balancing reasons)
     * Example: (A=8d, B=12d) => AB Hybrid = 10d
   * If re-harvestable, harvest speed is a weighted average of A and B harvest speed. (May need to be adjusted for balancing reasons)
     * Examples:
-      * (A = 1ea x $50 / 2 days, B = 3ea x $50 / 4 days) => --------------------------- TODO: Create weighted average formula for re-harvest time
+      * (A = 1ea x $50 / 2 days, B = 3ea x $50 / 4 days) =>
+        * ***TODO***: *Create weighted average formula for re-harvest time*
       * (A = 1ea x $200 / NO_REHARVEST, B = 2.5ea x $10 / 3 days) => 3 days
   * Inherits traits from parent crops, such as: season, yield multiple at harvest, regrow, grows on trellis, etc.
   * Complete the Hybrid Encyclopedia - a new collection for shipping every implemented hybrid crop.
 
-Details:
-  * Input a maximum of 5 seeds and 5 crops (minimum 1 seed and 0 crops) for both types, per hybrid attempt
-  * Combine two different crops and/or their seeds for a chance of recieving a hybrid of the two crops in return.
+#### Hybriding details:
+  * Input a maximum of 5 seeds and 5 crops (minimum 1 seed and 0 crops) for both types, per hybrid attempt.
+  * Combine two different seeds and/or their crops for a chance of recieving a hybrid of the two seeds in return.
     * Percent chance for hybrid shown via:
       * (Red -> Green) scaled colored-text, with text something like: ("Not likely" -> "Extremely likely").
         * (?) Maybe "IMPOSSIBLE" for hybrid crops that are not yet implemented
       * Maybe a brown slider nib inside red -> green gradient as well?
     * Adding more crops/seeds increases chance for hybrid success
     * Can add up to 4 extra of each (total = 5 crops and 5 seeds), for both crop types.
-		  * Each extra crop/seed adds +12.5% to success rate --------------------------- TODO: Crops should give more success rate, but get destroyed upon hybrid attempt
-			  * Total = +100% for either type
-				* If additional opposing-type crop/seed is also added, total bonus increased by +12.5% for each "pair".
-				* Grand total = +300% if both sides have 5 crops and 5 seeds.
-				* Examples (#seeds,#crops):
-					* (1,1),(1,1) => (0%)    + (0%)    + (0% bonus)    = +0%
-					* (3,2),(1,1) => (37.5%) + (0%)    + (0% bonus)    = +37.5%
-					* (2,2),(5,5) => (25%)   + (100%)  + (25% bonus)   = +150%
-					* (4,4),(4,4) => (75%)   + (75%)   + (75% bonus)   = +225%
-					* (1,5),(5,2) => (50%)   + (62.5%) + (12.5% bonus) = +125%
-					* (5,5),(1,1) => (100%)  + (0%)    + (0% bonus)    = +100%
-					* (5,1),(5,1) => (100%)  + (0%)    + (50% bonus)   = +150%
-		* Current luck amount when starting hybrid process also slightly affects success chance
-		* Hybrid process takes 2 in-game days (put in on 1st, results on 4th)
-		* Successful hybrid process takes all input and converts total number of input seeds/crops to same number of output hybrid seeds.
-			* i.e. 2 seed A & 4 crop A + 3 seed B => 9 hybrid AB seeds
-		* Failed hybrid process returns all seeds back (crops are lost)
-	* Uses a 2x2 machine located in Demetrius' lab
-	* Can interact with the machine to open interface:
-		* Two slots (one for seeds, one for crops) on left and right side of interface.
-		* One slot on bottom for output hybrid seed (or maybe a "trough" instead of a single slot)
-			* Becomes two slots upon hybrid process failure, holding returned seeds for both types
-			* Once returned seeds are taken, reverts back to a single slot
+      * Each extra crop/seed adds +12.5% to success rate
+        * ***TODO***: *Crop pair bonus should give more (maybe +37.5% ea) success rate, and crops should get destroyed upon hybrid attempt. This is to avoid cheap crops being used as a low-cost high-reward bonus when hybriding with expensive crops. Imagine 5 parsnips & 5 seeds w/ 1 ancient seed; each failure would only lose the 5 parsnips, so no big deal to keep wasting them until success rewards them with 11 hybrid seeds.*
+        * Total = +100% for either type
+        * If additional opposing-type crop/seed is also added, total bonus increased by +12.5% for each "pair".
+        * Grand total = +300% if both sides have 5 crops and 5 seeds.
+        * Examples:
+            | (#seeds, #crops) x2 |   | left |   | right |   | pair bonus |   | total |
+            |---------------------|---|------|---|-------|---|------------|---|-------|
+            | (1,1), (1,1) | => | (0%)    | + | (0%)    | + | (0% bonus)    | = | +0% |
+            | (3,2), (1,1) | => | (37.5%) | + | (0%)    | + | (0% bonus)    | = | +37.5% |
+            | (2,2), (5,5) | => | (25%)   | + | (100%)  | + | (25% bonus)   | = | +150% |
+            | (4,4), (4,4) | => | (75%)   | + | (75%)   | + | (75% bonus)   | = | +225% |
+            | (1,5), (5,2) | => | (50%)   | + | (62.5%) | + | (12.5% bonus) | = | +125% |
+            | (5,5), (1,1) | => | (100%)  | + | (0%)    | + | (0% bonus)    | = | +100% |
+            | (5,1), (5,1) | => | (100%)  | + | (0%)    | + | (50% bonus)   | = | +150% |
+        * Current luck amount when starting hybrid process also slightly affects success chance
+        * Hybrid process takes 2 in-game days (put in on 1st, results on 4th)
+        * Successful hybrid process takes all input and converts total number of input seeds/crops to same number of output hybrid seeds.
+          * i.e. 2 seed A & 4 crop A + 3 seed B => 9 hybrid AB seeds
+        * Failed hybrid process returns all seeds back (crops are lost)
+
+#### Interaction/Interface:
+  * Uses a 2x2 machine located in Demetrius' lab
+  * Can interact with the machine to open interface:
+    * On left and right side of interface, either:
+      * Two slots (one for seeds, one for crops) with stacking up to max. total, or
+        * **Fancy idea**: *Upon placing a stack of ```X``` items into their respective slot, if the machine currently has ```Y``` spaces for that slot, take ```Y``` amount from the stack (or the entire stack ```X``` if ```Y >= X```), updating the machine's current space for that slot to ```Y - Min(X, Y)```. Each item gets visually "placed" into the machine and can be seen upon entering the interface. For ease of use (and easier for controllers), add a "Return all" button to the interface that attempts to return all the items from the machine into your backpack. (If no button, return each item upon clicking/selecting them in the interface.)*
+      * Ten slots (five for seeds, five for crops)... wouldn't work with + max. total input config option
+    * One slot on bottom for output hybrid seed (or maybe a "trough" instead of a single slot)
+      * Becomes two slots upon hybrid process failure, holding returned seeds for both types
+      * Once returned seeds are taken, reverts back to a single slot
+
+#### Random ideas:
+  * Ancient fruit is many genetic variations behind all crops, so hybriding with it is very difficult, but IS possible.
+    * Maybe a 2nd storyline quest that unlocks this?
 
 ### Hybrid Crops Storyline
 Quest involving Wizard and Demetrius that provides a backstory leading up to unlocking the main mod content — the ability to create hybrid crops.
 
-Prerequisites:
+#### Prerequisites:
   * Spring Year 2 or later
   * Friendship with Wizard and Demetrius
 
