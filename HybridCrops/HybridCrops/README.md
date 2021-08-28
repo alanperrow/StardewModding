@@ -27,7 +27,8 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
     * Support other mods/allow support by other mods
     * Potentially add more traits/inheritance perks than originally thought of
       * One thing that comes to mind is a "Winter" perk/prefix by hybriding with winter forage
-      * Other special, unique behavior like above...
+      * Extra perks; think Tinkers' Construct
+      * Other special, unique behavior...
   * 3) Create the first hybrid crop
     * Crop details like price, growth, etc.
     * Temporary sprites for now (unless bored and want to pixel art lol)
