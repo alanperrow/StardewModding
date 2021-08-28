@@ -39,7 +39,9 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
     * Details like fruit price, season, etc.
     * Temporary sprites for now (unless bored and want to pixel art again lol)
   * 7) Define the "recipe" for the first hybrid fruit tree to be created using the Hybrid Seed Maker. Validate all functionality works perfectly.
-  * 8) From this point on, foundation has been laid, so all work should be based off previously-completed code. Now create more hybrids!
+  * 8) From this point on, foundation has been laid, so all work should be based off previously-completed code.
+  * 9) Make reddit post asking for feedback, ideas, and opinions about what would be good to include and what would not. Better to get this feedback now rather than after everything has been made solely to my liking. 
+  * 10) With community feedback in mind, make any desired changes, and start creating more hybrids!
 
 
 ### Hybrid Seed Maker
@@ -48,7 +50,7 @@ Large machine located in Demetrius' lab after completing Hybrid Crops storyline.
 Takes in two different types of seeds (and crops, optionally). After some time, has a chance to produce seeds that are a hybrid between both of the input seed types.
 
 #### Benefits to hybrid crops:
-  * A hybrid of crop A and crop B sells for the price of A + B. (May need to be adjusted for balancing reasons)
+  * A hybrid of crop A and crop B sells for the price of A + B. (May need to be adjusted for balancing reasons. Maybe average of both prices?)
   * Grows at the average of A and B growth speed. (May need to be adjusted for balancing reasons)
     * Example: (A=8d, B=12d) => AB Hybrid = 10d
   * If re-harvestable, harvest speed is a weighted average of A and B harvest speed. (May need to be adjusted for balancing reasons)
