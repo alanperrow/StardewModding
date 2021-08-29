@@ -118,15 +118,17 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
     * Maybe multiple tiers?
   * Goal to discover 25 (?) hybrids for Demetrius, tracked with the Hybrid Encyclopedia.
     * Each new hybrid found during this time will prompt the player to talk with Demetrius or interact with the Hybrid Encyclopedia.
-    * Doing so will display a scientific study, originally completely blank, that gets a new detail added with each new hybrid.
-    * Alongside the study being filled out, each new hybrid will prompt Demetrius to reward the player with money to continue "funding your research".
-    * When the study is complete, player is told to talk with Demetrius.
+    * Doing so will display a scientific research paper, originally completely blank, that gets a new detail added with each new hybrid.
+    * Alongside the paper being filled out, each new completed "section" will prompt Demetrius to reward the player with money to continue funding your research.
+    * When the paper is complete, player is told to talk with Demetrius.
       * He has successfully published your combined research! Scientists had been in conversation with him for a while now, so they were just waiting for the completed results and findings.
-      * He was rewarded handsomely for the research paper, as it will be further researched around the world to benefit global agriculture practices.
+      * He was rewarded handsomely for the publication, as it will be further researched around the world to benefit global agriculture practices.
       * He then rewards the player with a final large sum of money as compensation for the help.
       * The project is officially out of his hands now, so any further hybriding is your choice!
       * Maybe he offers a max. input amount upgrade at this point?
     * Overall, this side goal is just a way to provide satisfaction to completionist players, as well as provide more incentive towards experimentation and discovering new hybrids.
+    * If Wizard ever sees the completed paper, he alludes back to the myths and legends and says: this research paper is as if all of those supposed myths and legends had just been validated and explained, a story carried on through time. It truly is a magic of it's own.
+      * Maybe leads him to explain the connection with Ancient Fruit, and allow for hybriding with them?
 
 ### Hybrid Crops Storyline
 Quest involving Wizard and Demetrius that provides a backstory leading up to unlocking the main mod content — the ability to create hybrid crops.
