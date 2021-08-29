@@ -129,6 +129,11 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
     * Overall, this side goal is just a way to provide satisfaction to completionist players, as well as provide more incentive towards experimentation and discovering new hybrids.
     * If Wizard ever sees the completed paper, he alludes back to the myths and legends and says: this research paper is as if all of those supposed myths and legends had just been validated and explained, a story carried on through time. It truly is a magic of it's own.
       * Maybe leads him to explain the connection with Ancient Fruit, and allow for hybriding with them?
+  * Maybe Hybrid Crops Storyline can be started as early as Winter Year 1?
+    * Wizard was perplexed at the fruit that sprouted through the winter snow.
+    * Quest instead rewards the player with hybrid seeds of a Winter ___ crop.
+      * Same as the original crop, but with Winter added as one of its habitable seasons.
+      * Maybe this Winter hybrid trait can be passed on using Winter forage items? Or hybriding with Winter ___ hybrid crops? (A-BC Hybrid)
 
 ### Hybrid Crops Storyline
 Quest involving Wizard and Demetrius that provides a backstory leading up to unlocking the main mod content — the ability to create hybrid crops.
