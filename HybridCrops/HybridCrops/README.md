@@ -7,6 +7,7 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
   * Reworked hybrid success chance formula. Seeds no longer have an impact on success rate, as they just allow you to get more seeds as output. Crops are now the main "bonus" item, and they provide a much higher bonus when they are a pair. This discourages cheap crops being used as a low-cost high-reward bonus when hybriding with expensive crops.
   * Each crop pair now provides an extra output seed upon hybrid success. Input crops are still destroyed after every hybrid attempt.
   * Hybrid process can be attempted without using crops (only seeds), but the process takes an extra day and has a -50% success chance.
+  * Added some more random ideas for extra content.
 
 8/27/2021
   * Initial code created.
@@ -47,6 +48,7 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
   * 8) From this point on, foundation has been laid, so all work should be based off previously-completed code.
   * 9) Make reddit post asking for feedback, ideas, and opinions about what would be good to include and what would not. Better to get this feedback now rather than after everything has been made solely to my liking. 
   * 10) With community feedback in mind, make any desired changes, and start creating more hybrids!
+  * 11) Attempt implementation of extra content and/or random ideas listed here.
 
 
 ### Hybrid Seed Maker
@@ -112,6 +114,19 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
 #### Random ideas:
   * Ancient fruit is many genetic variations behind all crops, so hybriding with it is very difficult, but IS possible.
     * Maybe a 2nd storyline quest that unlocks this?
+  * Purchase max. input amount upgrade from Demetrius
+    * Maybe multiple tiers?
+  * Goal to discover 25 (?) hybrids for Demetrius, tracked with the Hybrid Encyclopedia.
+    * Each new hybrid found during this time will prompt the player to talk with Demetrius or interact with the Hybrid Encyclopedia.
+    * Doing so will display a scientific study, originally completely blank, that gets a new detail added with each new hybrid.
+    * Alongside the study being filled out, each new hybrid will prompt Demetrius to reward the player with money to continue "funding your research".
+    * When the study is complete, player is told to talk with Demetrius.
+      * He has successfully published your combined research! Scientists had been in conversation with him for a while now, so they were just waiting for the completed results and findings.
+      * He was rewarded handsomely for the research paper, as it will be further researched around the world to benefit global agriculture practices.
+      * He then rewards the player with a final large sum of money as compensation for the help.
+      * The project is officially out of his hands now, so any further hybriding is your choice!
+      * Maybe he offers a max. input amount upgrade at this point?
+    * Overall, this side goal is just a way to provide satisfaction to completionist players, as well as provide more incentive towards experimentation and discovering new hybrids.
 
 ### Hybrid Crops Storyline
 Quest involving Wizard and Demetrius that provides a backstory leading up to unlocking the main mod content — the ability to create hybrid crops.
