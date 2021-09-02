@@ -28,81 +28,75 @@ namespace FasterPathSpeed
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
             // Get Generic Mod Config Menu API (if it's installed)
-            var api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (api is null)
-                return;
-
-            // Register mod configuration
-            api.RegisterModConfig(
-                mod: ModManifest,
-                revertToDefault: () => Config = new ModConfig(),
-                saveToFile: () => Helper.WriteConfig(Config)
-            );
-
-            // Let players configure your mod in-game (instead of just from the title screen)
-            api.SetDefaultIngameOptinValue(this.ModManifest, true);
-
-            // Add some config options
-            api.RegisterSimpleOption(
-                mod: this.ModManifest,
-                optionName: "Example checkbox",
-                optionDesc: "An optional description shown as a tooltip to the player.",
-                optionGet: () => this.Config.ExampleCheckbox,
-                optionSet: value => this.Config.ExampleCheckbox = value
-            );
-            api.RegisterSimpleOption(
-                mod: this.ModManifest,
-                optionName: "Example string",
-                optionDesc: "...",
-                optionGet: () => this.Config.ExampleString,
-                optionSet: value => this.Config.ExampleString = value
-            );
-            api.RegisterChoiceOption(
-                mod: this.ModManifest,
-                optionName: "Example dropdown",
-                optionDesc: "...",
-                optionGet: () => this.Config.ExampleDropdown,
-                optionSet: value => this.Config.ExampleDropdown = value,
-                choices: new string[] { "choice A", "choice B", "choice C" }
-            );
-        }
-
-            public static float GetPathSpeedBoostByFlooringType(StardewValley.TerrainFeatures.Flooring flooring)
-        {
-            if (Config.IsUseCustomPathSpeedBuffValues)
+            IGenericModConfigMenuApi api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (api != null)
             {
-                switch (flooring.whichFloor.Value)
+                // Register mod configuration
+                api.RegisterModConfig(
+                    mod: ModManifest,
+                    revertToDefault: () => Config = new ModConfig(),
+                    saveToFile: () => Helper.WriteConfig(Config)
+                );
+
+                // Let players configure your mod in-game (instead of just from the title screen)
+                api.SetDefaultIngameOptinValue(ModManifest, true);
+
+                // Add some config options
+                api.RegisterClampedOption(
+                    mod: ModManifest,
+                    optionName: "Default Path Speed Buff",
+                    optionDesc: "Extra movement speed obtained from walking on a path",
+                    optionGet: () => Config.DefaultPathSpeedBuff,
+                    optionSet: value => Config.DefaultPathSpeedBuff = value,
+                    min: 0,
+                    max: 5,
+                    interval: 0.1f
+                );
+                api.RegisterSimpleOption(
+                    mod: ModManifest,
+                    optionName: "Only On Farm?",
+                    optionDesc: "Whether the path speed buff is only obtained while on your farm",
+                    optionGet: () => Config.IsPathSpeedBuffOnlyOnTheFarm,
+                    optionSet: value => Config.IsPathSpeedBuffOnlyOnTheFarm = value
+                );
+                api.RegisterSimpleOption(
+                    mod: ModManifest,
+                    optionName: "Affect Horse Speed?",
+                    optionDesc: "Whether the path speed buff is also obtained while riding a horse",
+                    optionGet: () => Config.IsPathAffectHorseSpeed,
+                    optionSet: value => Config.IsPathAffectHorseSpeed = value
+                );
+                api.RegisterClampedOption(
+                    mod: ModManifest,
+                    optionName: "Horse Speed Multiplier",
+                    optionDesc: "Multiplier for path speed buff while riding a horse",
+                    optionGet: () => Config.DefaultPathSpeedBuff,
+                    optionSet: value => Config.DefaultPathSpeedBuff = value,
+                    min: 0,
+                    max: 2,
+                    interval: 0.05f
+                );
+                api.RegisterSimpleOption(
+                    mod: ModManifest,
+                    optionName: "Use Custom Path Values?",
+                    optionDesc: "Whether the default path speed buff is used, or each path has its own buff amount",
+                    optionGet: () => Config.IsUseCustomPathSpeedBuffValues,
+                    optionSet: value => Config.IsUseCustomPathSpeedBuffValues = value
+                );
+                foreach (var prop in Config.CustomPathSpeedBuffValues.GetType().GetProperties())
                 {
-                    case StardewValley.TerrainFeatures.Flooring.wood:
-                        return Config.CustomPathSpeedBuffValues.Wood;
-                    case StardewValley.TerrainFeatures.Flooring.stone:
-                        return Config.CustomPathSpeedBuffValues.Stone;
-                    case StardewValley.TerrainFeatures.Flooring.ghost:
-                        return Config.CustomPathSpeedBuffValues.Ghost;
-                    case StardewValley.TerrainFeatures.Flooring.iceTile:
-                        return Config.CustomPathSpeedBuffValues.IceTile;
-                    case StardewValley.TerrainFeatures.Flooring.straw:
-                        return Config.CustomPathSpeedBuffValues.Straw;
-                    case StardewValley.TerrainFeatures.Flooring.gravel:
-                        return Config.CustomPathSpeedBuffValues.Gravel;
-                    case StardewValley.TerrainFeatures.Flooring.boardwalk:
-                        return Config.CustomPathSpeedBuffValues.Boardwalk;
-                    case StardewValley.TerrainFeatures.Flooring.colored_cobblestone:
-                        return Config.CustomPathSpeedBuffValues.ColoredCobblestone;
-                    case StardewValley.TerrainFeatures.Flooring.cobblestone:
-                        return Config.CustomPathSpeedBuffValues.Cobblestone;
-                    case StardewValley.TerrainFeatures.Flooring.steppingStone:
-                        return Config.CustomPathSpeedBuffValues.SteppingStone;
-                    case StardewValley.TerrainFeatures.Flooring.brick:
-                        return Config.CustomPathSpeedBuffValues.Brick;
-                    case StardewValley.TerrainFeatures.Flooring.plankFlooring:
-                        return Config.CustomPathSpeedBuffValues.PlankFlooring;
-                    case StardewValley.TerrainFeatures.Flooring.townFlooring:
-                        return Config.CustomPathSpeedBuffValues.TownFlooring;
+                    api.RegisterClampedOption(
+                        mod: ModManifest,
+                        optionName: $" - Custom: {prop.Name}",
+                        optionDesc: $"Extra movement speed obtained from walking on a {prop.Name} path",
+                        optionGet: () => (float)prop.GetValue(Config.CustomPathSpeedBuffValues),
+                        optionSet: value => prop.SetValue(Config.CustomPathSpeedBuffValues, value),
+                        min: 0,
+                        max: 5,
+                        interval: 0.1f
+                    );
                 }
             }
-
-            return Config.DefaultPathSpeedBuff;
         }
     }
 }
