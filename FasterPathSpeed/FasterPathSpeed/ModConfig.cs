@@ -8,7 +8,7 @@
 
         public bool IsPathAffectHorseSpeed { get; set; } = true;
 
-        public float HorsePathSpeedBuffModifier { get; set; } = 0.75f;
+        public float HorsePathSpeedBuffModifier { get; set; } = 1f;
 
         public bool IsUseCustomPathSpeedBuffValues { get; set; } = false;
 
