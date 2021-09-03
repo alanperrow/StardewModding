@@ -31,17 +31,14 @@ namespace FasterPathSpeed
             IGenericModConfigMenuApi api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (api != null)
             {
-                // Register mod configuration
                 api.RegisterModConfig(
                     mod: ModManifest,
                     revertToDefault: () => Config = new ModConfig(),
                     saveToFile: () => Helper.WriteConfig(Config)
                 );
 
-                // Let players configure your mod in-game (instead of just from the title screen)
                 api.SetDefaultIngameOptinValue(ModManifest, true);
 
-                // Add some config options
                 api.RegisterClampedOption(
                     mod: ModManifest,
                     optionName: "Default Path Speed Buff",
@@ -70,8 +67,8 @@ namespace FasterPathSpeed
                     mod: ModManifest,
                     optionName: "Horse Speed Multiplier",
                     optionDesc: "Multiplier for path speed buff while riding a horse",
-                    optionGet: () => Config.DefaultPathSpeedBuff,
-                    optionSet: value => Config.DefaultPathSpeedBuff = value,
+                    optionGet: () => Config.HorsePathSpeedBuffModifier,
+                    optionSet: value => Config.HorsePathSpeedBuffModifier = value,
                     min: 0,
                     max: 2,
                     interval: 0.05f
