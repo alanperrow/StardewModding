@@ -67,6 +67,7 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
       * (A = 1ea x $200 / NO_REHARVEST, B = 2.5ea x $10 / 3 days) => 3 days
   * Inherits traits from parent crops, such as: season, yield multiple at harvest, regrow, grows on trellis, etc.
   * Complete the Hybrid Encyclopedia - a new collection for shipping every implemented hybrid crop.
+  * A hybrid crop can be used in place of any of its parent crops in cooking recipes.
 
 #### Hybriding details:
   * Input a maximum of 5 seeds and 5 crops (minimum 1 seed and 0 crops) for both types, per hybrid attempt.
