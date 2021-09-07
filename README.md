@@ -14,6 +14,9 @@ Examples:
   * Chest quick-stack (and the other buttons)
   * ...
 
+Implementation:
+  * Maybe just add leftNeighbor to left "invisible" position that maps to the right-most button of the interface? And vice versa.
+
 ### Deposit to Nearby Chests
 Adds a button on side of player backpack UI to quickly deposit items to chests within a nearby range.
 
@@ -24,6 +27,15 @@ Config:
   * Nearby range
   * Render nearby chests in button tooltip
 
+### Chest Upgrades
+Adds four craftable "upgrade" items that can be used on chests to expand their storage capacity (think Iron Chests mod).
+
+Each successive upgrade requires the previous: Original -> Copper (+1 row) -> Iron (+2) -> Gold (+3) -> Iridium (+4).
+
+Will require Expanded Storage mod.
+
+<!--
+===== SCRAPPED =====
 ### Outgoing Mail
 Adds the ability to send your own mail to other people in town. You can either write a message (counts as talking with recipient), attach items as gifts (counts as gifting the item to the recipient), or both. 
 
@@ -38,3 +50,5 @@ Why send mail? Simply put, for convenience:
 For implementation, not sure which one of these would work better:
   * Use a stamp, which is a new craftable/purchasable item, on your mailbox, or
   * Require an upgrade for your mailbox from Robin. This upgrade would be instant upon purchase.
+====================
+-->
