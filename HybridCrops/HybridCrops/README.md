@@ -34,18 +34,19 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
     * Simplify future development process
     * Allow collaboration
     * Support other mods/allow support by other mods
-    * Potentially add more traits/inheritance perks than originally thought of
-      * One thing that comes to mind is a "Winter" perk/prefix by hybriding with winter forage
-      * Extra perks; think Tinkers' Construct
-        * Glowing: faintly glows in the dark while growing; crop brightly glows when ready to harvest
-        * Palatable/Cultured/Elite: produces silver/gold/iridium quality artisan good instead of normal quality
-        * Premier/Superior/Perfect: harvested crop is at minimum silver/gold/iridium quality
-        * Tasty: harvested crop provides extra health/energy
-        * Unquenched: grows faster on rainy days
-        * Sheer: can be harvested with scythe
-        * June Drop: "harvests itself" when ready, leaving crop(s) on the floor (ensure this still counts for harvest quests)
-        * Friendly: harvested crop has higher value when sold in-person rather than shipping, and provides extra friendship bonus when gifting
-      * Other special, unique behavior...
+  * Pre-3.1) Consider creating framework/api for crop traits
+    * Would help when adding more traits/inheritance perks than originally thought of
+    * One thing that comes to mind is a "Winter" perk/prefix by hybriding with winter forage
+    * Extra perks; think Tinkers' Construct
+      * Glowing: faintly glows in the dark while growing; crop brightly glows when ready to harvest
+      * Palatable/Cultured/Elite: produces silver/gold/iridium quality artisan good instead of normal quality
+      * Premier/Superior/Perfect: harvested crop is at minimum silver/gold/iridium quality
+      * Tasty: harvested crop provides extra health/energy
+      * Unquenched: grows faster on rainy days
+      * Sheer: can be harvested with scythe
+      * June Drop: "harvests itself" when ready, leaving crop(s) on the floor (ensure this still counts for harvest quests)
+      * Friendly: harvested crop has higher value when sold in-person rather than shipping, and provides extra friendship bonus when gifting
+    * Other special, unique behavior...
   * 3) Create the first hybrid crop
     * Crop details like price, growth, etc.
     * Temporary sprites for now (unless bored and want to pixel art lol)
