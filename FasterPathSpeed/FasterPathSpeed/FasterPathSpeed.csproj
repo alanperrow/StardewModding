@@ -54,6 +54,8 @@
     <Compile Include="FarmerPatches.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModEntry.cs" />
+    <Compile Include="ObjectPatches.cs" />
+    <Compile Include="PathIds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

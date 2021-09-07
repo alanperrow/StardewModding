@@ -14,19 +14,25 @@ namespace FasterPathSpeed
             Config = helper.ReadConfig<ModConfig>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-
-            FarmerPatches.Initialize(Monitor, Config);
-
-            var harmony = new Harmony(ModManifest.UniqueID);
-
-            harmony.Patch(
-                original: AccessTools.Method(typeof(StardewValley.Farmer), nameof(StardewValley.Farmer.getMovementSpeed)),
-                postfix: new HarmonyMethod(typeof(FarmerPatches), nameof(FarmerPatches.GetMovementSpeed_Postfix))
-            );
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            // Harmony patches
+            var harmony = new Harmony(ModManifest.UniqueID);
+
+            FarmerPatches.Initialize(Monitor, Config);
+            harmony.Patch(
+                original: AccessTools.Method(typeof(StardewValley.Farmer), nameof(StardewValley.Farmer.getMovementSpeed)),
+                postfix: new HarmonyMethod(typeof(FarmerPatches), nameof(FarmerPatches.GetMovementSpeed_Postfix))
+            );
+            
+            ObjectPatches.Initialize(Monitor, Config);
+            harmony.Patch(
+                original: AccessTools.Method(typeof(StardewValley.Object), nameof(StardewValley.Object.placementAction)),
+                postfix: new HarmonyMethod(typeof(ObjectPatches), nameof(ObjectPatches.PlacementAction_Postfix))
+            );
+
             // Get Generic Mod Config Menu API (if it's installed)
             IGenericModConfigMenuApi api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (api != null)
@@ -52,14 +58,14 @@ namespace FasterPathSpeed
                 api.RegisterSimpleOption(
                     mod: ModManifest,
                     optionName: "Only On Farm?",
-                    optionDesc: "Whether the path speed buff is only obtained while on your farm",
+                    optionDesc: "If enabled, the path speed buff is only obtained while on your farm",
                     optionGet: () => Config.IsPathSpeedBuffOnlyOnTheFarm,
                     optionSet: value => Config.IsPathSpeedBuffOnlyOnTheFarm = value
                 );
                 api.RegisterSimpleOption(
                     mod: ModManifest,
                     optionName: "Affect Horse Speed?",
-                    optionDesc: "Whether the path speed buff is also obtained while riding a horse",
+                    optionDesc: "If enabled, the path speed buff is also obtained while riding a horse",
                     optionGet: () => Config.IsPathAffectHorseSpeed,
                     optionSet: value => Config.IsPathAffectHorseSpeed = value
                 );
@@ -75,8 +81,15 @@ namespace FasterPathSpeed
                 );
                 api.RegisterSimpleOption(
                     mod: ModManifest,
+                    optionName: "Enable Path Replace?",
+                    optionDesc: "If enabled, placing a path on an existing one replaces it",
+                    optionGet: () => Config.IsEnablePathReplace,
+                    optionSet: value => Config.IsEnablePathReplace = value
+                );
+                api.RegisterSimpleOption(
+                    mod: ModManifest,
                     optionName: "Use Custom Path Values?",
-                    optionDesc: "Whether the default path speed buff is used, or each path has its own buff amount",
+                    optionDesc: "If enabled, each path has its own buff amount (listed below). Otherwise, the default path speed buff is used for all paths",
                     optionGet: () => Config.IsUseCustomPathSpeedBuffValues,
                     optionSet: value => Config.IsUseCustomPathSpeedBuffValues = value
                 );

@@ -10,6 +10,8 @@
 
         public float HorsePathSpeedBuffModifier { get; set; } = 1f;
 
+        public bool IsEnablePathReplace { get; set; } = true;
+
         public bool IsUseCustomPathSpeedBuffValues { get; set; } = false;
 
         public CustomPathSpeedBuffValues CustomPathSpeedBuffValues { get; set; }
