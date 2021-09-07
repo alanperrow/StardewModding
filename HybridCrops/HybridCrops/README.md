@@ -47,6 +47,7 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
       * June Drop: "harvests itself" when ready, leaving crop(s) on the floor (ensure this still counts for harvest quests)
       * Friendly: harvested crop has higher value when sold in-person rather than shipping, and provides extra friendship bonus when gifting
     * Other special, unique behavior...
+    * Discovered traits should be shown in the Hybrid Encyclopedia. Undiscovered should be grayed out.
   * 3) Create the first hybrid crop
     * Crop details like price, growth, etc.
     * Temporary sprites for now (unless bored and want to pixel art lol)
