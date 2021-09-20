@@ -2,10 +2,12 @@
 {
 	internal class ModConfig
 	{
-		public int Range { get; set; } = 5;
+		public int QuickStackRange { get; set; } = 5;
 
-		public bool IsQuickStackIntoBuildingsWithInventories { get; set; } = false;
+		public bool IsQuickStackIntoBuildingsWithInventories { get; set; } = true;
 
 		public bool IsQuickStackOverflowItems { get; set; } = true;
+
+		public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;
 	}
 }

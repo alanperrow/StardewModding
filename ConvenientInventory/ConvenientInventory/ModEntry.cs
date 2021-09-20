@@ -53,14 +53,21 @@ namespace ConvenientInventory
 
 				api.SetDefaultIngameOptinValue(ModManifest, true);
 
+				api.RegisterLabel(
+					mod: ModManifest,
+					labelName: "Quick Stack To Nearby Chests",
+					labelDesc: null
+				);
+
 				api.RegisterClampedOption(
 					mod: ModManifest,
 					optionName: "Range",
 					optionDesc: "How many tiles away from the player to search for nearby chests.",
-					optionGet: () => Config.Range,
-					optionSet: value => Config.Range = value,
+					optionGet: () => Config.QuickStackRange,
+					optionSet: value => Config.QuickStackRange = value,
 					min: 0,
-					max: 10
+					max: 10,
+					interval: 1
 				);
 				api.RegisterSimpleOption(
 					mod: ModManifest,
@@ -75,6 +82,13 @@ namespace ConvenientInventory
 					optionDesc: "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
 					optionGet: () => Config.IsQuickStackOverflowItems,
 					optionSet: value => Config.IsQuickStackOverflowItems = value
+				);
+				api.RegisterSimpleOption(
+					mod: ModManifest,
+					optionName: "Show nearby chests in tooltip?",
+					optionDesc: "If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.",
+					optionGet: () => Config.IsQuickStackTooltipDrawNearbyChests,
+					optionSet: value => Config.IsQuickStackTooltipDrawNearbyChests = value
 				);
 			}
 
