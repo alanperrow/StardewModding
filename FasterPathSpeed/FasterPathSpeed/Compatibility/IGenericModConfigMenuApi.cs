@@ -1,8 +1,5 @@
 ﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
 
 namespace GenericModConfigMenu
 {
@@ -11,6 +8,8 @@ namespace GenericModConfigMenu
         void RegisterModConfig(IManifest mod, Action revertToDefault, Action saveToFile);
 
         void SetDefaultIngameOptinValue(IManifest mod, bool optedIn);
+
+        void RegisterLabel(IManifest mod, string labelName, string labelDesc);
 
         void RegisterSimpleOption(IManifest mod, string optionName, string optionDesc, Func<bool> optionGet, Action<bool> optionSet);
 

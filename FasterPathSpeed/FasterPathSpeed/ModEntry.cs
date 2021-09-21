@@ -7,10 +7,12 @@ namespace FasterPathSpeed
 {
     public class ModEntry : Mod
     {
+        public static ModEntry Context;
         public ModConfig Config;
 
         public override void Entry(IModHelper helper)
         {
+            Context = this;
             Config = helper.ReadConfig<ModConfig>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -21,13 +23,10 @@ namespace FasterPathSpeed
             // Harmony patches
             var harmony = new Harmony(ModManifest.UniqueID);
 
-            FarmerPatches.Initialize(Monitor, Config);
             harmony.Patch(
                 original: AccessTools.Method(typeof(StardewValley.Farmer), nameof(StardewValley.Farmer.getMovementSpeed)),
                 postfix: new HarmonyMethod(typeof(FarmerPatches), nameof(FarmerPatches.GetMovementSpeed_Postfix))
             );
-            
-            ObjectPatches.Initialize(Monitor, Config);
             harmony.Patch(
                 original: AccessTools.Method(typeof(StardewValley.Object), nameof(StardewValley.Object.placementAction)),
                 postfix: new HarmonyMethod(typeof(ObjectPatches), nameof(ObjectPatches.PlacementAction_Postfix))
@@ -86,6 +85,12 @@ namespace FasterPathSpeed
                     optionGet: () => Config.IsEnablePathReplace,
                     optionSet: value => Config.IsEnablePathReplace = value
                 );
+
+                api.RegisterLabel(
+                    mod: ModManifest,
+                    labelName: "Custom Path Values",
+                    labelDesc: null
+                );
                 api.RegisterSimpleOption(
                     mod: ModManifest,
                     optionName: "Use Custom Path Values?",
@@ -97,7 +102,7 @@ namespace FasterPathSpeed
                 {
                     api.RegisterClampedOption(
                         mod: ModManifest,
-                        optionName: $" - Custom: {prop.Name}",
+                        optionName: $" • {prop.Name}",
                         optionDesc: $"Extra movement speed obtained from walking on a {prop.Name} path",
                         optionGet: () => (float)prop.GetValue(Config.CustomPathSpeedBuffValues),
                         optionSet: value => prop.SetValue(Config.CustomPathSpeedBuffValues, value),
