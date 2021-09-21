@@ -102,7 +102,7 @@ namespace FasterPathSpeed
                 {
                     api.RegisterClampedOption(
                         mod: ModManifest,
-                        optionName: $" • {prop.Name}",
+                        optionName: $" - {prop.Name}",
                         optionDesc: $"Extra movement speed obtained from walking on a {prop.Name} path",
                         optionGet: () => (float)prop.GetValue(Config.CustomPathSpeedBuffValues),
                         optionSet: value => prop.SetValue(Config.CustomPathSpeedBuffValues, value),
