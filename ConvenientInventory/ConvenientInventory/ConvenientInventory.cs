@@ -106,9 +106,8 @@ namespace ConvenientInventory
 			{
 				if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
 				{
-					// TODO: Change this to draw extra tooltip space underneath the text, so it can fit the nearby chests that are about to be drawn
-					IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText+"\n\n\n\n", string.Empty, null, false, -1, 0, /*166*/-1, -1, null, -1);
-
+					var text = QuickStackButton.hoverText + new string('\n', 2 * ((NearbyTypedChests.Count + 7) / 8));  // Draw two newlines for each row of chests
+					IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, /*166*/-1, -1, null, -1);
 					DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
 				}
                 else
@@ -159,7 +158,8 @@ namespace ConvenientInventory
 					continue;
                 }
 
-				int offsetY =  + 384 + 64 * (i % 2 == 0 ? (i + 1) / 2 : -(i + 1) / 2);
+				int offsetX = toolTipPosition.X + 20 + 46 * (i % 8);
+				int offsetY = toolTipPosition.Y + 40 + 52 * (i / 8);
 
 				switch (chestType)
                 {
@@ -170,8 +170,8 @@ namespace ConvenientInventory
 
 						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
 							new Vector2(
-								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
-								Page.yPositionOnScreen + offsetY
+								offsetX,
+								offsetY
 							),
 							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130 && !chest.playerChoiceColor.Value.Equals(Color.Black)) ? 168 : chest.ParentSheetIndex, 16, 32),
 							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
@@ -180,8 +180,8 @@ namespace ConvenientInventory
 
 						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
 							new Vector2(
-								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
-								Page.yPositionOnScreen + offsetY + 42
+								offsetX,
+								offsetY + 42
 							),
 							new Rectangle(0, ((chest.ParentSheetIndex == 130) ? 168 : chest.ParentSheetIndex) / 8 * 32 + 53, 16, 11),
 							Color.White,
@@ -190,8 +190,8 @@ namespace ConvenientInventory
 
 						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
 							new Vector2(
-								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
-								Page.yPositionOnScreen + offsetY
+								offsetX,
+								offsetY
 							),
 							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130) ? chest.startingLidFrame.Value + 46 : chest.startingLidFrame.Value + 8, 16, 32),
 							Color.White,
