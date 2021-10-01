@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Buildings;
@@ -13,6 +14,33 @@ namespace ConvenientInventory
 {
 	internal static class QuickStackLogic
 	{
+
+		private class ChestWithDistance
+		{
+			public Chest Chest { get; private set; }
+
+			public double Distance { get; private set; }
+
+			public ChestWithDistance(Chest chest, double distance)
+			{
+				Chest = chest;
+				Distance = distance;
+			}
+		}
+
+		private class TypedChestWithDistance
+		{
+			public TypedChest TypedChest { get; private set; }
+
+			public double Distance { get; private set; }
+
+			public TypedChestWithDistance(TypedChest chest, double distance)
+			{
+				TypedChest = chest;
+				Distance = distance;
+			}
+		}
+
 		internal static bool StackToNearbyChests(int range, InventoryPage inventoryPage)
 		{
 			if (inventoryPage == null)
@@ -146,22 +174,25 @@ namespace ConvenientInventory
 			Point farmerTileLocation = who.getTileLocationPoint();
 			GameLocation gameLocation = who.currentLocation;
 
-			return sorted 
+			return sorted
 				? GetNearbyChestsWithDistance(farmerPosition, range, gameLocation).OrderBy(x => x.Distance).Select(x => x.Chest).ToList()
 				: GetNearbyChests(farmerTileLocation, range, gameLocation);
 		}
 
-		private class ChestWithDistance
+		internal static List<TypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
 		{
-			public Chest Chest { get; private set; }
-
-			public double Distance { get; private set; }
-
-			public ChestWithDistance(Chest chest, double distance)
+			if (who is null)
 			{
-				Chest = chest;
-				Distance = distance;
+				return new List<TypedChest>();
 			}
+
+			Vector2 farmerPosition = who.getStandingPosition();
+			Point farmerTileLocation = who.getTileLocationPoint();
+			GameLocation gameLocation = who.currentLocation;
+
+			return sorted 
+				? GetNearbyTypedChestsWithDistance(farmerPosition, range, gameLocation).OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList()
+				: GetNearbyTypedChests(farmerTileLocation, range, gameLocation);
 		}
 
 		// From origin, return all nearby chests, including the point-distance from their tile-center to origin, within a given square range.
@@ -259,6 +290,111 @@ namespace ConvenientInventory
 			return dChests;
 		}
 
+		private static List<TypedChestWithDistance> GetNearbyTypedChestsWithDistance(Vector2 origin, int range, GameLocation gameLocation)
+		{
+			var tdChests = new List<TypedChestWithDistance>((2 * range + 1) * (2 * range + 1));
+			Vector2 originTileCenterPosition = GetTileCenterPosition(GetTileLocation(origin));
+			Vector2 tileLocation = Vector2.Zero;
+			int tx, ty, dx, dy;
+
+			// Chests (includes mini fridge, stone chest, mini shipping bin, junimo chest, ...)
+			for (int x = -range; x <= range; x++)
+			{
+				for (int y = -range; y <= range; y++)
+				{
+					tx = (int)originTileCenterPosition.X + (x * Game1.tileSize);
+					ty = (int)originTileCenterPosition.Y + (y * Game1.tileSize);
+
+					tileLocation.X = tx / Game1.tileSize;
+					tileLocation.Y = ty / Game1.tileSize;
+
+					if (gameLocation.objects.TryGetValue(tileLocation, out StardewValley.Object obj) && obj is Chest chest)
+					{
+						// Make sure chest is not in-use by another player (easy fix to avoid item deletion)
+						if (chest.GetMutex().IsLocked())
+						{
+							continue;
+						}
+
+						dx = tx - (int)origin.X;
+						dy = ty - (int)origin.Y;
+
+						// TODO: Maybe switch on chest.ParentSheetIndex? not sure...
+
+						var chestType = ChestType.Normal;/*(chest.SpecialChestType == Chest.SpecialChestTypes.None) ? ChestType.Default | ChestType.Stone*/
+						var typedChest = new TypedChest(chest, chestType);
+
+						tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+					}
+				}
+			}
+
+			// Kitchen fridge
+			if (gameLocation is FarmHouse farmHouse && farmHouse.upgradeLevel > 0)  // Kitchen only exists when upgradeLevel > 0
+			{
+				Vector2 fridgeTileCenterPosition = GetTileCenterPosition(farmHouse.fridgePosition);
+
+				if (IsPositionWithinRange(origin, fridgeTileCenterPosition, range))
+				{
+					if (farmHouse.fridge.Value != null && !farmHouse.fridge.Value.GetMutex().IsLocked())
+					{
+						dx = (int)fridgeTileCenterPosition.X - (int)origin.X;
+						dy = (int)fridgeTileCenterPosition.Y - (int)origin.Y;
+
+						var typedChest = new TypedChest(farmHouse.fridge.Value, ChestType.Fridge);
+
+						tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+					}
+				}
+			}
+
+			// Buildings
+			if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
+			{
+				if (gameLocation is BuildableGameLocation buildableGameLocation)
+				{
+					foreach (Building building in buildableGameLocation.buildings)
+					{
+						Vector2 buildingTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
+
+						if (IsPositionWithinRange(origin, buildingTileCenterPosition, range))
+						{
+							if (building is JunimoHut junimoHut)
+							{
+								if (junimoHut.output.Value.GetMutex().IsLocked())
+								{
+									continue;
+								}
+
+								dx = (int)buildingTileCenterPosition.X - (int)origin.X;
+								dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
+
+								var typedChest = new TypedChest(junimoHut.output.Value, ChestType.JunimoHut);
+
+								tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+							}
+							else if (building is Mill mill)
+							{
+								if (mill.input.Value.GetMutex().IsLocked())
+								{
+									continue;
+								}
+
+								dx = (int)buildingTileCenterPosition.X - (int)origin.X;
+								dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
+
+								var typedChest = new TypedChest(mill.input.Value, ChestType.Mill);
+
+								tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+							}
+						}
+					}
+				}
+			}
+
+			return tdChests;
+		}
+
 		private static List<Chest> GetNearbyChests(Point originTile, int range, GameLocation gameLocation)
 		{
 			var chests = new List<Chest>((2 * range + 1) * (2 * range + 1));
@@ -330,6 +466,81 @@ namespace ConvenientInventory
 			}
 
 			return chests;
+		}
+
+		private static List<TypedChest> GetNearbyTypedChests(Point originTile, int range, GameLocation gameLocation)
+		{
+			var tChests = new List<TypedChest>((2 * range + 1) * (2 * range + 1));
+
+			// Chests
+			for (int dx = -range; dx <= range; dx++)
+			{
+				for (int dy = -range; dy <= range; dy++)
+				{
+					Vector2 tileLocation = new Vector2(originTile.X + dx, originTile.Y + dy);
+
+					if (gameLocation.objects.TryGetValue(tileLocation, out StardewValley.Object obj) && obj is Chest chest)
+					{
+						if (chest.GetMutex().IsLocked())
+						{
+							continue;
+						}
+
+						var chestType = ChestType.Normal;/*(chest.SpecialChestType == Chest.SpecialChestTypes.None) ? ChestType.Default | ChestType.Stone | ChestType.MiniFridge | ChestType.Special*/
+
+						tChests.Add(new TypedChest(chest, chestType));
+					}
+				}
+			}
+
+			// Kitchen fridge
+			if (gameLocation is FarmHouse farmHouse && farmHouse.upgradeLevel >= 1) //Lvl 1,2,3 is where you have fridge upgrade
+			{
+				Point kitchenStandingSpot = farmHouse.getKitchenStandingSpot();
+				Point fridgeTileLocation = new Point(kitchenStandingSpot.X + 2, kitchenStandingSpot.Y - 1); //Fridge spot relative to kitchen spot
+
+				if (IsTileWithinRange(originTile, fridgeTileLocation, range))
+				{
+					if (farmHouse.fridge.Value != null && !farmHouse.fridge.Value.GetMutex().IsLocked())
+					{
+						tChests.Add(new TypedChest(farmHouse.fridge.Value, ChestType.Fridge));
+					}
+				}
+			}
+
+			// Buildings
+			if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
+			{
+				if (gameLocation is BuildableGameLocation buildableGameLocation)
+				{
+					foreach (Building building in buildableGameLocation.buildings)
+					{
+						if (IsTileWithinRange(originTile, building.tileX.Value, building.tileY.Value, range))
+						{
+							if (building is JunimoHut junimoHut)
+							{
+								if (junimoHut.output.Value.GetMutex().IsLocked())
+								{
+									continue;
+								}
+
+								tChests.Add(new TypedChest(junimoHut.output.Value, ChestType.JunimoHut));
+							}
+							else if (building is Mill mill)
+							{
+								if (mill.input.Value.GetMutex().IsLocked())
+								{
+									continue;
+								}
+
+								tChests.Add(new TypedChest(mill.input.Value, ChestType.Mill));
+							}
+						}
+					}
+				}
+			}
+
+			return tChests;
 		}
 
 		private static Point GetTileLocation(Vector2 position)

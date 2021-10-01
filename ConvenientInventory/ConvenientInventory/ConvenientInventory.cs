@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ConvenientInventory.TypedChests;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
-using StardewValley.Objects;
+using System;
 using System.Collections.Generic;
 using static StardewValley.Menus.ItemGrabMenu;
 
@@ -16,7 +17,7 @@ namespace ConvenientInventory
 	{
 		internal static Texture2D QuickStackButtonIcon { private get; set; }
 
-		internal static IReadOnlyList<Chest> NearbyChests { get; set; }
+		internal static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
 		private static ClickableTextureComponent QuickStackButton { get; set; }
 
@@ -95,7 +96,7 @@ namespace ConvenientInventory
 			// On second thought, this doesn't handle edge cases very well (co-op chest usage, closing & reopening menu, etc)
 			if (IsDrawToolTip/* && !PrevIsDrawToolTip*/)
 			{
-				NearbyChests = QuickStackLogic.GetChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
+				NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
 
 				// DEBUG
 				//ModEntry.Context.Monitor.Log($"NearbyChests populated with {NearbyChests.Count} chests.", StardewModdingAPI.LogLevel.Debug);
@@ -103,70 +104,153 @@ namespace ConvenientInventory
 
 			if (IsDrawToolTip)
 			{
-				IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyChests.Count})", string.Empty, null, false, -1, 0, /*166*/-1, -1, null, -1);
-
-				/*
-				 * TODO: Draw preview of all chests/inventories in range. (Should also show chest colors, fridge, hut, etc...)
-				 *		 - May need to override Chest.draw() or make custom draw function. Currently cannot scale *and* display correctly colored sprite.
-				 *		 - layerDepth??? Can't seem to draw on top of tooltip :(
-				 *		     - Look into how "extraItemToShow" works in drawToolTip method, and see if that same logic can be used to draw on top of tooltip directly.
-				 *		 
-				 *		 
-				 * 9/19: Chests and stone chests are drawn perfectly - colored and show trim.
-				 * TODO:
-				 * - If chest is not wooden chest/stone chest, do NOT draw trim. (Do junimo chests draw trim?)
-				 * - Kitchen fridge and building chests display as normal chests. Fixing would require a modification to QuickStackLogic.GetChestsAroundFarmer
-				 * - OR new method QuickStackLogic.GetTypedChestsAroundFarmer which returns a List<TypedChest>, each object containing the Chest and its respective Type enum value
-				 *     - I.e., Default, Stone, Fridge, MiniFridge, Mill, JunimoHut, Special (x-ref chest.SpecialChestTypes when this is the case)
-				 *	   - Display chests under tooltip in a new "section", with horizontal divider between tooltip and new section.
-				 *	       - X chests per row, nearest chests shown first starting @ top-left of section.
-				 *		   - When row is full, start new row below.
-				 *		   - Each chest should be moderately spaced apart (drawing buildings might cause trouble... take more space? scale smaller? custom icons?)
-				 *		       - Maybe for-loop with separate "horizontal space" counter that += 1 with normal chests, but += 2 with buildings so they take up more space
-				 *		 
-				 */
 				if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
 				{
-					for (int i = 0; i < NearbyChests.Count; i++)
-					{
-						var chest = NearbyChests[i];
+					// TODO: Change this to draw extra tooltip space underneath the text, so it can fit the nearby chests that are about to be drawn
+					IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText+"\n\n\n\n", string.Empty, null, false, -1, 0, /*166*/-1, -1, null, -1);
 
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(
-								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
-								Page.yPositionOnScreen + 16 + 256 + ((i % 2 == 0 ? (i + 1) / 2 : -(i + 1) / 2) * 64)
-							),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130 && !chest.playerChoiceColor.Value.Equals(Color.Black)) ? 168 : chest.ParentSheetIndex, 16, 32),
-							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1E-05f
-						);
-
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(
-								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
-								Page.yPositionOnScreen + 16 + 256 + 42 + ((i % 2 == 0 ? (i + 1) / 2 : -(i + 1) / 2) * 64)
-							),
-							new Rectangle(0, ((chest.ParentSheetIndex == 130) ? 168 : chest.ParentSheetIndex) / 8 * 32 + 53, 16, 11),
-							Color.White,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 3E-05f
-						);
-
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(
-								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
-								Page.yPositionOnScreen + 16 + 256 + ((i % 2 == 0 ? (i + 1) / 2 : -(i + 1) / 2) * 64)
-							),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130) ? chest.startingLidFrame.Value + 46 : chest.startingLidFrame.Value + 8, 16, 32),
-							Color.White,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 4E-05f
-						);
-					}
+					DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
+				}
+                else
+                {
+					IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
 				}
 			}
 		}
 
-		// Used to update transferredItemSprite animation
-		public static void Update(GameTime time)
+		private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<TypedChest> typedChests)
+		{
+			/*
+			 * TODO: Draw preview of all chests/inventories in range. (Should also show chest colors, fridge, hut, etc...)
+			 *		 - May need to override Chest.draw() or make custom draw function. Currently cannot scale *and* display correctly colored sprite.
+			 *		 - layerDepth??? Can't seem to draw on top of tooltip :(
+			 *		     - Look into how "extraItemToShow" works in drawToolTip method, and see if that same logic can be used to draw on top of tooltip directly.
+			 *		 
+			 *		 
+			 * 9/19: Chests and stone chests are drawn perfectly - colored and show trim.
+			 * TODO:
+			 * - If chest is not wooden chest/stone chest, do NOT draw trim. (Do junimo chests draw trim?)
+			 * - Kitchen fridge and building chests display as normal chests. Fixing would require a modification to QuickStackLogic.GetChestsAroundFarmer
+			 * - OR new method QuickStackLogic.GetTypedChestsAroundFarmer which returns a List<TypedChest>, each object containing the Chest and its respective Type enum value
+			 *     - I.e., Default, Stone, Fridge, MiniFridge, Mill, JunimoHut, Special (x-ref chest.SpecialChestTypes when this is the case)
+			 *	   - Display chests under tooltip in a new "section", with horizontal divider between tooltip and new section.
+			 *	       - X chests per row, nearest chests shown first starting @ top-left of section.
+			 *		   - When row is full, start new row below.
+			 *		   - Each chest should be moderately spaced apart (drawing buildings might cause trouble... take more space? scale smaller? custom icons?)
+			 *		       - Maybe for-loop with separate "horizontal space" counter that += 1 with normal chests, but += 2 with buildings so they take up more space
+			 *		 
+			 *	9/30: Created TypedChest class, so we can now draw each chest type differently.
+			 *		  For each row of chests, add 2 newlines ('\n') to QuickStackButton.hoverText. This gives just enough space for chests to be drawn in that row.
+			 *		  Started working on drawing chests in correct position(s) in tooltip.
+			 *		  
+			 *	10/1: Finished (untested) GetToolTipDrawPosition method.
+			 */
+
+			// TODO: Find offset of this position for first chest to be drawn. After that, simple iteration, will be easy
+			Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
+
+			for (int i = 0, pos = 0; i < typedChests.Count; i++, pos++)
+			{
+				var chest = typedChests[i].Chest;
+				var chestType = typedChests[i].ChestType;
+
+				if (chest is null)
+                {
+					continue;
+                }
+
+				int offsetY =  + 384 + 64 * (i % 2 == 0 ? (i + 1) / 2 : -(i + 1) / 2);
+
+				switch (chestType)
+                {
+					case ChestType.Normal:
+					default:
+
+						// TODO: Split this logic into ChestType.Stone case. Currently handles both Normal and Stone.
+
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(
+								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
+								Page.yPositionOnScreen + offsetY
+							),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130 && !chest.playerChoiceColor.Value.Equals(Color.Black)) ? 168 : chest.ParentSheetIndex, 16, 32),
+							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
+							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
+						);
+
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(
+								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
+								Page.yPositionOnScreen + offsetY + 42
+							),
+							new Rectangle(0, ((chest.ParentSheetIndex == 130) ? 168 : chest.ParentSheetIndex) / 8 * 32 + 53, 16, 11),
+							Color.White,
+							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f
+						);
+
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(
+								Page.xPositionOnScreen + Page.width + (IClickableMenu.borderWidth / 2) - 64 + 192,
+								Page.yPositionOnScreen + offsetY
+							),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130) ? chest.startingLidFrame.Value + 46 : chest.startingLidFrame.Value + 8, 16, 32),
+							Color.White,
+							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f
+						);
+
+						break;
+					case ChestType.Stone:
+
+						break;
+					case ChestType.Fridge:
+
+						break;
+					case ChestType.MiniFridge:
+
+						break;
+					case ChestType.Mill:
+
+						break;
+					case ChestType.JunimoHut:
+
+						break;
+					case ChestType.Special:
+
+						break;
+				}
+			}
+		}
+
+		// Refactored from IClickableMenu drawHoverText()
+		// Finds the origin position of where a tooltip will be drawn.
+		private static Point GetToolTipDrawPosition(string text)
+        {
+			int width = (int)Game1.smallFont.MeasureString(text).X + 32;
+			int height = Math.Max(20 * 3, (int)Game1.smallFont.MeasureString(text).Y + 32 + 8);
+
+			int x = Game1.getOldMouseX() + 32;
+			int y = Game1.getOldMouseY() + 32;
+			
+			if (x + width > Utility.getSafeArea().Right)
+			{
+				x = Utility.getSafeArea().Right - width;
+				y += 16;
+			}
+			if (y + height > Utility.getSafeArea().Bottom)
+			{
+				x += 16;
+				if (x + width > Utility.getSafeArea().Right)
+				{
+					x = Utility.getSafeArea().Right - width;
+				}
+				y = Utility.getSafeArea().Bottom - height;
+			}
+
+			return new Point(x, y);
+		}
+
+        // Used to update transferredItemSprite animation
+        public static void Update(GameTime time)
 		{
 			for (int i = 0; i < transferredItemSprites.Count; i++)
 			{
