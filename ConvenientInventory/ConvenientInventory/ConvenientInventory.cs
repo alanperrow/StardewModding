@@ -25,8 +25,6 @@ namespace ConvenientInventory
 
 		private static bool IsDrawToolTip { get; set; } = false;
 
-		private static bool PrevIsDrawToolTip { get; set; } = false;
-
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
 
@@ -64,7 +62,6 @@ namespace ConvenientInventory
 		public static void PerformHoverAction(int x, int y)
 		{
 			QuickStackButton.tryHover(x, y);
-			PrevIsDrawToolTip = IsDrawToolTip;
 			IsDrawToolTip = QuickStackButton.containsPoint(x, y);
 		}
 
@@ -92,28 +89,22 @@ namespace ConvenientInventory
 		// Called after drawing everything else in InventoryPage. Use for drawing tooltip.
 		public static void PostDraw(SpriteBatch spriteBatch)
 		{
-			// Optimization: Only update nearby chests once upon initial hover over quick stack button
-			// On second thought, this doesn't handle edge cases very well (co-op chest usage, closing & reopening menu, etc)
-			if (IsDrawToolTip/* && !PrevIsDrawToolTip*/)
-			{
-				NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
+			if (!IsDrawToolTip)
+            {
+				return;
+            }
 
-				// DEBUG
-				//ModEntry.Context.Monitor.Log($"NearbyChests populated with {NearbyChests.Count} chests.", StardewModdingAPI.LogLevel.Debug);
+			NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
+
+			if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
+			{
+				var text = QuickStackButton.hoverText + new string('\n', 2 * ((NearbyTypedChests.Count + 7) / 8));  // Draw two newlines for each row of chests
+				IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, /*166*/-1, -1, null, -1);
+				DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
 			}
-
-			if (IsDrawToolTip)
-			{
-				if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
-				{
-					var text = QuickStackButton.hoverText + new string('\n', 2 * ((NearbyTypedChests.Count + 7) / 8));  // Draw two newlines for each row of chests
-					IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, /*166*/-1, -1, null, -1);
-					DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
-				}
-                else
-                {
-					IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
-				}
+            else
+            {
+				IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
 			}
 		}
 
@@ -142,7 +133,9 @@ namespace ConvenientInventory
 			 *		  For each row of chests, add 2 newlines ('\n') to QuickStackButton.hoverText. This gives just enough space for chests to be drawn in that row.
 			 *		  Started working on drawing chests in correct position(s) in tooltip.
 			 *		  
-			 *	10/1: Finished (untested) GetToolTipDrawPosition method.
+			 *	10/1: Finished GetToolTipDrawPosition method.
+			 *	
+			 *	10/5: Implemented GetChestType method in TypedChest.
 			 */
 
 			// TODO: Find offset of this position for first chest to be drawn. After that, simple iteration, will be easy

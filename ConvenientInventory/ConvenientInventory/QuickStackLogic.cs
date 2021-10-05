@@ -319,9 +319,8 @@ namespace ConvenientInventory
 						dx = tx - (int)origin.X;
 						dy = ty - (int)origin.Y;
 
-						// TODO: Maybe switch on chest.ParentSheetIndex? not sure...
+						ChestType chestType = TypedChest.GetChestType(chest);
 
-						var chestType = ChestType.Normal;/*(chest.SpecialChestType == Chest.SpecialChestTypes.None) ? ChestType.Default | ChestType.Stone*/
 						var typedChest = new TypedChest(chest, chestType);
 
 						tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
@@ -486,7 +485,7 @@ namespace ConvenientInventory
 							continue;
 						}
 
-						var chestType = ChestType.Normal;/*(chest.SpecialChestType == Chest.SpecialChestTypes.None) ? ChestType.Default | ChestType.Stone | ChestType.MiniFridge | ChestType.Special*/
+						ChestType chestType = TypedChest.GetChestType(chest);
 
 						tChests.Add(new TypedChest(chest, chestType));
 					}
