@@ -277,6 +277,8 @@ namespace ConvenientInventory
 									continue;
 								}
 
+								// TODO: Check if mill is under construction
+
 								dx = (int)buildingTileCenterPosition.X - (int)origin.X;
 								dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
 
@@ -378,6 +380,8 @@ namespace ConvenientInventory
 								{
 									continue;
 								}
+
+								// TODO: Check if mill is under construction
 
 								dx = (int)buildingTileCenterPosition.X - (int)origin.X;
 								dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;

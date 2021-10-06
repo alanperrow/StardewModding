@@ -9,9 +9,20 @@ using static StardewValley.Menus.ItemGrabMenu;
 
 namespace ConvenientInventory
 {
+	internal static class CachedTextures
+	{
+		public static Texture2D Mill { get; } = Game1.content.Load<Texture2D>("Buildings\\Mill");
+
+		public static Texture2D JunimoHut { get; } = Game1.content.Load<Texture2D>("Buildings\\Junimo Hut");
+
+		public static Texture2D Kitchen { get; } = null;	// TODO: Find where kitchen texture is stored.
+	}
+
 	/*
-	 * TODO: Implement favorited items, which will be ignored by "Quick Stack To Nearby Chests" button.
-	 *       Prefix "Add To Existing Stacks" button logic to ignore favorited items as well.
+	 * TODO: 
+	 *	- Implement favorited items, which will be ignored by "Quick Stack To Nearby Chests" button.
+	 *		- Prefix "Add To Existing Stacks" button logic to ignore favorited items as well.
+	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	internal class ConvenientInventory
 	{
@@ -98,8 +109,12 @@ namespace ConvenientInventory
 
 			if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
 			{
-				var text = QuickStackButton.hoverText + new string('\n', 2 * ((NearbyTypedChests.Count + 7) / 8));  // Draw two newlines for each row of chests
-				IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, /*166*/-1, -1, null, -1);
+				int numPos = ModEntry.Config.IsQuickStackIntoBuildingsWithInventories
+					? NearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(NearbyTypedChests)
+					: NearbyTypedChests.Count;
+
+				var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
+				IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, -1, -1, null, -1);
 				DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
 			}
             else
@@ -107,6 +122,25 @@ namespace ConvenientInventory
 				IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
 			}
 		}
+
+		private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<TypedChest> chests)
+        {
+			int extraNumPos = 0;
+
+			for (int i=0; i<chests.Count; i++)
+            {
+				if (chests[i] is null)
+                {
+					continue;
+                }
+
+				extraNumPos += TypedChest.IsBuildingChestType(chests[i].ChestType)
+					? 1 + ((i % 8 == 7) ? 1 : 0)
+					: 0;
+            }
+
+			return extraNumPos;
+        }
 
 		private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<TypedChest> typedChests)
 		{
@@ -138,7 +172,6 @@ namespace ConvenientInventory
 			 *	10/5: Implemented GetChestType method in TypedChest.
 			 */
 
-			// TODO: Find offset of this position for first chest to be drawn. After that, simple iteration, will be easy
 			Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
 
 			for (int i = 0, pos = 0; i < typedChests.Count; i++, pos++)
@@ -151,60 +184,102 @@ namespace ConvenientInventory
 					continue;
                 }
 
-				int offsetX = toolTipPosition.X + 20 + 46 * (i % 8);
-				int offsetY = toolTipPosition.Y + 40 + 52 * (i / 8);
+				int offsetX = toolTipPosition.X + 20 + 46 * (pos % 8);
+				int offsetY = toolTipPosition.Y + 40 + 52 * (pos / 8);
 
 				switch (chestType)
                 {
 					case ChestType.Normal:
 					default:
-
-						// TODO: Split this logic into ChestType.Stone case. Currently handles both Normal and Stone.
-
 						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(
-								offsetX,
-								offsetY
-							),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130 && !chest.playerChoiceColor.Value.Equals(Color.Black)) ? 168 : chest.ParentSheetIndex, 16, 32),
+							new Vector2(offsetX, offsetY),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, !chest.playerChoiceColor.Value.Equals(Color.Black) ? 168 : chest.ParentSheetIndex, 16, 32),
 							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
 							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
 						);
-
 						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(
-								offsetX,
-								offsetY + 42
-							),
-							new Rectangle(0, ((chest.ParentSheetIndex == 130) ? 168 : chest.ParentSheetIndex) / 8 * 32 + 53, 16, 11),
+							new Vector2(offsetX, offsetY + 42),
+							new Rectangle(0, 168 / 8 * 32 + 53, 16, 11),
 							Color.White,
 							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f
 						);
-
 						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(
-								offsetX,
-								offsetY
-							),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, (chest.ParentSheetIndex == 130) ? chest.startingLidFrame.Value + 46 : chest.startingLidFrame.Value + 8, 16, 32),
+							new Vector2(offsetX, offsetY),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.startingLidFrame.Value + 46, 16, 32),
 							Color.White,
 							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f
 						);
 
 						break;
 					case ChestType.Stone:
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(offsetX, offsetY),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.ParentSheetIndex, 16, 32),
+							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
+							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
+						);
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(offsetX, offsetY + 42),
+							new Rectangle(0, chest.ParentSheetIndex / 8 * 32 + 53, 16, 11),
+							Color.White,
+							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f
+						);
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(offsetX, offsetY),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.startingLidFrame.Value + 8, 16, 32),
+							Color.White,
+							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f
+						);
 
 						break;
 					case ChestType.Fridge:
 
 						break;
 					case ChestType.MiniFridge:
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(offsetX, offsetY + 8),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.ParentSheetIndex, 16, 32),
+							Color.White,
+							0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
+						);
 
 						break;
 					case ChestType.Mill:
+						if (pos % 8 == 7)
+                        {
+							pos++;
+							offsetX = toolTipPosition.X + 20 + 46 * (pos % 8);
+							offsetY = toolTipPosition.Y + 40 + 52 * (pos / 8);
+						}
+
+						spriteBatch.Draw(CachedTextures.Mill,
+							new Vector2(offsetX + 8, offsetY),
+							new Rectangle(0, 64, 64, 64),
+							Color.White,
+							0f, Vector2.Zero, 1f, SpriteEffects.None, 1f
+						);
+
+						pos++;
 
 						break;
 					case ChestType.JunimoHut:
+						if (pos % 8 == 7)
+						{
+							pos++;
+							offsetX = toolTipPosition.X + 20 + 46 * (pos % 8);
+							offsetY = toolTipPosition.Y + 40 + 52 * (pos / 8);
+						}
+
+						// TODO: Change appearance based on season. Maybe reference original draw method? If not possible, reference game season.
+
+						spriteBatch.Draw(CachedTextures.JunimoHut,
+							new Vector2(offsetX + 9, offsetY - 16),
+							new Rectangle(96, 0, 48, 64),
+							Color.White,
+							0f, Vector2.Zero, 1.25f, SpriteEffects.None, 1f
+						);
+
+						pos++;
 
 						break;
 					case ChestType.Special:

@@ -43,5 +43,10 @@ namespace ConvenientInventory.TypedChests
 					return ChestType.MiniFridge;
 			}
 		}
+
+		public static bool IsBuildingChestType(ChestType chestType)
+        {
+			return chestType == ChestType.Mill || chestType == ChestType.JunimoHut;
+        }
 	}
 }
