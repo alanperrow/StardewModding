@@ -170,6 +170,8 @@ namespace ConvenientInventory
 			 *	10/1: Finished GetToolTipDrawPosition method.
 			 *	
 			 *	10/5: Implemented GetChestType method in TypedChest.
+			 *	
+			 *	10/10: Draw correct junimo hut for the current season.
 			 */
 
 			Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
@@ -270,11 +272,9 @@ namespace ConvenientInventory
 							offsetY = toolTipPosition.Y + 40 + 52 * (pos / 8);
 						}
 
-						// TODO: Change appearance based on season. Maybe reference original draw method? If not possible, reference game season.
-
 						spriteBatch.Draw(CachedTextures.JunimoHut,
 							new Vector2(offsetX + 9, offsetY - 16),
-							new Rectangle(96, 0, 48, 64),
+							new Rectangle(Utility.getSeasonNumber(Game1.currentSeason) * 48, 0, 48, 64),
 							Color.White,
 							0f, Vector2.Zero, 1.25f, SpriteEffects.None, 1f
 						);
@@ -283,6 +283,12 @@ namespace ConvenientInventory
 
 						break;
 					case ChestType.Special:
+						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
+							new Vector2(offsetX, offsetY),
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, !chest.playerChoiceColor.Value.Equals(Color.Black) ? 168 : chest.ParentSheetIndex, 16, 32),
+							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
+							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
+						);
 
 						break;
 				}
