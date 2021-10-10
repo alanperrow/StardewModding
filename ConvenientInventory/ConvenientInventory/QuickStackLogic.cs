@@ -247,6 +247,23 @@ namespace ConvenientInventory
 				}
 			}
 
+			// Island kitchen fridge
+			if (gameLocation is IslandFarmHouse islandFarmHouse)
+			{
+				Vector2 fridgeTileCenterPosition = GetTileCenterPosition(islandFarmHouse.fridgePosition);
+
+				if (IsPositionWithinRange(origin, fridgeTileCenterPosition, range))
+				{
+					if (islandFarmHouse.fridge.Value != null && !islandFarmHouse.fridge.Value.GetMutex().IsLocked())
+					{
+						dx = (int)fridgeTileCenterPosition.X - (int)origin.X;
+						dy = (int)fridgeTileCenterPosition.Y - (int)origin.Y;
+
+						dChests.Add(new ChestWithDistance(islandFarmHouse.fridge.Value, Math.Sqrt(dx * dx + dy * dy)));
+					}
+				}
+			}
+
 			// Buildings
 			if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
 			{
@@ -349,6 +366,25 @@ namespace ConvenientInventory
 				}
 			}
 
+			// Island kitchen fridge
+			if (gameLocation is IslandFarmHouse islandFarmHouse)
+			{
+				Vector2 fridgeTileCenterPosition = GetTileCenterPosition(islandFarmHouse.fridgePosition);
+
+				if (IsPositionWithinRange(origin, fridgeTileCenterPosition, range))
+				{
+					if (islandFarmHouse.fridge.Value != null && !islandFarmHouse.fridge.Value.GetMutex().IsLocked())
+					{
+						dx = (int)fridgeTileCenterPosition.X - (int)origin.X;
+						dy = (int)fridgeTileCenterPosition.Y - (int)origin.Y;
+
+						var typedChest = new TypedChest(islandFarmHouse.fridge.Value, ChestType.Fridge);
+
+						tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+					}
+				}
+			}
+
 			// Buildings
 			if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
 			{
@@ -436,6 +472,20 @@ namespace ConvenientInventory
 				}
 			}
 
+			// Island kitchen fridge
+			if (gameLocation is IslandFarmHouse islandFarmHouse)
+			{
+				Point fridgeTileLocation = islandFarmHouse.fridgePosition;
+
+				if (IsTileWithinRange(originTile, fridgeTileLocation, range))
+				{
+					if (islandFarmHouse.fridge.Value != null && !islandFarmHouse.fridge.Value.GetMutex().IsLocked())
+					{
+						chests.Add(islandFarmHouse.fridge.Value);
+					}
+				}
+			}
+
 			// Buildings
 			if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
 			{
@@ -507,6 +557,20 @@ namespace ConvenientInventory
 					if (farmHouse.fridge.Value != null && !farmHouse.fridge.Value.GetMutex().IsLocked())
 					{
 						tChests.Add(new TypedChest(farmHouse.fridge.Value, ChestType.Fridge));
+					}
+				}
+			}
+
+			// Island kitchen fridge
+			if (gameLocation is IslandFarmHouse islandFarmHouse)
+			{
+				Point fridgeTileLocation = islandFarmHouse.fridgePosition;
+
+				if (IsTileWithinRange(originTile, fridgeTileLocation, range))
+				{
+					if (islandFarmHouse.fridge.Value != null && !islandFarmHouse.fridge.Value.GetMutex().IsLocked())
+					{
+						tChests.Add(new TypedChest(islandFarmHouse.fridge.Value, ChestType.Fridge));
 					}
 				}
 			}

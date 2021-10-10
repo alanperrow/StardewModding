@@ -15,7 +15,7 @@ namespace ConvenientInventory
 
 		public static Texture2D JunimoHut { get; } = Game1.content.Load<Texture2D>("Buildings\\Junimo Hut");
 
-		public static Texture2D Kitchen { get; } = null;	// TODO: Find where kitchen texture is stored.
+		public static Texture2D FarmHouse { get; } = Game1.content.Load<Texture2D>("Maps\\farmhouse_tiles");
 	}
 
 	/*
@@ -172,6 +172,7 @@ namespace ConvenientInventory
 			 *	10/5: Implemented GetChestType method in TypedChest.
 			 *	
 			 *	10/10: Draw correct junimo hut for the current season.
+			 *		   Kitchen fridge (both types) is now drawn.
 			 */
 
 			Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
@@ -235,6 +236,25 @@ namespace ConvenientInventory
 
 						break;
 					case ChestType.Fridge:
+						if (Game1.currentLocation is StardewValley.Locations.FarmHouse)
+                        {
+							spriteBatch.Draw(CachedTextures.FarmHouse,
+								new Vector2(offsetX, offsetY + 3),
+								new Rectangle(16 * 5, 48 * 4 + 13, 16, 35),
+								Color.White,
+								0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
+							);
+                        }
+                        else
+                        {
+							// Island house
+							spriteBatch.Draw(CachedTextures.FarmHouse,
+								new Vector2(offsetX, offsetY + 3),
+								new Rectangle(16 * 6, 48 * 6 + 29, 16, 35),
+								Color.White,
+								0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
+							);
+						}
 
 						break;
 					case ChestType.MiniFridge:
@@ -285,8 +305,8 @@ namespace ConvenientInventory
 					case ChestType.Special:
 						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
 							new Vector2(offsetX, offsetY),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, !chest.playerChoiceColor.Value.Equals(Color.Black) ? 168 : chest.ParentSheetIndex, 16, 32),
-							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
+							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.ParentSheetIndex, 16, 32),
+							Color.White,
 							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
 						);
 
