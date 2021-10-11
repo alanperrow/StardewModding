@@ -24,11 +24,11 @@ namespace ConvenientInventory
 	 *		- Prefix "Add To Existing Stacks" button logic to ignore favorited items as well.
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
-	internal class ConvenientInventory
+	internal static class ConvenientInventory
 	{
 		internal static Texture2D QuickStackButtonIcon { private get; set; }
 
-		internal static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
+		private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
 		private static ClickableTextureComponent QuickStackButton { get; set; }
 
@@ -39,51 +39,112 @@ namespace ConvenientInventory
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
 
+		internal static Texture2D FavoriteItemsCursor { private get; set; }
+
+		internal static Texture2D FavoriteItemsHighlight { private get; set; }
+
+		internal static bool IsFavoriteItemsHotkeyDown { get; set; } = false;
+
+		internal static bool[] InventoryFavoriteItems { get; set; }
+
 		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
 			Page = inventoryPage;
 
-			QuickStackButton = new ClickableTextureComponent("",
-				new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
-				string.Empty,
-				"Quick Stack To Nearby Chests",
-				QuickStackButtonIcon,
-				Rectangle.Empty,
-				4f,
-				false)
-			{
-				myID = quickStackButtonID,
-				downNeighborID = 105,  // trash can
-				upNeighborID = 106,  // organize button
-				leftNeighborID = 11  // top-right inventory slot
-			};
+			if (ModEntry.Config.IsEnableQuickStack)
+            {
+				QuickStackButton = new ClickableTextureComponent("",
+					new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
+					string.Empty,
+					"Quick Stack To Nearby Chests",
+					QuickStackButtonIcon,
+					Rectangle.Empty,
+					4f,
+					false)
+				{
+					myID = quickStackButtonID,
+					downNeighborID = 105,  // trash can
+					upNeighborID = 106,  // organize button
+					leftNeighborID = 11  // top-right inventory slot
+				};
 
-			inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
-			inventoryPage.trashCan.upNeighborID = quickStackButtonID;
+				inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
+				inventoryPage.trashCan.upNeighborID = quickStackButtonID;
+			}
+
+			if (ModEntry.Config.IsEnableFavoriteItems && InventoryFavoriteItems is null)
+            {
+				InventoryFavoriteItems = new bool[Page.inventory.inventory.Count];
+            }
 		}
 
 		public static void ReceiveLeftClick(int x, int y)
 		{
-			if (QuickStackButton != null && QuickStackButton.containsPoint(x, y))
+			if (ModEntry.Config.IsEnableQuickStack)
 			{
-				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, Page);
+				if (QuickStackButton != null && QuickStackButton.containsPoint(x, y))
+				{
+					QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, Page);
+				}
+			}
+
+			// TODO: Move to prefix method.
+			//		 Favoriting an item should only toggle the favorited status, not select the item.
+			if (ModEntry.Config.IsEnableFavoriteItems)
+            {
+
+				//DEBUG
+				//IsFavoriteItemsHotkeyDown = true;
+
+				if (Page != null && IsFavoriteItemsHotkeyDown)
+                {
+					int clickPos = Page.inventory.getInventoryPositionOfClick(x, y);
+
+					if (clickPos != -1 && Page.inventory.actualInventory.Count > clickPos)
+                    {
+						ModEntry.Context.Monitor
+							.Log($"{(InventoryFavoriteItems[clickPos] ? "Un-" : string.Empty)}Favorited item {clickPos}: {Page.inventory.actualInventory[clickPos]?.Name}",
+							StardewModdingAPI.LogLevel.Debug);
+
+						InventoryFavoriteItems[clickPos] = !InventoryFavoriteItems[clickPos];
+                    }
+                }
 			}
 		}
 
 		public static void PerformHoverAction(int x, int y)
 		{
+			if (!ModEntry.Config.IsEnableQuickStack)
+			{
+				return;
+			}
+
 			QuickStackButton.tryHover(x, y);
 			IsDrawToolTip = QuickStackButton.containsPoint(x, y);
 		}
 
 		public static void PopulateClickableComponentsList(InventoryPage inventoryPage)
 		{
+			if (!ModEntry.Config.IsEnableQuickStack)
+			{
+				return;
+			}
+
 			inventoryPage.allClickableComponents.Add(QuickStackButton);
 		}
+
+
+		// TODO: Use InventoryMenu.GetSlotDrawPositions() for drawing favorite highlights
+
 
 		// Called before drawing tooltip. Use for drawing the button.
 		public static void TrashCanDrawn(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
 		{
+			if (!ModEntry.Config.IsEnableQuickStack)
+			{
+				return;
+			}
+
 			if (Page?.trashCan == textureComponent)
 			{
 				// Draw transferred item sprites
@@ -100,7 +161,7 @@ namespace ConvenientInventory
 		// Called after drawing everything else in InventoryPage. Use for drawing tooltip.
 		public static void PostDraw(SpriteBatch spriteBatch)
 		{
-			if (!IsDrawToolTip)
+			if (!IsDrawToolTip || !ModEntry.Config.IsEnableQuickStack)
             {
 				return;
             }
@@ -173,6 +234,8 @@ namespace ConvenientInventory
 			 *	
 			 *	10/10: Draw correct junimo hut for the current season.
 			 *		   Kitchen fridge (both types) is now drawn.
+			 *		   
+			 *	10/11: Finalized Quick Stack code. Initial work on Favorite Items.
 			 */
 
 			Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);

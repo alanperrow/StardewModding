@@ -21,7 +21,10 @@ namespace ConvenientInventory
 		{
 			Context = this;
 			Config = helper.ReadConfig<ModConfig>();
-			ConvenientInventory.QuickStackButtonIcon = helper.Content.Load<Texture2D>(@"Assets\\icon.png");
+
+			ConvenientInventory.QuickStackButtonIcon = helper.Content.Load<Texture2D>(@"Assets\icon.png");
+			ConvenientInventory.FavoriteItemsCursor = helper.Content.Load<Texture2D>(@"Assets\favoriteCursor.png");
+			ConvenientInventory.FavoriteItemsHighlight = helper.Content.Load<Texture2D>(@"Assets\favoriteHighlight.png");
 
 			helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
 		}
@@ -59,6 +62,13 @@ namespace ConvenientInventory
 					labelDesc: null
 				);
 
+				api.RegisterSimpleOption(
+					mod: ModManifest,
+					optionName: "Enable Quick stack?",
+					optionDesc: "If enabled, adds a \"Quick Stack To Nearby Chests\" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.",
+					optionGet: () => Config.IsEnableQuickStack,
+					optionSet: value => Config.IsEnableQuickStack = value
+				);
 				api.RegisterClampedOption(
 					mod: ModManifest,
 					optionName: "Range",
@@ -90,9 +100,34 @@ namespace ConvenientInventory
 					optionGet: () => Config.IsQuickStackTooltipDrawNearbyChests,
 					optionSet: value => Config.IsQuickStackTooltipDrawNearbyChests = value
 				);
-			}
 
-			
+				api.RegisterLabel(
+					mod: ModManifest,
+					labelName: "Favorite Items",
+					labelDesc: null
+				);
+				api.RegisterSimpleOption(
+					mod: ModManifest,
+					optionName: "Enable favorite items?",   // TODO: Will favorited items ignore Auto Stash to Chest? Or just quick stack?
+					optionDesc: "If enabled, items in your inventory can be \"favorited\". Favorited items will be ignored when stacking into chests.",
+					optionGet: () => Config.IsEnableFavoriteItems,
+					optionSet: value => Config.IsEnableFavoriteItems = value
+				);
+				api.RegisterSimpleOption(
+					mod: ModManifest,
+					optionName: "Favorite keybind (keyboard)",
+					optionDesc: "Hold this key when selecting an item to favorite it.",
+					optionGet: () => Config.FavoriteItemsKeyboardHotkey,
+					optionSet: value => Config.FavoriteItemsKeyboardHotkey = value
+				);
+				api.RegisterSimpleOption(
+					mod: ModManifest,
+					optionName: "Favorite keybind (controller)",
+					optionDesc: "Press this button when hovering over an item to favorite it.",
+					optionGet: () => Config.FavoriteItemsControllerHotkey,
+					optionSet: value => Config.FavoriteItemsControllerHotkey = value
+				);
+			}
 		}
 	}
 }

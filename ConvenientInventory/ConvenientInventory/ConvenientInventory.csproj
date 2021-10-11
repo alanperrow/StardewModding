@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <!--<GamePath>C:\Repos\alanperrow\StardewModding\MOD TOOLS\Stardew Valley</GamePath>-->
+    <GamePath>C:\Repos\alanperrow\StardewModding\MOD TOOLS\Stardew Valley</GamePath>
     <EnableHarmony>true</EnableHarmony>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -63,6 +63,8 @@
     <Compile Include="TypedChests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\favoriteCursor.png" />
+    <Content Include="Assets\favoriteHighlight.png" />
     <Content Include="Assets\icon.png" />
   </ItemGroup>
   <ItemGroup>
