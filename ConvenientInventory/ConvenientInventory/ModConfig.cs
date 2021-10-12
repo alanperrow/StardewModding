@@ -16,6 +16,8 @@ namespace ConvenientInventory
 
 		public bool IsEnableFavoriteItems { get; set; } = true;
 
+		public int FavoriteItemsHighlightTextureChoice { get; set; } = 0;
+
 		public SButton FavoriteItemsKeyboardHotkey { get; set; } = SButton.LeftAlt;
 
 		public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftStick;

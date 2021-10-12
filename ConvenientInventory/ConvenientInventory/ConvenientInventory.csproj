@@ -64,7 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\favoriteCursor.png" />
-    <Content Include="Assets\favoriteHighlight.png" />
+    <Content Include="Assets\favoriteHighlight_0.png" />
+    <Content Include="Assets\favoriteHighlight_1.png" />
+    <Content Include="Assets\favoriteHighlight_2.png" />
+    <Content Include="Assets\favoriteHighlight_3.png" />
     <Content Include="Assets\icon.png" />
   </ItemGroup>
   <ItemGroup>

@@ -11,11 +11,11 @@ namespace ConvenientInventory
 {
 	internal static class CachedTextures
 	{
-		public static Texture2D Mill { get; } = Game1.content.Load<Texture2D>("Buildings\\Mill");
+		public static Texture2D Mill { get; } = Game1.content.Load<Texture2D>(@"Buildings\Mill");
 
-		public static Texture2D JunimoHut { get; } = Game1.content.Load<Texture2D>("Buildings\\Junimo Hut");
+		public static Texture2D JunimoHut { get; } = Game1.content.Load<Texture2D>(@"Buildings\Junimo Hut");
 
-		public static Texture2D FarmHouse { get; } = Game1.content.Load<Texture2D>("Maps\\farmhouse_tiles");
+		public static Texture2D FarmHouse { get; } = Game1.content.Load<Texture2D>(@"Maps\farmhouse_tiles");
 	}
 
 	/*
@@ -39,13 +39,14 @@ namespace ConvenientInventory
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
 
-		internal static Texture2D FavoriteItemsCursor { private get; set; }
+		internal static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
-		internal static Texture2D FavoriteItemsHighlight { private get; set; }
+		internal static Texture2D FavoriteItemsHighlightTexture { private get; set; }
 
 		internal static bool IsFavoriteItemsHotkeyDown { get; set; } = false;
+		private static int favoriteItemsHotkeyDownCounter = 0;
 
-		internal static bool[] InventoryFavoriteItems { get; set; }
+		internal static bool[] FavoriteItemSlots { get; set; }
 
 		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
@@ -72,80 +73,147 @@ namespace ConvenientInventory
 				inventoryPage.trashCan.upNeighborID = quickStackButtonID;
 			}
 
-			if (ModEntry.Config.IsEnableFavoriteItems && InventoryFavoriteItems is null)
+			if (ModEntry.Config.IsEnableFavoriteItems && FavoriteItemSlots is null)
             {
-				InventoryFavoriteItems = new bool[Page.inventory.inventory.Count];
+				FavoriteItemSlots = new bool[inventoryPage.inventory.inventory.Count];
             }
 		}
 
-		public static void ReceiveLeftClick(int x, int y)
+		// Backpack inventory page.
+		public static void ReceiveLeftClick(InventoryPage inventoryPage, int x, int y)
 		{
-			if (ModEntry.Config.IsEnableQuickStack)
+			if (ModEntry.Config.IsEnableQuickStack && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
 			{
-				if (QuickStackButton != null && QuickStackButton.containsPoint(x, y))
-				{
-					QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, Page);
-				}
+				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
+
+				return;
 			}
 
 			// TODO: Move to prefix method.
 			//		 Favoriting an item should only toggle the favorited status, not select the item.
 			if (ModEntry.Config.IsEnableFavoriteItems)
-            {
-
-				//DEBUG
-				//IsFavoriteItemsHotkeyDown = true;
-
-				if (Page != null && IsFavoriteItemsHotkeyDown)
+			{
+				if (IsFavoriteItemsHotkeyDown)
                 {
-					int clickPos = Page.inventory.getInventoryPositionOfClick(x, y);
-
-					if (clickPos != -1 && Page.inventory.actualInventory.Count > clickPos)
-                    {
-						ModEntry.Context.Monitor
-							.Log($"{(InventoryFavoriteItems[clickPos] ? "Un-" : string.Empty)}Favorited item {clickPos}: {Page.inventory.actualInventory[clickPos]?.Name}",
-							StardewModdingAPI.LogLevel.Debug);
-
-						InventoryFavoriteItems[clickPos] = !InventoryFavoriteItems[clickPos];
-                    }
+                    ToggleFavoriteItemsSlotAtClickPosition(inventoryPage.inventory, x, y);
                 }
-			}
+            }
 		}
+
+        // Arbitrary inventory menu with a section for the player's inventory.
+        public static void ReceiveLeftClick(MenuWithInventory menuWithInventory, int x, int y)
+		{
+			// TODO: Move to prefix method.
+			//		 Favoriting an item should only toggle the favorited status, not select the item.
+			if (ModEntry.Config.IsEnableFavoriteItems/* && menuWithInventory.inventory.playerInventory*/)
+			{
+				if (IsFavoriteItemsHotkeyDown)
+				{
+					ToggleFavoriteItemsSlotAtClickPosition(menuWithInventory.inventory, x, y);
+				}
+			}
+        }
+
+		// Toggles the favorited status of a selected item slot.
+        private static void ToggleFavoriteItemsSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY)
+        {
+            int clickPos = inventoryMenu.getInventoryPositionOfClick(clickX, clickY);
+
+			// TODO: Only allow favoriting if selected slot contains an item.
+			//		 Currently this doesn't work because the item gets picked up before we get to check. (See TODO above: "Move to prefix method")
+			if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos/* && inventoryMenu.actualInventory[clickPos] != null*/)
+            {
+                ModEntry.Context.Monitor
+					.Log($"{(FavoriteItemSlots[clickPos] ? "Un-" : string.Empty)}Favorited item slot {clickPos}: {inventoryMenu.actualInventory[clickPos]?.Name}",
+                	StardewModdingAPI.LogLevel.Debug);
+
+				Game1.playSound("smallSelect");
+
+                FavoriteItemSlots[clickPos] = !FavoriteItemSlots[clickPos];
+            }
+        }
 
 		public static void PerformHoverAction(int x, int y)
 		{
-			if (!ModEntry.Config.IsEnableQuickStack)
+			if (ModEntry.Config.IsEnableQuickStack)
 			{
-				return;
+				QuickStackButton.tryHover(x, y);
+				IsDrawToolTip = QuickStackButton.containsPoint(x, y);
 			}
-
-			QuickStackButton.tryHover(x, y);
-			IsDrawToolTip = QuickStackButton.containsPoint(x, y);
 		}
 
 		public static void PopulateClickableComponentsList(InventoryPage inventoryPage)
 		{
-			if (!ModEntry.Config.IsEnableQuickStack)
+			if (ModEntry.Config.IsEnableQuickStack)
 			{
-				return;
+				inventoryPage.allClickableComponents.Add(QuickStackButton);
 			}
-
-			inventoryPage.allClickableComponents.Add(QuickStackButton);
 		}
 
-
-		// TODO: Use InventoryMenu.GetSlotDrawPositions() for drawing favorite highlights
-
-
-		// Called before drawing tooltip. Use for drawing the button.
-		public static void TrashCanDrawn(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
-		{
-			if (!ModEntry.Config.IsEnableQuickStack)
+		// TODO: Draw highlight *underneath* items
+		// Called after drawing everything else in arbitrary inventory menu.
+		// Draws favorite item slot highlights, and favorite items cursor if keybind is being pressed.
+		public static void PostInventoryDraw(MenuWithInventory menuWithInventory, SpriteBatch spriteBatch)
+        {
+			if (ModEntry.Config.IsEnableFavoriteItems)
 			{
-				return;
-			}
+				List<Vector2> slotDrawPositions = menuWithInventory.inventory?.GetSlotDrawPositions();
+				DrawFavoriteItemSlotHighlights(spriteBatch, slotDrawPositions);
 
-			if (Page?.trashCan == textureComponent)
+				if (IsFavoriteItemsHotkeyDown)
+				{
+					DrawFavoriteItemsCursor(spriteBatch);
+					favoriteItemsHotkeyDownCounter++;
+				}
+				else
+				{
+					favoriteItemsHotkeyDownCounter = 0;
+				}
+			}
+		}
+
+		// Called after drawing everything else in player inventory section of arbitrary inventory menu.
+		public static void PostInventoryDraw(InventoryMenu inventoryMenu, SpriteBatch spriteBatch)
+		{
+			if (ModEntry.Config.IsEnableFavoriteItems)
+            {
+                List<Vector2> slotDrawPositions = inventoryMenu.GetSlotDrawPositions();
+				DrawFavoriteItemSlotHighlights(spriteBatch, slotDrawPositions);
+            }
+        }
+
+        private static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, List<Vector2> slotDrawPositions)
+        {
+			if (slotDrawPositions is null)
+            {
+				return;
+            }
+
+            for (int i = 0; i < slotDrawPositions.Count; i++)
+            {
+                if (!FavoriteItemSlots[i])
+                {
+                    continue;
+                }
+
+                spriteBatch.Draw(FavoriteItemsHighlightTexture,
+                    slotDrawPositions[i],
+                    new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
+                    Color.White,
+                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
+                );
+            }
+        }
+
+        public static void PostClickableTextureComponentDraw(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
+		{
+			// Check if we have just drawn the trash can for this inventory page, which happens before in-game tooltip is drawn.
+			if (Page?.trashCan != textureComponent)
+            {
+				return;
+            }
+
+			if (ModEntry.Config.IsEnableQuickStack)
 			{
 				// Draw transferred item sprites
 				foreach (TransferredItemSprite transferredItemSprite in transferredItemSprites)
@@ -157,34 +225,57 @@ namespace ConvenientInventory
 			}
 		}
 
-
-		// Called after drawing everything else in InventoryPage. Use for drawing tooltip.
-		public static void PostDraw(SpriteBatch spriteBatch)
+		// Called after drawing everything else in InventoryPage. Draws tooltip.
+		public static void PostInventoryPageDraw(SpriteBatch spriteBatch)
 		{
-			if (!IsDrawToolTip || !ModEntry.Config.IsEnableQuickStack)
+			if (ModEntry.Config.IsEnableQuickStack && IsDrawToolTip)
             {
-				return;
-            }
+				NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
 
-			NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
+				if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
+				{
+					int numPos = ModEntry.Config.IsQuickStackIntoBuildingsWithInventories
+						? NearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(NearbyTypedChests)
+						: NearbyTypedChests.Count;
 
-			if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
-			{
-				int numPos = ModEntry.Config.IsQuickStackIntoBuildingsWithInventories
-					? NearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(NearbyTypedChests)
-					: NearbyTypedChests.Count;
+					var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
+					IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, -1, -1, null, -1);
 
-				var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
-				IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, -1, -1, null, -1);
-				DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
+					DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
+				}
+				else
+				{
+					IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
+				}
 			}
-            else
-            {
-				IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
+
+			if (ModEntry.Config.IsEnableFavoriteItems)
+			{
+				if (IsFavoriteItemsHotkeyDown)
+                {
+                    DrawFavoriteItemsCursor(spriteBatch);
+                    favoriteItemsHotkeyDownCounter++;
+                }
+                else
+                {
+					favoriteItemsHotkeyDownCounter = 0;
+                }
 			}
 		}
 
-		private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<TypedChest> chests)
+        private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
+        {
+            float scale = (float)(3d + 0.15d * Math.Cos(favoriteItemsHotkeyDownCounter / 15d));
+
+            spriteBatch.Draw(FavoriteItemsCursorTexture,
+               new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
+               new Rectangle(0, 0, FavoriteItemsCursorTexture.Width, FavoriteItemsCursorTexture.Height),
+               Color.White,
+               0f, Vector2.Zero, scale, SpriteEffects.None, 1f
+           );
+        }
+
+        private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<TypedChest> chests)
         {
 			int extraNumPos = 0;
 
@@ -205,176 +296,11 @@ namespace ConvenientInventory
 
 		private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<TypedChest> typedChests)
 		{
-			/*
-			 * TODO: Draw preview of all chests/inventories in range. (Should also show chest colors, fridge, hut, etc...)
-			 *		 - May need to override Chest.draw() or make custom draw function. Currently cannot scale *and* display correctly colored sprite.
-			 *		 - layerDepth??? Can't seem to draw on top of tooltip :(
-			 *		     - Look into how "extraItemToShow" works in drawToolTip method, and see if that same logic can be used to draw on top of tooltip directly.
-			 *		 
-			 *		 
-			 * 9/19: Chests and stone chests are drawn perfectly - colored and show trim.
-			 * TODO:
-			 * - If chest is not wooden chest/stone chest, do NOT draw trim. (Do junimo chests draw trim?)
-			 * - Kitchen fridge and building chests display as normal chests. Fixing would require a modification to QuickStackLogic.GetChestsAroundFarmer
-			 * - OR new method QuickStackLogic.GetTypedChestsAroundFarmer which returns a List<TypedChest>, each object containing the Chest and its respective Type enum value
-			 *     - I.e., Default, Stone, Fridge, MiniFridge, Mill, JunimoHut, Special (x-ref chest.SpecialChestTypes when this is the case)
-			 *	   - Display chests under tooltip in a new "section", with horizontal divider between tooltip and new section.
-			 *	       - X chests per row, nearest chests shown first starting @ top-left of section.
-			 *		   - When row is full, start new row below.
-			 *		   - Each chest should be moderately spaced apart (drawing buildings might cause trouble... take more space? scale smaller? custom icons?)
-			 *		       - Maybe for-loop with separate "horizontal space" counter that += 1 with normal chests, but += 2 with buildings so they take up more space
-			 *		 
-			 *	9/30: Created TypedChest class, so we can now draw each chest type differently.
-			 *		  For each row of chests, add 2 newlines ('\n') to QuickStackButton.hoverText. This gives just enough space for chests to be drawn in that row.
-			 *		  Started working on drawing chests in correct position(s) in tooltip.
-			 *		  
-			 *	10/1: Finished GetToolTipDrawPosition method.
-			 *	
-			 *	10/5: Implemented GetChestType method in TypedChest.
-			 *	
-			 *	10/10: Draw correct junimo hut for the current season.
-			 *		   Kitchen fridge (both types) is now drawn.
-			 *		   
-			 *	10/11: Finalized Quick Stack code. Initial work on Favorite Items.
-			 */
-
 			Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
 
 			for (int i = 0, pos = 0; i < typedChests.Count; i++, pos++)
 			{
-				var chest = typedChests[i].Chest;
-				var chestType = typedChests[i].ChestType;
-
-				if (chest is null)
-                {
-					continue;
-                }
-
-				int offsetX = toolTipPosition.X + 20 + 46 * (pos % 8);
-				int offsetY = toolTipPosition.Y + 40 + 52 * (pos / 8);
-
-				switch (chestType)
-                {
-					case ChestType.Normal:
-					default:
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, !chest.playerChoiceColor.Value.Equals(Color.Black) ? 168 : chest.ParentSheetIndex, 16, 32),
-							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
-						);
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY + 42),
-							new Rectangle(0, 168 / 8 * 32 + 53, 16, 11),
-							Color.White,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f
-						);
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.startingLidFrame.Value + 46, 16, 32),
-							Color.White,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f
-						);
-
-						break;
-					case ChestType.Stone:
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.ParentSheetIndex, 16, 32),
-							chest.playerChoiceColor.Value.Equals(Color.Black) ? chest.Tint : chest.playerChoiceColor.Value,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
-						);
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY + 42),
-							new Rectangle(0, chest.ParentSheetIndex / 8 * 32 + 53, 16, 11),
-							Color.White,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f
-						);
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.startingLidFrame.Value + 8, 16, 32),
-							Color.White,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f
-						);
-
-						break;
-					case ChestType.Fridge:
-						if (Game1.currentLocation is StardewValley.Locations.FarmHouse)
-                        {
-							spriteBatch.Draw(CachedTextures.FarmHouse,
-								new Vector2(offsetX, offsetY + 3),
-								new Rectangle(16 * 5, 48 * 4 + 13, 16, 35),
-								Color.White,
-								0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
-							);
-                        }
-                        else
-                        {
-							// Island house
-							spriteBatch.Draw(CachedTextures.FarmHouse,
-								new Vector2(offsetX, offsetY + 3),
-								new Rectangle(16 * 6, 48 * 6 + 29, 16, 35),
-								Color.White,
-								0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
-							);
-						}
-
-						break;
-					case ChestType.MiniFridge:
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY + 8),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.ParentSheetIndex, 16, 32),
-							Color.White,
-							0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
-						);
-
-						break;
-					case ChestType.Mill:
-						if (pos % 8 == 7)
-                        {
-							pos++;
-							offsetX = toolTipPosition.X + 20 + 46 * (pos % 8);
-							offsetY = toolTipPosition.Y + 40 + 52 * (pos / 8);
-						}
-
-						spriteBatch.Draw(CachedTextures.Mill,
-							new Vector2(offsetX + 8, offsetY),
-							new Rectangle(0, 64, 64, 64),
-							Color.White,
-							0f, Vector2.Zero, 1f, SpriteEffects.None, 1f
-						);
-
-						pos++;
-
-						break;
-					case ChestType.JunimoHut:
-						if (pos % 8 == 7)
-						{
-							pos++;
-							offsetX = toolTipPosition.X + 20 + 46 * (pos % 8);
-							offsetY = toolTipPosition.Y + 40 + 52 * (pos / 8);
-						}
-
-						spriteBatch.Draw(CachedTextures.JunimoHut,
-							new Vector2(offsetX + 9, offsetY - 16),
-							new Rectangle(Utility.getSeasonNumber(Game1.currentSeason) * 48, 0, 48, 64),
-							Color.White,
-							0f, Vector2.Zero, 1.25f, SpriteEffects.None, 1f
-						);
-
-						pos++;
-
-						break;
-					case ChestType.Special:
-						spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-							new Vector2(offsetX, offsetY),
-							Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, chest.ParentSheetIndex, 16, 32),
-							Color.White,
-							0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
-						);
-
-						break;
-				}
+				pos += typedChests[i]?.DrawInToolTip(spriteBatch, toolTipPosition, pos) ?? 0;
 			}
 		}
 
@@ -406,7 +332,7 @@ namespace ConvenientInventory
 			return new Point(x, y);
 		}
 
-        // Used to update transferredItemSprite animation
+        // Updates transferredItemSprite animation
         public static void Update(GameTime time)
 		{
 			for (int i = 0; i < transferredItemSprites.Count; i++)

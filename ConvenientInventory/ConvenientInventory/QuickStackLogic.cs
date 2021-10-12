@@ -78,6 +78,12 @@ namespace ConvenientInventory
 							continue;
 						}
 
+						if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+                        {
+							// Skip favorited items
+							continue;
+                        }
+
 						int beforeStack = playerItem.Stack;
 						playerItem.Stack = chestItem.addToStack(playerItem);
 						bool movedAtLeastOne = beforeStack != playerItem.Stack;
@@ -127,6 +133,12 @@ namespace ConvenientInventory
 						{
 							if (playerItem is null || !playerItem.canStackWith(stackOverflowItem))
 							{
+								continue;
+							}
+
+							if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+							{
+								// Skip favorited items
 								continue;
 							}
 

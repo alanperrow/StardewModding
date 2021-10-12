@@ -23,10 +23,13 @@ namespace ConvenientInventory
 			Config = helper.ReadConfig<ModConfig>();
 
 			ConvenientInventory.QuickStackButtonIcon = helper.Content.Load<Texture2D>(@"Assets\icon.png");
-			ConvenientInventory.FavoriteItemsCursor = helper.Content.Load<Texture2D>(@"Assets\favoriteCursor.png");
-			ConvenientInventory.FavoriteItemsHighlight = helper.Content.Load<Texture2D>(@"Assets\favoriteHighlight.png");
+			ConvenientInventory.FavoriteItemsCursorTexture = helper.Content.Load<Texture2D>(@"Assets\favoriteCursor.png");
+			ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
 
-			helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
+			helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+
+			helper.Events.Input.ButtonPressed += OnButtonPressed;
+			helper.Events.Input.ButtonReleased += OnButtonReleased;
 		}
 
 		/// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves). All mods are loaded and initialised at this point, so this is a good time to set up mod integrations.</summary>
@@ -47,7 +50,7 @@ namespace ConvenientInventory
 			// Get Generic Mod Config Menu API (if it's installed)
 			var api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (api != null)
-            {
+			{
 				api.RegisterModConfig(
 					mod: ModManifest,
 					revertToDefault: () => Config = new ModConfig(),
@@ -113,20 +116,50 @@ namespace ConvenientInventory
 					optionGet: () => Config.IsEnableFavoriteItems,
 					optionSet: value => Config.IsEnableFavoriteItems = value
 				);
+				api.RegisterChoiceOption(
+					mod: ModManifest,
+					optionName: "Highlight visual preference",
+					optionDesc: "Choose your preferred texture for highlighting favorited items in your inventory.",
+					optionGet: () => Config.FavoriteItemsHighlightTextureChoice.ToString(),
+					optionSet: value =>
+					{
+						Config.FavoriteItemsHighlightTextureChoice = int.Parse(value);
+						ConvenientInventory.FavoriteItemsHighlightTexture = Helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{value}.png");
+					},
+					choices: new string[] { "0", "1", "2", "3", "4" }
+				);
 				api.RegisterSimpleOption(
 					mod: ModManifest,
-					optionName: "Favorite keybind (keyboard)",
+					optionName: "Keybind (keyboard)",
 					optionDesc: "Hold this key when selecting an item to favorite it.",
 					optionGet: () => Config.FavoriteItemsKeyboardHotkey,
 					optionSet: value => Config.FavoriteItemsKeyboardHotkey = value
 				);
 				api.RegisterSimpleOption(
 					mod: ModManifest,
-					optionName: "Favorite keybind (controller)",
-					optionDesc: "Press this button when hovering over an item to favorite it.",
+					optionName: "Keybind (controller)",
+					optionDesc: "Hold this button when selecting an item to favorite it.",
 					optionGet: () => Config.FavoriteItemsControllerHotkey,
 					optionSet: value => Config.FavoriteItemsControllerHotkey = value
 				);
+			}
+		}
+
+		private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+		{
+			// Handle favorite items hotkey being pressed
+			if (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey)
+            {
+				ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
+            }
+		}
+
+		private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
+		{
+			// Handle favorite items hotkey being released
+			if (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey)
+			{
+				ConvenientInventory.IsFavoriteItemsHotkeyDown = false;
 			}
 		}
 	}
