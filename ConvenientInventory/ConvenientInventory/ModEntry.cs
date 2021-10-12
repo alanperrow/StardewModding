@@ -26,6 +26,11 @@ namespace ConvenientInventory
 			ConvenientInventory.FavoriteItemsCursorTexture = helper.Content.Load<Texture2D>(@"Assets\favoriteCursor.png");
 			ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
 
+			// HACK: Implement game logic here to find out number of slots to use
+			//		 Should always be 36 for vanilla, but for backpack expansion mod compatibility this should be dynamic
+			int backpackSize = 36;
+			ConvenientInventory.FavoriteItemSlots = new bool[backpackSize];
+
 			helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
 			helper.Events.Input.ButtonPressed += OnButtonPressed;
