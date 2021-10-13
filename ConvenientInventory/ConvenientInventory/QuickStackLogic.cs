@@ -301,12 +301,10 @@ namespace ConvenientInventory
 							}
 							else if (building is Mill mill)
 							{
-								if (mill.input.Value.GetMutex().IsLocked())
+								if (mill.isUnderConstruction() || mill.input.Value.GetMutex().IsLocked())
 								{
 									continue;
 								}
-
-								// TODO: Check if mill is under construction
 
 								dx = (int)buildingTileCenterPosition.X - (int)origin.X;
 								dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
@@ -424,12 +422,10 @@ namespace ConvenientInventory
 							}
 							else if (building is Mill mill)
 							{
-								if (mill.input.Value.GetMutex().IsLocked())
+								if (mill.isUnderConstruction() || mill.input.Value.GetMutex().IsLocked())
 								{
 									continue;
 								}
-
-								// TODO: Check if mill is under construction
 
 								dx = (int)buildingTileCenterPosition.X - (int)origin.X;
 								dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;

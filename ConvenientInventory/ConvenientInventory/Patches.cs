@@ -4,9 +4,46 @@ using HarmonyLib;
 using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
+using System.Diagnostics;
 
 namespace ConvenientInventory.Patches
 {
+	public static class Utilities
+    {
+		/// <summary>
+		/// Iterates through the current StackTrace to try to find a specified type as a method caller.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="maxDepth"></param>
+		/// <returns>Whether or not the specified type was found as a method caller within the maximum iteration depth.</returns>
+		public static bool IsThisMethodCalledFromType(Type type, int maxDepth = 2)
+        {
+			var trace = new StackTrace(2);  // Skip first two frames (this method, and the caller of this method)
+			var frames = trace?.GetFrames();
+			int depth = 0;
+
+			foreach (var frame in frames)
+			{
+				if (depth > maxDepth * 2)  // maxDepth * 2 because each method call takes up two frames
+                {
+					return false;
+                }
+
+				var method = frame?.GetMethod();
+
+				var isCraftingPage = method?.GetParameters()?[0].ParameterType == type;
+				if (isCraftingPage)
+				{
+					return true;
+				}
+
+				depth++;
+			}
+
+			return false;
+		}
+    }
+
 	public class InventoryPageConstructorPatch
 	{
 		public static void Postfix(InventoryPage __instance, int x, int y, int width, int height)
@@ -53,10 +90,41 @@ namespace ConvenientInventory.Patches
 			}
 		}
 
-
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(InventoryPage.receiveLeftClick))]
 		public static void ReceiveLeftClick_Postfix(InventoryPage __instance, int x, int y)
+		{
+			try
+			{
+				ConvenientInventory.ReceiveLeftClick(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
+			}
+		}
+	}
+
+	[HarmonyPatch(typeof(CraftingPage))]
+	public class CraftingPagePatches
+	{
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(CraftingPage.draw))]
+		public static void Draw_Postfix(SpriteBatch b)
+		{
+			try
+			{
+				ConvenientInventory.PostCraftingPageDraw(b);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+			}
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(CraftingPage.receiveLeftClick))]
+		public static void ReceiveLeftClick_Postfix(CraftingPage __instance, int x, int y)
 		{
 			try
 			{
@@ -144,7 +212,6 @@ namespace ConvenientInventory.Patches
 			}
 		}
 
-
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(MenuWithInventory.receiveLeftClick))]
 		public static void ReceiveLeftClick_Postfix(MenuWithInventory __instance, int x, int y)
@@ -170,7 +237,8 @@ namespace ConvenientInventory.Patches
 		{
 			try
 			{
-				if (__instance.playerInventory)
+				// HACK: CraftingPage.inventory has playerInventory = false, so we manually check if this draw call originated from CraftingPage.
+				if (__instance.playerInventory || Utilities.IsThisMethodCalledFromType(typeof(CraftingPage)))
                 {
 					ConvenientInventory.PostInventoryDraw(__instance, b);
 				}

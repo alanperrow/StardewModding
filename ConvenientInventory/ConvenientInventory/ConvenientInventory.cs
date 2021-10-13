@@ -5,6 +5,7 @@ using StardewValley;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static StardewValley.Menus.ItemGrabMenu;
 
 namespace ConvenientInventory
@@ -24,9 +25,9 @@ namespace ConvenientInventory
 	 *		- Prefix "Add To Existing Stacks" button logic to ignore favorited items as well.
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
-	internal static class ConvenientInventory
+	public static class ConvenientInventory
 	{
-		internal static Texture2D QuickStackButtonIcon { private get; set; }
+		public static Texture2D QuickStackButtonIcon { private get; set; }
 
 		private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
@@ -39,14 +40,48 @@ namespace ConvenientInventory
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
 
-		internal static Texture2D FavoriteItemsCursorTexture { private get; set; }
+		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
-		internal static Texture2D FavoriteItemsHighlightTexture { private get; set; }
+		public static Texture2D FavoriteItemsHighlightTexture { private get; set; }
 
-		internal static bool IsFavoriteItemsHotkeyDown { get; set; } = false;
+		public static bool IsFavoriteItemsHotkeyDown { get; set; } = false;
+
 		private static int favoriteItemsHotkeyDownCounter = 0;
 
-		internal static bool[] FavoriteItemSlots { get; set; }
+		private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Context.ModManifest.UniqueID}/favoriteItemSlots";
+
+		private static bool[] favoriteItemSlots;
+		public static bool[] FavoriteItemSlots
+		{
+			get { return favoriteItemSlots ?? LoadFavoriteItemSlots(); }
+			set { favoriteItemSlots = value; }
+		}
+
+		public static bool[] LoadFavoriteItemSlots()
+		{
+			Game1.player.modData.TryGetValue(favoriteItemSlotsModDataKey, out string dataStr);
+			
+			favoriteItemSlots = dataStr?
+				.Select(x => x == '1')
+				.ToArray()
+				?? new bool[36];  // TODO: Is there a way to get this value (for inventory expansion compatibility) rather than hard-coding it?  //Game1.player.maxItems.Value
+
+			return favoriteItemSlots;
+		}
+
+		public static string SaveFavoriteItemSlots()
+		{
+			if (favoriteItemSlots is null)
+            {
+				LoadFavoriteItemSlots();
+			}
+
+			var saveStr = new string(favoriteItemSlots.Select(x => x ? '1' : '0').ToArray());
+
+			Game1.player.modData[favoriteItemSlotsModDataKey] = saveStr;
+
+			return saveStr;
+		}
 
 		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
@@ -72,11 +107,6 @@ namespace ConvenientInventory
 				inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
 				inventoryPage.trashCan.upNeighborID = quickStackButtonID;
 			}
-
-			if (ModEntry.Config.IsEnableFavoriteItems && FavoriteItemSlots is null)
-            {
-				FavoriteItemSlots = new bool[inventoryPage.inventory.inventory.Count];
-            }
 		}
 
 		// Backpack inventory page.
@@ -100,12 +130,26 @@ namespace ConvenientInventory
             }
 		}
 
-        // Arbitrary inventory menu with a section for the player's inventory.
-        public static void ReceiveLeftClick(MenuWithInventory menuWithInventory, int x, int y)
+		// TODO: Crafting inventory page.
+		public static void ReceiveLeftClick(CraftingPage craftingPage, int x, int y)
 		{
 			// TODO: Move to prefix method.
 			//		 Favoriting an item should only toggle the favorited status, not select the item.
-			if (ModEntry.Config.IsEnableFavoriteItems/* && menuWithInventory.inventory.playerInventory*/)
+			if (ModEntry.Config.IsEnableFavoriteItems)
+			{
+				if (IsFavoriteItemsHotkeyDown)
+				{
+					ToggleFavoriteItemsSlotAtClickPosition(craftingPage.inventory, x, y);
+				}
+			}
+		}
+
+		// Arbitrary inventory menu with a section for the player's inventory.
+		public static void ReceiveLeftClick(MenuWithInventory menuWithInventory, int x, int y)
+		{
+			// TODO: Move to prefix method.
+			//		 Favoriting an item should only toggle the favorited status, not select the item.
+			if (ModEntry.Config.IsEnableFavoriteItems)
 			{
 				if (IsFavoriteItemsHotkeyDown)
 				{
@@ -225,7 +269,7 @@ namespace ConvenientInventory
 			}
 		}
 
-		// Called after drawing everything else in InventoryPage. Draws tooltip.
+		// Called after drawing everything else in InventoryPage. Draws tooltip. Draws favorite cursor.
 		public static void PostInventoryPageDraw(SpriteBatch spriteBatch)
 		{
 			if (ModEntry.Config.IsEnableQuickStack && IsDrawToolTip)
@@ -263,7 +307,24 @@ namespace ConvenientInventory
 			}
 		}
 
-        private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
+		// Called after drawing everything else in CraftingPage. Draws favorite cursor.
+		public static void PostCraftingPageDraw(SpriteBatch spriteBatch)
+		{
+			if (ModEntry.Config.IsEnableFavoriteItems)
+			{
+				if (IsFavoriteItemsHotkeyDown)
+				{
+					DrawFavoriteItemsCursor(spriteBatch);
+					favoriteItemsHotkeyDownCounter++;
+				}
+				else
+				{
+					favoriteItemsHotkeyDownCounter = 0;
+				}
+			}
+		}
+
+		private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
         {
             float scale = (float)(3d + 0.15d * Math.Cos(favoriteItemsHotkeyDownCounter / 15d));
 

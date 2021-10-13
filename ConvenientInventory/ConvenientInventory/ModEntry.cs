@@ -26,13 +26,13 @@ namespace ConvenientInventory
 			ConvenientInventory.FavoriteItemsCursorTexture = helper.Content.Load<Texture2D>(@"Assets\favoriteCursor.png");
 			ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
 
-			// HACK: Implement game logic here to find out number of slots to use
-			//		 Should always be 36 for vanilla, but for backpack expansion mod compatibility this should be dynamic
-			int backpackSize = 36;
-			ConvenientInventory.FavoriteItemSlots = new bool[backpackSize];
-
 			helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
+			helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+			helper.Events.GameLoop.Saving += OnSaving;
+
+			// TODO: Controller button should have different logic. Should toggle favorite on button_press, not button_hold+select.
+			// TODO: Suppress inputs. That way, item is not picked up when toggling favorite.
 			helper.Events.Input.ButtonPressed += OnButtonPressed;
 			helper.Events.Input.ButtonReleased += OnButtonReleased;
 		}
@@ -149,6 +149,17 @@ namespace ConvenientInventory
 				);
 			}
 		}
+
+		private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+		{
+			ConvenientInventory.LoadFavoriteItemSlots();
+			Monitor.Log("Favorite item slots loaded.", LogLevel.Debug);
+		}
+
+		private void OnSaving(object sender, SavingEventArgs e)
+        {
+			Monitor.Log($"Favorite item slots saved to player modData: '{     ConvenientInventory.SaveFavoriteItemSlots()     }'.", LogLevel.Debug);
+        }
 
 		private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
