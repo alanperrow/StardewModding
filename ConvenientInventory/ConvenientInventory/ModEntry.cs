@@ -117,21 +117,38 @@ namespace ConvenientInventory
 				api.RegisterSimpleOption(
 					mod: ModManifest,
 					optionName: "Enable favorite items?",   // TODO: Will favorited items ignore Auto Stash to Chest? Or just quick stack?
-					optionDesc: "If enabled, items in your inventory can be \"favorited\". Favorited items will be ignored when stacking into chests.",
+					optionDesc: "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests.",
 					optionGet: () => Config.IsEnableFavoriteItems,
 					optionSet: value => Config.IsEnableFavoriteItems = value
 				);
+				string[] highlightStyleDescriptions =
+				{
+					": Gold dashed",
+					": Clean gold dashed",
+					": Thick gold border",
+					": Textured gold inset border",
+					": Gold inset border",
+					": Dark dashed"
+				};
 				api.RegisterChoiceOption(
 					mod: ModManifest,
-					optionName: "Highlight visual preference",
-					optionDesc: "Choose your preferred texture for highlighting favorited items in your inventory.",
-					optionGet: () => Config.FavoriteItemsHighlightTextureChoice.ToString(),
+					optionName: "Highlight style",
+					optionDesc: "Choose your preferred texture style for highlighting favorited items in your inventory.",
+					optionGet: () => Config.FavoriteItemsHighlightTextureChoice.ToString() + highlightStyleDescriptions[Config.FavoriteItemsHighlightTextureChoice],
 					optionSet: value =>
 					{
-						Config.FavoriteItemsHighlightTextureChoice = int.Parse(value);
-						ConvenientInventory.FavoriteItemsHighlightTexture = Helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{value}.png");
+						Config.FavoriteItemsHighlightTextureChoice = int.Parse(value.Substring(0, 1));
+						ConvenientInventory.FavoriteItemsHighlightTexture = Helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{value[0]}.png");
 					},
-					choices: new string[] { "0", "1", "2", "3", "4" }
+					choices: new string[]
+					{
+						"0" + highlightStyleDescriptions[0],
+						"1" + highlightStyleDescriptions[1],
+						"2" + highlightStyleDescriptions[2],
+						"3" + highlightStyleDescriptions[3],
+						"4" + highlightStyleDescriptions[4],
+						"5" + highlightStyleDescriptions[5]
+					}
 				);
 				api.RegisterSimpleOption(
 					mod: ModManifest,

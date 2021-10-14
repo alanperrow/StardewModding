@@ -68,6 +68,8 @@
     <Content Include="Assets\favoriteHighlight_1.png" />
     <Content Include="Assets\favoriteHighlight_2.png" />
     <Content Include="Assets\favoriteHighlight_3.png" />
+    <Content Include="Assets\favoriteHighlight_4.png" />
+    <Content Include="Assets\favoriteHighlight_5.png" />
     <Content Include="Assets\icon.png" />
   </ItemGroup>
   <ItemGroup>
