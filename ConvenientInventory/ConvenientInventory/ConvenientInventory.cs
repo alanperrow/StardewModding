@@ -83,6 +83,16 @@ namespace ConvenientInventory
 			return saveStr;
 		}
 
+		// TODO: BEFORE TRYING PREFIX METHOD: Try drawing highlight with a smaller layer depth value?
+		// TODO: Create CurrentMenuType as a static variable in this class to store the type of menu currently being displayed in-game.
+		//		  - Set by postfix patching each menu's constructor, and in those patches, setting CurrentMenuType to the constructor's class type.
+		//		  - Constructors to patch: InventoryPage, CraftingPage, MenuWithInventory, ...
+		//		 Then, prefix patch InventoryMenu.draw().
+		//		  - Copy-paste original method, but call DrawFavoriteItemSlotHighlights() before drawing items, so highlights are drawn underneath items.
+		//		     - Should be inserted between the two for-loops in the "if (this.drawSlots)" block.
+		//		  - Switch logic based on CurrentMenuType so it knows whether or not to use modified draw method.
+		//		 Should also figure out when hotbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
+
 		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
 			Page = inventoryPage;
