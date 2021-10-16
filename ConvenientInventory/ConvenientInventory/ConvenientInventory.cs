@@ -40,6 +40,10 @@ namespace ConvenientInventory
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
 
+		private const int playerInventorySize = 36;
+
+		public static int? PlayerInventorySizeExpanded { get; set; } = null;  // For supporting mods which expand player inventory size
+
 		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
 		public static Texture2D FavoriteItemsHighlightTexture { private get; set; }
@@ -64,7 +68,11 @@ namespace ConvenientInventory
 			favoriteItemSlots = dataStr?
 				.Select(x => x == '1')
 				.ToArray()
-				?? new bool[36];  // TODO: Is there a way to get this value (for inventory expansion compatibility) rather than hard-coding it?  //Game1.player.maxItems.Value
+				?? new bool[playerInventorySize];
+			
+			// TODO: Is there a way to get max inventory size (for inventory expansion compatibility) rather than hard-coding it?  //Game1.player.maxItems.Value
+			//		 For now, support inventory expansion mods manually by detecting them and setting PlayerInventorySizeExpanded to the new value.
+			//		 Will have to make a new modData entry "favoriteItemSlotsExpanded" to support extra slots and not interfere with original inventory.
 
 			return favoriteItemSlots;
 		}
