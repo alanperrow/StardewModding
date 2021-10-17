@@ -92,9 +92,8 @@ namespace ConvenientInventory
 			return saveStr;
 		}
 
-		// TODO: BEFORE TRYING PREFIX METHOD: Try drawing highlight with a smaller layer depth value?
-		//		  - DOESN'T WORK
-		// TODO: Create CurrentMenuType as a static variable in this class to store the type of menu currently being displayed in-game.
+		// TODO: Try using "helper.Events.Display.RenderedActiveMenu" and "StardewValley.Game1.activeClickableMenu" for post-draw logic.
+		// TODO: Create CurrentMenuType as a static variable in this class to store the type of menu currently being displayed in-game. (Maybe reference Game1.onScreenMenus ?)
 		//		  - Set by postfix patching each menu's constructor, and in those patches, setting CurrentMenuType to the constructor's class type.
 		//		  - Constructors to patch: InventoryPage, CraftingPage, MenuWithInventory, ...
 		//		 Then, prefix patch InventoryMenu.draw().
