@@ -40,9 +40,7 @@ namespace ConvenientInventory
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
 
-		private const int playerInventorySize = 36;
-
-		public static int? PlayerInventorySizeExpanded { get; set; } = null;  // For supporting mods which expand player inventory size
+		public static int? PlayerInventoryExpandedSize { get; set; } = null;  // For supporting mods which expand player inventory size
 
 		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
@@ -65,33 +63,37 @@ namespace ConvenientInventory
 		{
 			Game1.player.modData.TryGetValue(favoriteItemSlotsModDataKey, out string dataStr);
 			
-			favoriteItemSlots = dataStr?
+			FavoriteItemSlots = dataStr?
 				.Select(x => x == '1')
 				.ToArray()
-				?? new bool[playerInventorySize];
-			
-			// TODO: Is there a way to get max inventory size (for inventory expansion compatibility) rather than hard-coding it?  //Game1.player.maxItems.Value
-			//		 For now, support inventory expansion mods manually by detecting them and setting PlayerInventorySizeExpanded to the new value.
+				?? new bool[Farmer.maxInventorySpace];
+
+			// TODO: Is this a good a way of getting max inventory size (for inventory expansion compatibility)?
+			//		 For now, support inventory expansion mods manually by detecting them and setting PlayerInventoryExpandedSize to the new value.
 			//		 Will have to make a new modData entry "favoriteItemSlotsExpanded" to support extra slots and not interfere with original inventory.
 
-			return favoriteItemSlots;
+			dataStr = dataStr ?? new string('0', FavoriteItemSlots.Length);
+			ModEntry.Context.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Debug);
+			return FavoriteItemSlots;
 		}
 
 		public static string SaveFavoriteItemSlots()
 		{
-			if (favoriteItemSlots is null)
+			if (FavoriteItemSlots is null)
             {
 				LoadFavoriteItemSlots();
 			}
 
-			var saveStr = new string(favoriteItemSlots.Select(x => x ? '1' : '0').ToArray());
+			var saveStr = new string(FavoriteItemSlots.Select(x => x ? '1' : '0').ToArray());
 
 			Game1.player.modData[favoriteItemSlotsModDataKey] = saveStr;
 
+			ModEntry.Context.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", StardewModdingAPI.LogLevel.Debug);
 			return saveStr;
 		}
 
 		// TODO: BEFORE TRYING PREFIX METHOD: Try drawing highlight with a smaller layer depth value?
+		//		  - DOESN'T WORK
 		// TODO: Create CurrentMenuType as a static variable in this class to store the type of menu currently being displayed in-game.
 		//		  - Set by postfix patching each menu's constructor, and in those patches, setting CurrentMenuType to the constructor's class type.
 		//		  - Constructors to patch: InventoryPage, CraftingPage, MenuWithInventory, ...
@@ -100,6 +102,7 @@ namespace ConvenientInventory
 		//		     - Should be inserted between the two for-loops in the "if (this.drawSlots)" block.
 		//		  - Switch logic based on CurrentMenuType so it knows whether or not to use modified draw method.
 		//		 Should also figure out when hotbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
+		//		  - Toolbar class
 
 		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
@@ -187,13 +190,54 @@ namespace ConvenientInventory
             {
                 ModEntry.Context.Monitor
 					.Log($"{(FavoriteItemSlots[clickPos] ? "Un-" : string.Empty)}Favorited item slot {clickPos}: {inventoryMenu.actualInventory[clickPos]?.Name}",
-                	StardewModdingAPI.LogLevel.Debug);
+                	StardewModdingAPI.LogLevel.Trace);
 
 				Game1.playSound("smallSelect");
 
                 FavoriteItemSlots[clickPos] = !FavoriteItemSlots[clickPos];
             }
         }
+
+		// Player shifted toolbar row, so shift all favorited item slots by a row
+		public static void ShiftToolbar(bool right)
+		{
+			RotateArray(FavoriteItemSlots, 12, right);
+		}
+
+		private static void RotateArray(bool[] arr, int count, bool right)
+		{
+			count %= arr.Length;
+			if (count == 0) return;
+
+			bool[] toMove = (bool[]) arr.Clone();
+
+			if (right)
+			{
+				// SDV "right" => left shift
+				for (int i = 0; i < arr.Length - count; i++)
+				{
+					arr[i] = arr[i + count];
+				}
+				for (int i = 0; i < count; i++)
+				{
+					arr[arr.Length - count + i] = toMove[i];
+				}
+
+				return;
+			}
+
+			// SDV "left" => right shift
+			for (int i = 0; i < arr.Length - count; i++)
+			{
+				arr[arr.Length - 1 - i] = arr[arr.Length - 1 - i - count];
+			}
+			for (int i = 0; i < count; i++)
+			{
+				arr[i] = toMove[arr.Length - count + i];
+			}
+
+			return;
+		}
 
 		public static void PerformHoverAction(int x, int y)
 		{

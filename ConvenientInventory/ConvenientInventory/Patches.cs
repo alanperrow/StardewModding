@@ -5,6 +5,7 @@ using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using System.Diagnostics;
+using StardewValley;
 
 namespace ConvenientInventory.Patches
 {
@@ -249,4 +250,27 @@ namespace ConvenientInventory.Patches
 			}
 		}
 	}
+
+	[HarmonyPatch(typeof(Farmer))]
+	public class FarmerPatches
+    {
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(Farmer.shiftToolbar))]
+		public static void ShiftToolbar_Postfix(Farmer __instance, bool right)
+        {
+            try
+            {
+				if (__instance.Items == null || __instance.Items.Count < 12 || __instance.UsingTool || Game1.dialogueUp || (!Game1.pickingTool && !Game1.player.CanMove) || __instance.areAllItemsNull() || Game1.eventUp || Game1.farmEvent != null)
+				{
+					return;
+				}
+
+				ConvenientInventory.ShiftToolbar(right);
+			}
+			catch (Exception e)
+            {
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ShiftToolbar_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
 }

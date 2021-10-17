@@ -170,12 +170,11 @@ namespace ConvenientInventory
 		private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
 			ConvenientInventory.LoadFavoriteItemSlots();
-			Monitor.Log("Favorite item slots loaded.", LogLevel.Debug);
 		}
 
 		private void OnSaving(object sender, SavingEventArgs e)
         {
-			Monitor.Log($"Favorite item slots saved to player modData: '{     ConvenientInventory.SaveFavoriteItemSlots()     }'.", LogLevel.Debug);
+			ConvenientInventory.SaveFavoriteItemSlots();
         }
 
 		private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
