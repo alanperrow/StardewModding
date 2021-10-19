@@ -6,45 +6,11 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using System.Diagnostics;
 using StardewValley;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace ConvenientInventory.Patches
 {
-	public static class Utilities
-    {
-		/// <summary>
-		/// Iterates through the current StackTrace to try to find a specified type as a method caller.
-		/// </summary>
-		/// <param name="type"></param>
-		/// <param name="maxDepth"></param>
-		/// <returns>Whether or not the specified type was found as a method caller within the maximum iteration depth.</returns>
-		public static bool IsThisMethodCalledFromType(Type type, int maxDepth = 2)
-        {
-			var trace = new StackTrace(2);  // Skip first two frames (this method, and the caller of this method)
-			var frames = trace?.GetFrames();
-			int depth = 0;
-
-			foreach (var frame in frames)
-			{
-				if (depth > maxDepth * 2)  // maxDepth * 2 because each method call takes up two frames
-                {
-					return false;
-                }
-
-				var method = frame?.GetMethod();
-
-				var isCraftingPage = method?.GetParameters()?[0].ParameterType == type;
-				if (isCraftingPage)
-				{
-					return true;
-				}
-
-				depth++;
-			}
-
-			return false;
-		}
-    }
-
 	public class InventoryPageConstructorPatch
 	{
 		public static void Postfix(InventoryPage __instance, int x, int y, int width, int height)
@@ -205,7 +171,7 @@ namespace ConvenientInventory.Patches
 		{
 			try
 			{
-				ConvenientInventory.PostInventoryDraw(__instance, b);
+				ConvenientInventory.PostMenuWithInventoryDraw(__instance, b);
 			}
 			catch (Exception e)
 			{
@@ -231,6 +197,46 @@ namespace ConvenientInventory.Patches
 	[HarmonyPatch(typeof(InventoryMenu))]
 	public class InventoryMenuPatches
 	{
+		static FieldInfo fieldInfo = AccessTools.Field(typeof(InventoryMenu), "");
+
+		[HarmonyTranspiler]
+		[HarmonyPatch(nameof(InventoryMenu.draw))]
+		[HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(int) })]
+		public static IEnumerable<CodeInstruction> Draw_Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			try
+			{
+				// Add my conditional method call between these two opcodes in InventoryMenu.draw(s, i, i, i):
+				// IL_02c3: blt IL_00e5		// END for j (SDV l) loop
+				// >>> MY METHOD CALL HERE
+				// IL_02c8: ldc.i4.0		// BEGIN for k loop
+
+				/*
+				=== Desired C# code ===
+				if (ConvenientInventory.IsPlayerInventory(__instance))
+				{
+					ConvenientInventory.DrawFavoriteItemSlotHighlights(spriteBatch, __instance);
+				}
+
+				=== Psuedocode ===
+				ldarg.0																						// load this object instance (arg 0)
+				call ConvenientInventory::IsPlayerInventory()												// call IsPlayerInventory(this)
+				brfalse IL_02c8																				// break if call => false
+
+				ldarg.1																						// load SpriteBatch "b" (arg 1)
+				ldarg.0																						// load this object instance (arg 0)
+				call ConvenientInventory::DrawFavoriteItemSlotHighlights()									// call DrawFavoriteItemSlotHighlights(b, this)
+
+				*/
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Transpiler)}:\n{e}", LogLevel.Error);
+			}
+
+			return instructions;
+		}
+
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(InventoryMenu.draw))]
 		[HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(int) })]
@@ -238,8 +244,7 @@ namespace ConvenientInventory.Patches
 		{
 			try
 			{
-				// HACK: CraftingPage.inventory has playerInventory = false, so we manually check if this draw call originated from CraftingPage.
-				if (__instance.playerInventory || Utilities.IsThisMethodCalledFromType(typeof(CraftingPage)))
+				if (ConvenientInventory.IsPlayerInventory(__instance))
                 {
 					ConvenientInventory.PostInventoryDraw(__instance, b);
 				}

@@ -116,7 +116,7 @@ namespace ConvenientInventory
 				);
 				api.RegisterSimpleOption(
 					mod: ModManifest,
-					optionName: "Enable favorite items?",   // TODO: Will favorited items ignore Auto Stash to Chest? Or just quick stack?
+					optionName: "Enable favorite items?",   // TODO: Will favorited items ignore Add To Existing Stacks? Or just quick stack?
 					optionDesc: "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests.",
 					optionGet: () => Config.IsEnableFavoriteItems,
 					optionSet: value => Config.IsEnableFavoriteItems = value

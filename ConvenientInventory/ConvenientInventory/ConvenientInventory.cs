@@ -92,17 +92,6 @@ namespace ConvenientInventory
 			return saveStr;
 		}
 
-		// TODO: Try using "helper.Events.Display.RenderedActiveMenu" and "StardewValley.Game1.activeClickableMenu" for post-draw logic.
-		// TODO: Create CurrentMenuType as a static variable in this class to store the type of menu currently being displayed in-game. (Maybe reference Game1.onScreenMenus ?)
-		//		  - Set by postfix patching each menu's constructor, and in those patches, setting CurrentMenuType to the constructor's class type.
-		//		  - Constructors to patch: InventoryPage, CraftingPage, MenuWithInventory, ...
-		//		 Then, prefix patch InventoryMenu.draw().
-		//		  - Copy-paste original method, but call DrawFavoriteItemSlotHighlights() before drawing items, so highlights are drawn underneath items.
-		//		     - Should be inserted between the two for-loops in the "if (this.drawSlots)" block.
-		//		  - Switch logic based on CurrentMenuType so it knows whether or not to use modified draw method.
-		//		 Should also figure out when hotbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
-		//		  - Toolbar class
-
 		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
 			Page = inventoryPage;
@@ -150,7 +139,7 @@ namespace ConvenientInventory
             }
 		}
 
-		// TODO: Crafting inventory page.
+		// Crafting inventory page.
 		public static void ReceiveLeftClick(CraftingPage craftingPage, int x, int y)
 		{
 			// TODO: Move to prefix method.
@@ -255,15 +244,18 @@ namespace ConvenientInventory
 			}
 		}
 
+		// TODO: Try using "helper.Events.Display.RenderedActiveMenu" and "StardewValley.Game1.activeClickableMenu" for post-draw logic.
+		// TODO: Should also figure out when toolbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
+		//		  - Toolbar class
+
 		// TODO: Draw highlight *underneath* items
 		// Called after drawing everything else in arbitrary inventory menu.
 		// Draws favorite item slot highlights, and favorite items cursor if keybind is being pressed.
-		public static void PostInventoryDraw(MenuWithInventory menuWithInventory, SpriteBatch spriteBatch)
+		public static void PostMenuWithInventoryDraw(MenuWithInventory menuWithInventory, SpriteBatch spriteBatch)
         {
 			if (ModEntry.Config.IsEnableFavoriteItems)
 			{
-				List<Vector2> slotDrawPositions = menuWithInventory.inventory?.GetSlotDrawPositions();
-				DrawFavoriteItemSlotHighlights(spriteBatch, slotDrawPositions);
+				DrawFavoriteItemSlotHighlights(spriteBatch, menuWithInventory.inventory);
 
 				if (IsFavoriteItemsHotkeyDown)
 				{
@@ -277,18 +269,25 @@ namespace ConvenientInventory
 			}
 		}
 
+		// CraftingPage.inventory has playerInventory = false, so we manually check if this inventory is from CraftingPage.
+		public static bool IsPlayerInventory(InventoryMenu inventoryMenu)
+		{
+			return inventoryMenu.playerInventory || (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage);
+		}
+
 		// Called after drawing everything else in player inventory section of arbitrary inventory menu.
 		public static void PostInventoryDraw(InventoryMenu inventoryMenu, SpriteBatch spriteBatch)
 		{
 			if (ModEntry.Config.IsEnableFavoriteItems)
             {
-                List<Vector2> slotDrawPositions = inventoryMenu.GetSlotDrawPositions();
-				DrawFavoriteItemSlotHighlights(spriteBatch, slotDrawPositions);
+				DrawFavoriteItemSlotHighlights(spriteBatch, inventoryMenu);
             }
         }
 
-        private static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, List<Vector2> slotDrawPositions)
+        public static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, InventoryMenu inventoryMenu)
         {
+			List<Vector2> slotDrawPositions = inventoryMenu?.GetSlotDrawPositions();
+
 			if (slotDrawPositions is null)
             {
 				return;
