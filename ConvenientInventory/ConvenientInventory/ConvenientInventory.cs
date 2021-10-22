@@ -21,8 +21,12 @@ namespace ConvenientInventory
 
 	/*
 	 * TODO: 
-	 *	- Implement favorited items, which will be ignored by "Quick Stack To Nearby Chests" button.
+	 *	- Implement favorited items
+	 *		- Will be ignored by "Quick Stack To Nearby Chests" button.
 	 *		- Prefix "Add To Existing Stacks" button logic to ignore favorited items as well.
+	 *		- (?) Prevents being sold to shops
+	 *		- (?) Prevents being dropped from inventory
+	 *		- (?) Prevents being trashed in inventory
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	public static class ConvenientInventory
@@ -117,54 +121,31 @@ namespace ConvenientInventory
 				inventoryPage.trashCan.upNeighborID = quickStackButtonID;
 			}
 		}
-
-		// Backpack inventory page.
-		public static void ReceiveLeftClick(InventoryPage inventoryPage, int x, int y)
+		
+		public static void ReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
 		{
-			if (ModEntry.Config.IsEnableQuickStack && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
-			{
+			var inventoryPage = menu as InventoryPage;				// Player menu - inventory tab
+			var craftingPage = menu as CraftingPage;				// Player menu - crafting tab
+			var menuWithInventory = menu as MenuWithInventory;      // Arbitrary menu
+
+			// Quick stack button clicked (in InventoryPage)
+			if (inventoryPage != null && ModEntry.Config.IsEnableQuickStack && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
+            {
 				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
-
-				return;
 			}
 
-			// TODO: Move to prefix method.
-			//		 Favoriting an item should only toggle the favorited status, not select the item.
-			if (ModEntry.Config.IsEnableFavoriteItems)
-			{
-				if (IsFavoriteItemsHotkeyDown)
-                {
-                    ToggleFavoriteItemsSlotAtClickPosition(inventoryPage.inventory, x, y);
-                }
+			// Try to favorite an item slot
+			if (ModEntry.Config.IsEnableFavoriteItems && IsFavoriteItemsHotkeyDown)
+            {
+				InventoryMenu inventory = inventoryPage?.inventory
+					?? craftingPage?.inventory
+					?? menuWithInventory?.inventory;
+
+				if (inventory != null)
+				{
+					ToggleFavoriteItemsSlotAtClickPosition(inventory, x, y);
+				}
             }
-		}
-
-		// Crafting inventory page.
-		public static void ReceiveLeftClick(CraftingPage craftingPage, int x, int y)
-		{
-			// TODO: Move to prefix method.
-			//		 Favoriting an item should only toggle the favorited status, not select the item.
-			if (ModEntry.Config.IsEnableFavoriteItems)
-			{
-				if (IsFavoriteItemsHotkeyDown)
-				{
-					ToggleFavoriteItemsSlotAtClickPosition(craftingPage.inventory, x, y);
-				}
-			}
-		}
-
-		// Arbitrary inventory menu with a section for the player's inventory.
-		public static void ReceiveLeftClick(MenuWithInventory menuWithInventory, int x, int y)
-		{
-			// TODO: Move to prefix method.
-			//		 Favoriting an item should only toggle the favorited status, not select the item.
-			if (ModEntry.Config.IsEnableFavoriteItems)
-			{
-				if (IsFavoriteItemsHotkeyDown)
-				{
-					ToggleFavoriteItemsSlotAtClickPosition(menuWithInventory.inventory, x, y);
-				}
-			}
         }
 
 		// Toggles the favorited status of a selected item slot.
@@ -227,7 +208,7 @@ namespace ConvenientInventory
 			return;
 		}
 
-		public static void PerformHoverAction(int x, int y)
+		public static void PerformHoverActionInInventoryPage(int x, int y)
 		{
 			if (ModEntry.Config.IsEnableQuickStack)
 			{
@@ -236,7 +217,7 @@ namespace ConvenientInventory
 			}
 		}
 
-		public static void PopulateClickableComponentsList(InventoryPage inventoryPage)
+		public static void PopulateClickableComponentsListInInventoryPage(InventoryPage inventoryPage)
 		{
 			if (ModEntry.Config.IsEnableQuickStack)
 			{
@@ -245,19 +226,90 @@ namespace ConvenientInventory
 		}
 
 		// CraftingPage.inventory has playerInventory = false, so we manually check if this inventory is from CraftingPage.
+		// TODO: Check for ShopMenu - it also has playerInventory = false.
 		public static bool IsPlayerInventory(InventoryMenu inventoryMenu)
 		{
 			return inventoryMenu.playerInventory || (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage);
 		}
 
-        public static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, InventoryMenu inventoryMenu)
-        {
-			List<Vector2> slotDrawPositions = inventoryMenu?.GetSlotDrawPositions();
+		// TODO: Try using "helper.Events.Display.RenderedActiveMenu" and "StardewValley.Game1.activeClickableMenu" for post-draw logic.
+		// TODO: Should also figure out when toolbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
+		//		  - Toolbar class
 
-			if (slotDrawPositions is null)
+		// TODO: Draw highlight *underneath* items
+		// Called after drawing everything else in arbitrary inventory menu.
+		// Draws favorite item slot highlights, and favorite items cursor if keybind is being pressed.
+		public static void PostMenuDraw<T>(T menu, SpriteBatch spriteBatch) where T : IClickableMenu
+		{
+			var inventoryMenu = menu as InventoryMenu;          // Inventory item slots container
+			var inventoryPage = menu as InventoryPage;          // Player menu - inventory tab
+			var craftingPage = menu as CraftingPage;            // Player menu - crafting tab
+			var menuWithInventory = menu as MenuWithInventory;  // Arbitrary menu
+
+			// Draw quick stack button tooltip (in InventoryPage)
+			if (inventoryPage != null && ModEntry.Config.IsEnableQuickStack && IsDrawToolTip)
+			{
+				DrawQuickStackButtonToolTip(spriteBatch);
+			}
+
+			InventoryMenu inventory = inventoryMenu
+				?? inventoryPage?.inventory
+				?? craftingPage?.inventory
+				?? menuWithInventory?.inventory;
+
+			if (inventory != null && ModEntry.Config.IsEnableFavoriteItems)
+			{
+				// Draw favorite highlights (in InventoryMenu or MenuWithInventory)
+				if (inventoryMenu != null || menuWithInventory != null)
+				{
+					DrawFavoriteItemSlotHighlights(spriteBatch, inventory);
+				}
+
+				// Draw favorite cursor (unless this is an InventoryMenu)
+				if (IsFavoriteItemsHotkeyDown)
+				{
+					if (inventoryMenu is null)
+					{
+						DrawFavoriteItemsCursor(spriteBatch);
+						favoriteItemsHotkeyDownCounter++;
+					}
+				}
+				else
+				{
+					favoriteItemsHotkeyDownCounter = 0;
+				}
+			}
+		}
+
+        private static void DrawQuickStackButtonToolTip(SpriteBatch spriteBatch)
+        {
+            NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
+
+            if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
+            {
+                int numPos = ModEntry.Config.IsQuickStackIntoBuildingsWithInventories
+                    ? NearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(NearbyTypedChests)
+                    : NearbyTypedChests.Count;
+
+                var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
+                IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, -1, -1, null, -1);
+
+                DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
+            }
+            else
+            {
+                IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
+            }
+        }
+
+		private static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, InventoryMenu inventoryMenu)
+        {
+			if (inventoryMenu is null)
             {
 				return;
             }
+
+			List<Vector2> slotDrawPositions = inventoryMenu.GetSlotDrawPositions();
 
             for (int i = 0; i < slotDrawPositions.Count; i++)
             {
@@ -275,39 +327,17 @@ namespace ConvenientInventory
             }
         }
 
-		// TODO: Try using "helper.Events.Display.RenderedActiveMenu" and "StardewValley.Game1.activeClickableMenu" for post-draw logic.
-		// TODO: Should also figure out when toolbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
-		//		  - Toolbar class
-
-		// TODO: Draw highlight *underneath* items
-		// Called after drawing everything else in arbitrary inventory menu.
-		// Draws favorite item slot highlights, and favorite items cursor if keybind is being pressed.
-		public static void PostMenuWithInventoryDraw(MenuWithInventory menuWithInventory, SpriteBatch spriteBatch)
-        {
-			if (ModEntry.Config.IsEnableFavoriteItems)
-			{
-				DrawFavoriteItemSlotHighlights(spriteBatch, menuWithInventory.inventory);
-
-				if (IsFavoriteItemsHotkeyDown)
-				{
-					DrawFavoriteItemsCursor(spriteBatch);
-					favoriteItemsHotkeyDownCounter++;
-				}
-				else
-				{
-					favoriteItemsHotkeyDownCounter = 0;
-				}
-			}
-		}
-
-		// Called after drawing everything else in player inventory section of arbitrary inventory menu.
-		public static void PostInventoryDraw(InventoryMenu inventoryMenu, SpriteBatch spriteBatch)
+		private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
 		{
-			if (ModEntry.Config.IsEnableFavoriteItems)
-            {
-				DrawFavoriteItemSlotHighlights(spriteBatch, inventoryMenu);
-            }
-        }
+			float scale = (float)(3d + 0.15d * Math.Cos(favoriteItemsHotkeyDownCounter / 15d));
+
+			spriteBatch.Draw(FavoriteItemsCursorTexture,
+			   new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
+			   new Rectangle(0, 0, FavoriteItemsCursorTexture.Width, FavoriteItemsCursorTexture.Height),
+			   Color.White,
+			   0f, Vector2.Zero, scale, SpriteEffects.None, 1f
+		   );
+		}
 
         public static void PostClickableTextureComponentDraw(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
 		{
@@ -328,73 +358,6 @@ namespace ConvenientInventory
 				QuickStackButton?.draw(spriteBatch);
 			}
 		}
-
-		// Called after drawing everything else in InventoryPage. Draws tooltip. Draws favorite cursor.
-		public static void PostInventoryPageDraw(SpriteBatch spriteBatch)
-		{
-			if (ModEntry.Config.IsEnableQuickStack && IsDrawToolTip)
-            {
-				NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
-
-				if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
-				{
-					int numPos = ModEntry.Config.IsQuickStackIntoBuildingsWithInventories
-						? NearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(NearbyTypedChests)
-						: NearbyTypedChests.Count;
-
-					var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
-					IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, -1, -1, null, -1);
-
-					DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
-				}
-				else
-				{
-					IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
-				}
-			}
-
-			if (ModEntry.Config.IsEnableFavoriteItems)
-			{
-				if (IsFavoriteItemsHotkeyDown)
-                {
-                    DrawFavoriteItemsCursor(spriteBatch);
-                    favoriteItemsHotkeyDownCounter++;
-                }
-                else
-                {
-					favoriteItemsHotkeyDownCounter = 0;
-                }
-			}
-		}
-
-		// Called after drawing everything else in CraftingPage. Draws favorite cursor.
-		public static void PostCraftingPageDraw(SpriteBatch spriteBatch)
-		{
-			if (ModEntry.Config.IsEnableFavoriteItems)
-			{
-				if (IsFavoriteItemsHotkeyDown)
-				{
-					DrawFavoriteItemsCursor(spriteBatch);
-					favoriteItemsHotkeyDownCounter++;
-				}
-				else
-				{
-					favoriteItemsHotkeyDownCounter = 0;
-				}
-			}
-		}
-
-		private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
-        {
-            float scale = (float)(3d + 0.15d * Math.Cos(favoriteItemsHotkeyDownCounter / 15d));
-
-            spriteBatch.Draw(FavoriteItemsCursorTexture,
-               new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
-               new Rectangle(0, 0, FavoriteItemsCursorTexture.Width, FavoriteItemsCursorTexture.Height),
-               Color.White,
-               0f, Vector2.Zero, scale, SpriteEffects.None, 1f
-           );
-        }
 
         private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<TypedChest> chests)
         {

@@ -4,7 +4,6 @@ using HarmonyLib;
 using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
-using System.Diagnostics;
 using StardewValley;
 using System.Collections.Generic;
 using System.Reflection;
@@ -31,11 +30,11 @@ namespace ConvenientInventory.Patches
 	{
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(InventoryPage.draw))]
-		public static void Draw_Postfix(SpriteBatch b)
+		public static void Draw_Postfix(InventoryPage __instance, SpriteBatch b)
 		{
 			try
             {
-                ConvenientInventory.PostInventoryPageDraw(b);
+                ConvenientInventory.PostMenuDraw(__instance, b);
 			}
 			catch (Exception e)
 			{
@@ -49,7 +48,7 @@ namespace ConvenientInventory.Patches
 		{
 			try
             {
-                ConvenientInventory.PerformHoverAction(x, y);
+                ConvenientInventory.PerformHoverActionInInventoryPage(x, y);
 			}
 			catch (Exception e)
 			{
@@ -63,7 +62,7 @@ namespace ConvenientInventory.Patches
 		{
 			try
 			{
-				ConvenientInventory.ReceiveLeftClick(__instance, x, y);
+				ConvenientInventory.ReceiveLeftClickInMenu(__instance, x, y);
 			}
 			catch (Exception e)
 			{
@@ -77,11 +76,11 @@ namespace ConvenientInventory.Patches
 	{
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(CraftingPage.draw))]
-		public static void Draw_Postfix(SpriteBatch b)
+		public static void Draw_Postfix(CraftingPage __instance, SpriteBatch b)
 		{
 			try
 			{
-				ConvenientInventory.PostCraftingPageDraw(b);
+				ConvenientInventory.PostMenuDraw(__instance, b);
 			}
 			catch (Exception e)
 			{
@@ -95,7 +94,7 @@ namespace ConvenientInventory.Patches
 		{
 			try
 			{
-				ConvenientInventory.ReceiveLeftClick(__instance, x, y);
+				ConvenientInventory.ReceiveLeftClickInMenu(__instance, x, y);
 			}
 			catch (Exception e)
 			{
@@ -115,7 +114,7 @@ namespace ConvenientInventory.Patches
 			{
 				if (__instance is InventoryPage inventoryPage)
 				{
-					ConvenientInventory.PopulateClickableComponentsList(inventoryPage);
+					ConvenientInventory.PopulateClickableComponentsListInInventoryPage(inventoryPage);
 				}
 			}
 			catch (Exception e)
@@ -171,7 +170,7 @@ namespace ConvenientInventory.Patches
 		{
 			try
 			{
-				ConvenientInventory.PostMenuWithInventoryDraw(__instance, b);
+				ConvenientInventory.PostMenuDraw(__instance, b);
 			}
 			catch (Exception e)
 			{
@@ -185,7 +184,7 @@ namespace ConvenientInventory.Patches
 		{
 			try
 			{
-				ConvenientInventory.ReceiveLeftClick(__instance, x, y);
+				ConvenientInventory.ReceiveLeftClickInMenu(__instance, x, y);
 			}
 			catch (Exception e)
 			{
@@ -246,7 +245,7 @@ namespace ConvenientInventory.Patches
 			{
 				if (ConvenientInventory.IsPlayerInventory(__instance))
                 {
-					ConvenientInventory.PostInventoryDraw(__instance, b);
+					ConvenientInventory.PostMenuDraw(__instance, b);
 				}
 			}
 			catch (Exception e)
