@@ -244,6 +244,37 @@ namespace ConvenientInventory
 			}
 		}
 
+		// CraftingPage.inventory has playerInventory = false, so we manually check if this inventory is from CraftingPage.
+		public static bool IsPlayerInventory(InventoryMenu inventoryMenu)
+		{
+			return inventoryMenu.playerInventory || (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage);
+		}
+
+        public static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, InventoryMenu inventoryMenu)
+        {
+			List<Vector2> slotDrawPositions = inventoryMenu?.GetSlotDrawPositions();
+
+			if (slotDrawPositions is null)
+            {
+				return;
+            }
+
+            for (int i = 0; i < slotDrawPositions.Count; i++)
+            {
+                if (!FavoriteItemSlots[i])
+                {
+                    continue;
+                }
+
+                spriteBatch.Draw(FavoriteItemsHighlightTexture,
+                    slotDrawPositions[i],
+                    new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
+                    Color.White,
+                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
+                );
+            }
+        }
+
 		// TODO: Try using "helper.Events.Display.RenderedActiveMenu" and "StardewValley.Game1.activeClickableMenu" for post-draw logic.
 		// TODO: Should also figure out when toolbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
 		//		  - Toolbar class
@@ -269,43 +300,12 @@ namespace ConvenientInventory
 			}
 		}
 
-		// CraftingPage.inventory has playerInventory = false, so we manually check if this inventory is from CraftingPage.
-		public static bool IsPlayerInventory(InventoryMenu inventoryMenu)
-		{
-			return inventoryMenu.playerInventory || (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage);
-		}
-
 		// Called after drawing everything else in player inventory section of arbitrary inventory menu.
 		public static void PostInventoryDraw(InventoryMenu inventoryMenu, SpriteBatch spriteBatch)
 		{
 			if (ModEntry.Config.IsEnableFavoriteItems)
             {
 				DrawFavoriteItemSlotHighlights(spriteBatch, inventoryMenu);
-            }
-        }
-
-        public static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, InventoryMenu inventoryMenu)
-        {
-			List<Vector2> slotDrawPositions = inventoryMenu?.GetSlotDrawPositions();
-
-			if (slotDrawPositions is null)
-            {
-				return;
-            }
-
-            for (int i = 0; i < slotDrawPositions.Count; i++)
-            {
-                if (!FavoriteItemSlots[i])
-                {
-                    continue;
-                }
-
-                spriteBatch.Draw(FavoriteItemsHighlightTexture,
-                    slotDrawPositions[i],
-                    new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
-                    Color.White,
-                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
-                );
             }
         }
 
