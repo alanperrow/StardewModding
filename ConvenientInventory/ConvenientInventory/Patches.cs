@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq;
+using System.Text;
 
 namespace ConvenientInventory.Patches
 {
@@ -280,6 +281,7 @@ namespace ConvenientInventory.Patches
         {
             try
             {
+				// Game logic
 				if (__instance.Items == null || __instance.Items.Count < 12 || __instance.UsingTool || Game1.dialogueUp || (!Game1.pickingTool && !Game1.player.CanMove) || __instance.areAllItemsNull() || Game1.eventUp || Game1.farmEvent != null)
 				{
 					return;
@@ -292,5 +294,23 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ShiftToolbar_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+    }
+
+	[HarmonyPatch(typeof(Item))]
+	public class ItemPatches
+    {
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(Item.drawTooltip))]
+		public static void DrawToolTip_Postfix(Item __instance, SpriteBatch spriteBatch, ref int x, ref int y, SpriteFont font, float alpha, StringBuilder overrideText)
+        {
+			try
+			{
+				ConvenientInventory.PostItemDrawToolTip(__instance, spriteBatch, ref x, ref y, font, alpha, overrideText);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(DrawToolTip_Postfix)}:\n{e}", LogLevel.Error);
+			}
+		}
     }
 }
