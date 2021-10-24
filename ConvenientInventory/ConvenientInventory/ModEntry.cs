@@ -25,6 +25,7 @@ namespace ConvenientInventory
 			ConvenientInventory.QuickStackButtonIcon = helper.Content.Load<Texture2D>(@"Assets\icon.png");
 			ConvenientInventory.FavoriteItemsCursorTexture = helper.Content.Load<Texture2D>(@"Assets\favoriteCursor.png");
 			ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
+			ConvenientInventory.FavoriteItemsBorderTexture = helper.Content.Load<Texture2D>(@"Assets\favoriteBorder.png");
 
 			helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 

@@ -27,8 +27,9 @@ namespace ConvenientInventory
 	 *		- (?) Prevents being sold to shops
 	 *		- (?) Prevents being dropped from inventory
 	 *		- (?) Prevents being trashed in inventory
+	 *		- Prevent click action being performed on item when toggling favorite
 	 *		- Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
-	 *			- Prefix item hover method? (if there is one, lol. Otherwise will need a new generic PostMenuPerformHoverAction method)
+	 *			- (Not feasible) Prefix item hover method? (if there is one, lol. Otherwise will need a new generic PostMenuPerformHoverAction method)
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	public static class ConvenientInventory
@@ -51,6 +52,8 @@ namespace ConvenientInventory
 		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
 		public static Texture2D FavoriteItemsHighlightTexture { private get; set; }
+
+		public static Texture2D FavoriteItemsBorderTexture { private get; set; }
 
 		public static bool IsFavoriteItemsHotkeyDown { get; set; } = false;
 
@@ -329,7 +332,40 @@ namespace ConvenientInventory
 		   );
 		}
 
-        public static void PostClickableTextureComponentDraw(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
+		public static void DrawFavoriteItemsToolTipBorder(Item item, SpriteBatch spriteBatch, int x, int y)
+		{
+			int index = GetPlayerInventoryIndexOfItem(item);
+
+			if (ModEntry.Config.IsEnableFavoriteItems && index != -1 && FavoriteItemSlots[index])
+			{
+				spriteBatch.Draw(FavoriteItemsBorderTexture,
+					new Vector2(x, y + 111),	// TODO: fix y
+					new Rectangle(0, 0, FavoriteItemsBorderTexture.Width, FavoriteItemsBorderTexture.Height),
+					Color.White,
+					0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
+				);
+			}
+		}
+
+		private static int GetPlayerInventoryIndexOfItem(Item item)
+		{
+			if (item is null)
+            {
+				return -1;
+            }
+
+			for (int i = 0; i < Game1.player.Items.Count; i++)
+			{
+				if (Game1.player.Items[i] == item && Game1.player.Items[i] != null && item != null)
+				{
+					return i;
+				}
+			}
+
+			return -1;
+		}
+
+		public static void PostClickableTextureComponentDraw(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
 		{
 			// Check if we have just drawn the trash can for this inventory page, which happens before in-game tooltip is drawn.
 			if (Page?.trashCan != textureComponent)

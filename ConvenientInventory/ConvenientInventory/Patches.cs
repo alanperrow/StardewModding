@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq;
+using System.Text;
 
 namespace ConvenientInventory.Patches
 {
@@ -140,6 +141,86 @@ namespace ConvenientInventory.Patches
 			{
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(Update_Postfix)}:\n{e}", LogLevel.Error);
 			}
+		}
+
+		//[HarmonyPostfix]
+		//[HarmonyPatch(new Type[]
+		//{
+		//	typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int),
+		//	typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int), typeof(int), typeof(int),
+		//	typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>)
+		//})]
+
+		//[HarmonyPatch(nameof(IClickableMenu.drawTextureBox))]
+		////drawTextureBox(SpriteBatch b, int x, int y, int width, int height, Color color)
+		//public static void DrawTextureBox_Postfix(SpriteBatch b, int x, int y, int width, int height, Color color)
+		//{
+		//	try
+		//	{
+		//		ConvenientInventory.PostDrawHoverTextureBox(b, x, y, width, height);
+		//	}
+		//	catch (Exception e)
+		//	{
+		//		ModEntry.Context.Monitor.Log($"Failed in {nameof(DrawToolTip_Prefix)}:\n{e}", LogLevel.Error);
+		//	}
+		//}
+
+		[HarmonyTranspiler]
+		[HarmonyPatch(nameof(IClickableMenu.drawHoverText))]
+		[HarmonyPatch(new Type[]
+        {
+            typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int),
+            typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int), typeof(int), typeof(int),
+            typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>)
+        })]
+		public static IEnumerable<CodeInstruction> DrawHoverText_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
+		{
+			MethodInfo isPlayerInventory = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.IsPlayerInventory));
+			MethodInfo drawFavoriteItemsToolTipBorder = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemsToolTipBorder));
+
+			List<CodeInstruction> instructionsList = instructions.ToList();
+
+			bool flag = false;
+
+			for (int i = 0; i<instructionsList.Count; i++)
+			{
+				// Find instruction position after calling drawTextureBox (loading args starts at: IL_0559)
+				// IL_0595
+				// TODO: Wrong call, we want the drawTextureBox after this one
+				if (i > 0 && i < instructionsList.Count - 2
+					&& instructionsList[i - 1].opcode == OpCodes.Call
+					&& instructionsList[i].opcode == OpCodes.Ldarg_S && instructionsList[i].operand is byte b && b == 6
+					&& instructionsList[i + 1].opcode == OpCodes.Brfalse)
+				{
+					Label label = ilg.DefineLabel();
+
+					/*
+					yield return new CodeInstruction(OpCodes.Ldarg_0) { labels = instructionsList[i].ExtractLabels() }; // load this InventoryMenu instance (arg 0)
+					yield return new CodeInstruction(OpCodes.Call, isPlayerInventory);                                  // call IsPlayerInventory(this)
+					yield return new CodeInstruction(OpCodes.Brfalse, label);                                           // break if call => false
+					*/
+
+					yield return new CodeInstruction(OpCodes.Ldarg, 9);                                                 // load Item "hoveredItem" (arg 9)
+					yield return new CodeInstruction(OpCodes.Ldarg_0);                                                  // load SpriteBatch "b" (arg 1)
+					yield return new CodeInstruction(OpCodes.Ldloc_S, 5);                                               // load local int "x"
+					yield return new CodeInstruction(OpCodes.Ldloc_S, 6);                                               // load local int "y"
+					yield return new CodeInstruction(OpCodes.Call, drawFavoriteItemsToolTipBorder);                     // call DrawFavoriteItemsToolTipBorder(hoveredItem, b, x, y)
+
+					instructionsList[i].WithLabels(label);
+
+					flag = true;
+				}
+
+				yield return instructionsList[i];
+			}
+
+			if (!flag)
+			{
+				ModEntry.Context.Monitor.Log(
+					$"{nameof(DrawHoverText_Transpiler)} could not find target instruction(s) in {nameof(IClickableMenu.drawHoverText)}, so no changes were made.", LogLevel.Error);
+			}
+
+			yield break;
 		}
 	}
 
@@ -293,5 +374,5 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ShiftToolbar_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
-    }
+	}
 }

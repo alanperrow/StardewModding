@@ -63,6 +63,7 @@
     <Compile Include="TypedChests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\favoriteBorder.png" />
     <Content Include="Assets\favoriteCursor.png" />
     <Content Include="Assets\favoriteHighlight_0.png" />
     <Content Include="Assets\favoriteHighlight_1.png" />
