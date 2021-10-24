@@ -7,6 +7,8 @@ using StardewModdingAPI;
 using StardewValley;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Linq;
 
 namespace ConvenientInventory.Patches
 {
@@ -196,45 +198,59 @@ namespace ConvenientInventory.Patches
 	[HarmonyPatch(typeof(InventoryMenu))]
 	public class InventoryMenuPatches
 	{
-		static FieldInfo fieldInfo = AccessTools.Field(typeof(InventoryMenu), "");
-
 		[HarmonyTranspiler]
 		[HarmonyPatch(nameof(InventoryMenu.draw))]
 		[HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(int) })]
-		public static IEnumerable<CodeInstruction> Draw_Transpiler(IEnumerable<CodeInstruction> instructions)
+		public static IEnumerable<CodeInstruction> Draw_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
 		{
-			try
-			{
-				// Add my conditional method call between these two opcodes in InventoryMenu.draw(s, i, i, i):
-				// IL_02c3: blt IL_00e5		// END for j (SDV l) loop
-				// >>> MY METHOD CALL HERE
-				// IL_02c8: ldc.i4.0		// BEGIN for k loop
+			MethodInfo isPlayerInventory = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.IsPlayerInventory));
+			MethodInfo drawFavoriteItemSlotHighlights = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemSlotHighlights));
 
-				/*
-				=== Desired C# code ===
-				if (ConvenientInventory.IsPlayerInventory(__instance))
+			MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsConfigEnableFavoriteItems));
+
+			List<CodeInstruction> instructionsList = instructions.ToList();
+
+			bool flag = false;
+
+			for (int i = 0; i < instructionsList.Count; i++)
+			{
+				if (i < instructionsList.Count - 2
+					&& instructionsList[i].opcode == OpCodes.Ldc_I4_0
+					&& instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
+					&& instructionsList[i + 2].opcode == OpCodes.Br)
 				{
-					ConvenientInventory.DrawFavoriteItemSlotHighlights(spriteBatch, __instance);
+					Label label = ilg.DefineLabel();
+
+					yield return new CodeInstruction(OpCodes.Ldarg_0) { labels = instructionsList[i].ExtractLabels() };	// load this InventoryMenu instance (arg 0)
+					yield return new CodeInstruction(OpCodes.Call, isPlayerInventory);									// call IsPlayerInventory(this)
+					yield return new CodeInstruction(OpCodes.Brfalse, label);                                           // break if call => false
+
+					yield return new CodeInstruction(OpCodes.Call, isConfigEnableFavoriteItems);                        // call helper method
+					yield return new CodeInstruction(OpCodes.Brfalse, label);                                           // break if call => false
+
+					yield return new CodeInstruction(OpCodes.Ldarg_1);													// load SpriteBatch "b" (arg 1)
+					yield return new CodeInstruction(OpCodes.Ldarg_0);													// load this InventoryMenu instance (arg 0)
+					yield return new CodeInstruction(OpCodes.Call, drawFavoriteItemSlotHighlights);						// call DrawFavoriteItemSlotHighlights(b, this)
+
+					instructionsList[i].WithLabels(label);
+
+					flag = true;
 				}
 
-				=== Psuedocode ===
-				ldarg.0																						// load this object instance (arg 0)
-				call ConvenientInventory::IsPlayerInventory()												// call IsPlayerInventory(this)
-				brfalse IL_02c8																				// break if call => false
-
-				ldarg.1																						// load SpriteBatch "b" (arg 1)
-				ldarg.0																						// load this object instance (arg 0)
-				call ConvenientInventory::DrawFavoriteItemSlotHighlights()									// call DrawFavoriteItemSlotHighlights(b, this)
-
-				*/
+				yield return instructionsList[i];
 			}
-			catch (Exception e)
+
+			if (!flag)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Transpiler)}:\n{e}", LogLevel.Error);
+				ModEntry.Context.Monitor.Log(
+					$"{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.draw)}, so no changes were made.", LogLevel.Error);
 			}
 
-			return instructions;
+			yield break;
 		}
+
+		public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.IsEnableFavoriteItems;
+
 
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(InventoryMenu.draw))]

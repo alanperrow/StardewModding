@@ -9,7 +9,7 @@ using System;
 namespace ConvenientInventory
 {
 	/// <summary>The mod entry class loaded by SMAPI.</summary>
-	internal class ModEntry : Mod
+	public class ModEntry : Mod
 	{
 		public static ModEntry Context { get; private set; }
 
@@ -169,18 +169,24 @@ namespace ConvenientInventory
 
 		private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
-			ConvenientInventory.LoadFavoriteItemSlots();
+			if (Config.IsEnableFavoriteItems)
+			{
+				ConvenientInventory.LoadFavoriteItemSlots();
+			}
 		}
 
 		private void OnSaving(object sender, SavingEventArgs e)
         {
-			ConvenientInventory.SaveFavoriteItemSlots();
+			if (Config.IsEnableFavoriteItems)
+			{
+				ConvenientInventory.SaveFavoriteItemSlots();
+			}
         }
 
 		private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
 			// Handle favorite items hotkey being pressed
-			if (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey)
+			if (Config.IsEnableFavoriteItems && e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey)
             {
 				ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
             }
@@ -189,7 +195,7 @@ namespace ConvenientInventory
 		private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
 		{
 			// Handle favorite items hotkey being released
-			if (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey)
+			if (Config.IsEnableFavoriteItems && e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey)
 			{
 				ConvenientInventory.IsFavoriteItemsHotkeyDown = false;
 			}

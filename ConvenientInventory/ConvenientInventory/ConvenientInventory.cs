@@ -22,11 +22,13 @@ namespace ConvenientInventory
 	/*
 	 * TODO: 
 	 *	- Implement favorited items
-	 *		- Will be ignored by "Quick Stack To Nearby Chests" button.
+	 *		- (DONE) Will be ignored by "Quick Stack To Nearby Chests" button.
 	 *		- Prefix "Add To Existing Stacks" button logic to ignore favorited items as well.
 	 *		- (?) Prevents being sold to shops
 	 *		- (?) Prevents being dropped from inventory
 	 *		- (?) Prevents being trashed in inventory
+	 *		- Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
+	 *			- Prefix item hover method? (if there is one, lol. Otherwise will need a new generic PostMenuPerformHoverAction method)
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	public static class ConvenientInventory
@@ -77,7 +79,7 @@ namespace ConvenientInventory
 			//		 Will have to make a new modData entry "favoriteItemSlotsExpanded" to support extra slots and not interfere with original inventory.
 
 			dataStr = dataStr ?? new string('0', FavoriteItemSlots.Length);
-			ModEntry.Context.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Debug);
+			ModEntry.Context.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
 			return FavoriteItemSlots;
 		}
 
@@ -92,7 +94,7 @@ namespace ConvenientInventory
 
 			Game1.player.modData[favoriteItemSlotsModDataKey] = saveStr;
 
-			ModEntry.Context.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", StardewModdingAPI.LogLevel.Debug);
+			ModEntry.Context.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", StardewModdingAPI.LogLevel.Trace);
 			return saveStr;
 		}
 
@@ -124,22 +126,19 @@ namespace ConvenientInventory
 		
 		public static void ReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
 		{
-			var inventoryPage = menu as InventoryPage;				// Player menu - inventory tab
-			var craftingPage = menu as CraftingPage;				// Player menu - crafting tab
-			var menuWithInventory = menu as MenuWithInventory;      // Arbitrary menu
-
 			// Quick stack button clicked (in InventoryPage)
-			if (inventoryPage != null && ModEntry.Config.IsEnableQuickStack && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
+			if (menu is InventoryPage inventoryPage && ModEntry.Config.IsEnableQuickStack && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
             {
 				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
 			}
 
+			// TODO: Move to prefix method (InventoryMenu.LeftClick)
 			// Try to favorite an item slot
 			if (ModEntry.Config.IsEnableFavoriteItems && IsFavoriteItemsHotkeyDown)
-            {
-				InventoryMenu inventory = inventoryPage?.inventory
-					?? craftingPage?.inventory
-					?? menuWithInventory?.inventory;
+			{
+				InventoryMenu inventory = (menu as InventoryPage)?.inventory    // Player menu - inventory tab
+					?? (menu as CraftingPage)?.inventory						// Player menu - crafting tab
+					?? (menu as MenuWithInventory)?.inventory;					// Arbitrary menu
 
 				if (inventory != null)
 				{
@@ -225,58 +224,49 @@ namespace ConvenientInventory
 			}
 		}
 
-		// CraftingPage.inventory has playerInventory = false, so we manually check if this inventory is from CraftingPage.
-		// TODO: Check for ShopMenu - it also has playerInventory = false.
 		public static bool IsPlayerInventory(InventoryMenu inventoryMenu)
 		{
-			return inventoryMenu.playerInventory || (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage);
+			var result = inventoryMenu.playerInventory
+				|| (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage)  // CraftingPage.inventory has playerInventory = false
+				|| (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu && itemGrabMenu.inventory == inventoryMenu)  // ItemGrabMenu.inventory is the player's InventoryMenu
+				|| (Game1.activeClickableMenu is ShopMenu);
+
+			return result;
 		}
 
-		// TODO: Try using "helper.Events.Display.RenderedActiveMenu" and "StardewValley.Game1.activeClickableMenu" for post-draw logic.
 		// TODO: Should also figure out when toolbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
 		//		  - Toolbar class
 
-		// TODO: Draw highlight *underneath* items
 		// Called after drawing everything else in arbitrary inventory menu.
-		// Draws favorite item slot highlights, and favorite items cursor if keybind is being pressed.
+		// Draws favorite items cursor if keybind is being pressed.
 		public static void PostMenuDraw<T>(T menu, SpriteBatch spriteBatch) where T : IClickableMenu
 		{
-			var inventoryMenu = menu as InventoryMenu;          // Inventory item slots container
-			var inventoryPage = menu as InventoryPage;          // Player menu - inventory tab
-			var craftingPage = menu as CraftingPage;            // Player menu - crafting tab
-			var menuWithInventory = menu as MenuWithInventory;  // Arbitrary menu
-
 			// Draw quick stack button tooltip (in InventoryPage)
-			if (inventoryPage != null && ModEntry.Config.IsEnableQuickStack && IsDrawToolTip)
+			if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage && IsDrawToolTip)
 			{
 				DrawQuickStackButtonToolTip(spriteBatch);
 			}
 
-			InventoryMenu inventory = inventoryMenu
-				?? inventoryPage?.inventory
-				?? craftingPage?.inventory
-				?? menuWithInventory?.inventory;
-
-			if (inventory != null && ModEntry.Config.IsEnableFavoriteItems)
+			if (ModEntry.Config.IsEnableFavoriteItems)
 			{
-				// Draw favorite highlights (in InventoryMenu or MenuWithInventory)
-				if (inventoryMenu != null || menuWithInventory != null)
-				{
-					DrawFavoriteItemSlotHighlights(spriteBatch, inventory);
-				}
+				// Get inventory if menu has one
+				InventoryMenu inventory = (menu as InventoryMenu)   // Inventory item slots container
+					?? (menu as InventoryPage)?.inventory           // Player menu - inventory tab
+					?? (menu as CraftingPage)?.inventory            // Player menu - crafting tab
+					?? (menu as MenuWithInventory)?.inventory;      // Arbitrary menu
 
 				// Draw favorite cursor (unless this is an InventoryMenu)
-				if (IsFavoriteItemsHotkeyDown)
+				if (inventory != null && !(menu is InventoryMenu))
 				{
-					if (inventoryMenu is null)
+					if (IsFavoriteItemsHotkeyDown)
 					{
 						DrawFavoriteItemsCursor(spriteBatch);
 						favoriteItemsHotkeyDownCounter++;
 					}
-				}
-				else
-				{
-					favoriteItemsHotkeyDownCounter = 0;
+					else
+					{
+						favoriteItemsHotkeyDownCounter = 0;
+					}
 				}
 			}
 		}
@@ -302,7 +292,7 @@ namespace ConvenientInventory
             }
         }
 
-		private static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, InventoryMenu inventoryMenu)
+		public static void DrawFavoriteItemSlotHighlights(SpriteBatch spriteBatch, InventoryMenu inventoryMenu)
         {
 			if (inventoryMenu is null)
             {

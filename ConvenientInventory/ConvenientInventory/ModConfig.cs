@@ -2,7 +2,7 @@
 
 namespace ConvenientInventory
 {
-	internal class ModConfig
+	public class ModConfig
 	{
 		public bool IsEnableQuickStack { get; set; } = true;
 
