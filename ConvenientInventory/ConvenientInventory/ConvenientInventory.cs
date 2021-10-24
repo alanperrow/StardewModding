@@ -6,7 +6,6 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using static StardewValley.Menus.ItemGrabMenu;
 
 namespace ConvenientInventory
@@ -328,38 +327,6 @@ namespace ConvenientInventory
 			   Color.White,
 			   0f, Vector2.Zero, scale, SpriteEffects.None, 1f
 		   );
-		}
-
-		public static int PostItemDrawToolTip(Item item, SpriteBatch spriteBatch, ref int x, ref int y, SpriteFont font, float alpha, StringBuilder overrideText)
-        {
-			int index = GetIndexOfInventoryItem(item);
-
-			if (ModEntry.Config.IsEnableFavoriteItems && index != -1 && FavoriteItemSlots[index])
-            {
-                spriteBatch.Draw(FavoriteItemsCursorTexture,
-                    new Vector2(x, y),
-                    new Rectangle(0, 0, FavoriteItemsCursorTexture.Width, FavoriteItemsCursorTexture.Height),
-                    Color.White,
-                    0f, Vector2.Zero, 3f, SpriteEffects.None, 1f
-                );
-
-                return 1;
-				//}
-			}
-
-			return 0;
-
-			int GetIndexOfInventoryItem(Item _item)
-			{
-				for (int i = 0; i < Game1.player.Items.Count; i++)
-				{
-					if (Game1.player.Items[i] == _item && Game1.player.Items[i] != null && _item != null)
-					{
-						return i;
-					}
-				}
-				return -1;
-			}
 		}
 
         public static void PostClickableTextureComponentDraw(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)

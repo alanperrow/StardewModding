@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq;
-using System.Text;
 
 namespace ConvenientInventory.Patches
 {
@@ -294,23 +293,5 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ShiftToolbar_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
-    }
-
-	[HarmonyPatch(typeof(Item))]
-	public class ItemPatches
-    {
-		[HarmonyPostfix]
-		[HarmonyPatch(nameof(Item.drawTooltip))]
-		public static void DrawToolTip_Postfix(Item __instance, SpriteBatch spriteBatch, ref int x, ref int y, SpriteFont font, float alpha, StringBuilder overrideText)
-        {
-			try
-			{
-				ConvenientInventory.PostItemDrawToolTip(__instance, spriteBatch, ref x, ref y, font, alpha, overrideText);
-			}
-			catch (Exception e)
-			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(DrawToolTip_Postfix)}:\n{e}", LogLevel.Error);
-			}
-		}
     }
 }
