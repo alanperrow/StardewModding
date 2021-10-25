@@ -173,9 +173,9 @@ namespace ConvenientInventory.Patches
             typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int), typeof(int), typeof(int),
             typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>)
         })]
-		public static IEnumerable<CodeInstruction> DrawHoverText_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
+		public static IEnumerable<CodeInstruction> DrawHoverText_Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			MethodInfo isPlayerInventory = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.IsPlayerInventory));
+			MethodInfo getYMinusBoldTitleTextHeight = AccessTools.Method(typeof(IClickableMenuPatches), nameof(GetYMinusBoldTitleTextHeight));
 			MethodInfo drawFavoriteItemsToolTipBorder = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemsToolTipBorder));
 
 			List<CodeInstruction> instructionsList = instructions.ToList();
@@ -184,29 +184,20 @@ namespace ConvenientInventory.Patches
 
 			for (int i = 0; i<instructionsList.Count; i++)
 			{
-				// Find instruction position after calling drawTextureBox (loading args starts at: IL_0559)
-				// IL_0595
-				// TODO: Wrong call, we want the drawTextureBox after this one
-				if (i > 0 && i < instructionsList.Count - 2
-					&& instructionsList[i - 1].opcode == OpCodes.Call
-					&& instructionsList[i].opcode == OpCodes.Ldarg_S && instructionsList[i].operand is byte b && b == 6
+				// Find instruction after if(boldTitleText != null){} block
+				// IL_07b3 (instructions[772])
+				if (i > 0 && i < instructionsList.Count - 1
+					&& instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 6
+					&& instructionsList[i].opcode == OpCodes.Ldarg_S && instructionsList[i].operand is byte b && b == 9
 					&& instructionsList[i + 1].opcode == OpCodes.Brfalse)
 				{
-					Label label = ilg.DefineLabel();
-
-					/*
-					yield return new CodeInstruction(OpCodes.Ldarg_0) { labels = instructionsList[i].ExtractLabels() }; // load this InventoryMenu instance (arg 0)
-					yield return new CodeInstruction(OpCodes.Call, isPlayerInventory);                                  // call IsPlayerInventory(this)
-					yield return new CodeInstruction(OpCodes.Brfalse, label);                                           // break if call => false
-					*/
-
-					yield return new CodeInstruction(OpCodes.Ldarg, 9);                                                 // load Item "hoveredItem" (arg 9)
-					yield return new CodeInstruction(OpCodes.Ldarg_0);                                                  // load SpriteBatch "b" (arg 1)
-					yield return new CodeInstruction(OpCodes.Ldloc_S, 5);                                               // load local int "x"
-					yield return new CodeInstruction(OpCodes.Ldloc_S, 6);                                               // load local int "y"
-					yield return new CodeInstruction(OpCodes.Call, drawFavoriteItemsToolTipBorder);                     // call DrawFavoriteItemsToolTipBorder(hoveredItem, b, x, y)
-
-					instructionsList[i].WithLabels(label);
+					yield return new CodeInstruction(OpCodes.Ldarg, 9);                              // load Item "hoveredItem" (arg 9)
+					yield return new CodeInstruction(OpCodes.Ldarg_0);                               // load SpriteBatch "b" (arg 1)
+					yield return new CodeInstruction(OpCodes.Ldloc_S, 5);                            // load local int "x"
+					yield return new CodeInstruction(OpCodes.Ldloc_S, 6);                            //     load local int "y"
+					yield return new CodeInstruction(OpCodes.Ldarg, 6);                              //     load string "boldTitleText" (arg 6)
+					yield return new CodeInstruction(OpCodes.Call, getYMinusBoldTitleTextHeight);    //     call GetYMinusBoldTitleTextHeight(y, boldTitleText)
+					yield return new CodeInstruction(OpCodes.Call, drawFavoriteItemsToolTipBorder);  // call DrawFavoriteItemsToolTipBorder(hoveredItem, b, x, GetYMinus)
 
 					flag = true;
 				}
@@ -222,6 +213,8 @@ namespace ConvenientInventory.Patches
 
 			yield break;
 		}
+
+		public static int GetYMinusBoldTitleTextHeight(int y, string boldTitleText) => (boldTitleText is null) ? y : (y - (int)Game1.dialogueFont.MeasureString(boldTitleText).Y);
 	}
 
 	[HarmonyPatch(typeof(ClickableTextureComponent))]

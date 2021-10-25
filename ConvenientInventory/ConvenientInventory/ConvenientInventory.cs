@@ -28,8 +28,7 @@ namespace ConvenientInventory
 	 *		- (?) Prevents being dropped from inventory
 	 *		- (?) Prevents being trashed in inventory
 	 *		- Prevent click action being performed on item when toggling favorite
-	 *		- Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
-	 *			- (Not feasible) Prefix item hover method? (if there is one, lol. Otherwise will need a new generic PostMenuPerformHoverAction method)
+	 *		- (DONE) Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	public static class ConvenientInventory
@@ -339,7 +338,7 @@ namespace ConvenientInventory
 			if (ModEntry.Config.IsEnableFavoriteItems && index != -1 && FavoriteItemSlots[index])
 			{
 				spriteBatch.Draw(FavoriteItemsBorderTexture,
-					new Vector2(x, y + 111),	// TODO: fix y
+					new Vector2(x, y),
 					new Rectangle(0, 0, FavoriteItemsBorderTexture.Width, FavoriteItemsBorderTexture.Height),
 					Color.White,
 					0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
