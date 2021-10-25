@@ -59,13 +59,29 @@ namespace ConvenientInventory.Patches
 			}
 		}
 
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(InventoryPage.receiveLeftClick))]
+		public static bool ReceiveLeftClick_Prefix(InventoryPage __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveLeftClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(InventoryPage.receiveLeftClick))]
 		public static void ReceiveLeftClick_Postfix(InventoryPage __instance, int x, int y)
 		{
 			try
 			{
-				ConvenientInventory.ReceiveLeftClickInMenu(__instance, x, y);
+				ConvenientInventory.PostReceiveLeftClickInMenu(__instance, x, y);
 			}
 			catch (Exception e)
 			{
@@ -91,13 +107,29 @@ namespace ConvenientInventory.Patches
 			}
 		}
 
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(CraftingPage.receiveLeftClick))]
+		public static bool ReceiveLeftClick_Prefix(CraftingPage __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveLeftClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(CraftingPage.receiveLeftClick))]
 		public static void ReceiveLeftClick_Postfix(CraftingPage __instance, int x, int y)
 		{
 			try
 			{
-				ConvenientInventory.ReceiveLeftClickInMenu(__instance, x, y);
+				ConvenientInventory.PostReceiveLeftClickInMenu(__instance, x, y);
 			}
 			catch (Exception e)
 			{
@@ -142,28 +174,6 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(Update_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
-
-		//[HarmonyPostfix]
-		//[HarmonyPatch(new Type[]
-		//{
-		//	typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int),
-		//	typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int), typeof(int), typeof(int),
-		//	typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>)
-		//})]
-
-		//[HarmonyPatch(nameof(IClickableMenu.drawTextureBox))]
-		////drawTextureBox(SpriteBatch b, int x, int y, int width, int height, Color color)
-		//public static void DrawTextureBox_Postfix(SpriteBatch b, int x, int y, int width, int height, Color color)
-		//{
-		//	try
-		//	{
-		//		ConvenientInventory.PostDrawHoverTextureBox(b, x, y, width, height);
-		//	}
-		//	catch (Exception e)
-		//	{
-		//		ModEntry.Context.Monitor.Log($"Failed in {nameof(DrawToolTip_Prefix)}:\n{e}", LogLevel.Error);
-		//	}
-		//}
 
 		[HarmonyTranspiler]
 		[HarmonyPatch(nameof(IClickableMenu.drawHoverText))]
@@ -254,13 +264,29 @@ namespace ConvenientInventory.Patches
 			}
 		}
 
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(MenuWithInventory.receiveLeftClick))]
+		public static bool ReceiveLeftClick_Prefix(MenuWithInventory __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveLeftClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(MenuWithInventory.receiveLeftClick))]
 		public static void ReceiveLeftClick_Postfix(MenuWithInventory __instance, int x, int y)
 		{
 			try
 			{
-				ConvenientInventory.ReceiveLeftClickInMenu(__instance, x, y);
+				ConvenientInventory.PostReceiveLeftClickInMenu(__instance, x, y);
 			}
 			catch (Exception e)
 			{

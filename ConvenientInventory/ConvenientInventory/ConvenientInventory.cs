@@ -23,12 +23,19 @@ namespace ConvenientInventory
 	 * TODO: 
 	 *	- Implement favorited items
 	 *		- (DONE) Will be ignored by "Quick Stack To Nearby Chests" button.
-	 *		- Prefix "Add To Existing Stacks" button logic to ignore favorited items as well.
+	 *		- Patch the following methods which may interfere with favorite items functionality:
+	 *			- "Add To Existing Stacks" button
+	 *				- ignore favorited items
+	 *			- "Organize" button
+	 *				- ignore favorited items
+	 *			- 
 	 *		- (?) Prevents being sold to shops
 	 *		- (?) Prevents being dropped from inventory
 	 *		- (?) Prevents being trashed in inventory
-	 *		- Prevent click action being performed on item when toggling favorite
+	 *		- (DONE) Prevent click action being performed on item when toggling favorite
 	 *		- (DONE) Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
+	 *		- Only allow favoriting item slots containing an item.
+	 *			- Still allow un-favoriting empty item slots, as they may appear accidentally (due to my imperfect code)
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	public static class ConvenientInventory
@@ -125,32 +132,28 @@ namespace ConvenientInventory
 				inventoryPage.trashCan.upNeighborID = quickStackButtonID;
 			}
 		}
-		
-		public static void ReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
-		{
-			// Quick stack button clicked (in InventoryPage)
-			if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage inventoryPage && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
-            {
-				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
-			}
 
+		public static bool PreReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
+		{
 			// TODO: Move to prefix method (InventoryMenu.LeftClick)
 			// Try to favorite an item slot
 			if (ModEntry.Config.IsEnableFavoriteItems && IsFavoriteItemsHotkeyDown)
 			{
 				InventoryMenu inventory = (menu as InventoryPage)?.inventory    // Player menu - inventory tab
-					?? (menu as CraftingPage)?.inventory						// Player menu - crafting tab
-					?? (menu as MenuWithInventory)?.inventory;					// Arbitrary menu
+					?? (menu as CraftingPage)?.inventory                        // Player menu - crafting tab
+					?? (menu as MenuWithInventory)?.inventory;                  // Arbitrary menu
 
 				if (inventory != null)
 				{
-					ToggleFavoriteItemsSlotAtClickPosition(inventory, x, y);
+					return !ToggleFavoriteItemsSlotAtClickPosition(inventory, x, y);
 				}
-            }
-        }
+			}
 
-		// Toggles the favorited status of a selected item slot.
-        private static void ToggleFavoriteItemsSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY)
+			return true;
+		}
+
+		// Toggles the favorited status of a selected item slot. Returns whether an item was toggled.
+		private static bool ToggleFavoriteItemsSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY)
         {
             int clickPos = inventoryMenu.getInventoryPositionOfClick(clickX, clickY);
 
@@ -165,8 +168,21 @@ namespace ConvenientInventory
 				Game1.playSound("smallSelect");
 
                 FavoriteItemSlots[clickPos] = !FavoriteItemSlots[clickPos];
+
+				return true;
             }
+
+			return false;
         }
+		
+		public static void PostReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
+		{
+			// Quick stack button clicked (in InventoryPage)
+			if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage inventoryPage && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
+            {
+				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
+			}
+		}
 
 		// Player shifted toolbar row, so shift all favorited item slots by a row
 		public static void ShiftToolbar(bool right)
