@@ -24,18 +24,25 @@ namespace ConvenientInventory
 	 *	- Implement favorited items
 	 *		- (DONE) Will be ignored by "Quick Stack To Nearby Chests" button.
 	 *		- Patch the following methods which may interfere with favorite items functionality:
-	 *			- "Add To Existing Stacks" button
+	 *			- Chest: "Add To Existing Stacks" button
 	 *				- ignore favorited items
-	 *			- "Organize" button
+	 *			- Inventory: "Organize" button
 	 *				- ignore favorited items
-	 *			- 
+	 *			- ...
 	 *		- (?) Prevents being sold to shops
 	 *		- (?) Prevents being dropped from inventory
 	 *		- (?) Prevents being trashed in inventory
 	 *		- (DONE) Prevent click action being performed on item when toggling favorite
 	 *		- (DONE) Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
 	 *		- Only allow favoriting item slots containing an item.
-	 *			- Still allow un-favoriting empty item slots, as they may appear accidentally (due to my imperfect code)
+	 *			- Still allow un-favoriting empty item slots, as they may appear unintentionally (I'm not perfect)
+	 *		- Favorited item slot should "stick" to item in inventory.
+	 *			- If item is selected, temporarily remove (and track) favorited item slot.
+	 *			- When item is placed into a different slot, the favorited item slot should be reapplied to the new slot.
+	 *		- Find cases that might remove item from inventory. If item is removed, its favorited item slot should also be removed respectively.
+	 *			- (?) Maybe just patch Item method that reduces stack count, if possible
+	 *				- Try patching Item.Stack's Set method
+	 *			- ...
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	public static class ConvenientInventory
