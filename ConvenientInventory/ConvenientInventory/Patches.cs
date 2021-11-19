@@ -88,6 +88,22 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(InventoryPage.receiveRightClick))]
+		public static bool ReceiveRightClick_Prefix(InventoryPage __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveRightClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
 	}
 
 	[HarmonyPatch(typeof(CraftingPage))]
@@ -135,6 +151,22 @@ namespace ConvenientInventory.Patches
 			{
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
 			}
+		}
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(CraftingPage.receiveRightClick))]
+		public static bool ReceiveRightClick_Prefix(CraftingPage __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveRightClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
 		}
 	}
 
@@ -293,6 +325,22 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(MenuWithInventory.receiveRightClick))]
+		public static bool ReceiveRightClick_Prefix(MenuWithInventory __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveRightClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
 	}
 
 	[HarmonyPatch(typeof(InventoryMenu))]
@@ -369,6 +417,76 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
+	}
+
+	[HarmonyPatch(typeof(ShopMenu))]
+	public class ShopMenuPatches
+	{
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(ShopMenu.draw))]
+		public static void Draw_Postfix(ShopMenu __instance, SpriteBatch b)
+		{
+			try
+			{
+				ConvenientInventory.PostMenuDraw(__instance, b);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+			}
+		}
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(ShopMenu.receiveLeftClick))]
+		public static bool ReceiveLeftClick_Prefix(ShopMenu __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveLeftClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(ShopMenu.receiveRightClick))]
+		public static bool ReceiveRightClick_Prefix(ShopMenu __instance, int x, int y)
+		{
+			try
+			{
+				return ConvenientInventory.PreReceiveRightClickInMenu(__instance, x, y);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+	}
+
+	[HarmonyPatch(typeof(Item))]
+	public class ItemPatches
+    {
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(Item.canBeTrashed))]
+		public static bool CanBeTrashed_Prefix(ref bool __result)
+        {
+			if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemsIsItemSelected)
+			{
+				if (!(Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu && itemGrabMenu.shippingBin))
+				{
+					__result = false;
+					return false;
+				}
+			}
+
+			return true;
+        }
 	}
 
 	[HarmonyPatch(typeof(Farmer))]

@@ -28,21 +28,26 @@ namespace ConvenientInventory
 	 *				- ignore favorited items
 	 *			- Inventory: "Organize" button
 	 *				- ignore favorited items
+	 *				- Prefix/Transpile ItemGrabMenu.organizeItemsInList
 	 *			- ...
-	 *		- (?) Prevents being sold to shops
-	 *		- (?) Prevents being dropped from inventory
-	 *		- (?) Prevents being trashed in inventory
+	 *		- (ABANDONED) Prevents being sold to shops
+	 *		- (DONE) Prevents being dropped/trashed in inventory
+	 *			- Prefix Item.canBeTrashed
 	 *		- (DONE) Prevent click action being performed on item when toggling favorite
 	 *		- (DONE) Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
-	 *		- Only allow favoriting item slots containing an item.
+	 *		- (DONE) Only allow favoriting item slots containing an item.
 	 *			- Still allow un-favoriting empty item slots, as they may appear unintentionally (I'm not perfect)
-	 *		- Favorited item slot should "stick" to item in inventory.
-	 *			- If item is selected, temporarily remove (and track) favorited item slot.
-	 *			- When item is placed into a different slot, the favorited item slot should be reapplied to the new slot.
-	 *		- Find cases that might remove item from inventory. If item is removed, its favorited item slot should also be removed respectively.
-	 *			- (?) Maybe just patch Item method that reduces stack count, if possible
+	 *		- (2/3) Favorited item slot should "stick" to item in inventory.
+	 *			- (DONE) If item is selected, temporarily remove (and track) favorited item slot.
+	 *			- (DONE) When item is placed into a different slot, the favorited item slot should be reapplied to the new slot.
+	 *			- Handle shift left-click; it moves item to first available slot in inventory.
+	 *		- Find cases that might remove item from inventory. If item is removed, its respective favorited item slot should also be removed.
+	 *			- i.e.:
+	 *				- Eating
+	 *				- Gifting
+	 *				- ...
+	 *			- (ABANDONED) Maybe just patch Item method that reduces stack count, if possible
 	 *				- Try patching Item.Stack's Set method
-	 *			- ...
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
 	public static class ConvenientInventory
@@ -58,6 +63,7 @@ namespace ConvenientInventory
 		private static bool IsDrawToolTip { get; set; } = false;
 
 		private const int quickStackButtonID = 918021;  // Unique indentifier
+
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
 
 		public static int? PlayerInventoryExpandedSize { get; set; } = null;  // For supporting mods which expand player inventory size
@@ -68,18 +74,23 @@ namespace ConvenientInventory
 
 		public static Texture2D FavoriteItemsBorderTexture { private get; set; }
 
-		public static bool IsFavoriteItemsHotkeyDown { get; set; } = false;
+		public static bool IsFavoriteItemsHotkeyDown { get; set; }
 
 		private static int favoriteItemsHotkeyDownCounter = 0;
 
 		private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Context.ModManifest.UniqueID}/favoriteItemSlots";
 
 		private static bool[] favoriteItemSlots;
+
 		public static bool[] FavoriteItemSlots
 		{
 			get { return favoriteItemSlots ?? LoadFavoriteItemSlots(); }
 			set { favoriteItemSlots = value; }
 		}
+
+		public static bool FavoriteItemsIsItemSelected { get; set; }
+
+		public static int FavoriteItemsLastSelectedSlot { get; set; } = -1;
 
 		public static bool[] LoadFavoriteItemSlots()
 		{
@@ -142,31 +153,59 @@ namespace ConvenientInventory
 
 		public static bool PreReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
 		{
-			// TODO: Move to prefix method (InventoryMenu.LeftClick)
-			// Try to favorite an item slot
-			if (ModEntry.Config.IsEnableFavoriteItems && IsFavoriteItemsHotkeyDown)
+			if (ModEntry.Config.IsEnableFavoriteItems)
 			{
 				InventoryMenu inventory = (menu as InventoryPage)?.inventory    // Player menu - inventory tab
 					?? (menu as CraftingPage)?.inventory                        // Player menu - crafting tab
+					?? (menu as ShopMenu)?.inventory							// Shop menu
 					?? (menu as MenuWithInventory)?.inventory;                  // Arbitrary menu
 
-				if (inventory != null)
+
+				if (IsFavoriteItemsHotkeyDown)
 				{
-					return !ToggleFavoriteItemsSlotAtClickPosition(inventory, x, y);
+					return !ToggleFavoriteItemSlotAtClickPosition(inventory, x, y);
 				}
+                else
+                {
+					TrackSelectedFavoriteItemSlotAtClickPosition(inventory, x, y);
+                }
+			}
+
+			return true;
+		}
+
+		public static bool PreReceiveRightClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
+		{
+			if (ModEntry.Config.IsEnableFavoriteItems)
+			{
+				if (IsFavoriteItemsHotkeyDown)
+				{
+					return false;
+				}
+
+				InventoryMenu inventory = (menu as InventoryPage)?.inventory    // Player menu - inventory tab
+					?? (menu as CraftingPage)?.inventory                        // Player menu - crafting tab
+					?? (menu as ShopMenu)?.inventory                            // Shop menu
+					?? (menu as MenuWithInventory)?.inventory;                  // Arbitrary menu
+
+				TrackSelectedFavoriteItemSlotAtClickPosition(inventory, x, y, isRightClick: true);
 			}
 
 			return true;
 		}
 
 		// Toggles the favorited status of a selected item slot. Returns whether an item was toggled.
-		private static bool ToggleFavoriteItemsSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY)
-        {
-            int clickPos = inventoryMenu.getInventoryPositionOfClick(clickX, clickY);
+		private static bool ToggleFavoriteItemSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY, bool? favoriteOverride = null)
+		{
+			if (inventoryMenu is null)
+			{
+				return false;
+			}
 
-			// TODO: Only allow favoriting if selected slot contains an item.
-			//		 Currently this doesn't work because the item gets picked up before we get to check. (See TODO above: "Move to prefix method")
-			if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos/* && inventoryMenu.actualInventory[clickPos] != null*/)
+			int clickPos = inventoryMenu.getInventoryPositionOfClick(clickX, clickY);
+
+			// Only allow favoriting if selected slot contains an item. Always allow unfavoriting.
+			if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && (FavoriteItemSlots[clickPos] || inventoryMenu.actualInventory[clickPos] != null))
             {
                 ModEntry.Context.Monitor
 					.Log($"{(FavoriteItemSlots[clickPos] ? "Un-" : string.Empty)}Favorited item slot {clickPos}: {inventoryMenu.actualInventory[clickPos]?.Name}",
@@ -174,14 +213,113 @@ namespace ConvenientInventory
 
 				Game1.playSound("smallSelect");
 
-                FavoriteItemSlots[clickPos] = !FavoriteItemSlots[clickPos];
+				FavoriteItemSlots[clickPos] = (favoriteOverride is null)
+					? !FavoriteItemSlots[clickPos]
+					: favoriteOverride.Value;
 
 				return true;
             }
 
 			return false;
         }
-		
+
+		// Tracks and "moves" favorite item slots when selecting/de-selecting items in an inventory menu.
+		private static bool TrackSelectedFavoriteItemSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY, bool isRightClick = false)
+		{
+			if (!ModEntry.Config.IsEnableFavoriteItems || IsFavoriteItemsHotkeyDown || inventoryMenu is null)
+			{
+				return false;
+			}
+
+			int clickPos = inventoryMenu.getInventoryPositionOfClick(clickX, clickY);
+
+			if (!FavoriteItemsIsItemSelected || isRightClick)
+			{
+				// Check that we've selected a favorited item slot
+				if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && inventoryMenu.actualInventory[clickPos] != null && FavoriteItemSlots[clickPos]) 
+				{
+					if (!isRightClick && Game1.player.CursorSlotItem is null)
+					{
+						// Left click, with no item currently selected
+						if (!IsCurrentActiveMenuNoHeldItems())
+						{
+							FavoriteItemsLastSelectedSlot = clickPos;
+							FavoriteItemsIsItemSelected = true;
+							FavoriteItemSlots[clickPos] = false;
+						}
+						else
+						{
+							// Shop menus only allow held items after purchasing something, so we check for that case here.
+							if (Game1.activeClickableMenu is ShopMenu shopMenu)
+							{
+								if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(inventoryMenu.actualInventory[clickPos]))
+								{
+									FavoriteItemSlots[clickPos] = false;
+								}
+							}
+							else
+							{
+								FavoriteItemSlots[clickPos] = false;
+							}
+						}
+					}
+					else if (isRightClick && inventoryMenu.actualInventory[clickPos].Stack == 1)
+					{
+						// Right click, taking the last item
+						if (!IsCurrentActiveMenuNoHeldItems())
+						{
+							FavoriteItemsLastSelectedSlot = clickPos;
+							FavoriteItemsIsItemSelected = true;
+							FavoriteItemSlots[clickPos] = false;
+						}
+						else
+						{
+							// Shop menus only allow held items after purchasing something, so we check for that case here.
+							if (Game1.activeClickableMenu is ShopMenu shopMenu)
+							{
+								if ((shopMenu.heldItem == null || shopMenu.heldItem.canStackWith(inventoryMenu.actualInventory[clickPos]))
+									&& inventoryMenu.highlightMethod(inventoryMenu.actualInventory[clickPos]))
+								{
+									FavoriteItemsLastSelectedSlot = clickPos;
+									FavoriteItemsIsItemSelected = true;
+									FavoriteItemSlots[clickPos] = false;
+								}
+							}
+							else
+							{
+								FavoriteItemSlots[clickPos] = false;
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && !isRightClick)
+				{
+					FavoriteItemsLastSelectedSlot = -1;
+					FavoriteItemsIsItemSelected = false;
+
+					if (!FavoriteItemSlots[clickPos])
+					{
+						// We are placing the selected item into a non-favorited slot, so favorite this new one.
+						FavoriteItemSlots[clickPos] = true;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		// Checks for menus which don't allow selecting and holding items, i.e. chests, shipping bins, shops, etc.
+		private static bool IsCurrentActiveMenuNoHeldItems()
+        {
+			bool result = Game1.activeClickableMenu is ItemGrabMenu
+				|| Game1.activeClickableMenu is ShopMenu;
+
+			return result;
+		}
+
 		public static void PostReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
 		{
 			// Quick stack button clicked (in InventoryPage)
@@ -251,7 +389,7 @@ namespace ConvenientInventory
 
 		public static bool IsPlayerInventory(InventoryMenu inventoryMenu)
 		{
-			var result = inventoryMenu.playerInventory
+			bool result = inventoryMenu.playerInventory
 				|| (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage)  // CraftingPage.inventory has playerInventory = false
 				|| (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu && itemGrabMenu.inventory == inventoryMenu)  // ItemGrabMenu.inventory is the player's InventoryMenu
 				|| (Game1.activeClickableMenu is ShopMenu);
@@ -278,6 +416,7 @@ namespace ConvenientInventory
 				InventoryMenu inventory = (menu as InventoryMenu)   // Inventory item slots container
 					?? (menu as InventoryPage)?.inventory           // Player menu - inventory tab
 					?? (menu as CraftingPage)?.inventory            // Player menu - crafting tab
+					?? (menu as ShopMenu)?.inventory				// Shop menu
 					?? (menu as MenuWithInventory)?.inventory;      // Arbitrary menu
 
 				// Draw favorite cursor (unless this is an InventoryMenu)
@@ -369,7 +508,7 @@ namespace ConvenientInventory
 			}
 		}
 
-		private static int GetPlayerInventoryIndexOfItem(Item item)
+		public static int GetPlayerInventoryIndexOfItem(Item item)
 		{
 			if (item is null)
             {
