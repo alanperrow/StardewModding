@@ -46,11 +46,11 @@ namespace ConvenientInventory
 	 *			- (DONE) Handle shift left-click; it instantly moves item in/out of first inventory row.
 	 *				- (DONE) Crafting Page is weird... when shift-clicking a single-stack item (i.e. equipment), it "gives" it back to the player instead of selecting it
 	 *					- Not sure how to handle this case, or if it's even worth it
-	 *		- Find cases that might remove item from inventory. If item is removed, its respective favorited item slot should also be removed.
+	 *		- (DONE?) Find cases that might remove item from inventory. If item is removed, its respective favorited item slot should also be removed.
 	 *			- i.e.:
-	 *				- Eating
-	 *				- Gifting
-	 *				- ...
+	 *				- (DONE) Eating
+	 *				- (DONE) Gifting
+	 *				- ...?
 	 *			- (ABANDONED) Maybe just patch Item method that reduces stack count, if possible
 	 *				- Try patching Item.Stack's Set method
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
@@ -500,9 +500,6 @@ namespace ConvenientInventory
 				}
             }
 		}
-
-		// TODO: Should also figure out when toolbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
-		//		  - Toolbar class
 
 		// Called after drawing everything else in arbitrary inventory menu.
 		// Draws favorite items cursor if keybind is being pressed.
