@@ -1,8 +1,10 @@
 ﻿using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,10 +39,13 @@ namespace ConvenientInventory
 	 *		- (DONE) Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
 	 *		- (DONE) Only allow favoriting item slots containing an item.
 	 *			- Still allow un-favoriting empty item slots, as they may appear unintentionally (I'm not perfect)
-	 *		- (2/3) Favorited item slot should "stick" to item in inventory.
+	 *		- (DONE) Favorited item slot should "stick" to item in inventory.
 	 *			- (DONE) If item is selected, temporarily remove (and track) favorited item slot.
 	 *			- (DONE) When item is placed into a different slot, the favorited item slot should be reapplied to the new slot.
-	 *			- Handle shift left-click; it moves item to first available slot in inventory.
+	 *			- (DONE) Check for Item canStack logic when handling left/right clicks.
+	 *			- (DONE) Handle shift left-click; it instantly moves item in/out of first inventory row.
+	 *				- (DONE) Crafting Page is weird... when shift-clicking a single-stack item (i.e. equipment), it "gives" it back to the player instead of selecting it
+	 *					- Not sure how to handle this case, or if it's even worth it
 	 *		- Find cases that might remove item from inventory. If item is removed, its respective favorited item slot should also be removed.
 	 *			- i.e.:
 	 *				- Eating
@@ -238,28 +243,44 @@ namespace ConvenientInventory
 				// Check that we've selected a favorited item slot
 				if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && inventoryMenu.actualInventory[clickPos] != null && FavoriteItemSlots[clickPos]) 
 				{
-					if (!isRightClick && Game1.player.CursorSlotItem is null)
+					Item clickedItem = inventoryMenu.actualInventory[clickPos];
+
+					if (!isRightClick)
 					{
-						// Left click, with no item currently selected
-						if (!IsCurrentActiveMenuNoHeldItems())
+						if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuIP && gameMenuIP.pages[gameMenuIP.currentTab] is InventoryPage)
 						{
-							FavoriteItemsLastSelectedSlot = clickPos;
-							FavoriteItemsIsItemSelected = true;
-							FavoriteItemSlots[clickPos] = false;
+							// Game logic for shift-clicking in player's inventory page
+							HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
 						}
-						else
+						else if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuCP && gameMenuCP.pages[gameMenuCP.currentTab] is CraftingPage
+							&& (clickedItem is Hat || clickedItem is Clothing || clickedItem is Boots || clickedItem is Ring || clickedItem is StardewValley.Tools.MeleeWeapon))
+                        {
+							// Game logic for shift-clicking in player's crafting page. Idk why it works this way, but this handles it.
+							HandleFavoriteItemSlotShiftClickedInCraftingPage(clickPos, clickedItem);
+						}
+						else if (Game1.player.CursorSlotItem is null || !Game1.player.CursorSlotItem.canStackWith(clickedItem))
 						{
-							// Shop menus only allow held items after purchasing something, so we check for that case here.
-							if (Game1.activeClickableMenu is ShopMenu shopMenu)
+							// Left click with either (1.) no item currently selected, or (2.) item selected that cannot stack with the clicked slot
+							if (!IsCurrentActiveMenuNoHeldItems())
 							{
-								if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(inventoryMenu.actualInventory[clickPos]))
-								{
-									FavoriteItemSlots[clickPos] = false;
-								}
+								FavoriteItemsLastSelectedSlot = clickPos;
+								FavoriteItemsIsItemSelected = true;
+								FavoriteItemSlots[clickPos] = false;
 							}
 							else
 							{
-								FavoriteItemSlots[clickPos] = false;
+								// Shop menus only allow held items after purchasing something, so we check for that case here.
+								if (Game1.activeClickableMenu is ShopMenu shopMenu)
+								{
+									if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(inventoryMenu.actualInventory[clickPos]))
+									{
+										FavoriteItemSlots[clickPos] = false;
+									}
+								}
+								else
+								{
+									FavoriteItemSlots[clickPos] = false;
+								}
 							}
 						}
 					}
@@ -318,6 +339,75 @@ namespace ConvenientInventory
 				|| Game1.activeClickableMenu is ShopMenu;
 
 			return result;
+		}
+
+		// Handles shift-click logic for favorited item slots in player's inventory page.
+		private static bool HandleFavoriteItemSlotShiftClickedInInventoryPage(int clickPos, Item item)
+        {
+			bool isItemEquippable = (item is Ring && (Game1.player.leftRing.Value == null || Game1.player.rightRing.Value == null))
+				|| (item is Hat && Game1.player.hat.Value == null)
+				|| (item is Boots && Game1.player.boots.Value == null)
+				|| (item is Clothing && (((item as Clothing).clothesType.Value == 0 && Game1.player.shirtItem.Value == null)
+									   || (item as Clothing).clothesType.Value == 1 && Game1.player.pantsItem.Value == null));
+
+			if (isItemEquippable)
+			{
+				FavoriteItemSlots[clickPos] = false;
+				return true;
+			}
+			
+			if (clickPos >= 12)
+			{
+				for (int k = 0; k < 12; k++)
+				{
+					if (Game1.player.Items[k] == null || Game1.player.Items[k].canStackWith(item))
+					{
+						FavoriteItemSlots[clickPos] = false;
+						FavoriteItemSlots[k] = true;
+						return true;
+					}
+				}
+			}
+			else if (clickPos < 12)
+			{
+				for (int j = 12; j < Game1.player.Items.Count; j++)
+				{
+					if (Game1.player.Items[j] == null || Game1.player.Items[j].canStackWith(item))
+					{
+						FavoriteItemSlots[clickPos] = false;
+						FavoriteItemSlots[j] = true;
+						return true;
+					}
+				}
+			}
+
+			FavoriteItemsLastSelectedSlot = clickPos;
+			FavoriteItemsIsItemSelected = true;
+			FavoriteItemSlots[clickPos] = false;
+			return false;
+		}
+
+		private static bool HandleFavoriteItemSlotShiftClickedInCraftingPage(int clickPos, Item item)
+		{
+			for (int i = 0; i <= clickPos; i++)
+			{
+				if (i == clickPos)
+                {
+					return true;
+                }
+
+				if (Game1.player.Items[i] == null)
+				{
+					FavoriteItemSlots[clickPos] = false;
+					FavoriteItemSlots[i] = true;
+					return true;
+				}
+			}
+
+			FavoriteItemsLastSelectedSlot = clickPos;
+			FavoriteItemsIsItemSelected = true;
+			FavoriteItemSlots[clickPos] = false;
+			return false;
 		}
 
 		public static void PostReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
