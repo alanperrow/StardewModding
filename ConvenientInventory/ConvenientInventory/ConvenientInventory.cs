@@ -487,6 +487,20 @@ namespace ConvenientInventory
 			return result;
 		}
 
+		// Checks if we are about to remove the final item in a favorited item slot, and if so, unfavorites it.
+		public static void PreFarmerReduceActiveItemByOne(Farmer who)
+        {
+			if (who.CurrentItem?.Stack == 1)
+            {
+				int index = GetPlayerInventoryIndexOfItem(who.CurrentItem);
+
+				if (index != -1)
+				{
+					FavoriteItemSlots[index] = false;
+				}
+            }
+		}
+
 		// TODO: Should also figure out when toolbar items are drawn, and prefix that draw method as well (assuming it is not simply using InventoryMenu.draw()).
 		//		  - Toolbar class
 
@@ -571,6 +585,37 @@ namespace ConvenientInventory
             }
         }
 
+		// Draws favorite item slots in toolbar, and draws current tool red outline and slot text on top of highlight (so we don't cover them up).
+		public static void DrawFavoriteItemSlotHighlightsInToolbar(SpriteBatch spriteBatch, int yPositionOnScreen, float transparency, string[] slotText)
+		{
+			for (int i = 0; i < 12; i++)
+			{
+				if (!FavoriteItemSlots[i])
+				{
+					continue;
+				}
+
+				Vector2 toDraw = new Vector2(Game1.uiViewport.Width / 2 - 384 + i * 64, yPositionOnScreen - 96 + 8);
+
+				spriteBatch.Draw(FavoriteItemsHighlightTexture,
+					toDraw,
+					new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
+					Color.White,
+					0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
+				);
+
+				spriteBatch.DrawString(Game1.tinyFont, slotText[i], toDraw + new Vector2(4f, -8f), Color.DimGray * transparency);
+
+				if (Game1.player.CurrentToolIndex == i)
+                {
+					spriteBatch.Draw(Game1.menuTexture,
+						toDraw,
+						Game1.getSourceRectForStandardTileSheet(Game1.menuTexture, 56),
+						Color.White * transparency);
+				}
+			}
+		}
+
 		private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
 		{
 			float scale = (float)(3d + 0.15d * Math.Cos(favoriteItemsHotkeyDownCounter / 15d));
@@ -607,7 +652,7 @@ namespace ConvenientInventory
 
 			for (int i = 0; i < Game1.player.Items.Count; i++)
 			{
-				if (Game1.player.Items[i] == item && Game1.player.Items[i] != null && item != null)
+				if (Game1.player.Items[i] == item && Game1.player.Items[i] != null)
 				{
 					return i;
 				}

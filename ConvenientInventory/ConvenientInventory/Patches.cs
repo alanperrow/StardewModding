@@ -227,7 +227,7 @@ namespace ConvenientInventory.Patches
 			for (int i = 0; i<instructionsList.Count; i++)
 			{
 				// Find instruction after if(boldTitleText != null){} block
-				// IL_07b3 (instructions[772])
+				// IL_07b3 (instructionsList[772])
 				if (i > 0 && i < instructionsList.Count - 1
 					&& instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 6
 					&& instructionsList[i].opcode == OpCodes.Ldarg_S && instructionsList[i].operand is byte b && b == 9
@@ -419,6 +419,72 @@ namespace ConvenientInventory.Patches
 		}
 	}
 
+	[HarmonyPatch(typeof(Toolbar))]
+	public class ToolbarPatches
+	{
+		[HarmonyTranspiler]
+		[HarmonyPatch(nameof(Toolbar.draw))]
+		[HarmonyPatch(new Type[] { typeof(SpriteBatch) })]
+		public static IEnumerable<CodeInstruction> Draw_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
+		{
+			MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(ToolbarPatches), nameof(ToolbarPatches.IsConfigEnableFavoriteItems));
+			MethodInfo DrawFavoriteItemSlotHighlightsInToolbar = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemSlotHighlightsInToolbar));
+
+			FieldInfo yPositionOnScreen = typeof(Toolbar).GetField("yPositionOnScreen", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+			FieldInfo transparency = typeof(Toolbar).GetField("transparency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+			FieldInfo slotText = typeof(Toolbar).GetField("slotText", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+			List<CodeInstruction> instructionsList = instructions.ToList();
+
+			bool flag = false;
+
+			for (int i = 0; i < instructionsList.Count; i++)
+			{
+				// Find instruction after for(int j = 0; j < 12; j++){} block
+				// IL_027b (instructionsList[229])
+				if (i > 0 && i < instructionsList.Count - 2
+					&& instructionsList[i - 1].opcode == OpCodes.Blt
+					&& instructionsList[i].opcode == OpCodes.Ldc_I4_0
+					&& instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 9
+					&& instructionsList[i + 2].opcode == OpCodes.Br)
+				{
+					Label label = ilg.DefineLabel();
+
+					yield return new CodeInstruction(OpCodes.Call, isConfigEnableFavoriteItems)					// call helper method
+					{
+						labels = instructionsList[i].ExtractLabels()
+					};
+					yield return new CodeInstruction(OpCodes.Brfalse, label);                                   // break if call => false
+
+					yield return new CodeInstruction(OpCodes.Ldarg_1);                                          // load SpriteBatch "b" (arg 1)
+					yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
+					yield return new CodeInstruction(OpCodes.Ldfld, yPositionOnScreen);                         // load local variable "this.yPositionOnScreen"
+					yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
+					yield return new CodeInstruction(OpCodes.Ldfld, transparency);                              // load local variable "this.transparency"
+					yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
+					yield return new CodeInstruction(OpCodes.Ldfld, slotText);									// load local variable "this.slotText"
+					yield return new CodeInstruction(OpCodes.Call, DrawFavoriteItemSlotHighlightsInToolbar);	// call DrawFavoriteItemSlotHighlightsInToolbar(b, yPositionOnScreen)
+
+					instructionsList[i].WithLabels(label);
+
+					flag = true;
+				}
+
+				yield return instructionsList[i];
+			}
+
+			if (!flag)
+			{
+				ModEntry.Context.Monitor.Log(
+					$"{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(Toolbar.draw)}, so no changes were made.", LogLevel.Error);
+			}
+
+			yield break;
+		}
+
+		public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.IsEnableFavoriteItems;
+	}
+
 	[HarmonyPatch(typeof(ShopMenu))]
 	public class ShopMenuPatches
 	{
@@ -511,5 +577,21 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ShiftToolbar_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(Farmer.reduceActiveItemByOne))]
+		public static bool ReduceActiveItemByOne_Prefix(Farmer __instance)
+        {
+			try
+			{
+				ConvenientInventory.PreFarmerReduceActiveItemByOne(__instance);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReduceActiveItemByOne_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
 	}
 }
