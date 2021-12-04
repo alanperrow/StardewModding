@@ -362,9 +362,11 @@ namespace ConvenientInventory.Patches
 
 			for (int i = 0; i < instructionsList.Count; i++)
 			{
+				// Find instruction at start of (int k = 0; k < this.capacity; k++){} block
+				// IL_02d0 (instructionsList[?])
 				if (i < instructionsList.Count - 2
 					&& instructionsList[i].opcode == OpCodes.Ldc_I4_0
-					&& instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
+					&& instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 9
 					&& instructionsList[i + 2].opcode == OpCodes.Br)
 				{
 					Label label = ilg.DefineLabel();
@@ -391,7 +393,7 @@ namespace ConvenientInventory.Patches
 			if (!flag)
 			{
 				ModEntry.Context.Monitor.Log(
-					$"{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.draw)}, so no changes were made.", LogLevel.Error);
+					$"{nameof(InventoryMenuPatches)}.{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.draw)}, so no changes were made.", LogLevel.Error);
 			}
 
 			yield break;
@@ -476,7 +478,7 @@ namespace ConvenientInventory.Patches
 			if (!flag)
 			{
 				ModEntry.Context.Monitor.Log(
-					$"{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(Toolbar.draw)}, so no changes were made.", LogLevel.Error);
+					$"{nameof(ToolbarPatches)}.{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(Toolbar.draw)}, so no changes were made.", LogLevel.Error);
 			}
 
 			yield break;
