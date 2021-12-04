@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -69,9 +70,9 @@ namespace ConvenientInventory
 
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 
-		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
+		private static readonly List<TransferredItemSprite> transferredItemSprites = new();
 
-		public static int? PlayerInventoryExpandedSize { get; set; } = null;  // For supporting mods which expand player inventory size
+		private static PerScreen<int?> playerInventoryExpandedSize = new();  // For supporting mods which expand player inventory size
 
 		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
@@ -79,23 +80,42 @@ namespace ConvenientInventory
 
 		public static Texture2D FavoriteItemsBorderTexture { private get; set; }
 
-		public static bool IsFavoriteItemsHotkeyDown { get; set; }
+		private static PerScreen<bool> isFavoriteItemsHotkeyDown = new();
+		public static bool IsFavoriteItemsHotkeyDown
+		{
+			get { return isFavoriteItemsHotkeyDown.Value; }
+            set { isFavoriteItemsHotkeyDown.Value = value; }
+		}
 
-		private static int favoriteItemsHotkeyDownCounter = 0;
+		private static PerScreen<int> favoriteItemsHotkeyDownCounter = new();
+		private static int FavoriteItemsHotkeyDownCounter
+		{
+			get { return favoriteItemsHotkeyDownCounter.Value; }
+			set { favoriteItemsHotkeyDownCounter.Value = value; }
+		}
 
 		private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Context.ModManifest.UniqueID}/favoriteItemSlots";
 
-		private static bool[] favoriteItemSlots;
-
+		private static PerScreen<bool[]> favoriteItemSlots = new();
 		public static bool[] FavoriteItemSlots
 		{
-			get { return favoriteItemSlots ?? LoadFavoriteItemSlots(); }
-			set { favoriteItemSlots = value; }
+			get { return favoriteItemSlots.Value ?? LoadFavoriteItemSlots(); }
+			set { favoriteItemSlots.Value = value; }
 		}
 
-		public static bool FavoriteItemsIsItemSelected { get; set; }
+		private static PerScreen<bool> favoriteItemsIsItemSelected = new();
+		public static bool FavoriteItemsIsItemSelected
+		{
+			get { return favoriteItemsIsItemSelected.Value; }
+			set { favoriteItemsIsItemSelected.Value = value; }
+		}
 
-		public static int FavoriteItemsLastSelectedSlot { get; set; } = -1;
+		private static PerScreen<int> favoriteItemsLastSelectedSlot = new();
+		public static int FavoriteItemsLastSelectedSlot
+		{
+			get { return favoriteItemsLastSelectedSlot.Value; }
+			set { favoriteItemsLastSelectedSlot.Value = value; }
+		}
 
 		public static bool[] LoadFavoriteItemSlots()
 		{
@@ -526,11 +546,11 @@ namespace ConvenientInventory
 					if (IsFavoriteItemsHotkeyDown)
 					{
 						DrawFavoriteItemsCursor(spriteBatch);
-						favoriteItemsHotkeyDownCounter++;
+						FavoriteItemsHotkeyDownCounter++;
 					}
 					else
 					{
-						favoriteItemsHotkeyDownCounter = 0;
+						FavoriteItemsHotkeyDownCounter = 0;
 					}
 				}
 			}
@@ -615,7 +635,7 @@ namespace ConvenientInventory
 
 		private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
 		{
-			float scale = (float)(3d + 0.15d * Math.Cos(favoriteItemsHotkeyDownCounter / 15d));
+			float scale = (float)(3d + 0.15d * Math.Cos(FavoriteItemsHotkeyDownCounter / 15d));
 
 			spriteBatch.Draw(FavoriteItemsCursorTexture,
 			   new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
