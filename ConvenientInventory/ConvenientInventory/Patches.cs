@@ -19,7 +19,7 @@ namespace ConvenientInventory.Patches
 		{
             try
             {
-                ConvenientInventory.Constructor(__instance, x, y, width, height);
+                ConvenientInventory.InventoryPageConstructor(__instance, x, y, width, height);
             }
             catch (Exception e)
             {
@@ -534,6 +534,50 @@ namespace ConvenientInventory.Patches
 			}
 
 			return true;
+		}
+	}
+
+	[HarmonyPatch(typeof(ItemGrabMenu))]
+	public class ItemGrabMenuPatches
+    {
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
+		public static bool OrganizeItemsInList_Prefix(ItemGrabMenu __instance, out Item[] __state, IList<Item> items)
+		{
+			__state = null;
+
+			try
+			{
+				// Only call when this is the player's inventory
+				if (items == Game1.player.Items)
+				{
+					__state = ConvenientInventory.ExtractFavoriteItemsFromList(items);
+				}
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
+		public static void OrganizeItemsInList_Postfix(ItemGrabMenu __instance, Item[] __state, IList<Item> items)
+		{
+			try
+			{
+				// Only call when this is the player's inventory
+				if (items == Game1.player.Items)
+				{
+					ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, items);
+				}
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Postfix)}:\n{e}", LogLevel.Error);
+			}
 		}
 	}
 

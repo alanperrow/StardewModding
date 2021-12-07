@@ -26,10 +26,10 @@ namespace ConvenientInventory
 	 * TODO: 
 	 *	- Implement favorited items
 	 *		- (DONE) Will be ignored by "Quick Stack To Nearby Chests" button.
-	 *		- Patch the following methods which may interfere with favorite items functionality:
+	 *		- (1/2) Patch the following methods which may interfere with favorite items functionality:
 	 *			- Chest: "Add To Existing Stacks" button
 	 *				- ignore favorited items
-	 *			- Inventory: "Organize" button
+	 *			- (DONE) Inventory: "Organize" button
 	 *				- ignore favorited items
 	 *				- Prefix/Transpile ItemGrabMenu.organizeItemsInList
 	 *			- ...
@@ -72,7 +72,7 @@ namespace ConvenientInventory
 
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new();
 
-		private static PerScreen<int?> playerInventoryExpandedSize = new();  // For supporting mods which expand player inventory size
+		private static readonly PerScreen<int?> playerInventoryExpandedSize = new();  // For supporting mods which expand player inventory size
 
 		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
@@ -80,14 +80,14 @@ namespace ConvenientInventory
 
 		public static Texture2D FavoriteItemsBorderTexture { private get; set; }
 
-		private static PerScreen<bool> isFavoriteItemsHotkeyDown = new();
+		private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
 		public static bool IsFavoriteItemsHotkeyDown
 		{
 			get { return isFavoriteItemsHotkeyDown.Value; }
             set { isFavoriteItemsHotkeyDown.Value = value; }
 		}
 
-		private static PerScreen<int> favoriteItemsHotkeyDownCounter = new();
+		private static readonly PerScreen<int> favoriteItemsHotkeyDownCounter = new();
 		private static int FavoriteItemsHotkeyDownCounter
 		{
 			get { return favoriteItemsHotkeyDownCounter.Value; }
@@ -96,21 +96,21 @@ namespace ConvenientInventory
 
 		private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Context.ModManifest.UniqueID}/favoriteItemSlots";
 
-		private static PerScreen<bool[]> favoriteItemSlots = new();
+		private static readonly PerScreen<bool[]> favoriteItemSlots = new();
 		public static bool[] FavoriteItemSlots
 		{
 			get { return favoriteItemSlots.Value ?? LoadFavoriteItemSlots(); }
 			set { favoriteItemSlots.Value = value; }
 		}
 
-		private static PerScreen<bool> favoriteItemsIsItemSelected = new();
+		private static readonly PerScreen<bool> favoriteItemsIsItemSelected = new();
 		public static bool FavoriteItemsIsItemSelected
 		{
 			get { return favoriteItemsIsItemSelected.Value; }
 			set { favoriteItemsIsItemSelected.Value = value; }
 		}
 
-		private static PerScreen<int> favoriteItemsLastSelectedSlot = new();
+		private static readonly PerScreen<int> favoriteItemsLastSelectedSlot = new();
 		public static int FavoriteItemsLastSelectedSlot
 		{
 			get { return favoriteItemsLastSelectedSlot.Value; }
@@ -130,7 +130,7 @@ namespace ConvenientInventory
 			//		 For now, support inventory expansion mods manually by detecting them and setting PlayerInventoryExpandedSize to the new value.
 			//		 Will have to make a new modData entry "favoriteItemSlotsExpanded" to support extra slots and not interfere with original inventory.
 
-			dataStr = dataStr ?? new string('0', FavoriteItemSlots.Length);
+			dataStr ??= new string('0', FavoriteItemSlots.Length);
 			ModEntry.Context.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
 			return FavoriteItemSlots;
 		}
@@ -150,7 +150,7 @@ namespace ConvenientInventory
 			return saveStr;
 		}
 
-		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
+		public static void InventoryPageConstructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
 			Page = inventoryPage;
 
@@ -519,6 +519,68 @@ namespace ConvenientInventory
 					FavoriteItemSlots[index] = false;
 				}
             }
+		}
+
+		// Called when an inventory's Organize button is clicked.
+		// Extracts an inventory's favorited items (replacing with null), to be re-inserted after organization is completed.
+		public static Item[] ExtractFavoriteItemsFromList(IList<Item> items)
+        {
+			if (items is null)
+			{
+				return null;
+			}
+
+			Item[] extractedItems = new Item[items.Count];
+
+			for (int i = 0; i < items.Count; i++)
+            {
+				if (FavoriteItemSlots.Length == i)
+                {
+					break;
+                }
+
+				if (FavoriteItemSlots[i])
+                {
+					extractedItems[i] = items[i];
+					items[i] = null;
+                }
+            }
+
+			return extractedItems;
+		}
+
+		// Called after an inventory's Organize button is clicked.
+		// Re-inserts an inventory's favorited items that were extracted before organization began.
+		public static void ReinsertExtractedFavoriteItemsIntoList(Item[] extractedItems, IList<Item> items)
+		{
+			if (extractedItems is null || items is null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < items.Count; i++)
+			{
+				if (extractedItems[i] != null)
+				{
+					items.Insert(i, extractedItems[i]);
+
+					if (items[items.Count - 1] != null)
+                    {
+						// This "Item" should always be null (so this case should never happen), but just in case...
+						Game1.playSound("throwDownITem");
+						Game1.createItemDebris(items[items.Count - 1], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
+							.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
+
+						ModEntry.Context.Monitor
+							.Log($"Found non-null item: '{items[items.Count - 1].Name}' (x {items[items.Count - 1].Stack}) out of bounds of inventory list (index = {i})" +
+							"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
+							StardewModdingAPI.LogLevel.Warn);
+					}
+
+					// Remove the null "Item" we just pushed past the end of the list
+					items.RemoveAt(items.Count - 1);
+				}
+			}
 		}
 
 		// Called after drawing everything else in arbitrary inventory menu.
