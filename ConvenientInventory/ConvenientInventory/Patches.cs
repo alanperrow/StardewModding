@@ -579,6 +579,38 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
+		public static bool FillOutStacks_Prefix(ItemGrabMenu __instance, out Item[] __state)
+		{
+			__state = null;
+
+			try
+			{
+				__state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(FillOutStacks_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
+		public static void FillOutStacks_Postfix(ItemGrabMenu __instance, Item[] __state)
+		{
+			try
+			{
+				ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, __instance.inventory.actualInventory, false);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(FillOutStacks_Postfix)}:\n{e}", LogLevel.Error);
+			}
+		}
 	}
 
 	[HarmonyPatch(typeof(Item))]

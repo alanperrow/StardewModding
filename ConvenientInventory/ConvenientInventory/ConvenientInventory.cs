@@ -24,10 +24,10 @@ namespace ConvenientInventory
 
 	/*
 	 * TODO: 
-	 *	- Implement favorited items
+	 *	- (DONE) Implement favorited items
 	 *		- (DONE) Will be ignored by "Quick Stack To Nearby Chests" button.
-	 *		- (1/2) Patch the following methods which may interfere with favorite items functionality:
-	 *			- Chest: "Add To Existing Stacks" button
+	 *		- (DONE) Patch the following methods which may interfere with favorite items functionality:
+	 *			- (DONE) Chest: "Add To Existing Stacks" button
 	 *				- ignore favorited items
 	 *			- (DONE) Inventory: "Organize" button
 	 *				- ignore favorited items
@@ -532,13 +532,8 @@ namespace ConvenientInventory
 
 			Item[] extractedItems = new Item[items.Count];
 
-			for (int i = 0; i < items.Count; i++)
+			for (int i = 0; i < items.Count && i < FavoriteItemSlots.Length; i++)
             {
-				if (FavoriteItemSlots.Length == i)
-                {
-					break;
-                }
-
 				if (FavoriteItemSlots[i])
                 {
 					extractedItems[i] = items[i];
@@ -551,7 +546,7 @@ namespace ConvenientInventory
 
 		// Called after an inventory's Organize button is clicked.
 		// Re-inserts an inventory's favorited items that were extracted before organization began.
-		public static void ReinsertExtractedFavoriteItemsIntoList(Item[] extractedItems, IList<Item> items)
+		public static void ReinsertExtractedFavoriteItemsIntoList(Item[] extractedItems, IList<Item> items, bool isSorted = true)
 		{
 			if (extractedItems is null || items is null)
 			{
@@ -562,23 +557,45 @@ namespace ConvenientInventory
 			{
 				if (extractedItems[i] != null)
 				{
-					items.Insert(i, extractedItems[i]);
-
-					if (items[items.Count - 1] != null)
+					if (isSorted)
                     {
-						// This "Item" should always be null (so this case should never happen), but just in case...
-						Game1.playSound("throwDownITem");
-						Game1.createItemDebris(items[items.Count - 1], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
-							.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
+						// Inventory has been organized since we originally extracted favorite items, so we use Insert()
+						items.Insert(i, extractedItems[i]);
 
-						ModEntry.Context.Monitor
-							.Log($"Found non-null item: '{items[items.Count - 1].Name}' (x {items[items.Count - 1].Stack}) out of bounds of inventory list (index = {i})" +
-							"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
-							StardewModdingAPI.LogLevel.Warn);
+						if (items[items.Count - 1] != null)
+						{
+							// This "Item" should always be null (so this case should never happen), but just in case...
+							Game1.playSound("throwDownITem");
+							Game1.createItemDebris(items[items.Count - 1], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
+								.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
+
+							ModEntry.Context.Monitor
+								.Log($"Found non-null item: '{items[items.Count - 1].Name}' (x {items[items.Count - 1].Stack}) out of bounds of inventory list (index={i}) " +
+								"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
+								StardewModdingAPI.LogLevel.Warn);
+						}
+
+						// Remove the null "Item" we just pushed past the end of the list
+						items.RemoveAt(items.Count - 1);
 					}
+                    else
+                    {
+						// Inventory is the same as when we originally extracted favorite items, so we can manually place the items back in
+						if (items[i] != null)
+						{
+							// This "Item" should always be null (so this case should never happen), but just in case...
+							Game1.playSound("throwDownITem");
+							Game1.createItemDebris(items[i], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
+								.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
 
-					// Remove the null "Item" we just pushed past the end of the list
-					items.RemoveAt(items.Count - 1);
+							ModEntry.Context.Monitor
+								.Log($"Found non-null item: '{items[i].Name}' (x {items[i].Stack}) in unexpected position (index={i}) " +
+								"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
+								StardewModdingAPI.LogLevel.Warn);
+						}
+
+						items[i] = extractedItems[i];
+					}
 				}
 			}
 		}
