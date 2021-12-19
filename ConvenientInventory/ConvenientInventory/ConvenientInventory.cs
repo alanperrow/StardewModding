@@ -185,7 +185,6 @@ namespace ConvenientInventory
 					?? (menu as ShopMenu)?.inventory							// Shop menu
 					?? (menu as MenuWithInventory)?.inventory;                  // Arbitrary menu
 
-
 				if (IsFavoriteItemsHotkeyDown)
 				{
 					return !ToggleFavoriteItemSlotAtClickPosition(inventory, x, y);

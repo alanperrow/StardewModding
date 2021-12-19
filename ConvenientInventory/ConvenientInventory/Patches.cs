@@ -546,6 +546,11 @@ namespace ConvenientInventory.Patches
 		{
 			__state = null;
 
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+				return true;
+            }
+
 			try
 			{
 				// Only call when this is the player's inventory
@@ -566,6 +571,11 @@ namespace ConvenientInventory.Patches
 		[HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
 		public static void OrganizeItemsInList_Postfix(ItemGrabMenu __instance, Item[] __state, IList<Item> items)
 		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return;
+			}
+
 			try
 			{
 				// Only call when this is the player's inventory
@@ -586,6 +596,11 @@ namespace ConvenientInventory.Patches
 		{
 			__state = null;
 
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return true;
+			}
+
 			try
 			{
 				__state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
@@ -602,6 +617,11 @@ namespace ConvenientInventory.Patches
 		[HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
 		public static void FillOutStacks_Postfix(ItemGrabMenu __instance, Item[] __state)
 		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return;
+			}
+
 			try
 			{
 				ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, __instance.inventory.actualInventory, false);
@@ -639,9 +659,14 @@ namespace ConvenientInventory.Patches
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(Farmer.shiftToolbar))]
 		public static void ShiftToolbar_Postfix(Farmer __instance, bool right)
-        {
-            try
-            {
+		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return;
+			}
+
+			try
+			{
 				// Game logic
 				if (__instance.Items == null || __instance.Items.Count < 12 || __instance.UsingTool || Game1.dialogueUp || (!Game1.pickingTool && !Game1.player.CanMove) || __instance.areAllItemsNull() || Game1.eventUp || Game1.farmEvent != null)
 				{
@@ -659,7 +684,12 @@ namespace ConvenientInventory.Patches
 		[HarmonyPrefix]
 		[HarmonyPatch(nameof(Farmer.reduceActiveItemByOne))]
 		public static bool ReduceActiveItemByOne_Prefix(Farmer __instance)
-        {
+		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return true;
+			}
+
 			try
 			{
 				ConvenientInventory.PreFarmerReduceActiveItemByOne(__instance);
