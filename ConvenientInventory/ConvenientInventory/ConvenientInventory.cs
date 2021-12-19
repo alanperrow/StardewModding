@@ -277,9 +277,9 @@ namespace ConvenientInventory
 							// Game logic for shift-clicking in player's crafting page. Idk why it works this way, but this handles it.
 							HandleFavoriteItemSlotShiftClickedInCraftingPage(clickPos, clickedItem);
 						}
-						else if (Game1.player.CursorSlotItem is null || !Game1.player.CursorSlotItem.canStackWith(clickedItem))
+						else if ((Game1.player.CursorSlotItem is null || !Game1.player.CursorSlotItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
 						{
-							// Left click with either (1.) no item currently selected, or (2.) item selected that cannot stack with the clicked slot
+							// Left click with either (1.) no item currently selected, or (2.) item selected that cannot stack with the clicked slot, and (3.) clicked slot is not greyed out.
 							if (!IsCurrentActiveMenuNoHeldItems())
 							{
 								FavoriteItemsLastSelectedSlot = clickPos;
@@ -291,7 +291,7 @@ namespace ConvenientInventory
 								// Shop menus only allow held items after purchasing something, so we check for that case here.
 								if (Game1.activeClickableMenu is ShopMenu shopMenu)
 								{
-									if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(inventoryMenu.actualInventory[clickPos]))
+									if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(clickedItem))
 									{
 										FavoriteItemSlots[clickPos] = false;
 									}
@@ -303,7 +303,7 @@ namespace ConvenientInventory
 							}
 						}
 					}
-					else if (isRightClick && inventoryMenu.actualInventory[clickPos].Stack == 1)
+					else if (isRightClick && clickedItem.Stack == 1 && inventoryMenu.highlightMethod(clickedItem))
 					{
 						// Right click, taking the last item
 						if (!IsCurrentActiveMenuNoHeldItems())
@@ -317,8 +317,7 @@ namespace ConvenientInventory
 							// Shop menus only allow held items after purchasing something, so we check for that case here.
 							if (Game1.activeClickableMenu is ShopMenu shopMenu)
 							{
-								if ((shopMenu.heldItem == null || shopMenu.heldItem.canStackWith(inventoryMenu.actualInventory[clickPos]))
-									&& inventoryMenu.highlightMethod(inventoryMenu.actualInventory[clickPos]))
+								if ((shopMenu.heldItem == null || shopMenu.heldItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
 								{
 									FavoriteItemsLastSelectedSlot = clickPos;
 									FavoriteItemsIsItemSelected = true;
@@ -337,14 +336,35 @@ namespace ConvenientInventory
 			{
 				if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && !isRightClick)
 				{
-					FavoriteItemsLastSelectedSlot = -1;
-					FavoriteItemsIsItemSelected = false;
+					// We have a favorited item selected and have clicked a valid inventory slot.
+					Item clickedItem = inventoryMenu.actualInventory[clickPos];
 
-					if (!FavoriteItemSlots[clickPos])
-					{
-						// We are placing the selected item into a non-favorited slot, so favorite this new one.
-						FavoriteItemSlots[clickPos] = true;
+					if (FavoriteItemSlots[clickPos] && clickedItem != null && inventoryMenu.highlightMethod(clickedItem))
+                    {
+						// We are placing the selected favorited item into a favorited slot.
+						if (Game1.player.CursorSlotItem.canStackWith(clickedItem))
+						{
+							// Slot's item can stack with ours, so stop tracking.
+							FavoriteItemsLastSelectedSlot = -1;
+							FavoriteItemsIsItemSelected = false;
+						}
+						else
+                        {
+							// Slot's item cannot stack with ours, so swap which item slot we are tracking.
+							FavoriteItemsLastSelectedSlot = clickPos;
+						}
 					}
+					else
+                    {
+						// We are placing the selected favorited item into an empty slot, so stop tracking, and favorite this new slot if necessary.
+						FavoriteItemsLastSelectedSlot = -1;
+						FavoriteItemsIsItemSelected = false;
+
+						if (!FavoriteItemSlots[clickPos])
+						{
+							FavoriteItemSlots[clickPos] = true;
+						}
+                    }
 				}
 			}
 
