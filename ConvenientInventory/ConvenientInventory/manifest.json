@@ -6,5 +6,5 @@
   "UniqueID": "gaussfire.ConvenientInventory",
   "EntryDll": "ConvenientInventory.dll",
   "MinimumApiVersion": "3.0",
-  "UpdateKeys": [  ]
+  "UpdateKeys": [ "Nexus:10384" ]
 }
