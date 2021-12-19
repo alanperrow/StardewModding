@@ -19,7 +19,7 @@ namespace ConvenientInventory.Patches
 		{
             try
             {
-                ConvenientInventory.Constructor(__instance, x, y, width, height);
+                ConvenientInventory.InventoryPageConstructor(__instance, x, y, width, height);
             }
             catch (Exception e)
             {
@@ -362,9 +362,11 @@ namespace ConvenientInventory.Patches
 
 			for (int i = 0; i < instructionsList.Count; i++)
 			{
+				// Find instruction at start of (int k = 0; k < this.capacity; k++){} block
+				// IL_02d0 (instructionsList[?])
 				if (i < instructionsList.Count - 2
 					&& instructionsList[i].opcode == OpCodes.Ldc_I4_0
-					&& instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
+					&& instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 9
 					&& instructionsList[i + 2].opcode == OpCodes.Br)
 				{
 					Label label = ilg.DefineLabel();
@@ -391,7 +393,7 @@ namespace ConvenientInventory.Patches
 			if (!flag)
 			{
 				ModEntry.Context.Monitor.Log(
-					$"{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.draw)}, so no changes were made.", LogLevel.Error);
+					$"{nameof(InventoryMenuPatches)}.{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.draw)}, so no changes were made.", LogLevel.Error);
 			}
 
 			yield break;
@@ -476,7 +478,7 @@ namespace ConvenientInventory.Patches
 			if (!flag)
 			{
 				ModEntry.Context.Monitor.Log(
-					$"{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(Toolbar.draw)}, so no changes were made.", LogLevel.Error);
+					$"{nameof(ToolbarPatches)}.{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(Toolbar.draw)}, so no changes were made.", LogLevel.Error);
 			}
 
 			yield break;
@@ -535,6 +537,102 @@ namespace ConvenientInventory.Patches
 		}
 	}
 
+	[HarmonyPatch(typeof(ItemGrabMenu))]
+	public class ItemGrabMenuPatches
+    {
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
+		public static bool OrganizeItemsInList_Prefix(ItemGrabMenu __instance, out Item[] __state, IList<Item> items)
+		{
+			__state = null;
+
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+				return true;
+            }
+
+			try
+			{
+				// Only call when this is the player's inventory
+				if (items == Game1.player.Items)
+				{
+					__state = ConvenientInventory.ExtractFavoriteItemsFromList(items);
+				}
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
+		public static void OrganizeItemsInList_Postfix(ItemGrabMenu __instance, Item[] __state, IList<Item> items)
+		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return;
+			}
+
+			try
+			{
+				// Only call when this is the player's inventory
+				if (items == Game1.player.Items)
+				{
+					ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, items);
+				}
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Postfix)}:\n{e}", LogLevel.Error);
+			}
+		}
+
+		[HarmonyPrefix]
+		[HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
+		public static bool FillOutStacks_Prefix(ItemGrabMenu __instance, out Item[] __state)
+		{
+			__state = null;
+
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return true;
+			}
+
+			try
+			{
+				__state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(FillOutStacks_Prefix)}:\n{e}", LogLevel.Error);
+			}
+
+			return true;
+		}
+
+		[HarmonyPostfix]
+		[HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
+		public static void FillOutStacks_Postfix(ItemGrabMenu __instance, Item[] __state)
+		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return;
+			}
+
+			try
+			{
+				ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, __instance.inventory.actualInventory, false);
+			}
+			catch (Exception e)
+			{
+				ModEntry.Context.Monitor.Log($"Failed in {nameof(FillOutStacks_Postfix)}:\n{e}", LogLevel.Error);
+			}
+		}
+	}
+
 	[HarmonyPatch(typeof(Item))]
 	public class ItemPatches
     {
@@ -561,9 +659,14 @@ namespace ConvenientInventory.Patches
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(Farmer.shiftToolbar))]
 		public static void ShiftToolbar_Postfix(Farmer __instance, bool right)
-        {
-            try
-            {
+		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return;
+			}
+
+			try
+			{
 				// Game logic
 				if (__instance.Items == null || __instance.Items.Count < 12 || __instance.UsingTool || Game1.dialogueUp || (!Game1.pickingTool && !Game1.player.CanMove) || __instance.areAllItemsNull() || Game1.eventUp || Game1.farmEvent != null)
 				{
@@ -581,7 +684,12 @@ namespace ConvenientInventory.Patches
 		[HarmonyPrefix]
 		[HarmonyPatch(nameof(Farmer.reduceActiveItemByOne))]
 		public static bool ReduceActiveItemByOne_Prefix(Farmer __instance)
-        {
+		{
+			if (!ModEntry.Config.IsEnableFavoriteItems)
+			{
+				return true;
+			}
+
 			try
 			{
 				ConvenientInventory.PreFarmerReduceActiveItemByOne(__instance);

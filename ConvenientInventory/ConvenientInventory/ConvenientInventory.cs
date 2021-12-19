@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -23,12 +24,12 @@ namespace ConvenientInventory
 
 	/*
 	 * TODO: 
-	 *	- Implement favorited items
+	 *	- (DONE) Implement favorited items
 	 *		- (DONE) Will be ignored by "Quick Stack To Nearby Chests" button.
-	 *		- Patch the following methods which may interfere with favorite items functionality:
-	 *			- Chest: "Add To Existing Stacks" button
+	 *		- (DONE) Patch the following methods which may interfere with favorite items functionality:
+	 *			- (DONE) Chest: "Add To Existing Stacks" button
 	 *				- ignore favorited items
-	 *			- Inventory: "Organize" button
+	 *			- (DONE) Inventory: "Organize" button
 	 *				- ignore favorited items
 	 *				- Prefix/Transpile ItemGrabMenu.organizeItemsInList
 	 *			- ...
@@ -69,9 +70,9 @@ namespace ConvenientInventory
 
 		private const int quickStackButtonID = 918021;  // Unique indentifier
 
-		private static readonly List<TransferredItemSprite> transferredItemSprites = new List<TransferredItemSprite>();
+		private static readonly List<TransferredItemSprite> transferredItemSprites = new();
 
-		public static int? PlayerInventoryExpandedSize { get; set; } = null;  // For supporting mods which expand player inventory size
+		private static readonly PerScreen<int?> playerInventoryExpandedSize = new();  // For supporting mods which expand player inventory size
 
 		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
@@ -79,23 +80,42 @@ namespace ConvenientInventory
 
 		public static Texture2D FavoriteItemsBorderTexture { private get; set; }
 
-		public static bool IsFavoriteItemsHotkeyDown { get; set; }
+		private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
+		public static bool IsFavoriteItemsHotkeyDown
+		{
+			get { return isFavoriteItemsHotkeyDown.Value; }
+            set { isFavoriteItemsHotkeyDown.Value = value; }
+		}
 
-		private static int favoriteItemsHotkeyDownCounter = 0;
+		private static readonly PerScreen<int> favoriteItemsHotkeyDownCounter = new();
+		private static int FavoriteItemsHotkeyDownCounter
+		{
+			get { return favoriteItemsHotkeyDownCounter.Value; }
+			set { favoriteItemsHotkeyDownCounter.Value = value; }
+		}
 
 		private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Context.ModManifest.UniqueID}/favoriteItemSlots";
 
-		private static bool[] favoriteItemSlots;
-
+		private static readonly PerScreen<bool[]> favoriteItemSlots = new();
 		public static bool[] FavoriteItemSlots
 		{
-			get { return favoriteItemSlots ?? LoadFavoriteItemSlots(); }
-			set { favoriteItemSlots = value; }
+			get { return favoriteItemSlots.Value ?? LoadFavoriteItemSlots(); }
+			set { favoriteItemSlots.Value = value; }
 		}
 
-		public static bool FavoriteItemsIsItemSelected { get; set; }
+		private static readonly PerScreen<bool> favoriteItemsIsItemSelected = new();
+		public static bool FavoriteItemsIsItemSelected
+		{
+			get { return favoriteItemsIsItemSelected.Value; }
+			set { favoriteItemsIsItemSelected.Value = value; }
+		}
 
-		public static int FavoriteItemsLastSelectedSlot { get; set; } = -1;
+		private static readonly PerScreen<int> favoriteItemsLastSelectedSlot = new();
+		public static int FavoriteItemsLastSelectedSlot
+		{
+			get { return favoriteItemsLastSelectedSlot.Value; }
+			set { favoriteItemsLastSelectedSlot.Value = value; }
+		}
 
 		public static bool[] LoadFavoriteItemSlots()
 		{
@@ -110,7 +130,7 @@ namespace ConvenientInventory
 			//		 For now, support inventory expansion mods manually by detecting them and setting PlayerInventoryExpandedSize to the new value.
 			//		 Will have to make a new modData entry "favoriteItemSlotsExpanded" to support extra slots and not interfere with original inventory.
 
-			dataStr = dataStr ?? new string('0', FavoriteItemSlots.Length);
+			dataStr ??= new string('0', FavoriteItemSlots.Length);
 			ModEntry.Context.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
 			return FavoriteItemSlots;
 		}
@@ -130,7 +150,7 @@ namespace ConvenientInventory
 			return saveStr;
 		}
 
-		public static void Constructor(InventoryPage inventoryPage, int x, int y, int width, int height)
+		public static void InventoryPageConstructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
 			Page = inventoryPage;
 
@@ -164,7 +184,6 @@ namespace ConvenientInventory
 					?? (menu as CraftingPage)?.inventory                        // Player menu - crafting tab
 					?? (menu as ShopMenu)?.inventory							// Shop menu
 					?? (menu as MenuWithInventory)?.inventory;                  // Arbitrary menu
-
 
 				if (IsFavoriteItemsHotkeyDown)
 				{
@@ -501,6 +520,85 @@ namespace ConvenientInventory
             }
 		}
 
+		// Called when an inventory's Organize button is clicked.
+		// Extracts an inventory's favorited items (replacing with null), to be re-inserted after organization is completed.
+		public static Item[] ExtractFavoriteItemsFromList(IList<Item> items)
+        {
+			if (items is null)
+			{
+				return null;
+			}
+
+			Item[] extractedItems = new Item[items.Count];
+
+			for (int i = 0; i < items.Count && i < FavoriteItemSlots.Length; i++)
+            {
+				if (FavoriteItemSlots[i])
+                {
+					extractedItems[i] = items[i];
+					items[i] = null;
+                }
+            }
+
+			return extractedItems;
+		}
+
+		// Called after an inventory's Organize button is clicked.
+		// Re-inserts an inventory's favorited items that were extracted before organization began.
+		public static void ReinsertExtractedFavoriteItemsIntoList(Item[] extractedItems, IList<Item> items, bool isSorted = true)
+		{
+			if (extractedItems is null || items is null)
+			{
+				return;
+			}
+
+			for (int i = 0; i < items.Count; i++)
+			{
+				if (extractedItems[i] != null)
+				{
+					if (isSorted)
+                    {
+						// Inventory has been organized since we originally extracted favorite items, so we use Insert()
+						items.Insert(i, extractedItems[i]);
+
+						if (items[items.Count - 1] != null)
+						{
+							// This "Item" should always be null (so this case should never happen), but just in case...
+							Game1.playSound("throwDownITem");
+							Game1.createItemDebris(items[items.Count - 1], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
+								.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
+
+							ModEntry.Context.Monitor
+								.Log($"Found non-null item: '{items[items.Count - 1].Name}' (x {items[items.Count - 1].Stack}) out of bounds of inventory list (index={i}) " +
+								"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
+								StardewModdingAPI.LogLevel.Warn);
+						}
+
+						// Remove the null "Item" we just pushed past the end of the list
+						items.RemoveAt(items.Count - 1);
+					}
+                    else
+                    {
+						// Inventory is the same as when we originally extracted favorite items, so we can manually place the items back in
+						if (items[i] != null)
+						{
+							// This "Item" should always be null (so this case should never happen), but just in case...
+							Game1.playSound("throwDownITem");
+							Game1.createItemDebris(items[i], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
+								.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
+
+							ModEntry.Context.Monitor
+								.Log($"Found non-null item: '{items[i].Name}' (x {items[i].Stack}) in unexpected position (index={i}) " +
+								"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
+								StardewModdingAPI.LogLevel.Warn);
+						}
+
+						items[i] = extractedItems[i];
+					}
+				}
+			}
+		}
+
 		// Called after drawing everything else in arbitrary inventory menu.
 		// Draws favorite items cursor if keybind is being pressed.
 		public static void PostMenuDraw<T>(T menu, SpriteBatch spriteBatch) where T : IClickableMenu
@@ -526,11 +624,11 @@ namespace ConvenientInventory
 					if (IsFavoriteItemsHotkeyDown)
 					{
 						DrawFavoriteItemsCursor(spriteBatch);
-						favoriteItemsHotkeyDownCounter++;
+						FavoriteItemsHotkeyDownCounter++;
 					}
 					else
 					{
-						favoriteItemsHotkeyDownCounter = 0;
+						FavoriteItemsHotkeyDownCounter = 0;
 					}
 				}
 			}
@@ -615,7 +713,7 @@ namespace ConvenientInventory
 
 		private static void DrawFavoriteItemsCursor(SpriteBatch spriteBatch)
 		{
-			float scale = (float)(3d + 0.15d * Math.Cos(favoriteItemsHotkeyDownCounter / 15d));
+			float scale = (float)(3d + 0.15d * Math.Cos(FavoriteItemsHotkeyDownCounter / 15d));
 
 			spriteBatch.Draw(FavoriteItemsCursorTexture,
 			   new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
