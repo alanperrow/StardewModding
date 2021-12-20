@@ -1,4 +1,5 @@
-﻿using ConvenientInventory.TypedChests;
+﻿using ConvenientInventory.Compatibility;
+using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -23,39 +24,10 @@ namespace ConvenientInventory
 	}
 
 	/*
-	 * TODO: 
-	 *	- (DONE) Implement favorited items
-	 *		- (DONE) Will be ignored by "Quick Stack To Nearby Chests" button.
-	 *		- (DONE) Patch the following methods which may interfere with favorite items functionality:
-	 *			- (DONE) Chest: "Add To Existing Stacks" button
-	 *				- ignore favorited items
-	 *			- (DONE) Inventory: "Organize" button
-	 *				- ignore favorited items
-	 *				- Prefix/Transpile ItemGrabMenu.organizeItemsInList
-	 *			- ...
-	 *		- (ABANDONED) Prevents being sold to shops
-	 *		- (DONE) Prevents being dropped/trashed in inventory
-	 *			- Prefix Item.canBeTrashed
-	 *		- (DONE) Prevent click action being performed on item when toggling favorite
-	 *		- (DONE) Draw an icon in item tooltip post-draw, to better convey an item is favorited (especially if the item is large and covers most of its item slot)
-	 *		- (DONE) Only allow favoriting item slots containing an item.
-	 *			- Still allow un-favoriting empty item slots, as they may appear unintentionally (I'm not perfect)
-	 *		- (DONE) Favorited item slot should "stick" to item in inventory.
-	 *			- (DONE) If item is selected, temporarily remove (and track) favorited item slot.
-	 *			- (DONE) When item is placed into a different slot, the favorited item slot should be reapplied to the new slot.
-	 *			- (DONE) Check for Item canStack logic when handling left/right clicks.
-	 *			- (DONE) Handle shift left-click; it instantly moves item in/out of first inventory row.
-	 *				- (DONE) Crafting Page is weird... when shift-clicking a single-stack item (i.e. equipment), it "gives" it back to the player instead of selecting it
-	 *					- Not sure how to handle this case, or if it's even worth it
-	 *		- (DONE?) Find cases that might remove item from inventory. If item is removed, its respective favorited item slot should also be removed.
-	 *			- i.e.:
-	 *				- (DONE) Eating
-	 *				- (DONE) Gifting
-	 *				- ...?
-	 *			- (ABANDONED) Maybe just patch Item method that reduces stack count, if possible
-	 *				- Try patching Item.Stack's Set method
+	 * TODO:
 	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
 	 */
+
 	public static class ConvenientInventory
 	{
 		public static Texture2D QuickStackButtonIcon { private get; set; }
@@ -72,8 +44,6 @@ namespace ConvenientInventory
 
 		private static readonly List<TransferredItemSprite> transferredItemSprites = new();
 
-		private static readonly PerScreen<int?> playerInventoryExpandedSize = new();  // For supporting mods which expand player inventory size
-
 		public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
 		public static Texture2D FavoriteItemsHighlightTexture { private get; set; }
@@ -84,7 +54,7 @@ namespace ConvenientInventory
 		public static bool IsFavoriteItemsHotkeyDown
 		{
 			get { return isFavoriteItemsHotkeyDown.Value; }
-            set { isFavoriteItemsHotkeyDown.Value = value; }
+			set { isFavoriteItemsHotkeyDown.Value = value; }
 		}
 
 		private static readonly PerScreen<int> favoriteItemsHotkeyDownCounter = new();
@@ -99,7 +69,20 @@ namespace ConvenientInventory
 		private static readonly PerScreen<bool[]> favoriteItemSlots = new();
 		public static bool[] FavoriteItemSlots
 		{
-			get { return favoriteItemSlots.Value ?? LoadFavoriteItemSlots(); }
+			get
+			{
+				if (favoriteItemSlots.Value is null)
+                {
+					LoadFavoriteItemSlots();
+                }
+
+				if (InventoryExpansions.IsPlayerMaxItemsChanged(favoriteItemSlots.Value))
+                {
+					favoriteItemSlots.Value = InventoryExpansions.ResizeFavoriteItemSlots(favoriteItemSlots.Value, Game1.player.MaxItems);
+                }
+
+				return favoriteItemSlots.Value;
+			}
 			set { favoriteItemSlots.Value = value; }
 		}
 
@@ -124,11 +107,7 @@ namespace ConvenientInventory
 			FavoriteItemSlots = dataStr?
 				.Select(x => x == '1')
 				.ToArray()
-				?? new bool[Farmer.maxInventorySpace];
-
-			// TODO: Is this a good a way of getting max inventory size (for inventory expansion compatibility)?
-			//		 For now, support inventory expansion mods manually by detecting them and setting PlayerInventoryExpandedSize to the new value.
-			//		 Will have to make a new modData entry "favoriteItemSlotsExpanded" to support extra slots and not interfere with original inventory.
+				?? new bool[Game1.player.MaxItems];
 
 			dataStr ??= new string('0', FavoriteItemSlots.Length);
 			ModEntry.Context.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
@@ -684,7 +663,7 @@ namespace ConvenientInventory
 
 			List<Vector2> slotDrawPositions = inventoryMenu.GetSlotDrawPositions();
 
-            for (int i = 0; i < slotDrawPositions.Count; i++)
+            for (int i = 0; i < slotDrawPositions.Count && i < FavoriteItemSlots.Length; i++)
             {
                 if (!FavoriteItemSlots[i])
                 {
