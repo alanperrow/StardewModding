@@ -78,6 +78,7 @@ namespace ConvenientInventory
 					optionGet: () => Config.IsEnableQuickStack,
 					optionSet: value => Config.IsEnableQuickStack = value
 				);
+
 				api.RegisterClampedOption(
 					mod: ModManifest,
 					optionName: "Range",
@@ -88,6 +89,7 @@ namespace ConvenientInventory
 					max: 10,
 					interval: 1
 				);
+
 				api.RegisterSimpleOption(
 					mod: ModManifest,
 					optionName: "Quick stack into buildings?",
@@ -95,6 +97,7 @@ namespace ConvenientInventory
 					optionGet: () => Config.IsQuickStackIntoBuildingsWithInventories,
 					optionSet: value => Config.IsQuickStackIntoBuildingsWithInventories = value
 				);
+
 				api.RegisterSimpleOption(
 					mod: ModManifest,
 					optionName: "Quick stack overflow items?",
@@ -102,6 +105,7 @@ namespace ConvenientInventory
 					optionGet: () => Config.IsQuickStackOverflowItems,
 					optionSet: value => Config.IsQuickStackOverflowItems = value
 				);
+
 				api.RegisterSimpleOption(
 					mod: ModManifest,
 					optionName: "Show nearby chests in tooltip?",
@@ -115,6 +119,7 @@ namespace ConvenientInventory
 					labelName: "Favorite Items",
 					labelDesc: null
 				);
+
 				api.RegisterSimpleOption(
 					mod: ModManifest,
 					optionName: "Enable favorite items?",   // TODO: Will favorited items ignore Add To Existing Stacks? Or just quick stack?
@@ -122,35 +127,29 @@ namespace ConvenientInventory
 					optionGet: () => Config.IsEnableFavoriteItems,
 					optionSet: value => Config.IsEnableFavoriteItems = value
 				);
+
 				string[] highlightStyleDescriptions =
 				{
-					": Gold dashed",
-					": Clean gold dashed",
-					": Thick gold border",
-					": Textured gold inset border",
-					": Gold inset border",
-					": Dark dashed"
+					"0: Gold dashed",
+					"1: Clean gold dashed",
+					"2: Thick gold border",
+					"3: Textured gold inset border",
+					"4: Gold inset border",
+					"5: Dark dashed"
 				};
 				api.RegisterChoiceOption(
 					mod: ModManifest,
 					optionName: "Highlight style",
 					optionDesc: "Choose your preferred texture style for highlighting favorited items in your inventory.",
-					optionGet: () => Config.FavoriteItemsHighlightTextureChoice.ToString() + highlightStyleDescriptions[Config.FavoriteItemsHighlightTextureChoice],
+					optionGet: () => highlightStyleDescriptions[Config.FavoriteItemsHighlightTextureChoice],
 					optionSet: value =>
 					{
 						Config.FavoriteItemsHighlightTextureChoice = int.Parse(value.Substring(0, 1));
 						ConvenientInventory.FavoriteItemsHighlightTexture = Helper.Content.Load<Texture2D>($@"Assets\favoriteHighlight_{value[0]}.png");
 					},
-					choices: new string[]
-					{
-						"0" + highlightStyleDescriptions[0],
-						"1" + highlightStyleDescriptions[1],
-						"2" + highlightStyleDescriptions[2],
-						"3" + highlightStyleDescriptions[3],
-						"4" + highlightStyleDescriptions[4],
-						"5" + highlightStyleDescriptions[5]
-					}
+					choices: highlightStyleDescriptions
 				);
+
 				api.RegisterSimpleOption(
 					mod: ModManifest,
 					optionName: "Keybind (keyboard)",
@@ -158,6 +157,7 @@ namespace ConvenientInventory
 					optionGet: () => Config.FavoriteItemsKeyboardHotkey,
 					optionSet: value => Config.FavoriteItemsKeyboardHotkey = value
 				);
+
 				api.RegisterSimpleOption(
 					mod: ModManifest,
 					optionName: "Keybind (controller)",

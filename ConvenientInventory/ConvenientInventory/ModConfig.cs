@@ -14,6 +14,12 @@ namespace ConvenientInventory
 
 		public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;
 
+		public bool IsEnableQuickStackHotkey { get; set; } = false;  // TODO
+
+		public SButton QuickStackKeyboardHotkey { get; set; } = SButton.K;  // TODO
+
+		public SButton QuickStackControllerHotkey { get; set; } = SButton.None;  // TODO
+
 		public bool IsEnableFavoriteItems { get; set; } = true;
 
 		public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;

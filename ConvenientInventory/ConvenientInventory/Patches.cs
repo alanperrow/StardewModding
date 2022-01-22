@@ -139,6 +139,7 @@ namespace ConvenientInventory.Patches
 			return true;
 		}
 
+		/*
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(CraftingPage.receiveLeftClick))]
 		public static void ReceiveLeftClick_Postfix(CraftingPage __instance, int x, int y)
@@ -152,6 +153,7 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
+		*/
 
 		[HarmonyPrefix]
 		[HarmonyPatch(nameof(CraftingPage.receiveRightClick))]
@@ -312,6 +314,7 @@ namespace ConvenientInventory.Patches
 			return true;
 		}
 
+		/*
 		[HarmonyPostfix]
 		[HarmonyPatch(nameof(MenuWithInventory.receiveLeftClick))]
 		public static void ReceiveLeftClick_Postfix(MenuWithInventory __instance, int x, int y)
@@ -325,6 +328,7 @@ namespace ConvenientInventory.Patches
 				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
+		*/
 
 		[HarmonyPrefix]
 		[HarmonyPatch(nameof(MenuWithInventory.receiveRightClick))]
