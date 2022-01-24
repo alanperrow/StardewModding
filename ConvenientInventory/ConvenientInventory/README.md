@@ -33,8 +33,8 @@ Favorited items are prevented from:
  - **IsEnableFavoriteItems**: If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests.
  - **FavoriteItemsHighlightTextureChoice**: Choose your preferred texture style for highlighting favorited items in your inventory.
    - ( 0: ![](https://i.imgur.com/fTMl0FT.png),  1: ![](https://i.imgur.com/NTlia1R.png),  2: ![](https://i.imgur.com/QGztt8Q.png),  3: ![](https://i.imgur.com/MBG2A6e.png),  4: ![](https://i.imgur.com/rZqklnN.png),  5: ![](https://i.imgur.com/FvKpyZV.png) )
- - FavoriteItemsKeyboardHotkey: Hold this key when selecting an item to favorite it.
- - FavoriteItemsControllerHotkey: Hold this button when selecting an item to favorite it. (For controller support)
+ - **FavoriteItemsKeyboardHotkey**: Hold this key when selecting an item to favorite it.
+ - **FavoriteItemsControllerHotkey**: Hold this button when selecting an item to favorite it. (For controller support)
 
 ## Compatibility
  - Supports single player, split-screen local multiplayer, and online multiplayer.
