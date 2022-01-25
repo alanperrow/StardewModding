@@ -614,10 +614,21 @@ namespace ConvenientInventory
 		private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
 			// Handle favorite items hotkey being pressed
-			if (Config.IsEnableFavoriteItems && e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey)
+			if (Config.IsEnableFavoriteItems
+				&& Context.IsWorldReady
+				&& (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey))
             {
                 ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
             }
+
+			// Handle quick stack hotkey being pressed
+			if (Config.IsEnableQuickStackHotkey
+				&& Context.IsWorldReady
+				&& StardewValley.Game1.CurrentEvent is null
+				&& (e.Button == Config.QuickStackKeyboardHotkey || e.Button == Config.QuickStackControllerHotkey))
+            {
+				ConvenientInventory.OnQuickStackHotkeyPressed();
+			}
 		}
 
 		private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
