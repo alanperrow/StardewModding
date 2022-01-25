@@ -23,7 +23,7 @@ namespace ConvenientInventory.Patches
             }
             catch (Exception e)
             {
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 	}
@@ -41,7 +41,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(PerformHoverAction_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(PerformHoverAction_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -85,7 +85,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -99,7 +99,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -119,7 +119,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -165,7 +165,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -188,7 +188,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(PopulateClickableComponentsList_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(PopulateClickableComponentsList_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -205,7 +205,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Update_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Update_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -251,7 +251,7 @@ namespace ConvenientInventory.Patches
 
 			if (!flag)
 			{
-				ModEntry.Context.Monitor.Log(
+				ModEntry.Instance.Monitor.Log(
 					$"{nameof(DrawHoverText_Transpiler)} could not find target instruction(s) in {nameof(IClickableMenu.drawHoverText)}, so no changes were made.", LogLevel.Error);
 			}
 
@@ -275,7 +275,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 	}
@@ -294,7 +294,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -308,7 +308,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -340,7 +340,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -396,7 +396,7 @@ namespace ConvenientInventory.Patches
 
 			if (!flag)
 			{
-				ModEntry.Context.Monitor.Log(
+				ModEntry.Instance.Monitor.Log(
 					$"{nameof(InventoryMenuPatches)}.{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.draw)}, so no changes were made.", LogLevel.Error);
 			}
 
@@ -420,7 +420,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 	}
@@ -481,7 +481,7 @@ namespace ConvenientInventory.Patches
 
 			if (!flag)
 			{
-				ModEntry.Context.Monitor.Log(
+				ModEntry.Instance.Monitor.Log(
 					$"{nameof(ToolbarPatches)}.{nameof(Draw_Transpiler)} could not find target instruction(s) in {nameof(Toolbar.draw)}, so no changes were made.", LogLevel.Error);
 			}
 
@@ -504,7 +504,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -518,7 +518,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -534,7 +534,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -565,7 +565,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -590,7 +590,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(OrganizeItemsInList_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 
@@ -611,7 +611,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(FillOutStacks_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(FillOutStacks_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;
@@ -632,7 +632,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(FillOutStacks_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(FillOutStacks_Postfix)}:\n{e}", LogLevel.Error);
 			}
 		}
 	}
@@ -681,7 +681,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
             {
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ShiftToolbar_Postfix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ShiftToolbar_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
 
@@ -700,7 +700,7 @@ namespace ConvenientInventory.Patches
 			}
 			catch (Exception e)
 			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReduceActiveItemByOne_Prefix)}:\n{e}", LogLevel.Error);
+				ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReduceActiveItemByOne_Prefix)}:\n{e}", LogLevel.Error);
 			}
 
 			return true;

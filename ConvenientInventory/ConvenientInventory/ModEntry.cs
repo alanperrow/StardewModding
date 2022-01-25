@@ -12,7 +12,7 @@ namespace ConvenientInventory
 	/// <summary>The mod entry class loaded by SMAPI.</summary>
 	public class ModEntry : Mod
 	{
-		public static ModEntry Context { get; private set; }
+		public static ModEntry Instance { get; private set; }
 
 		public static ModConfig Config { get; private set; }
 
@@ -20,7 +20,7 @@ namespace ConvenientInventory
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
 		public override void Entry(IModHelper helper)
 		{
-			Context = this;
+			Instance = this;
 			Config = helper.ReadConfig<ModConfig>();
 
 			ConvenientInventory.QuickStackButtonIcon = helper.Content.Load<Texture2D>(@"assets\icon.png");
@@ -83,15 +83,20 @@ namespace ConvenientInventory
 		private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
 			// Handle favorite items hotkey being pressed
-			if (Config.IsEnableFavoriteItems && (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey))
+			if (Config.IsEnableFavoriteItems
+				&& Context.IsWorldReady
+				&& (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey))
             {
 				ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
             }
 
 			// Handle quick stack hotkey being pressed
-			if (Config.IsEnableQuickStackHotkey && (e.Button == Config.QuickStackKeyboardHotkey || e.Button == Config.QuickStackControllerHotkey))
+			if (Config.IsEnableQuickStackHotkey
+				&& Context.IsWorldReady
+				&& StardewValley.Game1.CurrentEvent is null
+				&& (e.Button == Config.QuickStackKeyboardHotkey || e.Button == Config.QuickStackControllerHotkey))
             {
-				ConvenientInventory.QuickStackHotkeyPressed();
+				ConvenientInventory.OnQuickStackHotkeyPressed();
 			}
 		}
 

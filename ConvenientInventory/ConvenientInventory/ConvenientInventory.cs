@@ -64,7 +64,7 @@ namespace ConvenientInventory
 			set { favoriteItemsHotkeyDownCounter.Value = value; }
 		}
 
-		private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Context.ModManifest.UniqueID}/favoriteItemSlots";
+		private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Instance.ModManifest.UniqueID}/favoriteItemSlots";
 
 		private static readonly PerScreen<bool[]> favoriteItemSlots = new();
 		public static bool[] FavoriteItemSlots
@@ -110,7 +110,7 @@ namespace ConvenientInventory
 				?? new bool[Game1.player.MaxItems];
 
 			dataStr ??= new string('0', FavoriteItemSlots.Length);
-			ModEntry.Context.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
+			ModEntry.Instance.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
 			return FavoriteItemSlots;
 		}
 
@@ -125,7 +125,7 @@ namespace ConvenientInventory
 
 			Game1.player.modData[favoriteItemSlotsModDataKey] = saveStr;
 
-			ModEntry.Context.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", StardewModdingAPI.LogLevel.Trace);
+			ModEntry.Instance.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", StardewModdingAPI.LogLevel.Trace);
 			return saveStr;
 		}
 
@@ -210,7 +210,7 @@ namespace ConvenientInventory
 			// Only allow favoriting if selected slot contains an item. Always allow unfavoriting.
 			if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && (FavoriteItemSlots[clickPos] || inventoryMenu.actualInventory[clickPos] != null))
             {
-                ModEntry.Context.Monitor
+                ModEntry.Instance.Monitor
 					.Log($"{(FavoriteItemSlots[clickPos] ? "Un-" : string.Empty)}Favorited item slot {clickPos}: {inventoryMenu.actualInventory[clickPos]?.Name}",
                 	StardewModdingAPI.LogLevel.Trace);
 
@@ -437,7 +437,7 @@ namespace ConvenientInventory
 			}
 		}
 
-		public static void QuickStackHotkeyPressed()
+		public static void OnQuickStackHotkeyPressed()
         {
 			if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is InventoryPage inventoryPage)
             {
@@ -578,7 +578,7 @@ namespace ConvenientInventory
 							Game1.createItemDebris(items[items.Count - 1], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
 								.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
 
-							ModEntry.Context.Monitor
+							ModEntry.Instance.Monitor
 								.Log($"Found non-null item: '{items[items.Count - 1].Name}' (x {items[items.Count - 1].Stack}) out of bounds of inventory list (index={i}) " +
 								"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
 								StardewModdingAPI.LogLevel.Warn);
@@ -597,7 +597,7 @@ namespace ConvenientInventory
 							Game1.createItemDebris(items[i], Game1.player.getStandingPosition(), Game1.player.FacingDirection)
 								.DroppedByPlayerID.Value = Game1.player.UniqueMultiplayerID;
 
-							ModEntry.Context.Monitor
+							ModEntry.Instance.Monitor
 								.Log($"Found non-null item: '{items[i].Name}' (x {items[i].Stack}) in unexpected position (index={i}) " +
 								"when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
 								StardewModdingAPI.LogLevel.Warn);
