@@ -1,3 +1,22 @@
+TO DO:
+ - Add hotkey for "Organize" button via opt-in config option.
+ - Add new opt-in config option that adds a left-to-right warp with the gamepad cursor in inventory page.
+ - Add new opt-in config option that allows quick stacking of items without checking quality.
+ - Support compatibility with "Vertical Toolbar" mod.
+   - If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
+ - Support compatibility with mods that add storage objects, such as
+   - Mega Storage
+   - Expanded Storage
+   - Storage Variety
+ - Re-investigate feasability of preventing favorited items from being placed in the shipping bin.
+ - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
+
+ DONE:
+ - Fix assets directory issue due to capitalization.
+ - Add hotkey for quick stack via opt-in config option.
+
+ ---
+
 NexusMods link: https://www.nexusmods.com/stardewvalley/mods/10384
 
 # Convenient Inventory
@@ -27,6 +46,9 @@ Favorited items are prevented from:
 ## Config
  - **IsEnableQuickStack**: If enabled, adds a "Quick Stack To Nearby Chests" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.
  - **QuickStackRange**: How many tiles away from the player to search for nearby chests.
+ - **IsEnableQuickStackHotkey**: If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.
+ - **QuickStackKeyboardHotkey**: Press this key to quick stack your items.
+ - **QuickStackControllerHotkey**: Press this button to quick stack your items.
  - **IsQuickStackIntoBuildingsWithInventories**: If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will also be checked when quick stacking.
  - **IsQuickStackOverflowItems**: If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.
  - **IsQuickStackTooltipDrawNearbyChests**: If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.

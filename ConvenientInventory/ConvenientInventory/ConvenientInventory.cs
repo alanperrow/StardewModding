@@ -23,11 +23,6 @@ namespace ConvenientInventory
 		public static Texture2D FarmHouse { get; } = Game1.content.Load<Texture2D>(@"Maps\farmhouse_tiles");
 	}
 
-	/*
-	 * TODO:
-	 *	- Implement quick-switch, where pressing hotbar key while hovering over an item will swap the currently hovered item with the item in the pressed hotbar key's position
-	 */
-
 	public static class ConvenientInventory
 	{
 		public static Texture2D QuickStackButtonIcon { private get; set; }
@@ -36,7 +31,12 @@ namespace ConvenientInventory
 
 		private static ClickableTextureComponent QuickStackButton { get; set; }
 
-		private static InventoryPage Page { get; set; }
+		private static readonly PerScreen<InventoryPage> playerInventoryPage = new();
+		private static InventoryPage PlayerInventoryPage
+		{
+			get { return playerInventoryPage.Value; }
+			set { playerInventoryPage.Value = value; }
+		}
 
 		private static bool IsDrawToolTip { get; set; } = false;
 
@@ -131,7 +131,7 @@ namespace ConvenientInventory
 
 		public static void InventoryPageConstructor(InventoryPage inventoryPage, int x, int y, int width, int height)
 		{
-			Page = inventoryPage;
+			PlayerInventoryPage = inventoryPage;
 
 			if (ModEntry.Config.IsEnableQuickStack)
             {
@@ -436,6 +436,17 @@ namespace ConvenientInventory
 				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
 			}
 		}
+
+		public static void QuickStackHotkeyPressed()
+        {
+			if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is InventoryPage inventoryPage)
+            {
+				QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
+				return;
+			}
+
+			QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange);
+        }
 
 		// Player shifted toolbar row, so shift all favorited item slots by a row
 		public static void ShiftToolbar(bool right)
@@ -758,7 +769,7 @@ namespace ConvenientInventory
 		public static void PostClickableTextureComponentDraw(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
 		{
 			// Check if we have just drawn the trash can for this inventory page, which happens before in-game tooltip is drawn.
-			if (Page?.trashCan != textureComponent)
+			if (PlayerInventoryPage?.trashCan != textureComponent)
             {
 				return;
             }

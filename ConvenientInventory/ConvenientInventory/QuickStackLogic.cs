@@ -12,9 +12,8 @@ using static StardewValley.Menus.ItemGrabMenu;
 
 namespace ConvenientInventory
 {
-	internal static class QuickStackLogic
+	public static class QuickStackLogic
 	{
-
 		private class ChestWithDistance
 		{
 			public Chest Chest { get; private set; }
@@ -41,7 +40,7 @@ namespace ConvenientInventory
 			}
 		}
 
-		internal static bool StackToNearbyChests(int range, InventoryPage inventoryPage)
+		public static bool StackToNearbyChests(int range, InventoryPage inventoryPage)
 		{
 			if (inventoryPage == null)
 			{
@@ -175,7 +174,114 @@ namespace ConvenientInventory
 			return movedAtLeastOneTotal;
 		}
 
-		internal static List<Chest> GetChestsAroundFarmer(Farmer who, int range, bool sorted = false)
+		// To be used when not in the InventoryPage, accessed via hotkey.
+		public static bool StackToNearbyChests(int range)
+		{
+			bool movedAtLeastOneTotal = false;
+			Farmer who = Game1.player;
+
+			List<Chest> chests = GetChestsAroundFarmer(who, range, true);
+
+			foreach (Chest chest in chests)
+			{
+				List<Item> stackOverflowItems = new List<Item>();
+
+				Netcode.NetObjectList<Item> chestItems = (chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest)
+						? chest.GetItemsForPlayer(who.UniqueMultiplayerID)
+						: chest.items;
+
+				// Fill chest stacks with player inventory items
+				foreach (Item chestItem in chestItems)
+				{
+					if (chestItem is null)
+					{
+						continue;
+					}
+
+					IList<Item> playerInventory = who.Items;
+
+					foreach (Item playerItem in playerInventory)
+					{
+						if (playerItem is null || !playerItem.canStackWith(chestItem))
+						{
+							continue;
+						}
+
+						if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+						{
+							// Skip favorited items
+							continue;
+						}
+
+						int beforeStack = playerItem.Stack;
+						playerItem.Stack = chestItem.addToStack(playerItem);
+						bool movedAtLeastOne = beforeStack != playerItem.Stack;
+
+						movedAtLeastOneTotal = movedAtLeastOneTotal || movedAtLeastOne;
+
+						if (movedAtLeastOne && playerItem.Stack == 0)
+						{
+							who.removeItemFromInventory(playerItem);
+						}
+
+						if (chestItem.Stack == chestItem.maximumStackSize())
+						{
+							if (ModEntry.Config.IsQuickStackOverflowItems)
+							{
+								stackOverflowItems.Add(chestItem.getOne());
+							}
+
+							break;
+						}
+					}
+				}
+
+				// Add overflow stacks to chest when applicable
+				if (ModEntry.Config.IsQuickStackOverflowItems && chestItems.Count < chest.GetActualCapacity())
+				{
+					IList<Item> playerInventory = who.Items;
+
+					foreach (Item stackOverflowItem in stackOverflowItems)
+					{
+						if (stackOverflowItem is null)
+						{
+							continue;
+						}
+
+						foreach (Item playerItem in playerInventory)
+						{
+							if (playerItem is null || !playerItem.canStackWith(stackOverflowItem))
+							{
+								continue;
+							}
+
+							if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+							{
+								// Skip favorited items
+								continue;
+							}
+
+							int beforeStack = playerItem.Stack;
+							Item leftoverItem = chest.addItem(playerItem);
+							bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
+
+							movedAtLeastOneTotal = movedAtLeastOneTotal || movedAtLeastOne;
+
+							if (leftoverItem is null)
+							{
+								who.removeItemFromInventory(playerItem);
+							}
+						}
+					}
+				}
+			}
+
+			Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
+
+			return movedAtLeastOneTotal;
+		}
+
+		public static List<Chest> GetChestsAroundFarmer(Farmer who, int range, bool sorted = false)
 		{
 			if (who is null)
 			{
@@ -191,7 +297,7 @@ namespace ConvenientInventory
 				: GetNearbyChests(farmerTileLocation, range, gameLocation);
 		}
 
-		internal static List<TypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
+		public static List<TypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
 		{
 			if (who is null)
 			{
