@@ -19,7 +19,11 @@ namespace ConvenientInventory.Compatibility
         {
 			api.RegisterModConfig(
 				mod: _modManifest,
-				revertToDefault: () => config = new ModConfig(),
+				revertToDefault: () =>
+				{
+					config = new ModConfig();
+					ModEntry.Config = config;
+				},
 				saveToFile: () => _helper.WriteConfig(config)
 			);
 

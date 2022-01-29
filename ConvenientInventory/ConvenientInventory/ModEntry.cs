@@ -14,7 +14,7 @@ namespace ConvenientInventory
 	{
 		public static ModEntry Instance { get; private set; }
 
-		public static ModConfig Config { get; private set; }
+		public static ModConfig Config { get; set; }
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>

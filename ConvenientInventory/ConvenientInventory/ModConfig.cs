@@ -18,7 +18,7 @@ namespace ConvenientInventory
 
 		public SButton QuickStackKeyboardHotkey { get; set; } = SButton.K;
 
-		public SButton QuickStackControllerHotkey { get; set; } = SButton.None;
+		public SButton QuickStackControllerHotkey { get; set; } = SButton.LeftStick;
 
 		public bool IsEnableFavoriteItems { get; set; } = true;
 
@@ -26,6 +26,6 @@ namespace ConvenientInventory
 
 		public SButton FavoriteItemsKeyboardHotkey { get; set; } = SButton.LeftAlt;
 
-		public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftStick;
+		public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftShoulder;
 	}
 }

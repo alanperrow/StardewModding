@@ -1,5 +1,4 @@
 TO DO:
- - Add hotkey for "Organize" button via opt-in config option.
  - Add new opt-in config option that adds a left-to-right warp with the gamepad cursor in inventory page.
  - Add new opt-in config option that allows quick stacking of items without checking quality.
  - Support compatibility with "Vertical Toolbar" mod.
@@ -14,6 +13,8 @@ TO DO:
  DONE:
  - Fix assets directory issue due to capitalization.
  - Add hotkey for quick stack via opt-in config option.
+ - (X) Add hotkey for "Organize" button via opt-in config option.
+   - No need for this, as base game already has a hotkey! When in your inventory menu, press the controller's "back" button to organize inventory.
 
  ---
 
