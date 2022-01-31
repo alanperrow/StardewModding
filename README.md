@@ -25,14 +25,15 @@ Features:
    - Per-use, first seed(s) of same type found in inventory?
  - How the tool should be used:
    - Using the tool should not stop player movement, as that would feel a bit clunky and honestly would not be worth getting.
-   - Hold left click to show highlighted area, release left-click to use.
-     - When holding left click, usage of the tool can be cancelled by switching to another item.
+   - Hold the tool to show highlighted area, press left-click to use.
    - Show tool range via highlighted squares, displaying the tiles in which seeds will be planted.
      - Only show highlighted squares up to the number of seeds the player has available to plant, so there is no confusion as to where the seeds will be going.
-   - Releasing left-click will shoot the seeds out into the highlighted tiles, planting them into any vacant hoed dirt.
+   - Pressing left-click will shoot the seeds out into the highlighted tiles, planting them into any vacant hoed dirt.
      - Maybe make a quick little animation of the seeds arcing into their respective tiles? Each seed should have a few ms differential, so a satisfying sound can be played when the seeds enter the dirt.
  - Tool should require a brief recharge after each use, ~1s.
-   - Try to reuse SDV weapon right-click cooldown meter, as this is the same concept.
+   - Left-click can be held down to automatically use the tool again after the recharge period ends.
+   - Play a shuffling, mechanical reload sound during this time.
+   - For displaying the tool icon "recharging", try to reuse SDV weapon right-click cooldown meter, as this is the same concept.
  - The planting range should make purhcasing/using the tool worthwhile.
    - Max range increases with each tool upgrade.
      - Original: 1x3 (ie: copper watering can)
@@ -43,7 +44,7 @@ Features:
        - (1) 5x6
        - (2) 5 steps; trapezoidal shape, each step increasing height by 1 on both sides. (useful for pivoting around a single point, planting in all directions)
          - 3x1, 5x1, 7x1, 9x1, 11x1
-   - Right-click should toggle the tool's range, so the player has more control over where they are planting.
+   - While holding the tool, pressing right-click toggles the tool's range, so the player has more control over where they are planting.
 
 <!--
 ===== SCRAPPED =====
