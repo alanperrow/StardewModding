@@ -3,10 +3,12 @@ TO DO:
  - Add new opt-in config option that allows quick stacking of items without checking quality.
  - Support compatibility with "Vertical Toolbar" mod.
    - If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
- - Support compatibility with mods that add storage objects, such as
+ - Support compatibility with mods that add storage objects, such as:
    - Mega Storage
    - Expanded Storage
    - Storage Variety
+ - Support compatibility with other mods:
+   - Convenient Chests
  - Re-investigate feasability of preventing favorited items from being placed in the shipping bin.
  - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
 
