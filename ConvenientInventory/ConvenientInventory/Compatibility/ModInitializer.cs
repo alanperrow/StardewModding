@@ -153,6 +153,20 @@ namespace ConvenientInventory.Compatibility
                 optionGet: () => config.FavoriteItemsControllerHotkey,
                 optionSet: value => config.FavoriteItemsControllerHotkey = value
             );
+
+            api.RegisterLabel(
+                mod: _modManifest,
+                labelName: "Miscellaneous",
+                labelDesc: null
+            );
+
+            api.RegisterSimpleOption(
+                mod: _modManifest,
+                optionName: "Enable inventory cursor side warp?",
+                optionDesc: "If enabled, moving your controller's cursor beyond either side of your inventory menu will warp the cursor to the opposite side.",
+                optionGet: () => config.IsEnableInventoryPageSideWarp,
+                optionSet: value => config.IsEnableInventoryPageSideWarp = value
+            );
         }
     }
 }

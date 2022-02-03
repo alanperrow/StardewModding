@@ -1,8 +1,8 @@
 TO DO:
- - Add new opt-in config option that adds a left-to-right warp with the gamepad cursor in inventory page.
- - Add new opt-in config option that allows quick stacking of items without checking quality.
+ - (WIP) Add new opt-in config option that allows quick stacking of items without checking quality.
  - Support compatibility with "Vertical Toolbar" mod.
    - If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
+     - Wear More Rings?
  - Support compatibility with mods that add storage objects, such as:
    - Mega Storage
    - Expanded Storage
@@ -17,6 +17,7 @@ TO DO:
  - Add hotkey for quick stack via opt-in config option.
  - (X) Add hotkey for "Organize" button via opt-in config option.
    - No need for this, as base game already has a hotkey! When in your inventory menu, press the controller's "back" button to organize inventory.
+ - Add new opt-in config option that adds a left-to-right warp with the gamepad cursor in inventory page.
 
  ---
 
@@ -46,6 +47,11 @@ Favorited items are prevented from:
  - Being considered when using the "Organize" button in the player's inventory
  - Being considered when using the "Add to Existing Stacks" button in a chest
 
+#### Inventory Page Side-Warp (as of version 1.3.0)
+For players using controllers, getting to the right side of your inventory menu is a hassle, as your cursor always starts at the leftmost item slot when opening your inventory. This feature allows the cursor to "warp" side-to-side when at either end of the menu.
+
+![](2-3-2021 ConvInv inventory menu side warp.gif)
+
 ## Config
  - **IsEnableQuickStack**: If enabled, adds a "Quick Stack To Nearby Chests" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.
  - **QuickStackRange**: How many tiles away from the player to search for nearby chests.
@@ -60,6 +66,7 @@ Favorited items are prevented from:
    - ( 0: ![](https://i.imgur.com/fTMl0FT.png),  1: ![](https://i.imgur.com/NTlia1R.png),  2: ![](https://i.imgur.com/QGztt8Q.png),  3: ![](https://i.imgur.com/MBG2A6e.png),  4: ![](https://i.imgur.com/rZqklnN.png),  5: ![](https://i.imgur.com/FvKpyZV.png) )
  - **FavoriteItemsKeyboardHotkey**: Hold this key when selecting an item to favorite it.
  - **FavoriteItemsControllerHotkey**: Hold this button when selecting an item to favorite it. (For controller support)
+ - **IsEnableInventoryPageSideWarp**: If enabled, moving your controller's cursor beyond either side of your inventory menu will warp the cursor to the opposite side.
 
 ## Compatibility
  - Supports single player, split-screen local multiplayer, and online multiplayer.

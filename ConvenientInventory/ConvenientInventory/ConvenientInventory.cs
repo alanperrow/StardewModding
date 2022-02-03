@@ -153,6 +153,12 @@ namespace ConvenientInventory
                 inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
                 inventoryPage.trashCan.upNeighborID = quickStackButtonID;
             }
+
+            if (ModEntry.Config.IsEnableInventoryPageSideWarp)
+            {
+                inventoryPage.inventory.dropItemInvisibleButton.leftNeighborID = inventoryPage.organizeButton.myID;
+                inventoryPage.organizeButton.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
+            }
         }
 
         public static bool PreReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
