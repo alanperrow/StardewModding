@@ -50,7 +50,7 @@ Favorited items are prevented from:
 #### Inventory Page Side-Warp (as of version 1.3.0)
 For players using controllers, getting to the right side of your inventory menu is a hassle, as your cursor always starts at the leftmost item slot when opening your inventory. This feature allows the cursor to "warp" side-to-side when at either end of the menu.
 
-![](2-3-2021 ConvInv inventory menu side warp.gif)
+![](https://i.imgur.com/jduD378.gif)
 
 ## Config
  - **IsEnableQuickStack**: If enabled, adds a "Quick Stack To Nearby Chests" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.
