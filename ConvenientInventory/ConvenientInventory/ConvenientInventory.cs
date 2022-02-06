@@ -78,7 +78,7 @@ namespace ConvenientInventory
 
                 if (InventoryExpansions.IsPlayerMaxItemsChanged(favoriteItemSlots.Value))
                 {
-                    favoriteItemSlots.Value = InventoryExpansions.ResizeFavoriteItemSlots(favoriteItemSlots.Value, Game1.player.MaxItems);
+                    favoriteItemSlots.Value = InventoryExpansions.ResizeFavoriteItemSlots(favoriteItemSlots.Value, Math.Max(Game1.player.MaxItems, Game1.player.Items.Count));
                 }
 
                 return favoriteItemSlots.Value;

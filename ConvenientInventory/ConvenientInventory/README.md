@@ -1,8 +1,8 @@
 TO DO:
- - (WIP) Add new opt-in config option that allows quick stacking of items without checking quality.
- - Support compatibility with "Vertical Toolbar" mod.
-   - If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
+ - (DONE) Support compatibility with "Vertical Toolbar" mod.
+   - (?) If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
      - Wear More Rings?
+ - Add new opt-in config option that allows quick stacking of items without checking quality.
  - Support compatibility with mods that add storage objects, such as:
    - Mega Storage
    - Expanded Storage
@@ -13,11 +13,9 @@ TO DO:
  - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
 
  DONE:
- - Fix assets directory issue due to capitalization.
- - Add hotkey for quick stack via opt-in config option.
- - (X) Add hotkey for "Organize" button via opt-in config option.
-   - No need for this, as base game already has a hotkey! When in your inventory menu, press the controller's "back" button to organize inventory.
  - Add new opt-in config option that adds a left-to-right warp with the gamepad cursor in inventory page.
+ - Added "player_fixinventory" SMAPI console command. This command resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory.
+   - Some mods directly modify the player's inventory size, causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.
 
  ---
 
