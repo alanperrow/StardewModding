@@ -20,7 +20,7 @@ namespace ConvenientInventory
 
         public SButton QuickStackControllerHotkey { get; set; } = SButton.LeftStick;
 
-        public bool IsQuickStackIgnoreItemQuality { get; set; } = false;  // TODO
+        public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
 
         public bool IsEnableFavoriteItems { get; set; } = true;
 

@@ -96,6 +96,14 @@ namespace ConvenientInventory.Compatibility
 
             api.RegisterSimpleOption(
                 mod: _modManifest,
+                optionName: "Quick stack ignore item quality?",
+                optionDesc: "(Requires \"Quick stack overflow items?\" to be enabled.) If enabled, quick stack will place items into chests which contain ANY quality of that same item.",
+                optionGet: () => config.IsQuickStackIgnoreItemQuality,
+                optionSet: value => config.IsQuickStackIgnoreItemQuality = value
+            );
+
+            api.RegisterSimpleOption(
+                mod: _modManifest,
                 optionName: "Show nearby chests in tooltip?",
                 optionDesc: "If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.",
                 optionGet: () => config.IsQuickStackTooltipDrawNearbyChests,

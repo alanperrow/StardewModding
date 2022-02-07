@@ -74,6 +74,11 @@ namespace ConvenientInventory
                     {
                         if (playerItem is null || !playerItem.canStackWith(chestItem))
                         {
+                            if (ModEntry.Config.IsQuickStackOverflowItems && ModEntry.Config.IsQuickStackIgnoreItemQuality && CanStackWithIgnoreQuality(playerItem, chestItem))
+                            {
+                                stackOverflowItems.Add(playerItem.getOne());
+                            }
+
                             continue;
                         }
 
@@ -204,6 +209,11 @@ namespace ConvenientInventory
                     {
                         if (playerItem is null || !playerItem.canStackWith(chestItem))
                         {
+                            if (ModEntry.Config.IsQuickStackOverflowItems && ModEntry.Config.IsQuickStackIgnoreItemQuality && CanStackWithIgnoreQuality(playerItem, chestItem))
+                            {
+                                stackOverflowItems.Add(playerItem.getOne());
+                            }
+
                             continue;
                         }
 
@@ -758,6 +768,37 @@ namespace ConvenientInventory
         private static bool IsPositionWithinRange(Vector2 origin, Vector2 target, int range)
         {
             return Math.Abs(origin.X - target.X) <= (range * Game1.tileSize) && Math.Abs(origin.Y - target.Y) <= (range * Game1.tileSize);
+        }
+
+        // Taken from Item.canStackWith, removing quality check.
+        private static bool CanStackWithIgnoreQuality(Item item, ISalable other)
+        {
+            if (item == null || other == null)
+            {
+                return false;
+            }
+
+            if ((other is StardewValley.Object && item is StardewValley.Object) || (other is ColoredObject && item is ColoredObject))
+            {
+                if ((other as StardewValley.Object).orderData.Value != (item as StardewValley.Object).orderData.Value)
+                {
+                    return false;
+                }
+
+                if (item is ColoredObject && other is ColoredObject && !(item as ColoredObject).color.Value.Equals((other as ColoredObject).color.Value))
+                {
+                    return false;
+                }
+
+                if (item.maximumStackSize() > 1 && other.maximumStackSize() > 1
+                    && (item as StardewValley.Object).ParentSheetIndex == (other as StardewValley.Object).ParentSheetIndex
+                    && (item as StardewValley.Object).bigCraftable.Value == (other as StardewValley.Object).bigCraftable.Value)
+                {
+                    return item.Name.Equals(other.Name);
+                }
+            }
+
+            return false;
         }
     }
 }
