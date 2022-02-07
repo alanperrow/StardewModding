@@ -156,8 +156,22 @@ namespace ConvenientInventory
 
             if (ModEntry.Config.IsEnableInventoryPageSideWarp)
             {
-                inventoryPage.inventory.dropItemInvisibleButton.leftNeighborID = inventoryPage.organizeButton.myID;
+                if (InventoryPage.ShouldShowJunimoNoteIcon())
+                {
+                    inventoryPage.inventory.dropItemInvisibleButton.leftNeighborID = inventoryPage.junimoNoteIcon.myID;
+                    inventoryPage.junimoNoteIcon.leftNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
+                }
+                else
+                {
+                    inventoryPage.inventory.dropItemInvisibleButton.leftNeighborID = inventoryPage.organizeButton.myID;
+                }
+
                 inventoryPage.organizeButton.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
+
+                if (ModEntry.Config.IsEnableQuickStack)
+                {
+                    QuickStackButton.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
+                }
             }
         }
 
