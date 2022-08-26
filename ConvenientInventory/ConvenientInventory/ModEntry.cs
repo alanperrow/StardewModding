@@ -13,26 +13,6 @@ namespace ConvenientInventory
     /// <summary>The mod entry class loaded by SMAPI.</summary>
     public class ModEntry : Mod
     {
-
-
-        // TODO: DEBUG
-        /// <summary>Returns IContentPack from IModInfo.</summary>
-        public static IContentPack GetContentPackFromModInfo(IModInfo modInfo)
-        {
-            if (!modInfo.IsContentPack)
-            {
-                throw new ArgumentException($"{modInfo.Manifest.UniqueID} is not a content pack");
-            }
-
-            // ContentPack is a property of the internal interface IModMetadata which is derived from IModInfo. Access it via reflection.
-            return modInfo.GetType().GetProperty("ContentPack").GetValue(modInfo) as IContentPack;
-        }
-
-        public static List<IContentPack> ChestContentPacks { get; private set; } = new ();
-
-
-
-
         public static ModEntry Instance { get; private set; }
 
         public static ModConfig Config { get; set; }
@@ -48,25 +28,6 @@ namespace ConvenientInventory
             ConvenientInventory.FavoriteItemsCursorTexture = helper.Content.Load<Texture2D>(@"assets\favoriteCursor.png");
             ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
             ConvenientInventory.FavoriteItemsBorderTexture = helper.Content.Load<Texture2D>(@"assets\favoriteBorder.png");
-
-
-            // TODO: DEBUG
-            //var __debug__assemblyLoc = helper.GetType().Assembly.Location;
-            //var __debug__a = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(__debug__assemblyLoc), "Mods");
-
-            var __debug__modInfoStorageVariety = helper.ModRegistry.Get("6480.StorageVariety");
-            var __debug__contentPackStorageVariety = GetContentPackFromModInfo(__debug__modInfoStorageVariety);
-            ChestContentPacks.Add(__debug__contentPackStorageVariety);
-
-            //__debug__contentPackStorageVariety.LoadAsset
-
-
-
-
-
-
-
-
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 

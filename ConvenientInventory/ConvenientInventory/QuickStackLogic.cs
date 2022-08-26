@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ConvenientInventory.Compatibility.TypedChests;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Locations;
@@ -31,11 +29,11 @@ namespace ConvenientInventory
 
         private class TypedChestWithDistance
         {
-            public TypedChest TypedChest { get; private set; }
+            public ITypedChest TypedChest { get; private set; }
 
             public double Distance { get; private set; }
 
-            public TypedChestWithDistance(TypedChest chest, double distance)
+            public TypedChestWithDistance(ITypedChest chest, double distance)
             {
                 TypedChest = chest;
                 Distance = distance;
@@ -309,11 +307,11 @@ namespace ConvenientInventory
                 : GetNearbyChests(farmerTileLocation, range, gameLocation);
         }
 
-        public static List<TypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
+        public static List<ITypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
         {
             if (who is null)
             {
-                return new List<TypedChest>();
+                return new List<ITypedChest>();
             }
 
             Vector2 farmerPosition = who.getStandingPosition();
@@ -466,46 +464,9 @@ namespace ConvenientInventory
                         dx = tx - (int)origin.X;
                         dy = ty - (int)origin.Y;
 
-
-
-
-
-
-
-                        // TODO: DEBUG
-                        if (ModEntry.ChestContentPacks.Count > 0)
-                        {
-                            // foreach content pack ...
-
-                            string __debug__modDataKey = "furyx639.ExpandedStorage/Storage";
-                            chest.modData.TryGetValue(__debug__modDataKey, out string __debug__modDataValue);
-
-                            //K "furyx639.ExpandedStorage/Storage"
-                            //V "Ice Cooler"
-                            //V "Lumber Pile"
-
-                            IContentPack __debug__cpStorageVariety = ModEntry.ChestContentPacks
-                                .SingleOrDefault(x => x.Manifest.UniqueID == "6480.StorageVariety");
-
-                            ContentPackChestType __debug__compatibilityChestType = __debug__cpStorageVariety is not null
-                                ? new (__debug__cpStorageVariety.Manifest.UniqueID, __debug__modDataValue)
-                                : null;
-
-
-                            // TODO: Use content pack json to find texture's asset directory string. For example:
-                            // { ... , "ID": "Ice Cooler", ... , "Texture": "assets/icecooler.png:0" }
-                        }
-
-
-
-
-
-
-
                         ChestType chestType = TypedChest.DetermineChestType(chest);
 
                         var typedChest = new TypedChest(chest, chestType);
-
                         tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
                     }
                 }
@@ -683,9 +644,9 @@ namespace ConvenientInventory
             return chests;
         }
 
-        private static List<TypedChest> GetNearbyTypedChests(Point originTile, int range, GameLocation gameLocation)
+        private static List<ITypedChest> GetNearbyTypedChests(Point originTile, int range, GameLocation gameLocation)
         {
-            var tChests = new List<TypedChest>((2 * range + 1) * (2 * range + 1));
+            var tChests = new List<ITypedChest>((2 * range + 1) * (2 * range + 1));
 
             // Chests
             for (int dx = -range; dx <= range; dx++)
