@@ -817,7 +817,7 @@ namespace ConvenientInventory
                     continue;
                 }
 
-                extraNumPos += TypedChest.IsBuildingChestType(chests[i].ChestType)
+                extraNumPos += chests[i].IsBuildingChestType()
                     ? 1 + ((i % 8 == 7) ? 1 : 0)
                     : 0;
             }

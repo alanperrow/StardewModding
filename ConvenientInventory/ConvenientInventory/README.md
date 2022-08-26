@@ -1,14 +1,27 @@
-TO DO:
+CONSIDER:
  - Support compatibility with mods that add storage objects, such as:
-   - Mega Storage
-   - Expanded Storage
-   - Storage Variety
+   - (X) Expanded Storage
+     - This changes vanilla chest behavior; no objects added. Should already be compatible.
+     - Also, this mod has been replaced with Better Chests, so maybe not worth the effort.
+       - Mega Storage (DEPRECATED)
+       - Chests and Pouches
+       - Storage Variety
  - Support compatibility with other mods:
    - Convenient Chests
+   - Better Chests
+ - Consider adding new experimental config flag to enable dynamically loading content pack chest textures (if this is even possible)
+
+TO DO:
+ - Volcano forge UI not showing favorites (correct) but affecting item selection.
+ - Right-click behavior fixes:
+   - Fishing rod (with bait)
+   - Clothes/equipment
  - Re-investigate feasability of preventing favorited items from being placed in the shipping bin.
  - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
+ - New house presents should not be considered for quick stack.
+ - Text localization support.
 
- DONE:
+DONE:
  - Add new opt-in config option that adds a left-to-right warp with the gamepad cursor in inventory page.
  - Added "player_fixinventory" SMAPI console command. This command resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory.
    - Some mods directly modify the player's inventory size, causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.

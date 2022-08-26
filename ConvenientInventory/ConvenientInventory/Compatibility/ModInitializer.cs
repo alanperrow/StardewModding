@@ -6,37 +6,37 @@ namespace ConvenientInventory.Compatibility
 {
     public class ModInitializer
     {
-        private readonly IManifest _modManifest;
-        private readonly IModHelper _helper;
+        private readonly IManifest modManifest;
+        private readonly IModHelper helper;
 
         public ModInitializer(IManifest modManifest, IModHelper helper)
         {
-            _modManifest = modManifest;
-            _helper = helper;
+            this.modManifest = modManifest;
+            this.helper = helper;
         }
 
         public void Initialize(IGenericModConfigMenuApi api, ModConfig config)
         {
             api.RegisterModConfig(
-                mod: _modManifest,
+                mod: modManifest,
                 revertToDefault: () =>
                 {
                     config = new ModConfig();
                     ModEntry.Config = config;
                 },
-                saveToFile: () => _helper.WriteConfig(config)
+                saveToFile: () => helper.WriteConfig(config)
             );
 
-            api.SetDefaultIngameOptinValue(_modManifest, true);
+            api.SetDefaultIngameOptinValue(modManifest, true);
 
             api.RegisterLabel(
-                mod: _modManifest,
+                mod: modManifest,
                 labelName: "Quick Stack To Nearby Chests",
                 labelDesc: null
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Enable Quick stack?",
                 optionDesc: "If enabled, adds a \"Quick Stack To Nearby Chests\" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.",
                 optionGet: () => config.IsEnableQuickStack,
@@ -44,7 +44,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterClampedOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Range",
                 optionDesc: "How many tiles away from the player to search for nearby chests.",
                 optionGet: () => config.QuickStackRange,
@@ -55,7 +55,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Enable hotkey?",
                 optionDesc: "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
                 optionGet: () => config.IsEnableQuickStackHotkey,
@@ -63,7 +63,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Keybind (keyboard)",
                 optionDesc: "Press this key to quick stack your items.",
                 optionGet: () => config.QuickStackKeyboardHotkey,
@@ -71,7 +71,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Keybind (controller)",
                 optionDesc: "Press this button to quick stack your items.",
                 optionGet: () => config.QuickStackControllerHotkey,
@@ -79,7 +79,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Quick stack into buildings?",
                 optionDesc: "If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will also be checked when quick stacking.",
                 optionGet: () => config.IsQuickStackIntoBuildingsWithInventories,
@@ -87,7 +87,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Quick stack overflow items?",
                 optionDesc: "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
                 optionGet: () => config.IsQuickStackOverflowItems,
@@ -95,7 +95,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Quick stack ignore item quality?",
                 optionDesc: "(Requires \"Quick stack overflow items?\" to be enabled.) If enabled, quick stack will place items into chests which contain ANY quality of that same item.",
                 optionGet: () => config.IsQuickStackIgnoreItemQuality,
@@ -103,7 +103,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Show nearby chests in tooltip?",
                 optionDesc: "If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.",
                 optionGet: () => config.IsQuickStackTooltipDrawNearbyChests,
@@ -111,13 +111,13 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterLabel(
-                mod: _modManifest,
+                mod: modManifest,
                 labelName: "Favorite Items",
                 labelDesc: null
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Enable favorite items?",
                 optionDesc: "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests.",
                 optionGet: () => config.IsEnableFavoriteItems,
@@ -134,20 +134,20 @@ namespace ConvenientInventory.Compatibility
                     "5: Dark dashed"
                 };
             api.RegisterChoiceOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Highlight style",
                 optionDesc: "Choose your preferred texture style for highlighting favorited items in your inventory.",
                 optionGet: () => highlightStyleDescriptions[config.FavoriteItemsHighlightTextureChoice],
                 optionSet: value =>
                     {
                         config.FavoriteItemsHighlightTextureChoice = int.Parse(value.Substring(0, 1));
-                        ConvenientInventory.FavoriteItemsHighlightTexture = _helper.Content.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
+                        ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
                     },
                 choices: highlightStyleDescriptions
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Keybind (keyboard)",
                 optionDesc: "Hold this key when selecting an item to favorite it.",
                 optionGet: () => config.FavoriteItemsKeyboardHotkey,
@@ -155,7 +155,7 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Keybind (controller)",
                 optionDesc: "Hold this button when selecting an item to favorite it.",
                 optionGet: () => config.FavoriteItemsControllerHotkey,
@@ -163,13 +163,13 @@ namespace ConvenientInventory.Compatibility
             );
 
             api.RegisterLabel(
-                mod: _modManifest,
+                mod: modManifest,
                 labelName: "Miscellaneous",
                 labelDesc: null
             );
 
             api.RegisterSimpleOption(
-                mod: _modManifest,
+                mod: modManifest,
                 optionName: "Enable inventory cursor side warp?",
                 optionDesc: "If enabled, moving your controller's cursor beyond either side of your inventory menu will warp the cursor to the opposite side.",
                 optionGet: () => config.IsEnableInventoryPageSideWarp,
