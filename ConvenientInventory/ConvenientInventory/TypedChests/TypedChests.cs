@@ -31,6 +31,7 @@ namespace ConvenientInventory.TypedChests
             {
                 232 => ChestType.Stone,
                 216 => ChestType.MiniFridge,
+                -1 => ChestType.Package,
                 _ => ChestType.Normal,
             };
         }

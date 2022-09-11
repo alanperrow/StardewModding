@@ -8,6 +8,7 @@
         MiniFridge,
         Mill,
         JunimoHut,
-        Special
+        Special,
+        Package
     }
 }

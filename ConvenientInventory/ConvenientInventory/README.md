@@ -18,7 +18,6 @@ TO DO:
    - Clothes/equipment
  - Re-investigate feasability of preventing favorited items from being placed in the shipping bin.
  - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
- - New house presents should not be considered for quick stack.
  - Text localization support.
 
 DONE:
@@ -28,6 +27,7 @@ DONE:
  - Support compatibility with "Vertical Toolbar" mod.
    - If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
  - Add new opt-in config option that allows quick stacking of items without checking quality.
+ - New house packages (presents) should not be considered for quick stack.
 
  ---
 

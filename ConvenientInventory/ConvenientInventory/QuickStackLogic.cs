@@ -465,6 +465,10 @@ namespace ConvenientInventory
                         dy = ty - (int)origin.Y;
 
                         ChestType chestType = TypedChest.DetermineChestType(chest);
+                        if (chestType == ChestType.Package)
+                        {
+                            continue; // Do not consider new farmer packages as chests for quick stack
+                        }
 
                         var typedChest = new TypedChest(chest, chestType);
                         tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
@@ -663,6 +667,10 @@ namespace ConvenientInventory
                         }
 
                         ChestType chestType = TypedChest.DetermineChestType(chest);
+                        if (chestType == ChestType.Package)
+                        {
+                            continue; // Do not consider new farmer packages as chests for quick stack
+                        }
 
                         tChests.Add(new TypedChest(chest, chestType));
                     }
