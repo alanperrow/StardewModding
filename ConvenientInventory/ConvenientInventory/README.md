@@ -12,12 +12,10 @@ CONSIDER:
  - Consider adding new experimental config flag to enable dynamically loading content pack chest textures (if this is even possible)
 
 TO DO:
- - Volcano forge UI not showing favorites (correct) but affecting item selection.
  - Right-click behavior fixes:
    - Fishing rod (with bait)
+     - Probably slingshot too, and any other items that store "ammo" via right-click
    - Clothes/equipment
- - Re-investigate feasability of preventing favorited items from being placed in the shipping bin.
- - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
  - Text localization support.
 
 DONE:
@@ -28,6 +26,10 @@ DONE:
    - If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
  - Add new opt-in config option that allows quick stacking of items without checking quality.
  - New house packages (presents) should not be considered for quick stack.
+ - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
+   - Validated cc button in inventory does appear, so this is not an issue.
+ - Fixed volcano forge UI not showing favorites (correct) but affecting item selection.
+ - Prevent favorited items from being placed in the shipping bin.
 
  ---
 

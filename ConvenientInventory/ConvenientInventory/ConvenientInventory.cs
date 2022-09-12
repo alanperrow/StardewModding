@@ -93,6 +93,13 @@ namespace ConvenientInventory
             set { favoriteItemsIsItemSelected.Value = value; }
         }
 
+        private static readonly PerScreen<Item> favoriteItemsSelectedItem = new();
+        public static Item FavoriteItemsSelectedItem
+        {
+            get { return favoriteItemsSelectedItem.Value; }
+            set { favoriteItemsSelectedItem.Value = value; }
+        }
+
         private static readonly PerScreen<int> favoriteItemsLastSelectedSlot = new();
         public static int FavoriteItemsLastSelectedSlot
         {
@@ -276,28 +283,35 @@ namespace ConvenientInventory
                             // Game logic for shift-clicking in player's crafting page. Idk why it works this way, but this handles it.
                             HandleFavoriteItemSlotShiftClickedInCraftingPage(clickPos, clickedItem);
                         }
-                        else if ((Game1.player.CursorSlotItem is null || !Game1.player.CursorSlotItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
+                        else
                         {
-                            // Left click with either (1.) no item currently selected, or (2.) item selected that cannot stack with the clicked slot, and (3.) clicked slot is not greyed out.
-                            if (!IsCurrentActiveMenuNoHeldItems())
+                            Item cursorSlotItem = (Game1.activeClickableMenu as ForgeMenu)?.heldItem    // Forge menu cursor slot item
+                                ?? Game1.player.CursorSlotItem;                                         // Arbritrary menu cursor slot item
+
+                            if ((cursorSlotItem is null || !cursorSlotItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
                             {
-                                FavoriteItemsLastSelectedSlot = clickPos;
-                                FavoriteItemsIsItemSelected = true;
-                                FavoriteItemSlots[clickPos] = false;
-                            }
-                            else
-                            {
-                                // Shop menus only allow held items after purchasing something, so we check for that case here.
-                                if (Game1.activeClickableMenu is ShopMenu shopMenu)
+                                // Left click with either (1.) no item currently selected, or (2.) item selected that cannot stack with the clicked slot, and (3.) clicked slot is not greyed out.
+                                if (!IsCurrentActiveMenuNoHeldItems())
                                 {
-                                    if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(clickedItem))
-                                    {
-                                        FavoriteItemSlots[clickPos] = false;
-                                    }
+                                    FavoriteItemsLastSelectedSlot = clickPos;
+                                    FavoriteItemsIsItemSelected = true;
+                                    FavoriteItemsSelectedItem = clickedItem;
+                                    FavoriteItemSlots[clickPos] = false;
                                 }
                                 else
                                 {
-                                    FavoriteItemSlots[clickPos] = false;
+                                    // Shop menus only allow held items after purchasing something, so we check for that case here.
+                                    if (Game1.activeClickableMenu is ShopMenu shopMenu)
+                                    {
+                                        if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(clickedItem))
+                                        {
+                                            FavoriteItemSlots[clickPos] = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        FavoriteItemSlots[clickPos] = false;
+                                    }
                                 }
                             }
                         }
@@ -309,6 +323,7 @@ namespace ConvenientInventory
                         {
                             FavoriteItemsLastSelectedSlot = clickPos;
                             FavoriteItemsIsItemSelected = true;
+                            FavoriteItemsSelectedItem = clickedItem;
                             FavoriteItemSlots[clickPos] = false;
                         }
                         else
@@ -320,6 +335,7 @@ namespace ConvenientInventory
                                 {
                                     FavoriteItemsLastSelectedSlot = clickPos;
                                     FavoriteItemsIsItemSelected = true;
+                                    FavoriteItemsSelectedItem = clickedItem;
                                     FavoriteItemSlots[clickPos] = false;
                                 }
                             }
@@ -340,17 +356,22 @@ namespace ConvenientInventory
 
                     if (FavoriteItemSlots[clickPos] && clickedItem != null && inventoryMenu.highlightMethod(clickedItem))
                     {
+                        Item cursorSlotItem = (Game1.activeClickableMenu as ForgeMenu)?.heldItem    // Forge menu cursor slot item
+                            ?? Game1.player.CursorSlotItem;                                         // Arbritrary menu cursor slot item
+
                         // We are placing the selected favorited item into a favorited slot.
-                        if (Game1.player.CursorSlotItem.canStackWith(clickedItem))
+                        if (cursorSlotItem != null && cursorSlotItem.canStackWith(clickedItem))
                         {
-                            // Slot's item can stack with ours, so stop tracking.
+                            // Clicked item can stack with ours, so stop tracking.
                             FavoriteItemsLastSelectedSlot = -1;
                             FavoriteItemsIsItemSelected = false;
+                            FavoriteItemsSelectedItem = null;
                         }
                         else
                         {
-                            // Slot's item cannot stack with ours, so swap which item slot we are tracking.
+                            // Clicked item cannot stack with ours, so swap which item slot we are tracking.
                             FavoriteItemsLastSelectedSlot = clickPos;
+                            FavoriteItemsSelectedItem = clickedItem;
                         }
                     }
                     else
@@ -358,6 +379,7 @@ namespace ConvenientInventory
                         // We are placing the selected favorited item into an empty slot, so stop tracking, and favorite this new slot if necessary.
                         FavoriteItemsLastSelectedSlot = -1;
                         FavoriteItemsIsItemSelected = false;
+                        FavoriteItemsSelectedItem = null;
 
                         if (!FavoriteItemSlots[clickPos])
                         {
@@ -421,6 +443,7 @@ namespace ConvenientInventory
 
             FavoriteItemsLastSelectedSlot = clickPos;
             FavoriteItemsIsItemSelected = true;
+            FavoriteItemsSelectedItem = item;
             FavoriteItemSlots[clickPos] = false;
             return false;
         }
@@ -444,6 +467,7 @@ namespace ConvenientInventory
 
             FavoriteItemsLastSelectedSlot = clickPos;
             FavoriteItemsIsItemSelected = true;
+            FavoriteItemsSelectedItem = item;
             FavoriteItemSlots[clickPos] = false;
             return false;
         }
