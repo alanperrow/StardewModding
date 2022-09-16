@@ -654,8 +654,10 @@ namespace ConvenientInventory.Patches
             {
                 if (Game1.activeClickableMenu is ForgeMenu forgeMenu)
                 {
-                    if (forgeMenu.trashCan.containsPoint(Game1.getMouseX(), Game1.getMouseY())
-                        && __instance == ConvenientInventory.FavoriteItemsSelectedItem)
+                    int mouseX, mouseY;
+                    if (__instance == ConvenientInventory.FavoriteItemsSelectedItem
+                        && (forgeMenu.trashCan.containsPoint(mouseX = Game1.getMouseX(), mouseY = Game1.getMouseY())
+                            || !forgeMenu.isWithinBounds(mouseX, mouseY)))
                     {
                         __result = false;
                         return false;
@@ -759,6 +761,74 @@ namespace ConvenientInventory.Patches
             }
 
             return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("_leftIngredientSpotClicked")]
+        public static bool LeftIngredientSpotClicked_Prefix(ForgeMenu __instance)
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return true;
+            }
+
+            try
+            {
+                if (__instance.heldItem != null)
+                {
+                    ConvenientInventory.ResetFavoriteItemSlotsTracking();
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(LeftIngredientSpotClicked_Prefix)}:\n{e}", LogLevel.Error);
+            }
+
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("_rightIngredientSpotClicked")]
+        public static bool RightIngredientSpotClicked_Prefix(ForgeMenu __instance)
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return true;
+            }
+
+            try
+            {
+                if (__instance.heldItem != null)
+                {
+                    ConvenientInventory.ResetFavoriteItemSlotsTracking();
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(RightIngredientSpotClicked_Prefix)}:\n{e}", LogLevel.Error);
+            }
+
+            return true;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ForgeMenu.CraftItem))]
+        public static void CraftItem_Postfix(bool forReal = false)
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems || !forReal)
+            {
+                return;
+            }
+
+            try
+            {
+                // In case this craft used all of the cinder shards in a stack, refresh favorite item slots.
+                ConvenientInventory.UnfavoriteEmptyItemSlots();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(CraftItem_Postfix)}:\n{e}", LogLevel.Error);
+            }
         }
     }
 

@@ -30,6 +30,8 @@ DONE:
    - Validated cc button in inventory does appear, so this is not an issue.
  - Fixed volcano forge UI not showing favorites (correct) but affecting item selection.
  - Prevent favorited items from being placed in the shipping bin.
+ - Double check Forge Menu behavior works with UI interaction. (I suspect it won't)
+   - Narrator: "*It didn't*." Fixed edge cases with forge UI and fixed favorite highlights not being shown.
 
  ---
 

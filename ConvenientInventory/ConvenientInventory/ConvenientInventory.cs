@@ -359,13 +359,11 @@ namespace ConvenientInventory
                         Item cursorSlotItem = (Game1.activeClickableMenu as ForgeMenu)?.heldItem    // Forge menu cursor slot item
                             ?? Game1.player.CursorSlotItem;                                         // Arbritrary menu cursor slot item
 
-                        // We are placing the selected favorited item into a favorited slot.
+                        // We are placing the selected favorited item into a favorited slot with an item in it.
                         if (cursorSlotItem != null && cursorSlotItem.canStackWith(clickedItem))
                         {
                             // Clicked item can stack with ours, so stop tracking.
-                            FavoriteItemsLastSelectedSlot = -1;
-                            FavoriteItemsIsItemSelected = false;
-                            FavoriteItemsSelectedItem = null;
+                            ResetFavoriteItemSlotsTracking();
                         }
                         else
                         {
@@ -376,17 +374,24 @@ namespace ConvenientInventory
                     }
                     else
                     {
-                        // We are placing the selected favorited item into an empty slot, so stop tracking, and favorite this new slot if necessary.
-                        FavoriteItemsLastSelectedSlot = -1;
-                        FavoriteItemsIsItemSelected = false;
-                        FavoriteItemsSelectedItem = null;
-
-                        if (!FavoriteItemSlots[clickPos])
+                        if (clickedItem == null || inventoryMenu.highlightMethod(clickedItem))
                         {
-                            FavoriteItemSlots[clickPos] = true;
+                            // We are placing our selected favorited item into a slot which is either empty or
+                            // contains a highlighted item, so stop tracking, and favorite this new slot.
+                            ResetFavoriteItemSlotsTracking();
+
+                            if (!FavoriteItemSlots[clickPos])
+                            {
+                                FavoriteItemSlots[clickPos] = true;
+                            }
                         }
                     }
                 }
+                //TODO: I think this is where we can handle right-clicking favorited "ammo" into its recipient
+                //else
+                //{
+
+                //}
             }
 
             return true;
@@ -555,7 +560,8 @@ namespace ConvenientInventory
             bool result = inventoryMenu.playerInventory
                 || (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages?[gameMenu.currentTab] is CraftingPage)  // CraftingPage.inventory has playerInventory = false
                 || (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu && itemGrabMenu.inventory == inventoryMenu)  // ItemGrabMenu.inventory is the player's InventoryMenu
-                || (Game1.activeClickableMenu is ShopMenu);
+                || (Game1.activeClickableMenu is ShopMenu)
+                || (Game1.activeClickableMenu is ForgeMenu);
 
             return result;
         }
@@ -570,6 +576,30 @@ namespace ConvenientInventory
                 if (index != -1)
                 {
                     FavoriteItemSlots[index] = false;
+                }
+            }
+        }
+
+        // Resets the tracking state of favorite item slots.
+        public static void ResetFavoriteItemSlotsTracking()
+        {
+            FavoriteItemsLastSelectedSlot = -1;
+            FavoriteItemsIsItemSelected = false;
+            FavoriteItemsSelectedItem = null;
+        }
+
+        // Unfavorites any empty favorite item slots.
+        public static void UnfavoriteEmptyItemSlots()
+        {
+            for (int i = 0; i < Game1.player.Items.Count; i++)
+            {
+                Item item = Game1.player.Items.ElementAtOrDefault(i);
+                if (item == null)
+                {
+                    if (FavoriteItemSlots.ElementAtOrDefault(i) == true)
+                    {
+                        FavoriteItemSlots[i] = false;
+                    }
                 }
             }
         }
