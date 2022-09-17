@@ -12,10 +12,6 @@ CONSIDER:
  - Consider adding new experimental config flag to enable dynamically loading content pack chest textures (if this is even possible)
 
 TO DO:
- - Right-click behavior fixes:
-   - Fishing rod (with bait)
-     - Probably slingshot too, and any other items that store "ammo" via right-click
-   - Clothes/equipment
  - Text localization support.
 
 DONE:
@@ -32,6 +28,10 @@ DONE:
  - Prevent favorited items from being placed in the shipping bin.
  - Double check Forge Menu behavior works with UI interaction. (I suspect it won't)
    - Narrator: "*It didn't*." Fixed edge cases with forge UI and fixed favorite highlights not being shown.
+ - Right-click behavior fixes:
+   - Fishing rod (with bait)
+     - Probably slingshot too, and any other items that store "ammo" via right-click
+   - Clothes/equipment
 
  ---
 
