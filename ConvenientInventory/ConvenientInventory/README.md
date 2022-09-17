@@ -1,40 +1,3 @@
-CONSIDER:
- - Support compatibility with mods that add storage objects, such as:
-   - (X) Expanded Storage
-     - This changes vanilla chest behavior; no objects added. Should already be compatible.
-     - Also, this mod has been replaced with Better Chests, so maybe not worth the effort.
-       - Mega Storage (DEPRECATED)
-       - Chests and Pouches
-       - Storage Variety
- - Support compatibility with other mods:
-   - Convenient Chests
-   - Better Chests
- - Consider adding new experimental config flag to enable dynamically loading content pack chest textures (if this is even possible)
-
-TO DO:
- - Text localization support.
-
-DONE:
- - Add new opt-in config option that adds a left-to-right warp with the gamepad cursor in inventory page.
- - Added "player_fixinventory" SMAPI console command. This command resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory.
-   - Some mods directly modify the player's inventory size, causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.
- - Support compatibility with "Vertical Toolbar" mod.
-   - If possible, extend compatibility for all mods that modify the player's inventory size, even if in (what I'm presuming to be) irregular ways like this one.
- - Add new opt-in config option that allows quick stacking of items without checking quality.
- - New house packages (presents) should not be considered for quick stack.
- - tails618: "community center bundles in the inventory is gone... am I missing something?". Validate if this is true.
-   - Validated cc button in inventory does appear, so this is not an issue.
- - Fixed volcano forge UI not showing favorites (correct) but affecting item selection.
- - Prevent favorited items from being placed in the shipping bin.
- - Double check Forge Menu behavior works with UI interaction. (I suspect it won't)
-   - Narrator: "*It didn't*." Fixed edge cases with forge UI and fixed favorite highlights not being shown.
- - Right-click behavior fixes:
-   - Fishing rod (with bait)
-     - Probably slingshot too, and any other items that store "ammo" via right-click
-   - Clothes/equipment
-
- ---
-
 NexusMods link: https://www.nexusmods.com/stardewvalley/mods/10384
 
 # Convenient Inventory
@@ -71,11 +34,12 @@ For players using controllers, getting to the right side of your inventory menu 
    - Some mods directly modify the player's inventory size, causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.
 
 ## Config
+#### Quick Stack to Nearby Chests
  - **IsEnableQuickStack**: If enabled, adds a "Quick Stack To Nearby Chests" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.
  - **QuickStackRange**: How many tiles away from the player to search for nearby chests.
  - **IsEnableQuickStackHotkey**: If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.
  - **QuickStackKeyboardHotkey**: Press this key to quick stack your items.
- - **QuickStackControllerHotkey**: Press this button to quick stack your items.
+ - **QuickStackControllerHotkey**: Press this button to quick stack your items. (For controller support)
  - **IsQuickStackIntoBuildingsWithInventories**: If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will also be checked when quick stacking.
  - **IsQuickStackOverflowItems**: If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.
  - **IsQuickStackIgnoreItemQuality**: (Requires IsQuickStackOverflowItems to be enabled.) If enabled, quick stack will place items into chests which contain ANY quality of that same item.
@@ -94,16 +58,20 @@ For players using controllers, getting to the right side of your inventory menu 
      ![](https://i.imgur.com/yokobZ1.png)
      </details>
  - **IsQuickStackTooltipDrawNearbyChests**: If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.
+
+#### Favorite Items
  - **IsEnableFavoriteItems**: If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests.
  - **FavoriteItemsHighlightTextureChoice**: Choose your preferred texture style for highlighting favorited items in your inventory.
-   - ( 0: ![](https://i.imgur.com/fTMl0FT.png),  1: ![](https://i.imgur.com/NTlia1R.png),  2: ![](https://i.imgur.com/QGztt8Q.png),  3: ![](https://i.imgur.com/MBG2A6e.png),  4: ![](https://i.imgur.com/rZqklnN.png),  5: ![](https://i.imgur.com/FvKpyZV.png) )
+   - ( 0: ![](https://i.imgur.com/fTMl0FT.png),  1: ![](https://i.imgur.com/NTlia1R.png),  2: ![](https://i.imgur.com/QGztt8Q.png),  3: ![](https://i.imgur.com/MBG2A6e.png),  4: ![](https://i.imgur.com/rZqklnN.png),  5: ![](https://i.imgur.com/FvKpyZV.png),  6: ![](https://i.imgur.com/JO8vsXS.png) )
  - **FavoriteItemsKeyboardHotkey**: Hold this key when selecting an item to favorite it.
  - **FavoriteItemsControllerHotkey**: Hold this button when selecting an item to favorite it. (For controller support)
+
+#### Miscellaneous
  - **IsEnableInventoryPageSideWarp**: If enabled, moving your controller's cursor beyond either side of your inventory menu will warp the cursor to the opposite side.
 
 ## Compatibility
  - Supports single player, split-screen local multiplayer, and online multiplayer.
- - Supports controllers by using the left-stick button (configurable) for favoriting.
+ - Supports controllers by using the left shoulder button (configurable) for favoriting.
  - Supports [Generic Mod Config Menu](https://www.nexusmods.com/stardewvalley/mods/5098) for in-game config editing.
  - Supports [Bigger Backpack](https://www.nexusmods.com/stardewvalley/mods/1845) and other inventory expansion mods (as of version 1.1.0).
  - Supports mods which directly add new inventory slots (as of version 1.3.0).

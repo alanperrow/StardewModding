@@ -145,7 +145,7 @@ namespace ConvenientInventory
                 QuickStackButton = new ClickableTextureComponent("",
                     new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
                     string.Empty,
-                    "Quick Stack To Nearby Chests",
+                    ModEntry.Instance.Helper.Translation.Get("QuickStackButton.hoverText"),
                     QuickStackButtonIcon,
                     Rectangle.Empty,
                     4f,
