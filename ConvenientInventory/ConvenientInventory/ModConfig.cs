@@ -20,6 +20,8 @@ namespace ConvenientInventory
 
         public SButton QuickStackControllerHotkey { get; set; } = SButton.LeftStick;
 
+        public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
+
         public bool IsEnableFavoriteItems { get; set; } = true;
 
         public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;
@@ -27,5 +29,7 @@ namespace ConvenientInventory
         public SButton FavoriteItemsKeyboardHotkey { get; set; } = SButton.LeftAlt;
 
         public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftShoulder;
+
+        public bool IsEnableInventoryPageSideWarp { get; set; } = true;
     }
 }
