@@ -137,7 +137,7 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
   * Ancient fruit is many genetic variations behind all crops, so hybriding with it is very difficult, but IS possible.
     * Maybe a 2nd storyline quest that unlocks this?
   * Ultimate goal of genetically recreating the Genesis Seed, unlocking ability to grow Eden Fruit (new best crop - I'm imagining a golden apple).
-		  * Maybe by hybriding two different ancient fruit hybrids together, therefore making the eden fruit an AB-AC hybrid?
+    * Maybe by hybriding two different ancient fruit hybrids together, therefore making the eden fruit an AB-AC hybrid?
   * Purchase max. input amount upgrade from Demetrius
     * Maybe multiple tiers?
   * Goal to discover 25 (?) hybrids for Demetrius, tracked with the Hybrid Encyclopedia.
