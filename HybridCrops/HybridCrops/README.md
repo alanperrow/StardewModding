@@ -3,6 +3,9 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
 
 ## Devlog
 ### 1.0.0
+9/17/2022
+  * Added extra details that were never uploaded to GitHub.
+
 9/7/2021
   * Added more crop trait ideas.
 
@@ -37,15 +40,17 @@ An expansion to Stardew Valley that adds the ability to create hybrid crops.
   * Pre-3.1) Consider creating framework/api for crop traits
     * Would help when adding more traits/inheritance perks than originally thought of
     * One thing that comes to mind is a "Winter" perk/prefix by hybriding with winter forage
+      * Spring/summer/fall traits could also be obtained by hybriding with their respective crops/forage
     * Extra perks; think Tinkers' Construct
-      * Glowing: faintly glows in the dark while growing; crop brightly glows when ready to harvest
+      * Glowing/Radiant/Irradiant: faintly glows in the dark, and glows brightly when ready to harvest; on sunny days, increases growth rate of self/self & surrounding crops/self & surrounding crops, and drops solar essence on harvest
       * Palatable/Cultured/Elite: produces silver/gold/iridium quality artisan good instead of normal quality
       * Premier/Superior/Perfect: harvested crop is at minimum silver/gold/iridium quality
       * Tasty: harvested crop provides extra health/energy
-      * Unquenched: grows faster on rainy days
-      * Sheer: can be harvested with scythe
+      * Absorbant: grows faster on rainy days
+      * Fragile: can be harvested with scythe
       * June Drop: "harvests itself" when ready, leaving crop(s) on the floor (ensure this still counts for harvest quests)
       * Friendly: harvested crop has higher value when sold in-person rather than shipping, and provides extra friendship bonus when gifting
+      * Quenched/Hydrant: after being watered initially, self-sustainably waters itself/self & surrounding crops
     * Other special, unique behavior...
     * Discovered traits should be shown in the Hybrid Encyclopedia. Undiscovered should be grayed out.
   * 3) Create the first hybrid crop
@@ -111,6 +116,7 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
       * Hybrid process takes 2 in-game days (begin on 1st, results on 4th)
         * Displayed by a progress bar when hybriding is in process
           * gray background, bar is a gradient from blue (start) -> green (finish)
+        * While hybriding is in process, if player inputs 10 (?) solar essence, speeds up the process by a day
       * Successful hybrid process takes all input seeds and converts them to same number of output hybrid seeds. Each crop pair adds an extra seed.
         * i.e. (2 seed A, 4 crop A) + (3 seed B, 2 crop A) => 2 + 3 + (2) = 7 hybrid AB seeds
       * Failed hybrid process returns all seeds back (crops are lost)
@@ -124,10 +130,14 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
       * Ten slots (five for seeds, five for crops)... wouldn't work with + max. total input config option
     * One slot on bottom for output hybrid seed
       * Or maybe a "trough" instead of a single slot, where all items go after hybrid process completes, success or failure.
+    * One slot on bottom-left for solar essence input
+      * **Fancy idea**: When solar essence is put in, visually place them nearby and show them expanding and glowing, before being absorbed by the machine. For each solar essence absorbed, increase the "glow" of the interface (I'm imagining glass tubes with green liquid running around the border/frame that will go from forest green to neon green). This should "grow" the blue/green progress bar to indiciate that the hybriding process has been sped up.
 
 #### Random ideas:
   * Ancient fruit is many genetic variations behind all crops, so hybriding with it is very difficult, but IS possible.
     * Maybe a 2nd storyline quest that unlocks this?
+  * Ultimate goal of genetically recreating the Genesis Seed, unlocking ability to grow Eden Fruit (new best crop - I'm imagining a golden apple).
+		  * Maybe by hybriding two different ancient fruit hybrids together, therefore making the eden fruit an AB-AC hybrid?
   * Purchase max. input amount upgrade from Demetrius
     * Maybe multiple tiers?
   * Goal to discover 25 (?) hybrids for Demetrius, tracked with the Hybrid Encyclopedia.
@@ -153,8 +163,85 @@ Takes in two different types of seeds (and crops, optionally). After some time, 
 Quest involving Wizard and Demetrius that provides a backstory leading up to unlocking the main mod content — the ability to create hybrid crops.
 
 #### Prerequisites:
-  * Spring Year 2 or later
-  * Friendship with Wizard and Demetrius
+  * Year 2+ Spring, Summer, or Fall
+			 * (?) Year 1 Winter instead, if planning on implementing Traits.
+  * 3 hearts with Wizard and Demetrius
+#### Condition:
+		* Receive letter from wizard about a mysterious fruit he has stumbled upon. Wants you to come visit him.
+		* Given quest: Visit the wizard to find out more about the mysterious fruit he found.
+#### Wizard
+		* Has unknown fruit from which he can sense a faint feeling of ... magic? No, something else.
+		* In any case, no other crop gives off this feeling, as far as he's aware. Maybe that potion he made yesterday is still affecting him...
+		* No, that can't be it. There's definitely something unique about this crop, but even his magic skills can't figure it what it is.
+		* As much as it pains him to say it, his magic senses aren't helping this time. He can't figure it out.
+		* He says to try bringing it to a human scientist and see if they have anything to say about it.
+		* He is obviously embarassed at his inability. OPTIONS:
+			 * It's okay, I can't even sense anything at all (cheers him up)
+			 * Magic and science might have to work together (reassures him)
+			 * Must feel weird to not be able to figure this out (still embarassed)
+		* Quest updated: Give the mysterious fruit to Demetrius to research.
+#### Demetrius
+		* What's this? A fruit? Never seen anything like it. Is this a gift of some sort? OPTIONS:
+			 * I'd like your help in finding out what it is (interested)
+			 * Not really, but it could be if you'd like (laugh)
+			 * Of course, it's called "more work for you" (annoyed)
+		* Alright. I'm usually pretty busy, but if you give me a few days to work on it I can let you know what I find.
+		* Quest updated: Visit Demetrius in 3 (counts down every day) days to find out more about the mysterious fruit.
+#### Demetrius (3 days left)
+		* I'll start looking at that fruit you gave me in just a little bit.
+#### Demetrius (<= 2 days left)
+		* I'm still looking at that fruit you gave me. I have to say, it has really sparked my curiosity.
+#### Demetrius (after time is up)
+		* Hey {NAME}, I finished looking at that fruit you gave me. What a bizarre plant species! I ended up running a few tests on its seeds.
+		* Using a makeshift phytogenic insolator, I managed to induce premature blooming and flowering via cotyledon expansion, and...
+		* Well, uh... (notices his scientific talk, embarassed) The seeds were able to produce fruit quite quickly.
+		* Oddly, however, my test resulted in the seeds producing Ancient Fruit; nothing like the fruit you originally gave me.
+		* My only hypothesis is that there must be a genetic link... perhaps from a time far before documented horticulture.
+		* (Something moves/makes a magical noise in an obscure spot in the room)
+		* You can take the fruit, if you want. There's plenty more of them growing from these seeds that I can continue my experiments with.
+		* Quest updated: Tell the wizard what Demetrius has discovered from his experiment.
+		* Receive rewards:
+			 * 1x Ancient Fruit
+#### Wizard
+		* Before you say anything, the wizard cuts you off explaining that he has been reading up on some old stories relating to what Demetrius said.
+		* (He must have been listening in on your conversation. That explains the weird noise.)
+		* He has read them all before, but just wanted a refresher to be sure. Many stories have been written about the Genesis Seed.
+		* In those stories, a miraculous plant was said to bloom, seed, pass on, and grow again for eons.
+		* It flourished in all of its eventual environments, evolving and adapting over time to fit in wherever it may be.
+		* It was told to be one of the most important pieces in bringing life and vibrance to the world.
+		* All this time, he thought it was just a legend, or a metaphor for something... there was never any link found validating that story.
+		* But thanks to Demetrius (and of course, himself) that link may have just been found!
+		* The Ancient Fruit that sprouted from his experiement must be closely derived from the Genesis Seed... the very same of which those stories tell.
+		* If you could convince Demetrius to let you join in on his experimentation, the wizard would be very interested in any results found.
+		* Quest updated: Convince Demetrius to let you join in with his research on the mysterious seeds.
+#### Demetrius
+		* Hi {NAME}, have you come to check in on my experiments?
+		* I've tried splicing the mysterious fruit seeds with multiple different crop seeds, but they all end up sprouting into Ancient Fruit.
+		* You know, I never asked... where'd you get that fruit from, anyway? OPTIONS:
+			 * It randomly grew on my farm. (suspicious, skeptical look)
+			 * I found it in the forest. (interested look)
+			 * Some strange guy gave it to me. (concerned look. Hopes you're not talking about Linus.)
+		* So anyway, I've been thinking. These experiments I've been doing so far... I've been able to nail down the *process*, but not any results yet.
+		* I know that these specific seeds are indeed interesting... But this process could definitely be applied to other seeds too!
+		* I need to look into performing more of these tests, but with different types of seeds and crops. That should get me some real results.
+		* (After this change of thought-process, you offer your help.) OPTIONS:
+			 * I could help with your research too!
+			 * It just so happens that I deal with a lot of crops myself!
+		* That's great! If you wouldn't mind helping me, we really could learn a lot from this. I could even be published!
+			 * I'd be happy to help! (confident)
+			 * I think you meant "we". (embarassed)
+		* I'll have to give you access to some of the equipment Maru and I built to perform these tests so far.
+		* (Warp to Demetrius' lab)
+		* Considering its functionality, I suppose you could call this machine a Hybrid Seed Maker.
+		* It uses two different types of seeds or crops, and after some time splicing the genetic structure together, there may be a hybrid seed created!
+		* It doesn't always work perfectly, though. As you can imagine, there are a lot of potential combinations, with some being more viable than others.
+		* Feel free to experiment with any seeds and crops you have. I'll be very interested in your findings!
+		* Quest complete! Rewards:
+			 * **If craftable**:
+			   * 1x Hybrid Seed Maker
+			   * (?) Recipe for Hybrid Seed Maker (maybe recipe comes later in a letter?)
+			 * **If not**: Access to the Hybrid Seed Maker in Demetrius' lab.
+			 * Gifting hybrid crops to Wizard, Demetrius, or Maru are all loved gifts.
 
 ### Config
 Hybrid Attempt
