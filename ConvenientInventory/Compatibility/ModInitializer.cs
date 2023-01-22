@@ -17,165 +17,160 @@ namespace ConvenientInventory.Compatibility
 
         public void Initialize(IGenericModConfigMenuApi api, ModConfig config)
         {
-            api.RegisterModConfig(
+            api.Register(
                 mod: modManifest,
-                revertToDefault: () =>
+                reset: () =>
                 {
                     config = new ModConfig();
                     ModEntry.Config = config;
                 },
-                saveToFile: () => helper.WriteConfig(config)
+                save: () => helper.WriteConfig(config)
             );
 
-            api.SetDefaultIngameOptinValue(modManifest, true);
-
-            api.RegisterLabel(
+            api.AddSectionTitle(
                 mod: modManifest,
-                labelName: helper.Translation.Get("ModConfigMenu.Label.QuickStackToNearbyChests"),
-                labelDesc: null
+                text: () => helper.Translation.Get("ModConfigMenu.Label.QuickStackToNearbyChests")
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsEnableQuickStack.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.IsEnableQuickStack.Desc"),
-                optionGet: () => config.IsEnableQuickStack,
-                optionSet: value => config.IsEnableQuickStack = value
+                getValue: () => config.IsEnableQuickStack,
+                setValue: value => config.IsEnableQuickStack = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStack.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStack.Desc")
             );
 
-            api.RegisterClampedOption(
+            api.AddNumberOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.QuickStackRange.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.QuickStackRange.Desc"),
-                optionGet: () => config.QuickStackRange,
-                optionSet: value => config.QuickStackRange = value,
+                getValue: () => config.QuickStackRange,
+                setValue: value => config.QuickStackRange = value,
+                name: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Desc"),
                 min: 0,
                 max: 10,
                 interval: 1
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsEnableQuickStackHotkey.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.IsEnableQuickStackHotkey.Desc"),
-                optionGet: () => config.IsEnableQuickStackHotkey,
-                optionSet: value => config.IsEnableQuickStackHotkey = value
+                getValue: () => config.IsEnableQuickStackHotkey,
+                setValue: value => config.IsEnableQuickStackHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackHotkey.Desc")
             );
 
-            api.RegisterSimpleOption(
+            api.AddKeybind(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.QuickStackKeyboardHotkey.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.QuickStackKeyboardHotkey.Desc"),
-                optionGet: () => config.QuickStackKeyboardHotkey,
-                optionSet: value => config.QuickStackKeyboardHotkey = value
+                getValue: () => config.QuickStackKeyboardHotkey,
+                setValue: value => config.QuickStackKeyboardHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.QuickStackKeyboardHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackKeyboardHotkey.Desc")
             );
 
-            api.RegisterSimpleOption(
+            api.AddKeybind(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.QuickStackControllerHotkey.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.QuickStackControllerHotkey.Desc"),
-                optionGet: () => config.QuickStackControllerHotkey,
-                optionSet: value => config.QuickStackControllerHotkey = value
+                getValue: () => config.QuickStackControllerHotkey,
+                setValue: value => config.QuickStackControllerHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.QuickStackControllerHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackControllerHotkey.Desc")
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc"),
-                optionGet: () => config.IsQuickStackIntoBuildingsWithInventories,
-                optionSet: value => config.IsQuickStackIntoBuildingsWithInventories = value
+                getValue: () => config.IsQuickStackIntoBuildingsWithInventories,
+                setValue: value => config.IsQuickStackIntoBuildingsWithInventories = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc")
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Desc"),
-                optionGet: () => config.IsQuickStackOverflowItems,
-                optionSet: value => config.IsQuickStackOverflowItems = value
+                getValue: () => config.IsQuickStackOverflowItems,
+                setValue: value => config.IsQuickStackOverflowItems = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Desc")
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Name"),
-                optionDesc: $"(Requires \"{helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name")}\" to be enabled.) " +
-                    helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc"),
-                optionGet: () => config.IsQuickStackIgnoreItemQuality,
-                optionSet: value => config.IsQuickStackIgnoreItemQuality = value
+                getValue: () => config.IsQuickStackIgnoreItemQuality,
+                setValue: value => config.IsQuickStackIgnoreItemQuality = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Name"),
+                tooltip: () => $"(Requires \"{helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name")}\" to be enabled.) " +
+                    helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc")
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc"),
-                optionGet: () => config.IsQuickStackTooltipDrawNearbyChests,
-                optionSet: value => config.IsQuickStackTooltipDrawNearbyChests = value
+                getValue: () => config.IsQuickStackTooltipDrawNearbyChests,
+                setValue: value => config.IsQuickStackTooltipDrawNearbyChests = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc")
             );
 
-            api.RegisterLabel(
+            api.AddSectionTitle(
                 mod: modManifest,
-                labelName: helper.Translation.Get("ModConfigMenu.Label.FavoriteItems"),
-                labelDesc: null
+                text: () => helper.Translation.Get("ModConfigMenu.Label.FavoriteItems")
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsEnableFavoriteItems.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.IsEnableFavoriteItems.Desc"),
-                optionGet: () => config.IsEnableFavoriteItems,
-                optionSet: value => config.IsEnableFavoriteItems = value
+                getValue: () => config.IsEnableFavoriteItems,
+                setValue: value => config.IsEnableFavoriteItems = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableFavoriteItems.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableFavoriteItems.Desc")
             );
 
             string[] highlightStyleDescriptions =
+            {
+                $"0: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0")}",
+                $"1: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1")}",
+                $"2: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2")}",
+                $"3: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3")}",
+                $"4: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4")}",
+                $"5: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5")}",
+                $"6: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6")}",
+            };
+            api.AddTextOption(
+                mod: modManifest,
+                getValue: () => highlightStyleDescriptions[config.FavoriteItemsHighlightTextureChoice],
+                setValue: value =>
                 {
-                    $"0: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0")}",
-                    $"1: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1")}",
-                    $"2: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2")}",
-                    $"3: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3")}",
-                    $"4: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4")}",
-                    $"5: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5")}",
-                    $"6: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6")}",
-                };
-            api.RegisterChoiceOption(
-                mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc"),
-                optionGet: () => highlightStyleDescriptions[config.FavoriteItemsHighlightTextureChoice],
-                optionSet: value =>
-                    {
-                        config.FavoriteItemsHighlightTextureChoice = int.Parse(value.Substring(0, 1));
-                        ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
-                    },
-                choices: highlightStyleDescriptions
+                    config.FavoriteItemsHighlightTextureChoice = int.Parse(value[..1]);
+                    ConvenientInventory.FavoriteItemsHighlightTexture = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
+                },
+                name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc"),
+                allowedValues: highlightStyleDescriptions
             );
 
-            api.RegisterSimpleOption(
+            api.AddKeybind(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc"),
-                optionGet: () => config.FavoriteItemsKeyboardHotkey,
-                optionSet: value => config.FavoriteItemsKeyboardHotkey = value
+                getValue: () => config.FavoriteItemsKeyboardHotkey,
+                setValue: value => config.FavoriteItemsKeyboardHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc")
             );
 
-            api.RegisterSimpleOption(
+            api.AddKeybind(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.FavoriteItemsControllerHotkey.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.FavoriteItemsControllerHotkey.Desc"),
-                optionGet: () => config.FavoriteItemsControllerHotkey,
-                optionSet: value => config.FavoriteItemsControllerHotkey = value
+                getValue: () => config.FavoriteItemsControllerHotkey,
+                setValue: value => config.FavoriteItemsControllerHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsControllerHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsControllerHotkey.Desc")
             );
 
-            api.RegisterLabel(
+            api.AddSectionTitle(
                 mod: modManifest,
-                labelName: helper.Translation.Get("ModConfigMenu.Label.Miscellaneous"),
-                labelDesc: null
+                text: () => helper.Translation.Get("ModConfigMenu.Label.Miscellaneous")
             );
 
-            api.RegisterSimpleOption(
+            api.AddBoolOption(
                 mod: modManifest,
-                optionName: helper.Translation.Get("ModConfigMenu.IsEnableInventoryPageSideWarp.Name"),
-                optionDesc: helper.Translation.Get("ModConfigMenu.IsEnableInventoryPageSideWarp.Desc"),
-                optionGet: () => config.IsEnableInventoryPageSideWarp,
-                optionSet: value => config.IsEnableInventoryPageSideWarp = value
+                getValue: () => config.IsEnableInventoryPageSideWarp,
+                setValue: value => config.IsEnableInventoryPageSideWarp = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableInventoryPageSideWarp.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableInventoryPageSideWarp.Desc")
             );
         }
     }
