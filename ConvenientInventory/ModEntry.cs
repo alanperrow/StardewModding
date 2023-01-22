@@ -6,7 +6,6 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using System;
 using ConvenientInventory.Compatibility;
-using System.Collections.Generic;
 
 namespace ConvenientInventory
 {
@@ -24,10 +23,10 @@ namespace ConvenientInventory
             Instance = this;
             Config = helper.ReadConfig<ModConfig>();
 
-            ConvenientInventory.QuickStackButtonIcon = helper.Content.Load<Texture2D>(@"assets\icon.png");
-            ConvenientInventory.FavoriteItemsCursorTexture = helper.Content.Load<Texture2D>(@"assets\favoriteCursor.png");
-            ConvenientInventory.FavoriteItemsHighlightTexture = helper.Content.Load<Texture2D>($@"assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
-            ConvenientInventory.FavoriteItemsBorderTexture = helper.Content.Load<Texture2D>(@"assets\favoriteBorder.png");
+            ConvenientInventory.QuickStackButtonIcon = helper.ModContent.Load<Texture2D>(@"assets\icon.png");
+            ConvenientInventory.FavoriteItemsCursorTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteCursor.png");
+            ConvenientInventory.FavoriteItemsHighlightTexture = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
+            ConvenientInventory.FavoriteItemsBorderTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteBorder.png");
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
