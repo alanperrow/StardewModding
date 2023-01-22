@@ -265,58 +265,120 @@ namespace ConvenientInventory
 
             if (!FavoriteItemsIsItemSelected || isRightClick)
             {
-                // Check that we've selected a favorited item slot
-                if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && inventoryMenu.actualInventory[clickPos] != null && FavoriteItemSlots[clickPos])
+                if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && inventoryMenu.actualInventory[clickPos] != null)
                 {
+                    // We've selected a slot with an item in it
                     Item clickedItem = inventoryMenu.actualInventory[clickPos];
 
-                    if (!isRightClick)
+                    if (FavoriteItemSlots[clickPos])
                     {
-                        if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuIP && gameMenuIP.pages[gameMenuIP.currentTab] is InventoryPage)
+                        // We've selected a favorited item slot with an item in it
+                        if (!isRightClick)
                         {
-                            // Game logic for shift-clicking in player's inventory page
-                            HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
-                        }
-                        else if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuCP && gameMenuCP.pages[gameMenuCP.currentTab] is CraftingPage
-                            && (clickedItem is Hat or Clothing or Boots or Ring or StardewValley.Tools.MeleeWeapon))
-                        {
-                            // Game logic for shift-clicking in player's crafting page. Idk why it works this way, but this handles it.
-                            HandleFavoriteItemSlotShiftClickedInCraftingPage(clickPos, clickedItem);
-                        }
-                        else
-                        {
-                            Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
-
-                            if ((cursorSlotItem is null || !cursorSlotItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
+                            if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuIP && gameMenuIP.pages[gameMenuIP.currentTab] is InventoryPage)
                             {
-                                // Left click with either (1.) no item currently selected, or (2.) item selected that cannot stack with the clicked slot, and (3.) clicked slot is not greyed out.
-                                if (!IsCurrentActiveMenuNoHeldItems())
+                                // Game logic for shift-clicking in player's inventory page
+                                HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
+                            }
+                            else if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuCP && gameMenuCP.pages[gameMenuCP.currentTab] is CraftingPage
+                                && (clickedItem is Hat or Clothing or Boots or Ring or StardewValley.Tools.MeleeWeapon))
+                            {
+                                // Game logic for shift-clicking in player's crafting page. Idk why it works this way, but this handles it.
+                                HandleFavoriteItemSlotShiftClickedInCraftingPage(clickPos, clickedItem);
+                            }
+                            else
+                            {
+                                Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
+
+                                if ((cursorSlotItem is null || !cursorSlotItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
                                 {
-                                    StartTrackingFavoriteItemSlot(clickPos, clickedItem);
-                                }
-                                else
-                                {
-                                    // Shop menus only allow held items after purchasing something, so we check for that case here.
-                                    if (Game1.activeClickableMenu is ShopMenu shopMenu)
+                                    // Left click with either (1.) no item currently selected, or (2.) item selected that cannot stack with the clicked slot, and (3.) clicked slot is not greyed out.
+                                    if (!IsCurrentActiveMenuNoHeldItems())
                                     {
-                                        if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(clickedItem))
+                                        StartTrackingFavoriteItemSlot(clickPos, clickedItem);
+                                    }
+                                    else
+                                    {
+                                        // Shop menus only allow held items after purchasing something, so we check for that case here.
+                                        if (Game1.activeClickableMenu is ShopMenu shopMenu)
+                                        {
+                                            if (shopMenu.heldItem == null && inventoryMenu.highlightMethod(clickedItem))
+                                            {
+                                                FavoriteItemSlots[clickPos] = false;
+                                            }
+                                        }
+                                        else
                                         {
                                             FavoriteItemSlots[clickPos] = false;
                                         }
                                     }
-                                    else
+                                }
+                            }
+                        }
+                        else if (isRightClick && clickedItem is Tool clickedTool)
+                        {
+                            Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
+
+                            // Right-click attachments into a favorited tool
+                            if (cursorSlotItem != null)
+                            {
+                                if (clickedTool.canThisBeAttached((StardewValley.Object)cursorSlotItem))
+                                {
+                                    // We are allowed to attach this item to our tool
+                                    var atts = clickedTool.attachments.Where(x => x != null && x.canStackWith(cursorSlotItem));
+                                    if (atts.Any())
                                     {
-                                        FavoriteItemSlots[clickPos] = false;
+                                        // We found an existing attachment to try to stack with our item
+                                        if (atts.Any(x => !IsOverMaxStackSize(x, cursorSlotItem)))
+                                        {
+                                            // We fully stacked our item and are no longer holding anything
+                                            ResetFavoriteItemSlotsTracking();
+                                        }
                                     }
+                                    else if (clickedTool.attachments.Any(x => x == null))
+                                    {
+                                        // We did not find any existing attachments to stack with our item, so this item itself will be attached
+                                        ResetFavoriteItemSlotsTracking();
+                                    }
+                                    else if (!clickedTool.attachments.Any(x => cursorSlotItem.CompareTo(x) == 0))
+                                    {
+                                        // We did not find any existing attachments to stack with our item, and there are no empty attachment slots,
+                                        // so this item itself will be swapped with one of the existing attachments
+                                        ResetFavoriteItemSlotsTracking();
+                                    }
+                                }
+                            }
+                        }
+                        else if (isRightClick && clickedItem.Stack == 1 && inventoryMenu.highlightMethod(clickedItem))
+                        {
+                            // Right click, taking the last item
+                            if (!IsCurrentActiveMenuNoHeldItems())
+                            {
+                                StartTrackingFavoriteItemSlot(clickPos, clickedItem);
+                            }
+                            else
+                            {
+                                // Shop menus only allow held items after purchasing something, so we check for that case here.
+                                if (Game1.activeClickableMenu is ShopMenu shopMenu)
+                                {
+                                    if ((shopMenu.heldItem == null || shopMenu.heldItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
+                                    {
+                                        StartTrackingFavoriteItemSlot(clickPos, clickedItem);
+                                    }
+                                }
+                                else
+                                {
+                                    FavoriteItemSlots[clickPos] = false;
                                 }
                             }
                         }
                     }
                     else if (isRightClick && clickedItem is Tool clickedTool)
                     {
+                        // We've right clicked an unfavorited slot with a tool in it
                         Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
 
-                        // Right-click attachments into a favorited tool
+                        // Right-click favorited attachments into an unfavorited tool
                         if (cursorSlotItem != null)
                         {
                             if (clickedTool.canThisBeAttached((StardewValley.Object)cursorSlotItem))
@@ -346,29 +408,6 @@ namespace ConvenientInventory
                             }
                         }
                     }
-                    else if (isRightClick && clickedItem.Stack == 1 && inventoryMenu.highlightMethod(clickedItem))
-                    {
-                        // Right click, taking the last item
-                        if (!IsCurrentActiveMenuNoHeldItems())
-                        {
-                            StartTrackingFavoriteItemSlot(clickPos, clickedItem);
-                        }
-                        else
-                        {
-                            // Shop menus only allow held items after purchasing something, so we check for that case here.
-                            if (Game1.activeClickableMenu is ShopMenu shopMenu)
-                            {
-                                if ((shopMenu.heldItem == null || shopMenu.heldItem.canStackWith(clickedItem)) && inventoryMenu.highlightMethod(clickedItem))
-                                {
-                                    StartTrackingFavoriteItemSlot(clickPos, clickedItem);
-                                }
-                            }
-                            else
-                            {
-                                FavoriteItemSlots[clickPos] = false;
-                            }
-                        }
-                    }
                 }
             }
             else
@@ -378,41 +417,41 @@ namespace ConvenientInventory
                     // We have a favorited item selected and have clicked a valid inventory slot.
                     Item clickedItem = inventoryMenu.actualInventory[clickPos];
 
-                    if (FavoriteItemSlots[clickPos] && clickedItem != null && inventoryMenu.highlightMethod(clickedItem))
-                    {
-                        Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
-
-                        // We are placing the selected favorited item into a favorited slot with an item in it.
-                        if (cursorSlotItem != null && cursorSlotItem.canStackWith(clickedItem))
+                        if (FavoriteItemSlots[clickPos] && clickedItem != null && inventoryMenu.highlightMethod(clickedItem))
                         {
-                            if (!IsOverMaxStackSize(cursorSlotItem, clickedItem))
+                            Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
+
+                            // We are placing the selected favorited item into a favorited slot with an item in it.
+                            if (cursorSlotItem != null && cursorSlotItem.canStackWith(clickedItem))
                             {
-                                // Clicked item can stack with ours, so stop tracking.
-                                ResetFavoriteItemSlotsTracking();
+                                if (!IsOverMaxStackSize(cursorSlotItem, clickedItem))
+                                {
+                                    // Clicked item can stack with ours, so stop tracking.
+                                    ResetFavoriteItemSlotsTracking();
+                                }
+                            }
+                            else
+                            {
+                                // Clicked item cannot stack with ours, so swap which item slot we are tracking.
+                                FavoriteItemsLastSelectedSlot = clickPos;
+                                FavoriteItemsSelectedItem = clickedItem;
                             }
                         }
                         else
                         {
-                            // Clicked item cannot stack with ours, so swap which item slot we are tracking.
-                            FavoriteItemsLastSelectedSlot = clickPos;
-                            FavoriteItemsSelectedItem = clickedItem;
-                        }
-                    }
-                    else
-                    {
-                        if (clickedItem == null || inventoryMenu.highlightMethod(clickedItem))
-                        {
-                            // We are placing our selected favorited item into a slot which is either empty or
-                            // contains a highlighted item, so stop tracking, and favorite this new slot.
-                            ResetFavoriteItemSlotsTracking();
-
-                            if (!FavoriteItemSlots[clickPos])
+                            if (clickedItem == null || inventoryMenu.highlightMethod(clickedItem))
                             {
-                                FavoriteItemSlots[clickPos] = true;
+                                // We are placing our selected favorited item into a slot which is either empty or
+                                // contains a highlighted item, so stop tracking, and favorite this new slot.
+                                ResetFavoriteItemSlotsTracking();
+
+                                if (!FavoriteItemSlots[clickPos])
+                                {
+                                    FavoriteItemSlots[clickPos] = true;
+                                }
                             }
                         }
                     }
-                }
                 else if (!isRightClick)
                 {
                     // We have a favorited item selected and have clicked somewhere outside the inventory slots.
