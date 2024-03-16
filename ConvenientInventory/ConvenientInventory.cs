@@ -1,4 +1,7 @@
-﻿using ConvenientInventory.Compatibility;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ConvenientInventory.Compatibility;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,10 +10,6 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using static StardewValley.Menus.ItemGrabMenu;
 
 namespace ConvenientInventory
 {
@@ -42,7 +41,7 @@ namespace ConvenientInventory
 
         private const int quickStackButtonID = 918021;  // Unique indentifier
 
-        private static readonly List<TransferredItemSprite> transferredItemSprites = new();
+        private static readonly List<ItemGrabMenu.TransferredItemSprite> transferredItemSprites = new();
 
         public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
@@ -856,7 +855,7 @@ namespace ConvenientInventory
                     ?? (menu as MenuWithInventory)?.inventory;      // Arbitrary menu
 
                 // Draw favorite cursor (unless this is an InventoryMenu)
-                if (inventory != null && !(menu is InventoryMenu))
+                if (inventory != null && menu is not InventoryMenu)
                 {
                     if (IsFavoriteItemsHotkeyDown)
                     {
@@ -927,7 +926,7 @@ namespace ConvenientInventory
                     continue;
                 }
 
-                Vector2 toDraw = new Vector2(Game1.uiViewport.Width / 2 - 384 + i * 64, yPositionOnScreen - 96 + 8);
+                Vector2 toDraw = new(Game1.uiViewport.Width / 2 - 384 + i * 64, yPositionOnScreen - 96 + 8);
 
                 spriteBatch.Draw(FavoriteItemsHighlightTexture,
                     toDraw,
@@ -1004,7 +1003,7 @@ namespace ConvenientInventory
             if (ModEntry.Config.IsEnableQuickStack)
             {
                 // Draw transferred item sprites
-                foreach (TransferredItemSprite transferredItemSprite in transferredItemSprites)
+                foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in transferredItemSprites)
                 {
                     transferredItemSprite.Draw(spriteBatch);
                 }
@@ -1083,7 +1082,7 @@ namespace ConvenientInventory
             }
         }
 
-        public static void AddTransferredItemSprite(TransferredItemSprite itemSprite)
+        public static void AddTransferredItemSprite(ItemGrabMenu.TransferredItemSprite itemSprite)
         {
             transferredItemSprites.Add(itemSprite);
         }

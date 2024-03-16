@@ -8,7 +8,6 @@ using StardewValley.Buildings;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
-using static StardewValley.Menus.ItemGrabMenu;
 
 namespace ConvenientInventory
 {
@@ -98,7 +97,7 @@ namespace ConvenientInventory
                         {
                             ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[playerInventory.IndexOf(playerItem)];
 
-                            ConvenientInventory.AddTransferredItemSprite(new TransferredItemSprite(
+                            ConvenientInventory.AddTransferredItemSprite(new ItemGrabMenu.TransferredItemSprite(
                                 playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y)
                             );
 
@@ -156,7 +155,7 @@ namespace ConvenientInventory
                             {
                                 ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[playerInventory.IndexOf(playerItem)];
 
-                                ConvenientInventory.AddTransferredItemSprite(new TransferredItemSprite(
+                                ConvenientInventory.AddTransferredItemSprite(new ItemGrabMenu.TransferredItemSprite(
                                     playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y)
                                 );
                             }
