@@ -1,16 +1,16 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using StardewValley.Menus;
-using HarmonyLib;
-using System;
-using Microsoft.Xna.Framework;
-using StardewModdingAPI;
-using StardewValley;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq;
 using System.Text;
+using HarmonyLib;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
+using StardewValley;
+using StardewValley.Menus;
 
 namespace ConvenientInventory.Patches
 {
@@ -140,22 +140,6 @@ namespace ConvenientInventory.Patches
             return true;
         }
 
-        /*
-		[HarmonyPostfix]
-		[HarmonyPatch(nameof(CraftingPage.receiveLeftClick))]
-		public static void ReceiveLeftClick_Postfix(CraftingPage __instance, int x, int y)
-		{
-			try
-			{
-				ConvenientInventory.PostReceiveLeftClickInMenu(__instance, x, y);
-			}
-			catch (Exception e)
-			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
-			}
-		}
-		*/
-
         [HarmonyPrefix]
         [HarmonyPatch(nameof(CraftingPage.receiveRightClick))]
         public static bool ReceiveRightClick_Prefix(CraftingPage __instance, int x, int y)
@@ -215,8 +199,9 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(new Type[]
         {
             typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int),
-            typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int), typeof(int), typeof(int),
-            typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>)
+            typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(string), typeof(int), typeof(int), typeof(int),
+            typeof(float), typeof(CraftingRecipe), typeof(IList<Item>),
+            typeof(Texture2D), typeof(Rectangle?), typeof(Color?), typeof(Color?), typeof(float), typeof(int), typeof(int)
         })]
         public static IEnumerable<CodeInstruction> DrawHoverText_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
@@ -229,8 +214,8 @@ namespace ConvenientInventory.Patches
 
             for (int i = 0; i < instructionsList.Count; i++)
             {
-                // Find instruction after if(boldTitleText != null){} block
-                // IL_07b3 (instructionsList[772])
+                // Find instruction after if(boldTitleText != null){ ... b.DrawString() x 3 ... } block
+                // IL_084e (instructionsList[?])
                 if (i > 0 && i < instructionsList.Count - 1
                     && instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 6
                     && instructionsList[i].opcode == OpCodes.Ldarg_S && instructionsList[i].operand is byte b && b == 9
@@ -315,22 +300,6 @@ namespace ConvenientInventory.Patches
             return true;
         }
 
-        /*
-		[HarmonyPostfix]
-		[HarmonyPatch(nameof(MenuWithInventory.receiveLeftClick))]
-		public static void ReceiveLeftClick_Postfix(MenuWithInventory __instance, int x, int y)
-		{
-			try
-			{
-				ConvenientInventory.PostReceiveLeftClickInMenu(__instance, x, y);
-			}
-			catch (Exception e)
-			{
-				ModEntry.Context.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
-			}
-		}
-		*/
-
         [HarmonyPrefix]
         [HarmonyPatch(nameof(MenuWithInventory.receiveRightClick))]
         public static bool ReceiveRightClick_Prefix(MenuWithInventory __instance, int x, int y)
@@ -368,10 +337,10 @@ namespace ConvenientInventory.Patches
             for (int i = 0; i < instructionsList.Count; i++)
             {
                 // Find instruction at start of (int k = 0; k < this.capacity; k++){} block
-                // IL_02d0 (instructionsList[?])
+                // IL_02d7 (instructionsList[?])
                 if (i < instructionsList.Count - 2
                     && instructionsList[i].opcode == OpCodes.Ldc_I4_0
-                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 9
+                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 10
                     && instructionsList[i + 2].opcode == OpCodes.Br)
                 {
                     Label label = ilg.DefineLabel();
@@ -448,11 +417,11 @@ namespace ConvenientInventory.Patches
             for (int i = 0; i < instructionsList.Count; i++)
             {
                 // Find instruction after for(int j = 0; j < 12; j++){} block
-                // IL_027b (instructionsList[229])
+                // IL_027c (instructionsList[?])
                 if (i > 0 && i < instructionsList.Count - 2
                     && instructionsList[i - 1].opcode == OpCodes.Blt
                     && instructionsList[i].opcode == OpCodes.Ldc_I4_0
-                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 9
+                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
                     && instructionsList[i + 2].opcode == OpCodes.Br)
                 {
                     Label label = ilg.DefineLabel();
@@ -697,8 +666,8 @@ namespace ConvenientInventory.Patches
                     || __instance.Items.Count < 12
                     || __instance.UsingTool
                     || Game1.dialogueUp
-                    || (!Game1.pickingTool && !Game1.player.CanMove)
-                    || __instance.areAllItemsNull()
+                    || !__instance.CanMove
+                    || !__instance.Items.HasAny()
                     || Game1.eventUp
                     || Game1.farmEvent != null)
                 {
