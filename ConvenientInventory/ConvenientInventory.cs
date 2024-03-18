@@ -510,13 +510,13 @@ namespace ConvenientInventory
                     }
                     break;
                 case "Shirt":
-                    if (cursorSlotItem is Clothing maybeShirt && maybeShirt.clothesType.Value == 0)
+                    if (cursorSlotItem is Clothing maybeShirt && maybeShirt.clothesType.Value == Clothing.ClothesType.SHIRT)
                     {
                         ResetFavoriteItemSlotsTracking();
                     }
                     break;
                 case "Pants":
-                    if (cursorSlotItem is Clothing maybePants && maybePants.clothesType.Value == 1
+                    if (cursorSlotItem is Clothing maybePants && maybePants.clothesType.Value == Clothing.ClothesType.PANTS
                         || cursorSlotItem is StardewValley.Object && cursorSlotItem.ParentSheetIndex == 71) // trimmed purple shorts
                     {
                         ResetFavoriteItemSlotsTracking();
@@ -572,8 +572,8 @@ namespace ConvenientInventory
             bool isItemEquippable = (item is Ring && (Game1.player.leftRing.Value == null || Game1.player.rightRing.Value == null))
                 || (item is Hat && Game1.player.hat.Value == null)
                 || (item is Boots && Game1.player.boots.Value == null)
-                || (item is Clothing && (((item as Clothing).clothesType.Value == 0 && Game1.player.shirtItem.Value == null)
-                                       || (item as Clothing).clothesType.Value == 1 && Game1.player.pantsItem.Value == null));
+                || (item is Clothing && (((item as Clothing).clothesType.Value == Clothing.ClothesType.SHIRT && Game1.player.shirtItem.Value == null)
+                                       || (item as Clothing).clothesType.Value == Clothing.ClothesType.PANTS && Game1.player.pantsItem.Value == null));
 
             if (isItemEquippable)
             {
@@ -881,13 +881,13 @@ namespace ConvenientInventory
                     : NearbyTypedChests.Count;
 
                 var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
-                IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null, false, -1, 0, -1, -1, null, -1);
+                IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null);
 
                 DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
             }
             else
             {
-                IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null, false, -1, 0, -1, -1, null, -1);
+                IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null);
             }
         }
 

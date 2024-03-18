@@ -5,6 +5,7 @@ using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Buildings;
+using StardewValley.Inventories;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -53,11 +54,11 @@ namespace ConvenientInventory
 
             foreach (Chest chest in chests)
             {
-                List<Item> stackOverflowItems = new List<Item>();
+                List<Item> stackOverflowItems = new();
 
-                Netcode.NetObjectList<Item> chestItems = (chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest)
+                IInventory chestItems = (chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest)
                         ? chest.GetItemsForPlayer(who.UniqueMultiplayerID)
-                        : chest.items;
+                        : chest.Items;
 
                 // Fill chest stacks with player inventory items
                 foreach (Item chestItem in chestItems)
@@ -188,11 +189,11 @@ namespace ConvenientInventory
 
             foreach (Chest chest in chests)
             {
-                List<Item> stackOverflowItems = new List<Item>();
+                List<Item> stackOverflowItems = new();
 
-                Netcode.NetObjectList<Item> chestItems = (chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest)
+                IInventory chestItems = (chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest)
                         ? chest.GetItemsForPlayer(who.UniqueMultiplayerID)
-                        : chest.items;
+                        : chest.Items;
 
                 // Fill chest stacks with player inventory items
                 foreach (Item chestItem in chestItems)
@@ -298,7 +299,7 @@ namespace ConvenientInventory
             }
 
             Vector2 farmerPosition = who.getStandingPosition();
-            Point farmerTileLocation = who.getTileLocationPoint();
+            Point farmerTileLocation = who.TilePoint;
             GameLocation gameLocation = who.currentLocation;
 
             return sorted
@@ -314,7 +315,7 @@ namespace ConvenientInventory
             }
 
             Vector2 farmerPosition = who.getStandingPosition();
-            Point farmerTileLocation = who.getTileLocationPoint();
+            Point farmerTileLocation = who.TilePoint;
             GameLocation gameLocation = who.currentLocation;
 
             return sorted
@@ -394,38 +395,47 @@ namespace ConvenientInventory
             // Buildings
             if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
             {
-                if (gameLocation is BuildableGameLocation buildableGameLocation)
+                foreach (Building building in gameLocation.buildings)
                 {
-                    foreach (Building building in buildableGameLocation.buildings)
+                    Vector2 buildingTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
+
+                    if (IsPositionWithinRange(origin, buildingTileCenterPosition, range))
                     {
-                        Vector2 buildingTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
-
-                        if (IsPositionWithinRange(origin, buildingTileCenterPosition, range))
+                        if (building is JunimoHut junimoHut)
                         {
-                            if (building is JunimoHut junimoHut)
+                            if (junimoHut.GetOutputChest().GetMutex().IsLocked())
                             {
-                                if (junimoHut.output.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                dx = (int)buildingTileCenterPosition.X - (int)origin.X;
-                                dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
-
-                                dChests.Add(new ChestWithDistance(junimoHut.output.Value, Math.Sqrt(dx * dx + dy * dy)));
+                                continue;
                             }
-                            else if (building is Mill mill)
+
+                            dx = (int)buildingTileCenterPosition.X - (int)origin.X;
+                            dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
+
+                            dChests.Add(new ChestWithDistance(junimoHut.GetOutputChest(), Math.Sqrt(dx * dx + dy * dy)));
+                        }
+                        // TODO: Mill
+                        //       Obsolete. The Mill class is only used to preserve data from old save files. All
+                        //       mills were converted into plain StardewValley.Buildings.Building instances, with
+                        //       the input items in StardewValley.Buildings.Building.buildingChests with the Input
+                        //       key.
+                        // TODO: Should I instead reference Building.buildingType string?
+                        else if (building is Mill mill)
+                        {
+                            // TODO: obsolete_input
+                            //       Obsolete. The Mill class is only used to preserve data from old save files. All
+                            //       mills were converted into plain StardewValley.Buildings.Building instances, with
+                            //       the input items in StardewValley.Buildings.Building.buildingChests with the Input
+                            //       key.
+                            if (mill.isUnderConstruction() || mill.obsolete_input.GetMutex().IsLocked())
                             {
-                                if (mill.isUnderConstruction() || mill.input.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                dx = (int)buildingTileCenterPosition.X - (int)origin.X;
-                                dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
-
-                                dChests.Add(new ChestWithDistance(mill.input.Value, Math.Sqrt(dx * dx + dy * dy)));
+                                continue;
                             }
+
+                            dx = (int)buildingTileCenterPosition.X - (int)origin.X;
+                            dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
+
+                            // TODO: obsolete_input
+                            dChests.Add(new ChestWithDistance(mill.obsolete_input, Math.Sqrt(dx * dx + dy * dy)));
                         }
                     }
                 }
@@ -516,42 +526,42 @@ namespace ConvenientInventory
             // Buildings
             if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
             {
-                if (gameLocation is BuildableGameLocation buildableGameLocation)
+                foreach (Building building in gameLocation.buildings)
                 {
-                    foreach (Building building in buildableGameLocation.buildings)
+                    Vector2 buildingTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
+
+                    if (IsPositionWithinRange(origin, buildingTileCenterPosition, range))
                     {
-                        Vector2 buildingTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
-
-                        if (IsPositionWithinRange(origin, buildingTileCenterPosition, range))
+                        if (building is JunimoHut junimoHut)
                         {
-                            if (building is JunimoHut junimoHut)
+                            if (junimoHut.GetOutputChest().GetMutex().IsLocked())
                             {
-                                if (junimoHut.output.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                dx = (int)buildingTileCenterPosition.X - (int)origin.X;
-                                dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
-
-                                var typedChest = new TypedChest(junimoHut.output.Value, ChestType.JunimoHut);
-
-                                tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+                                continue;
                             }
-                            else if (building is Mill mill)
+
+                            dx = (int)buildingTileCenterPosition.X - (int)origin.X;
+                            dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
+
+                            var typedChest = new TypedChest(junimoHut.GetOutputChest(), ChestType.JunimoHut);
+
+                            tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+                        }
+                        // TODO: Mill
+                        else if (building is Mill mill)
+                        {
+                            // TODO: obsolete_input
+                            if (mill.isUnderConstruction() || mill.obsolete_input.GetMutex().IsLocked())
                             {
-                                if (mill.isUnderConstruction() || mill.input.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                dx = (int)buildingTileCenterPosition.X - (int)origin.X;
-                                dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
-
-                                var typedChest = new TypedChest(mill.input.Value, ChestType.Mill);
-
-                                tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
+                                continue;
                             }
+
+                            dx = (int)buildingTileCenterPosition.X - (int)origin.X;
+                            dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
+
+                            // TODO: obsolete_input
+                            var typedChest = new TypedChest(mill.obsolete_input, ChestType.Mill);
+
+                            tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
                         }
                     }
                 }
@@ -569,7 +579,7 @@ namespace ConvenientInventory
             {
                 for (int dy = -range; dy <= range; dy++)
                 {
-                    Vector2 tileLocation = new Vector2(originTile.X + dx, originTile.Y + dy);
+                    Vector2 tileLocation = new(originTile.X + dx, originTile.Y + dy);
 
                     if (gameLocation.objects.TryGetValue(tileLocation, out StardewValley.Object obj) && obj is Chest chest)
                     {
@@ -587,7 +597,7 @@ namespace ConvenientInventory
             if (gameLocation is FarmHouse farmHouse && farmHouse.upgradeLevel >= 1) //Lvl 1,2,3 is where you have fridge upgrade
             {
                 Point kitchenStandingSpot = farmHouse.getKitchenStandingSpot();
-                Point fridgeTileLocation = new Point(kitchenStandingSpot.X + 2, kitchenStandingSpot.Y - 1); //Fridge spot relative to kitchen spot
+                Point fridgeTileLocation = new(kitchenStandingSpot.X + 2, kitchenStandingSpot.Y - 1); //Fridge spot relative to kitchen spot
 
                 if (IsTileWithinRange(originTile, fridgeTileLocation, range))
                 {
@@ -615,30 +625,30 @@ namespace ConvenientInventory
             // Buildings
             if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
             {
-                if (gameLocation is BuildableGameLocation buildableGameLocation)
+                foreach (Building building in gameLocation.buildings)
                 {
-                    foreach (Building building in buildableGameLocation.buildings)
+                    if (IsTileWithinRange(originTile, building.tileX.Value, building.tileY.Value, range))
                     {
-                        if (IsTileWithinRange(originTile, building.tileX.Value, building.tileY.Value, range))
+                        if (building is JunimoHut junimoHut)
                         {
-                            if (building is JunimoHut junimoHut)
+                            if (junimoHut.GetOutputChest().GetMutex().IsLocked())
                             {
-                                if (junimoHut.output.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                chests.Add(junimoHut.output.Value);
+                                continue;
                             }
-                            else if (building is Mill mill)
+
+                            chests.Add(junimoHut.GetOutputChest());
+                        }
+                        // TODO: Mill
+                        else if (building is Mill mill)
+                        {
+                            // TODO: obsolete_input
+                            if (mill.obsolete_input.GetMutex().IsLocked())
                             {
-                                if (mill.input.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                chests.Add(mill.input.Value);
+                                continue;
                             }
+
+                            // TODO: obsolete_input
+                            chests.Add(mill.obsolete_input);
                         }
                     }
                 }
@@ -656,7 +666,7 @@ namespace ConvenientInventory
             {
                 for (int dy = -range; dy <= range; dy++)
                 {
-                    Vector2 tileLocation = new Vector2(originTile.X + dx, originTile.Y + dy);
+                    Vector2 tileLocation = new(originTile.X + dx, originTile.Y + dy);
 
                     if (gameLocation.objects.TryGetValue(tileLocation, out StardewValley.Object obj) && obj is Chest chest)
                     {
@@ -680,7 +690,7 @@ namespace ConvenientInventory
             if (gameLocation is FarmHouse farmHouse && farmHouse.upgradeLevel >= 1) //Lvl 1,2,3 is where you have fridge upgrade
             {
                 Point kitchenStandingSpot = farmHouse.getKitchenStandingSpot();
-                Point fridgeTileLocation = new Point(kitchenStandingSpot.X + 2, kitchenStandingSpot.Y - 1); //Fridge spot relative to kitchen spot
+                Point fridgeTileLocation = new(kitchenStandingSpot.X + 2, kitchenStandingSpot.Y - 1); //Fridge spot relative to kitchen spot
 
                 if (IsTileWithinRange(originTile, fridgeTileLocation, range))
                 {
@@ -708,30 +718,30 @@ namespace ConvenientInventory
             // Buildings
             if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
             {
-                if (gameLocation is BuildableGameLocation buildableGameLocation)
+                foreach (Building building in gameLocation.buildings)
                 {
-                    foreach (Building building in buildableGameLocation.buildings)
+                    if (IsTileWithinRange(originTile, building.tileX.Value, building.tileY.Value, range))
                     {
-                        if (IsTileWithinRange(originTile, building.tileX.Value, building.tileY.Value, range))
+                        if (building is JunimoHut junimoHut)
                         {
-                            if (building is JunimoHut junimoHut)
+                            if (junimoHut.GetOutputChest().GetMutex().IsLocked())
                             {
-                                if (junimoHut.output.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                tChests.Add(new TypedChest(junimoHut.output.Value, ChestType.JunimoHut));
+                                continue;
                             }
-                            else if (building is Mill mill)
+
+                            tChests.Add(new TypedChest(junimoHut.GetOutputChest(), ChestType.JunimoHut));
+                        }
+                        // TODO: Mill
+                        else if (building is Mill mill)
+                        {
+                            // TODO: obsolete_input
+                            if (mill.obsolete_input.GetMutex().IsLocked())
                             {
-                                if (mill.input.Value.GetMutex().IsLocked())
-                                {
-                                    continue;
-                                }
-
-                                tChests.Add(new TypedChest(mill.input.Value, ChestType.Mill));
+                                continue;
                             }
+
+                            // TODO: obsolete_input
+                            tChests.Add(new TypedChest(mill.obsolete_input, ChestType.Mill));
                         }
                     }
                 }
