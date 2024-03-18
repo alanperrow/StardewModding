@@ -406,8 +406,8 @@ namespace ConvenientInventory.Patches
             MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(ToolbarPatches), nameof(ToolbarPatches.IsConfigEnableFavoriteItems));
             MethodInfo DrawFavoriteItemSlotHighlightsInToolbar = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemSlotHighlightsInToolbar));
 
-            FieldInfo yPositionOnScreen = typeof(Toolbar).GetField("yPositionOnScreen", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            FieldInfo transparency = typeof(Toolbar).GetField("transparency", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            FieldInfo yPositionOnScreen = typeof(Toolbar).GetField("yPositionOnScreen", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            FieldInfo transparency = typeof(Toolbar).GetField("transparency", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
             FieldInfo slotText = typeof(Toolbar).GetField("slotText", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
             List<CodeInstruction> instructionsList = instructions.ToList();
