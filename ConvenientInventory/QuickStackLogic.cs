@@ -413,20 +413,9 @@ namespace ConvenientInventory
 
                             dChests.Add(new ChestWithDistance(junimoHut.GetOutputChest(), Math.Sqrt(dx * dx + dy * dy)));
                         }
-                        // TODO: Mill
-                        //       Obsolete. The Mill class is only used to preserve data from old save files. All
-                        //       mills were converted into plain StardewValley.Buildings.Building instances, with
-                        //       the input items in StardewValley.Buildings.Building.buildingChests with the Input
-                        //       key.
-                        // TODO: Should I instead reference Building.buildingType string?
-                        else if (building is Mill mill)
+                        else if (building.buildingType.Value == "Mill")
                         {
-                            // TODO: obsolete_input
-                            //       Obsolete. The Mill class is only used to preserve data from old save files. All
-                            //       mills were converted into plain StardewValley.Buildings.Building instances, with
-                            //       the input items in StardewValley.Buildings.Building.buildingChests with the Input
-                            //       key.
-                            if (mill.isUnderConstruction() || mill.obsolete_input.GetMutex().IsLocked())
+                            if (building.isUnderConstruction() || building.GetBuildingChest("Input").GetMutex().IsLocked())
                             {
                                 continue;
                             }
@@ -434,8 +423,7 @@ namespace ConvenientInventory
                             dx = (int)buildingTileCenterPosition.X - (int)origin.X;
                             dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
 
-                            // TODO: obsolete_input
-                            dChests.Add(new ChestWithDistance(mill.obsolete_input, Math.Sqrt(dx * dx + dy * dy)));
+                            dChests.Add(new ChestWithDistance(building.GetBuildingChest("Input"), Math.Sqrt(dx * dx + dy * dy)));
                         }
                     }
                 }
@@ -546,11 +534,9 @@ namespace ConvenientInventory
 
                             tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
                         }
-                        // TODO: Mill
-                        else if (building is Mill mill)
+                        else if (building.buildingType.Value == "Mill")
                         {
-                            // TODO: obsolete_input
-                            if (mill.isUnderConstruction() || mill.obsolete_input.GetMutex().IsLocked())
+                            if (building.isUnderConstruction() || building.GetBuildingChest("Input").GetMutex().IsLocked())
                             {
                                 continue;
                             }
@@ -558,8 +544,7 @@ namespace ConvenientInventory
                             dx = (int)buildingTileCenterPosition.X - (int)origin.X;
                             dy = (int)buildingTileCenterPosition.Y - (int)origin.Y;
 
-                            // TODO: obsolete_input
-                            var typedChest = new TypedChest(mill.obsolete_input, ChestType.Mill);
+                            var typedChest = new TypedChest(building.GetBuildingChest("Input"), ChestType.Mill);
 
                             tdChests.Add(new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy)));
                         }
@@ -638,17 +623,14 @@ namespace ConvenientInventory
 
                             chests.Add(junimoHut.GetOutputChest());
                         }
-                        // TODO: Mill
-                        else if (building is Mill mill)
+                        else if (building.buildingType.Value == "Mill")
                         {
-                            // TODO: obsolete_input
-                            if (mill.obsolete_input.GetMutex().IsLocked())
+                            if (building.GetBuildingChest("Input").GetMutex().IsLocked())
                             {
                                 continue;
                             }
 
-                            // TODO: obsolete_input
-                            chests.Add(mill.obsolete_input);
+                            chests.Add(building.GetBuildingChest("Input"));
                         }
                     }
                 }
@@ -731,17 +713,14 @@ namespace ConvenientInventory
 
                             tChests.Add(new TypedChest(junimoHut.GetOutputChest(), ChestType.JunimoHut));
                         }
-                        // TODO: Mill
-                        else if (building is Mill mill)
+                        else if (building.buildingType.Value == "Mill")
                         {
-                            // TODO: obsolete_input
-                            if (mill.obsolete_input.GetMutex().IsLocked())
+                            if (building.GetBuildingChest("Input").GetMutex().IsLocked())
                             {
                                 continue;
                             }
 
-                            // TODO: obsolete_input
-                            tChests.Add(new TypedChest(mill.obsolete_input, ChestType.Mill));
+                            tChests.Add(new TypedChest(building.GetBuildingChest("Input"), ChestType.Mill));
                         }
                     }
                 }
