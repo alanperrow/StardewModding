@@ -104,7 +104,7 @@ namespace FasterPathSpeed
                         getValue: () => (float)prop.GetValue(Config.CustomPathSpeedBuffValues),
                         setValue: value => prop.SetValue(Config.CustomPathSpeedBuffValues, value),
                         name: () => $" - {prop.Name}",
-                        tooltip: () => $"Extra movement speed obtained from walking on a {prop.Name} path",
+                        tooltip: () => $"Extra movement speed obtained from walking on {prop.Name}",
                         min: 0,
                         max: 5,
                         interval: 0.1f
