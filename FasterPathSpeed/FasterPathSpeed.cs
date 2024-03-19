@@ -11,11 +11,14 @@ namespace FasterPathSpeed
         #region Farmer Methods
         public static void GetFarmerMovementSpeed(Farmer who, ref float refMovementSpeed)
         {
-            // TODO: if (who == null) { return; }
+            if (who == null || Game1.currentLocation == null)
+            {
+                return;
+            }
 
             if ((Game1.CurrentEvent == null || Game1.CurrentEvent.playerControlSequence)
                 && (!(Game1.CurrentEvent == null && who.hasBuff("19")))
-                && (!ModEntry.Config.IsPathSpeedBuffOnlyOnTheFarm || Game1.currentLocation.IsFarm)) // TODO: (Game1.currentLocation?.IsFarm ?? false)
+                && (!ModEntry.Config.IsPathSpeedBuffOnlyOnTheFarm || Game1.currentLocation.IsFarm))
             {
                 bool isOnFeature = Game1.currentLocation.terrainFeatures.TryGetValue(who.Tile, out TerrainFeature terrainFeature);
 
@@ -23,6 +26,7 @@ namespace FasterPathSpeed
                 {
                     float pathSpeedBoost = GetPathSpeedBoostByFlooringType(terrainFeature as Flooring);
 
+                    // TODO: Instead of multiplier, simplify horse bonus speed to linear addition just like path speed.
                     float mult = who.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *
                         ((!Game1.eventUp && who.isRidingHorse()) ? (ModEntry.Config.IsPathAffectHorseSpeed ? ModEntry.Config.HorsePathSpeedBuffModifier : 0) : 1);
 
