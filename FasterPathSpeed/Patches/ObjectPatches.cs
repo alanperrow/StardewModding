@@ -13,7 +13,7 @@ namespace FasterPathSpeed.Patches
             }
             catch (System.Exception e)
             {
-                ModEntry.Context.Monitor.Log($"Failed in {nameof(PlacementAction_Postfix)}:\n{e}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(PlacementAction_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
     }

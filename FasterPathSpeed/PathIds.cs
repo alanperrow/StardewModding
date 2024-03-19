@@ -18,6 +18,7 @@ namespace FasterPathSpeed
         public const string ColoredCobblestone = "409";
         public const string IceTile = "333";
 
+        // TODO: Investigate if Flooring.GetFloorPathItemLookup() obviates this.
         public static readonly List<string> WhichIds = new()
         {
             Wood,

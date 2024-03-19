@@ -8,13 +8,13 @@ namespace FasterPathSpeed
 {
     public class ModEntry : Mod
     {
-        public static ModEntry Context { get; private set; }
+        public static ModEntry Instance { get; private set; }
 
         public static ModConfig Config { get; private set; }
 
         public override void Entry(IModHelper helper)
         {
-            Context = this;
+            Instance = this;
             Config = helper.ReadConfig<ModConfig>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;

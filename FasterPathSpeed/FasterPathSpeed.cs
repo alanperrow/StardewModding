@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
@@ -14,7 +15,7 @@ namespace FasterPathSpeed
 
             if ((Game1.CurrentEvent == null || Game1.CurrentEvent.playerControlSequence)
                 && (!(Game1.CurrentEvent == null && who.hasBuff("19")))
-                && (!ModEntry.Context.Config.IsPathSpeedBuffOnlyOnTheFarm || Game1.currentLocation.IsFarm)) // TODO: (Game1.currentLocation?.IsFarm ?? false)
+                && (!ModEntry.Config.IsPathSpeedBuffOnlyOnTheFarm || Game1.currentLocation.IsFarm)) // TODO: (Game1.currentLocation?.IsFarm ?? false)
             {
                 bool isOnFeature = Game1.currentLocation.terrainFeatures.TryGetValue(who.Tile, out TerrainFeature terrainFeature);
 
@@ -23,7 +24,7 @@ namespace FasterPathSpeed
                     float pathSpeedBoost = GetPathSpeedBoostByFlooringType(terrainFeature as Flooring);
 
                     float mult = who.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *
-                        ((!Game1.eventUp && who.isRidingHorse()) ? (ModEntry.Context.Config.IsPathAffectHorseSpeed ? ModEntry.Context.Config.HorsePathSpeedBuffModifier : 0) : 1);
+                        ((!Game1.eventUp && who.isRidingHorse()) ? (ModEntry.Config.IsPathAffectHorseSpeed ? ModEntry.Config.HorsePathSpeedBuffModifier : 0) : 1);
 
                     refMovementSpeed += (who.movementDirections.Count > 1) ? (0.7f * pathSpeedBoost * mult) : (pathSpeedBoost * mult);
                 }
@@ -32,27 +33,27 @@ namespace FasterPathSpeed
 
         public static float GetPathSpeedBoostByFlooringType(Flooring flooring)
         {
-            if (!ModEntry.Context.Config.IsUseCustomPathSpeedBuffValues)
+            if (!ModEntry.Config.IsUseCustomPathSpeedBuffValues)
             {
-                return ModEntry.Context.Config.DefaultPathSpeedBuff;
+                return ModEntry.Config.DefaultPathSpeedBuff;
             }
 
             return flooring.whichFloor.Value switch
             {
-                Flooring.wood => ModEntry.Context.Config.CustomPathSpeedBuffValues.Wood,
-                Flooring.stone => ModEntry.Context.Config.CustomPathSpeedBuffValues.Stone,
-                Flooring.ghost => ModEntry.Context.Config.CustomPathSpeedBuffValues.Ghost,
-                Flooring.iceTile => ModEntry.Context.Config.CustomPathSpeedBuffValues.IceTile,
-                Flooring.straw => ModEntry.Context.Config.CustomPathSpeedBuffValues.Straw,
-                Flooring.gravel => ModEntry.Context.Config.CustomPathSpeedBuffValues.Gravel,
-                Flooring.boardwalk => ModEntry.Context.Config.CustomPathSpeedBuffValues.Boardwalk,
-                Flooring.colored_cobblestone => ModEntry.Context.Config.CustomPathSpeedBuffValues.ColoredCobblestone,
-                Flooring.cobblestone => ModEntry.Context.Config.CustomPathSpeedBuffValues.Cobblestone,
-                Flooring.steppingStone => ModEntry.Context.Config.CustomPathSpeedBuffValues.SteppingStone,
-                Flooring.brick => ModEntry.Context.Config.CustomPathSpeedBuffValues.Brick,
-                Flooring.plankFlooring => ModEntry.Context.Config.CustomPathSpeedBuffValues.PlankFlooring,
-                Flooring.townFlooring => ModEntry.Context.Config.CustomPathSpeedBuffValues.TownFlooring,
-                _ => ModEntry.Context.Config.DefaultPathSpeedBuff,
+                Flooring.wood => ModEntry.Config.CustomPathSpeedBuffValues.Wood,
+                Flooring.stone => ModEntry.Config.CustomPathSpeedBuffValues.Stone,
+                Flooring.ghost => ModEntry.Config.CustomPathSpeedBuffValues.Ghost,
+                Flooring.iceTile => ModEntry.Config.CustomPathSpeedBuffValues.IceTile,
+                Flooring.straw => ModEntry.Config.CustomPathSpeedBuffValues.Straw,
+                Flooring.gravel => ModEntry.Config.CustomPathSpeedBuffValues.Gravel,
+                Flooring.boardwalk => ModEntry.Config.CustomPathSpeedBuffValues.Boardwalk,
+                Flooring.colored_cobblestone => ModEntry.Config.CustomPathSpeedBuffValues.ColoredCobblestone,
+                Flooring.cobblestone => ModEntry.Config.CustomPathSpeedBuffValues.Cobblestone,
+                Flooring.steppingStone => ModEntry.Config.CustomPathSpeedBuffValues.SteppingStone,
+                Flooring.brick => ModEntry.Config.CustomPathSpeedBuffValues.Brick,
+                Flooring.plankFlooring => ModEntry.Config.CustomPathSpeedBuffValues.PlankFlooring,
+                Flooring.townFlooring => ModEntry.Config.CustomPathSpeedBuffValues.TownFlooring,
+                _ => ModEntry.Config.DefaultPathSpeedBuff,
             };
         }
         #endregion
@@ -60,9 +61,16 @@ namespace FasterPathSpeed
         #region Object Methods
         public static void ObjectPlacementAction(Object obj, ref bool refSuccess, GameLocation location, int x, int y, Farmer who)
         {
-            if (ObjectIsPath(obj) && ModEntry.Context.Config.IsEnablePathReplace)
+            if (ObjectIsPath(obj) && ModEntry.Config.IsEnablePathReplace)
             {
                 Vector2 placementTile = new(x / 64, y / 64);
+
+                // TODO: Investigate if this would do the same thing, but cleaner:
+                var debug = Flooring.GetFloorPathItemLookup()/*[base.ItemId]*/;
+                //if (Game1.floorPathData.TryGetValue(key, out var floorData) && floorData.PlacementSound != null)
+                //{
+                //    location.playSound(floorData.PlacementSound);
+                //}
 
                 if (!obj.bigCraftable.Value && obj is not Furniture
                     && location.terrainFeatures.TryGetValue(placementTile, out TerrainFeature terrainFeature)

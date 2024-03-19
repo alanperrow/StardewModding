@@ -14,7 +14,7 @@ namespace FasterPathSpeed.Patches
             }
             catch (Exception e)
             {
-                ModEntry.Context.Monitor.Log($"Failed in {nameof(GetMovementSpeed_Postfix)}:\n{e}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(GetMovementSpeed_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
     }
