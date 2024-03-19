@@ -30,7 +30,7 @@ namespace FasterPathSpeed
                 if (Game1.currentLocation.terrainFeatures.TryGetValue(who.Tile, out TerrainFeature terrainFeature)
                     && terrainFeature is Flooring flooring)
                 {
-                    float pathSpeedBoost = GetPathSpeedBoostByFlooringType(flooring);
+                    float pathSpeedBoost = GetPathSpeedBoostByFlooring(flooring);
 
                     float mult = (!Game1.eventUp && who.isRidingHorse())
                         ? (ModEntry.Config.IsPathAffectHorseSpeed ? ModEntry.Config.HorsePathSpeedBuffModifier : 0f)
@@ -41,7 +41,7 @@ namespace FasterPathSpeed
             }
         }
 
-        public static float GetPathSpeedBoostByFlooringType(Flooring flooring)
+        public static float GetPathSpeedBoostByFlooring(Flooring flooring)
         {
             if (!ModEntry.Config.IsUseCustomPathSpeedBuffValues)
             {
@@ -50,19 +50,19 @@ namespace FasterPathSpeed
 
             return flooring.whichFloor.Value switch
             {
-                Flooring.wood => ModEntry.Config.CustomPathSpeedBuffValues.Wood,
-                Flooring.stone => ModEntry.Config.CustomPathSpeedBuffValues.Stone,
-                Flooring.ghost => ModEntry.Config.CustomPathSpeedBuffValues.Ghost,
-                Flooring.iceTile => ModEntry.Config.CustomPathSpeedBuffValues.IceTile,
-                Flooring.straw => ModEntry.Config.CustomPathSpeedBuffValues.Straw,
-                Flooring.gravel => ModEntry.Config.CustomPathSpeedBuffValues.Gravel,
-                Flooring.boardwalk => ModEntry.Config.CustomPathSpeedBuffValues.Boardwalk,
-                Flooring.colored_cobblestone => ModEntry.Config.CustomPathSpeedBuffValues.ColoredCobblestone,
-                Flooring.cobblestone => ModEntry.Config.CustomPathSpeedBuffValues.Cobblestone,
-                Flooring.steppingStone => ModEntry.Config.CustomPathSpeedBuffValues.SteppingStone,
-                Flooring.brick => ModEntry.Config.CustomPathSpeedBuffValues.Brick,
-                Flooring.plankFlooring => ModEntry.Config.CustomPathSpeedBuffValues.PlankFlooring,
-                Flooring.townFlooring => ModEntry.Config.CustomPathSpeedBuffValues.TownFlooring,
+                Flooring.wood => ModEntry.Config.CustomPathSpeedBuffValues.WoodFloor,
+                Flooring.stone => ModEntry.Config.CustomPathSpeedBuffValues.StoneFloor,
+                Flooring.ghost => ModEntry.Config.CustomPathSpeedBuffValues.WeatheredFloor,
+                Flooring.iceTile => ModEntry.Config.CustomPathSpeedBuffValues.CrystalFloor,
+                Flooring.straw => ModEntry.Config.CustomPathSpeedBuffValues.StrawFloor,
+                Flooring.gravel => ModEntry.Config.CustomPathSpeedBuffValues.GravelPath,
+                Flooring.boardwalk => ModEntry.Config.CustomPathSpeedBuffValues.WoodPath,
+                Flooring.colored_cobblestone => ModEntry.Config.CustomPathSpeedBuffValues.CrystalPath,
+                Flooring.cobblestone => ModEntry.Config.CustomPathSpeedBuffValues.CobblestonePath,
+                Flooring.steppingStone => ModEntry.Config.CustomPathSpeedBuffValues.SteppingStonePath,
+                Flooring.brick => ModEntry.Config.CustomPathSpeedBuffValues.BrickFloor,
+                Flooring.plankFlooring => ModEntry.Config.CustomPathSpeedBuffValues.RusticPlankFloor,
+                Flooring.townFlooring => ModEntry.Config.CustomPathSpeedBuffValues.StoneWalkwayFloor,
                 _ => ModEntry.Config.DefaultPathSpeedBuff,
             };
         }

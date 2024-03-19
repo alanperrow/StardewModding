@@ -1,47 +1,45 @@
 ﻿namespace FasterPathSpeed
 {
+    // Note: These comments correspond to the variable name for that flooring type in SDV source code.
     public class CustomPathSpeedBuffValues
     {
-        // TODO: Swap comments with property names.
-        // Note: Comments correspond to the variable name for that flooring type in SDV source code.
+        // boardwalk
+        public float WoodPath { get; set; } = 1f;
 
-        // Wood Path
-        public float Boardwalk { get; set;} = 1f;
+        // wood
+        public float WoodFloor { get; set; } = 1f;
 
-        // Wood Floor
-        public float Wood { get; set; } = 1f;
+        // plankFlooring
+        public float RusticPlankFloor { get; set; } = 1f;
 
-        // Rustic Plank Floor
-        public float PlankFlooring { get; set; } = 1f;
+        // ghost
+        public float WeatheredFloor { get; set; } = 1f;
 
-        // Weathered Floor
-        public float Ghost { get; set; } = 1f;
+        // straw
+        public float StrawFloor { get; set; } = 1f;
 
-        // Straw Floor
-        public float Straw { get; set; } = 1f;
+        // gravel
+        public float GravelPath { get; set; } = 1f;
 
-        // Gravel Path
-        public float Gravel { get; set; } = 1f;
+        // cobblestone
+        public float CobblestonePath { get; set; } = 1f;
 
-        // Cobblestone Path
-        public float Cobblestone { get; set; } = 1f;
+        // steppingStone
+        public float SteppingStonePath { get; set; } = 1f;
 
-        // Stepping Stone Path
-        public float SteppingStone { get; set; } = 1f;
+        // stone
+        public float StoneFloor { get; set; } = 1f;
 
-        // Stone Floor
-        public float Stone { get; set; } = 1f;
+        // townFlooring
+        public float StoneWalkwayFloor { get; set; } = 1f;
 
-        // Stone Walkway Floor
-        public float TownFlooring { get; set; } = 1f;
+        // brick
+        public float BrickFloor { get; set; } = 1.25f;
 
-        // Brick Floor
-        public float Brick { get; set; } = 1.25f;
+        // colored_cobblestone
+        public float CrystalPath { get; set; } = 1.5f;
 
-        // Crystal Path
-        public float ColoredCobblestone { get; set; } = 1.5f;
-
-        // Crystal Floor
-        public float IceTile { get; set; } = 1.5f;
+        // iceTile
+        public float CrystalFloor { get; set; } = 1.5f;
     }
 }
