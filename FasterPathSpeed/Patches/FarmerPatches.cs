@@ -1,8 +1,8 @@
-﻿using StardewModdingAPI;
-using System;
+﻿using System;
+using StardewModdingAPI;
 using StardewValley;
 
-namespace FasterPathSpeed
+namespace FasterPathSpeed.Patches
 {
     public class FarmerPatches
     {

@@ -1,14 +1,16 @@
-﻿using StardewModdingAPI;
-using HarmonyLib;
-using StardewModdingAPI.Events;
+﻿using FasterPathSpeed.Patches;
 using GenericModConfigMenu;
+using HarmonyLib;
+using StardewModdingAPI;
+using StardewModdingAPI.Events;
 
 namespace FasterPathSpeed
 {
     public class ModEntry : Mod
     {
-        public static ModEntry Context;
-        public ModConfig Config;
+        public static ModEntry Context { get; private set; }
+
+        public static ModConfig Config { get; private set; }
 
         public override void Entry(IModHelper helper)
         {

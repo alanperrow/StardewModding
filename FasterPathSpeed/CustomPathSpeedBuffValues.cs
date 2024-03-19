@@ -2,6 +2,9 @@
 {
     public class CustomPathSpeedBuffValues
     {
+
+        // TODO: Refactor names to match in-game name rather than source code name.
+
         // Wood Path
         public float Boardwalk { get; set;} = 1f;
 

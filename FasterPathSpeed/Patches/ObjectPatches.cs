@@ -1,10 +1,7 @@
 ﻿using StardewModdingAPI;
 using StardewValley;
-using Microsoft.Xna.Framework;
-using StardewValley.Objects;
-using StardewValley.TerrainFeatures;
 
-namespace FasterPathSpeed
+namespace FasterPathSpeed.Patches
 {
     public class ObjectPatches
     {
