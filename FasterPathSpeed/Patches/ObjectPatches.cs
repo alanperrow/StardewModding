@@ -1,10 +1,7 @@
 ﻿using StardewModdingAPI;
 using StardewValley;
-using Microsoft.Xna.Framework;
-using StardewValley.Objects;
-using StardewValley.TerrainFeatures;
 
-namespace FasterPathSpeed
+namespace FasterPathSpeed.Patches
 {
     public class ObjectPatches
     {
@@ -12,11 +9,11 @@ namespace FasterPathSpeed
         {
             try
             {
-                FasterPathSpeed.ObjectPlacementAction(__instance, ref __result, location, x, y, who);
+                FasterPathSpeed.PostObjectPlacementAction(__instance, ref __result, location, x, y, who);
             }
             catch (System.Exception e)
             {
-                ModEntry.Context.Monitor.Log($"Failed in {nameof(PlacementAction_Postfix)}:\n{e}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(PlacementAction_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
     }

@@ -1,8 +1,8 @@
-﻿using StardewModdingAPI;
-using System;
+﻿using System;
+using StardewModdingAPI;
 using StardewValley;
 
-namespace FasterPathSpeed
+namespace FasterPathSpeed.Patches
 {
     public class FarmerPatches
     {
@@ -10,11 +10,11 @@ namespace FasterPathSpeed
         {
             try
             {
-                FasterPathSpeed.GetFarmerMovementSpeed(__instance, ref __result);
+                FasterPathSpeed.PostGetFarmerMovementSpeed(__instance, ref __result);
             }
             catch (Exception e)
             {
-                ModEntry.Context.Monitor.Log($"Failed in {nameof(GetMovementSpeed_Postfix)}:\n{e}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(GetMovementSpeed_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
     }
