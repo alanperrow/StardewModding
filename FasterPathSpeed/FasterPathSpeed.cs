@@ -1,15 +1,14 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using StardewValley;
-using StardewValley.Objects;
+using StardewValley.GameData.FloorsAndPaths;
 using StardewValley.TerrainFeatures;
 
 namespace FasterPathSpeed
 {
     internal class FasterPathSpeed
     {
-        #region Farmer Methods
-        public static void GetFarmerMovementSpeed(Farmer who, ref float refMovementSpeed)
+        public static void PostGetFarmerMovementSpeed(Farmer who, ref float refMovementSpeed)
         {
             if (who == null || Game1.currentLocation == null)
             {
@@ -26,7 +25,10 @@ namespace FasterPathSpeed
                 {
                     float pathSpeedBoost = GetPathSpeedBoostByFlooringType(terrainFeature as Flooring);
 
-                    // TODO: Instead of multiplier, simplify horse bonus speed to linear addition just like path speed.
+                    // TODO: Remove top line: "who.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *"
+                    //       This logic is already handled in Farmer.getMovementSpeed(), so doing it again here is unnecessary.
+                    //       i.e. If we have a large frame delta, say 1000ms, our speed would already have been multiplied coming into this method,
+                    //            therefore multiplying the delta again would exponentially increase the movement speed unintentionally.
                     float mult = who.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *
                         ((!Game1.eventUp && who.isRidingHorse()) ? (ModEntry.Config.IsPathAffectHorseSpeed ? ModEntry.Config.HorsePathSpeedBuffModifier : 0) : 1);
 
@@ -60,68 +62,42 @@ namespace FasterPathSpeed
                 _ => ModEntry.Config.DefaultPathSpeedBuff,
             };
         }
-        #endregion
 
-        #region Object Methods
-        public static void ObjectPlacementAction(Object obj, ref bool refSuccess, GameLocation location, int x, int y, Farmer who)
+        public static void PostObjectPlacementAction(Object obj, ref bool refSuccess, GameLocation location, int x, int y, Farmer who)
         {
-            if (ObjectIsPath(obj) && ModEntry.Config.IsEnablePathReplace)
+            if (!ModEntry.Config.IsEnablePathReplace)
             {
-                Vector2 placementTile = new(x / 64, y / 64);
+                return;
+            }
 
-                // TODO: Investigate if this would do the same thing, but cleaner:
-                var debug = Flooring.GetFloorPathItemLookup()/*[base.ItemId]*/;
-                //if (Game1.floorPathData.TryGetValue(key, out var floorData) && floorData.PlacementSound != null)
-                //{
-                //    location.playSound(floorData.PlacementSound);
-                //}
+            Vector2 placementTile = new(x / 64, y / 64);
+            Dictionary<string, string> floorPathItemLookup = Flooring.GetFloorPathItemLookup();
 
-                if (!obj.bigCraftable.Value && obj is not Furniture
-                    && location.terrainFeatures.TryGetValue(placementTile, out TerrainFeature terrainFeature)
-                    && terrainFeature is Flooring flooring
-                    && PathIds.WhichIds[System.Convert.ToInt32(flooring.whichFloor.Value)] != obj.ItemId) // TODO: Verify System.Convert.ToInt32() works.
+            if (obj.IsFloorPathItem()
+                && location.terrainFeatures.TryGetValue(placementTile, out TerrainFeature terrainFeature)
+                && terrainFeature is Flooring flooring
+                && floorPathItemLookup[obj.ItemId] != flooring.whichFloor.Value)
+            {
+                // Remove the existing path and try to add it to the player inventory.
+                location.terrainFeatures.Remove(placementTile);
+
+                FloorPathData flooringPathData = flooring.GetData();
+                Object replacedPath = new(flooringPathData.ItemId, 1);
+                if (!who.addItemToInventoryBool(replacedPath))
                 {
-                    location.terrainFeatures.Remove(placementTile);
-                    location.terrainFeatures.Add(placementTile, new Flooring(PathIds.WhichIds.IndexOf(obj.ItemId).ToString())); // TODO: Verify .ToString() works.
-
-                    var replacedPath = new Object(PathIds.WhichIds[System.Convert.ToInt32(flooring.whichFloor.Value)], 1); // TODO: Verify System.Convert.ToInt32() works.
-                    if (!who.addItemToInventoryBool(replacedPath))
-                    {
-                        who.dropItem(replacedPath);
-                    }
-
-                    location.playSound(GetPathSoundStringByPathId(obj.ItemId));
-
-                    refSuccess = true;
+                    // Inventory was full, so drop the replaced path instead.
+                    who.dropItem(replacedPath);
                 }
+
+                // Place the new path and play its placement sound.
+                Flooring newFlooring = new(floorPathItemLookup[obj.ItemId]);
+                location.terrainFeatures.Add(placementTile, newFlooring);
+
+                FloorPathData newFlooringPathData = newFlooring.GetData();
+                location.playSound(newFlooringPathData.PlacementSound);
+
+                refSuccess = true;
             }
         }
-
-        private static bool ObjectIsPath(Object obj)
-        {
-            return PathIds.WhichIds.Contains(obj.ItemId);
-        }
-
-        private static string GetPathSoundStringByPathId(string id)
-        {
-            return id switch
-            {
-                PathIds.Wood => "axchop",
-                PathIds.Stone => "thudStep",
-                PathIds.Ghost => "axchop",
-                PathIds.IceTile => "thudStep",
-                PathIds.Straw => "thudStep",
-                PathIds.Brick => "thudStep",
-                PathIds.Boardwalk => "woodyStep",
-                PathIds.Gravel => "dirtyHit",
-                PathIds.ColoredCobblestone => "stoneStep",
-                PathIds.SteppingStone => "stoneStep",
-                PathIds.Cobblestone => "stoneStep",
-                PathIds.PlankFlooring => "stoneStep",
-                PathIds.TownFlooring => "stoneStep",
-                _ => "stoneStep",
-            };
-        }
-        #endregion
     }
 }

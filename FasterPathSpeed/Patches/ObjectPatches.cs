@@ -9,7 +9,7 @@ namespace FasterPathSpeed.Patches
         {
             try
             {
-                FasterPathSpeed.ObjectPlacementAction(__instance, ref __result, location, x, y, who);
+                FasterPathSpeed.PostObjectPlacementAction(__instance, ref __result, location, x, y, who);
             }
             catch (System.Exception e)
             {

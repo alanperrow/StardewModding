@@ -10,7 +10,7 @@ namespace FasterPathSpeed.Patches
         {
             try
             {
-                FasterPathSpeed.GetFarmerMovementSpeed(__instance, ref __result);
+                FasterPathSpeed.PostGetFarmerMovementSpeed(__instance, ref __result);
             }
             catch (Exception e)
             {
