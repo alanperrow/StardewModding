@@ -2,8 +2,8 @@
 {
     public class CustomPathSpeedBuffValues
     {
-
-        // TODO: Refactor names to match in-game name rather than source code name.
+        // TODO: Swap comments with property names.
+        // Note: Comments correspond to the variable name for that flooring type in SDV source code.
 
         // Wood Path
         public float Boardwalk { get; set;} = 1f;

@@ -15,22 +15,26 @@ namespace FasterPathSpeed
                 return;
             }
 
-            if ((Game1.CurrentEvent == null || Game1.CurrentEvent.playerControlSequence)
-                && (!(Game1.CurrentEvent == null && who.hasBuff("19")))
-                && (!ModEntry.Config.IsPathSpeedBuffOnlyOnTheFarm || Game1.currentLocation.IsFarm))
+            if (ModEntry.Config.IsPathSpeedBuffOnlyOnTheFarm && !Game1.currentLocation.IsFarm)
             {
-                bool isOnFeature = Game1.currentLocation.terrainFeatures.TryGetValue(who.Tile, out TerrainFeature terrainFeature);
+                return;
+            }
 
-                if (isOnFeature && terrainFeature is Flooring)
+            if (Game1.CurrentEvent == null && who.hasBuff("19"))
+            {
+                return;
+            }
+
+            if (Game1.CurrentEvent == null || Game1.CurrentEvent.playerControlSequence)
+            {
+                if (Game1.currentLocation.terrainFeatures.TryGetValue(who.Tile, out TerrainFeature terrainFeature)
+                    && terrainFeature is Flooring flooring)
                 {
-                    float pathSpeedBoost = GetPathSpeedBoostByFlooringType(terrainFeature as Flooring);
+                    float pathSpeedBoost = GetPathSpeedBoostByFlooringType(flooring);
 
-                    // TODO: Remove top line: "who.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *"
-                    //       This logic is already handled in Farmer.getMovementSpeed(), so doing it again here is unnecessary.
-                    //       i.e. If we have a large frame delta, say 1000ms, our speed would already have been multiplied coming into this method,
-                    //            therefore multiplying the delta again would exponentially increase the movement speed unintentionally.
-                    float mult = who.movementMultiplier * Game1.currentGameTime.ElapsedGameTime.Milliseconds *
-                        ((!Game1.eventUp && who.isRidingHorse()) ? (ModEntry.Config.IsPathAffectHorseSpeed ? ModEntry.Config.HorsePathSpeedBuffModifier : 0) : 1);
+                    float mult = (!Game1.eventUp && who.isRidingHorse())
+                        ? (ModEntry.Config.IsPathAffectHorseSpeed ? ModEntry.Config.HorsePathSpeedBuffModifier : 0f)
+                        : 1f;
 
                     refMovementSpeed += (who.movementDirections.Count > 1) ? (0.7f * pathSpeedBoost * mult) : (pathSpeedBoost * mult);
                 }
