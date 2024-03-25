@@ -1,0 +1,10 @@
+﻿{
+	"Name": "Splitscreen Music Fix",
+	"Author": "gaussfire",
+	"Version": "1.0.0",
+	"Description": "Fixes music issues with splitscreen/local co-op.",
+	"UniqueID": "gaussfire.SplitscreenMusicFix",
+	"EntryDll": "SplitscreenMusicFix.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": []
+}
