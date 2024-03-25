@@ -2,7 +2,7 @@
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
-namespace SplitscreenMusicFix
+namespace BetterSplitscreen
 {
     /// <summary>
     /// The mod entry class loaded by SMAPI.

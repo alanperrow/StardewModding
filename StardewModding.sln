@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToggleableWateringCan", "To
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FasterPathSpeed", "FasterPathSpeed\FasterPathSpeed.csproj", "{039F8143-F1C1-4003-AF46-E40FE4AF5420}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitscreenMusicFix", "SplitscreenMusicFix\SplitscreenMusicFix.csproj", "{C408ED18-0F8B-4D7F-810D-78B51BB64609}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetterSplitscreen", "SplitscreenMusicFix\BetterSplitscreen.csproj", "{C408ED18-0F8B-4D7F-810D-78B51BB64609}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

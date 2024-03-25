@@ -1,10 +1,10 @@
 ﻿{
-	"Name": "Splitscreen Music Fix",
+	"Name": "Better Splitscreen",
 	"Author": "gaussfire",
 	"Version": "1.0.0",
-	"Description": "Fixes music issues with splitscreen/local co-op.",
-	"UniqueID": "gaussfire.SplitscreenMusicFix",
-	"EntryDll": "SplitscreenMusicFix.dll",
+	"Description": "Fixes splitscreen/local co-op issues such as music not playing, and introduces splitscreen layouts.",
+	"UniqueID": "gaussfire.BetterSplitscreen",
+	"EntryDll": "BetterSplitscreen.dll",
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": []
 }

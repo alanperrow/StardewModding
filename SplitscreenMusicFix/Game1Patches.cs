@@ -5,11 +5,14 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData;
 
-namespace SplitscreenMusicFix
+
+namespace BetterSplitscreen
 {
     [HarmonyPatch(typeof(Game1))]
-    public class Patches
+    public class Game1Patches
     {
+        // Music bug - still investigating
+        /*
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Game1.changeMusicTrack))]
         public static bool ChangeMusicTrack_Prefix(string newTrackName, bool track_interruptable, MusicContext music_context)
@@ -57,5 +60,6 @@ namespace SplitscreenMusicFix
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(ChangeMusicTrack_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+        */
     }
 }
