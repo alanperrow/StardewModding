@@ -1,4 +1,5 @@
 ﻿using System;
+using BetterSplitscreen.Layout;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
@@ -15,7 +16,7 @@ namespace BetterSplitscreen
             try
             {
                 // Replaces base game method call.
-                ModLogic.SetWindowSize(__instance, w, h);
+                LayoutManager.SetWindowSize(__instance, w, h);
                 return false;
             }
             catch (Exception e)

@@ -2,7 +2,7 @@
 	"Name": "Better Splitscreen",
 	"Author": "gaussfire",
 	"Version": "1.0.0",
-	"Description": "Fixes splitscreen/local co-op issues such as music not playing, and introduces splitscreen layouts.",
+	"Description": "Introduces splitscreen layouts and fixes splitscreen issues such as music not playing.",
 	"UniqueID": "gaussfire.BetterSplitscreen",
 	"EntryDll": "BetterSplitscreen.dll",
 	"MinimumApiVersion": "4.0.0",
