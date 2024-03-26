@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
-using System.Collections.Generic;
 
 namespace BetterSplitscreen
 {
@@ -21,7 +22,7 @@ namespace BetterSplitscreen
 
             screenSplits.Clear();
 
-            ModEntry.Instance.Monitor.Log("SetScreenSplits hit", StardewModdingAPI.LogLevel.Info);
+            ModEntry.Instance.Monitor.Log("SetScreenSplits hit", LogLevel.Debug);
 
             if (isDefaultLayout)
             {

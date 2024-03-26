@@ -14,16 +14,93 @@ namespace BetterSplitscreen
     [HarmonyPatch(typeof(Game1))]
     public class Game1Patches
     {
+        /*
         public static void DebugLog1(List<Microsoft.Xna.Framework.Vector4> screen_splits)
         {
             int i = 0;
             foreach(var split in screen_splits)
             {
                 string vec4str = $"({++i})\tX={split.X}, Y={split.Y}, W={split.W}, H={split.Z}";
-                ModEntry.Instance.Monitor.Log(vec4str, LogLevel.Info);
+                ModEntry.Instance.Monitor.Log(vec4str, LogLevel.Debug);
             }
         }
+        */
 
+        public static void DebugLog2()
+        {
+            ModEntry.Instance.Monitor.Log("DebugLog2 hit", LogLevel.Debug);
+        }
+
+
+        [HarmonyTranspiler]
+        [HarmonyPatch(nameof(Game1.Window_ClientSizeChanged))]
+        [HarmonyPatch(new Type[] { typeof(object), typeof(EventArgs) })]
+        public static IEnumerable<CodeInstruction> WindowClientSizeChanged_Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            MethodInfo debugLog2Method = AccessTools.DeclaredMethod(typeof(Game1Patches), nameof(Game1Patches.DebugLog2));
+
+            FieldInfo gameRunnerInstanceField = AccessTools.DeclaredField(typeof(GameRunner), nameof(GameRunner.instance));
+            FieldInfo game1WindowResizingField = AccessTools.DeclaredField(typeof(Game1), "_windowResizing");
+
+            var ciMatches = new CodeInstruction[]
+            {
+                new(OpCodes.Stfld),
+                new(OpCodes.Ldsfld, gameRunnerInstanceField),
+                new(OpCodes.Ldloc_0),
+            };
+
+            var ciSkipUntilMatches = new CodeInstruction[]
+            {
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Ldc_I4_0),
+                new(OpCodes.Stfld, game1WindowResizingField),
+            };
+
+            List<CodeInstruction> instructionsList = instructions.ToList();
+            bool foundInstruction = false;
+            for (int i = 0; i < instructionsList.Count; i++)
+            {
+                // Find instruction: `GameRunner.instance.ExecuteForInstances(delegate(Game1 instance) { instance.SetWindowSize(w, h); });`
+                // IL_00b6 (instructionsList[50])
+                if (i > 0 && i < instructionsList.Count - 1
+                    && instructionsList[i - 1].opcode == ciMatches[0].opcode
+                    && instructionsList[i].opcode == ciMatches[1].opcode && instructionsList[i].operand == ciMatches[1].operand
+                    && instructionsList[i + 1].opcode == ciMatches[2].opcode)
+                {
+                    foundInstruction = true;
+
+                    yield return new CodeInstruction(OpCodes.Call, debugLog2Method);
+
+                    // Skip existing instructions in favor of our injected instructions.
+                    // Find instruction: `this._windowResizing = false;`
+                    // IL_00cc (instructionsList[55])
+                    while (i < instructionsList.Count - 2
+                        && !(instructionsList[i].opcode == ciSkipUntilMatches[0].opcode
+                            && instructionsList[i + 1].opcode == ciSkipUntilMatches[1].opcode
+                            && instructionsList[i + 2].opcode == ciSkipUntilMatches[2].opcode && instructionsList[i + 2].operand == ciSkipUntilMatches[2].operand))
+                    {
+                        i++;
+                    }
+
+                    // Inject replacement instructions.
+                    //...
+                }
+
+                yield return instructionsList[i];
+            }
+
+            if (!foundInstruction)
+            {
+                ModEntry.Instance.Monitor.Log(
+                    $"{nameof(WindowClientSizeChanged_Transpiler)} could not find target instruction(s) in {nameof(Game1.Window_ClientSizeChanged)}, so no changes were made.",
+                    LogLevel.Error);
+            }
+
+            yield break;
+        }
+
+
+        /*
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(Game1.SetWindowSize))]
         [HarmonyPatch(new Type[] { typeof(int), typeof(int) })]
@@ -117,7 +194,7 @@ namespace BetterSplitscreen
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetWindowSize_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
-
+        */
 
 
 
