@@ -128,6 +128,75 @@ namespace BetterSplitscreen
                 allowedValues: layoutPresetNames);
 
             // TODO: Make a nice pretty graphic with red/blue/green/yellow boxes representing each individual splitscreen position.
+            api.AddComplexOption(
+                mod: ModManifest,
+                name: () => "Preview Layout:",
+                draw: (sb, p) =>
+                {
+                    //sb.Draw(
+                    //    StardewValley.Game1.staminaRect,
+                    //    new Microsoft.Xna.Framework.Rectangle((int)p.X, (int)p.Y, 200, 200),
+                    //    Microsoft.Xna.Framework.Color.Red);
+
+                    int px = (int)p.X;
+                    int py = (int)p.Y;
+
+                    // Border
+                    sb.Draw(
+                        StardewValley.Game1.fadeToBlackRect,
+                        new Microsoft.Xna.Framework.Rectangle(px, py, 208, 208),
+                        Microsoft.Xna.Framework.Color.Black);
+
+                    // TODO: In LayoutManager, dynamically perform the following draw logic:
+
+                    // Player window locations
+                    // TODO: Draw layout preview based on current SplitscreenLayout
+                    int p1_x, p1_y, p2_x, p2_y;
+                    if (Config.LayoutFeature.PresetChoice == LayoutPreset.Default)
+                    {
+                        p1_x = px + 4;
+                        p1_y = py + 4;
+                        p2_x = px + 4 + 100;
+                        p2_y = py + 4;
+                    }
+                    else
+                    {
+                        p1_x = px + 4 + 100;
+                        p1_y = py + 4;
+                        p2_x = px + 4;
+                        p2_y = py + 4;
+                    }
+
+                    sb.Draw(
+                        StardewValley.Game1.fadeToBlackRect,
+                        new Microsoft.Xna.Framework.Rectangle(p1_x, p1_y, 100, 200),
+                        Microsoft.Xna.Framework.Color.Red);
+                    sb.Draw(
+                        StardewValley.Game1.fadeToBlackRect,
+                        new Microsoft.Xna.Framework.Rectangle(p2_x, p2_y, 100, 200),
+                        Microsoft.Xna.Framework.Color.Blue);
+
+                    // Player indicators
+                    // TODO: P1, P2, P3, P4; dynamically
+                    sb.DrawString(
+                        StardewValley.Game1.dialogueFont,
+                        "P1",
+                        new Microsoft.Xna.Framework.Vector2(p1_x + 30, p1_y + 30),
+                        Microsoft.Xna.Framework.Color.Black);
+                    sb.DrawString(
+                        StardewValley.Game1.dialogueFont,
+                        "P2",
+                        new Microsoft.Xna.Framework.Vector2(p2_x + 30, p2_y + 30),
+                        Microsoft.Xna.Framework.Color.Black);
+                },
+                tooltip: () => "Preview how the currently selected layout preset will be displayed.\n" +
+                    "Blue = Player 1\n" +
+                    "Red = Player 2\n" +
+                    "Green = Player 3\n" +
+                    "Yellow = Player 4");
+
+            // TODO: Preview Player Count: Dropdown list {1, 2, 3, 4} for number of players to preview splitscreen layout.
+            //api.AddTextOption()
         }
     }
 }
