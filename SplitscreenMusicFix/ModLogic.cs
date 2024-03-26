@@ -8,17 +8,20 @@ namespace BetterSplitscreen
     {
         /// <summary>
         /// Calculates the screen split locations for each splitscreen player.
-        /// TODO: , dependent on the selected layout from ModConfig.
+        /// TODO: , dependent on the selected layout from ModConfig
+        /// , and overwrites the values in the input list.
         /// </summary>
-        /// <param name="screenSplits">Original instance from game source code.</param>
+        /// <param name="screenSplits">Original instance.</param>
         /// <returns>The list of screen split locations.</returns>
-        public static void GetScreenSplits(List<Vector4> screenSplits)
+        public static void SetScreenSplits(List<Vector4> screenSplits)
         {
             // TODO: Conditional logic based on ModConfig.
             // IDEA: Make a nice pretty graphic with red/blue/green/yellow boxes representing each individual splitscreen position.
             bool isDefaultLayout = false;
 
             screenSplits.Clear();
+
+            ModEntry.Instance.Monitor.Log("SetScreenSplits hit", StardewModdingAPI.LogLevel.Info);
 
             if (isDefaultLayout)
             {
