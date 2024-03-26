@@ -14,6 +14,7 @@ namespace BetterSplitscreen
     [HarmonyPatch(typeof(Game1))]
     public class Game1Patches
     {
+        /*
         public static void DebugLog1(List<Microsoft.Xna.Framework.Vector4> screen_splits)
         {
             int i = 0;
@@ -28,7 +29,9 @@ namespace BetterSplitscreen
         {
             ModEntry.Instance.Monitor.Log("DebugLog2 hit", LogLevel.Debug);
         }
+        */
 
+        /*
         /// <summary>
         /// This method overwrites a call to Game1.SetWindowSize to avoid it being inlined (if inlined, our transpiler changes are not applied).
         /// The overwritten logic behaves the same, but with a foreach rather than a delegate (dynamic method), so compiler does not inline the Game1.SetWindowSize call.
@@ -108,7 +111,9 @@ namespace BetterSplitscreen
 
             yield break;
         }
+        */
 
+        /*
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(Game1.SetWindowSize))]
         [HarmonyPatch(new Type[] { typeof(int), typeof(int) })]
@@ -161,20 +166,17 @@ namespace BetterSplitscreen
 
             yield break;
         }
+        */
 
-        /*
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Game1.SetWindowSize))]
         public static bool SetWindowSize_Prefix(Game1 __instance, int w, int h)
         {
-
-            var window = __instance.localMultiplayerWindow;
-            var player = Game1.player;
-            var viewport = Game1.viewport;
-            var defviewport = Game1.defaultDeviceViewport;
-
             try
             {
+                // Replaces base game method call.
+                ModLogic.SetWindowSize(__instance, w, h);
+                return false;
             }
             catch (Exception e)
             {
@@ -184,6 +186,9 @@ namespace BetterSplitscreen
             return true;
         }
 
+
+
+        /*
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Game1.SetWindowSize))]
         public static void SetWindowSize_Postfix(Game1 __instance, int w, int h)
