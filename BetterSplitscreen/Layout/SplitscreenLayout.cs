@@ -8,7 +8,6 @@ namespace BetterSplitscreen.Layout
         {
             Preset = layoutPreset;
 
-            SinglePlayerLayout = new SplitscreenLayoutData(1, layoutPreset);
             TwoPlayerLayout = new SplitscreenLayoutData(2, layoutPreset);
             ThreePlayerLayout = new SplitscreenLayoutData(3, layoutPreset);
             FourPlayerLayout = new SplitscreenLayoutData(4, layoutPreset);
@@ -16,13 +15,14 @@ namespace BetterSplitscreen.Layout
 
         public LayoutPreset Preset { get; }
 
-        private SplitscreenLayoutData SinglePlayerLayout { get; }
+        // Private access modifier because singleplayer layout should not be configurable.
+        private SplitscreenLayoutData SinglePlayerLayout { get; } = new(1);
 
-        private SplitscreenLayoutData TwoPlayerLayout { get; }
+        public SplitscreenLayoutData TwoPlayerLayout { get; }
 
-        private SplitscreenLayoutData ThreePlayerLayout { get; }
+        public SplitscreenLayoutData ThreePlayerLayout { get; }
 
-        private SplitscreenLayoutData FourPlayerLayout { get; }
+        public SplitscreenLayoutData FourPlayerLayout { get; }
 
         public Vector4[] GetScreenSplits(int numScreens)
         {

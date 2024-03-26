@@ -122,9 +122,9 @@ namespace BetterSplitscreen
                 },
                 name: () => "Layout Preset",
                 tooltip: () => "The currently selected layout preset.\n" +
-                    "'Default' = Vanilla splitscreen layout,\n" +
+                    "'Default' = Vanilla splitscreen layout\n" +
                     "'SwapSides' = Left and right screens are swapped\n" +
-                    "'Custom' = Use a custom layout (see below).",
+                    "'Custom' = Use a custom layout (see below)",
                 allowedValues: layoutPresetNames);
 
             // TODO: Make a nice pretty graphic with red/blue/green/yellow boxes representing each individual splitscreen position.

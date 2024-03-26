@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using StardewValley;
 
 namespace BetterSplitscreen.Layout
 {
-    internal class SplitscreenLayoutData
+    public class SplitscreenLayoutData
     {
         public SplitscreenLayoutData(byte numScreens, LayoutPreset layoutPreset = LayoutPreset.Default)
         {
@@ -20,9 +19,9 @@ namespace BetterSplitscreen.Layout
             };
         }
 
-        public byte NumScreens { get; }
-
         public Vector4[] ScreenSplits { get; }
+
+        private byte NumScreens { get; }
 
         private Vector4[] GetDefaultScreenSplits()
         {
