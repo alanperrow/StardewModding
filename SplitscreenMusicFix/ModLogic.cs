@@ -8,13 +8,43 @@ namespace BetterSplitscreen
     public static class ModLogic
     {
         /// <summary>
-        /// Calculates the screen split locations for each splitscreen player.
-        /// TODO: , dependent on the selected layout from ModConfig
+        /// Modified version of <see cref="GameRunner.ExecuteForInstances"/> for calling <see cref="Game1.SetWindowSize"/> to avoid compiler inlining.
+        /// </summary>
+        public static void SetWindowSizeForInstances(Game1 game1)
+        {
+            // See comment in WindowClientSizeChanged_Transpiler about overwriting `w` and `h`.
+            int w = Game1.graphics.IsFullScreen ? Game1.graphics.PreferredBackBufferWidth : game1.Window.ClientBounds.Width;
+            int h = Game1.graphics.IsFullScreen ? Game1.graphics.PreferredBackBufferHeight : game1.Window.ClientBounds.Height;
+
+            Game1 old_game1 = Game1.game1;
+            if (old_game1 != null)
+            {
+                GameRunner.SaveInstance(old_game1);
+            }
+            foreach (Game1 instance in GameRunner.instance.gameInstances)
+            {
+                GameRunner.LoadInstance(instance);
+                instance.SetWindowSize(w, h);
+                GameRunner.SaveInstance(instance);
+            }
+            if (old_game1 != null)
+            {
+                GameRunner.LoadInstance(old_game1);
+            }
+            else
+            {
+                Game1.game1 = null;
+            }
+        }
+
+        /// <summary>
+        /// Calculates the custom screen split locations for each splitscreen player
+        /// [TODO: , dependent on the selected layout from ModConfig]
         /// , and overwrites the values in the input list.
         /// </summary>
         /// <param name="screenSplits">Original instance.</param>
-        /// <returns>The list of screen split locations.</returns>
-        public static void SetScreenSplits(List<Vector4> screenSplits)
+        /// <returns>The overwritten list of screen split locations.</returns>
+        public static void OverwriteScreenSplits(List<Vector4> screenSplits)
         {
             // TODO: Conditional logic based on ModConfig.
             // IDEA: Make a nice pretty graphic with red/blue/green/yellow boxes representing each individual splitscreen position.
