@@ -35,10 +35,10 @@ namespace BetterSplitscreen
                     && instructionsList[i].opcode == OpCodes.Ldsfld
                     && instructionsList[i + 1].opcode == OpCodes.Ldfld)
                 {
-                    //yield return new CodeInstruction(OpCodes.Ldloc_1); // load local List<Vector4> `screen_splits`
+                    yield return new CodeInstruction(OpCodes.Ldloc_1);                      // load local List<Vector4> `screen_splits`
+                    yield return new CodeInstruction(OpCodes.Call, getScreenSplitsMethod);  // call GetScreenSplits(screen_splits)
 
-                    yield return new CodeInstruction(OpCodes.Call, getScreenSplitsMethod);  // call GetScreenSplits()
-                    yield return new CodeInstruction(OpCodes.Stloc_1);                      // store result in local List<Vector4> `screen_splits` (this overwrites base game values)
+                    //yield return new CodeInstruction(OpCodes.Stloc_1);                      // store result in local List<Vector4> `screen_splits` (this overwrites base game values)
 
                     foundInstruction = true;
                 }
@@ -63,6 +63,8 @@ namespace BetterSplitscreen
 
             var window = __instance.localMultiplayerWindow;
             var player = Game1.player;
+            var viewport = Game1.viewport;
+            var defviewport = Game1.defaultDeviceViewport;
 
             try
             {
@@ -81,6 +83,8 @@ namespace BetterSplitscreen
         {
             var window = __instance.localMultiplayerWindow;
             var player = Game1.player;
+            var dviewport = Game1.viewport;
+            var defviewport = Game1.defaultDeviceViewport;
 
             try
             {
