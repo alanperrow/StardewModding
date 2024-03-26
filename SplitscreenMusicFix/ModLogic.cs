@@ -10,38 +10,6 @@ namespace BetterSplitscreen
 {
     public static class ModLogic
     {
-        /*
-        /// <summary>
-        /// Modified version of <see cref="GameRunner.ExecuteForInstances"/> for calling <see cref="Game1.SetWindowSize"/> to avoid compiler inlining.
-        /// </summary>
-        public static void SetWindowSizeForInstances(Game1 game1)
-        {
-            // See comment in WindowClientSizeChanged_Transpiler about overwriting `w` and `h`.
-            int w = Game1.graphics.IsFullScreen ? Game1.graphics.PreferredBackBufferWidth : game1.Window.ClientBounds.Width;
-            int h = Game1.graphics.IsFullScreen ? Game1.graphics.PreferredBackBufferHeight : game1.Window.ClientBounds.Height;
-
-            Game1 old_game1 = Game1.game1;
-            if (old_game1 != null)
-            {
-                GameRunner.SaveInstance(old_game1);
-            }
-            foreach (Game1 instance in GameRunner.instance.gameInstances)
-            {
-                GameRunner.LoadInstance(instance);
-                instance.SetWindowSize(w, h);
-                GameRunner.SaveInstance(instance);
-            }
-            if (old_game1 != null)
-            {
-                GameRunner.LoadInstance(old_game1);
-            }
-            else
-            {
-                Game1.game1 = null;
-            }
-        }
-        */
-
         /// <summary>
         /// Calculates the custom screen split locations for each game instance.
         /// [TODO: , dependent on the selected layout from ModConfig]
