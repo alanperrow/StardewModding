@@ -13,9 +13,19 @@ namespace BetterSplitscreen
         [HarmonyPatch(nameof(Game1.SetWindowSize))]
         public static bool SetWindowSize_Prefix(Game1 __instance, int w, int h)
         {
+            if (!ModEntry.Config.IsModEnabled)
+            {
+                return true;
+            }
+
+            if (!ModEntry.Config.LayoutFeature.IsFeatureEnabled)
+            {
+                return true;
+            }
+
             try
             {
-                // Replaces base game method call.
+                // Replace base game method call.
                 LayoutManager.SetWindowSize(__instance, w, h);
                 return false;
             }

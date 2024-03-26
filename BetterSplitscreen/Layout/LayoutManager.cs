@@ -62,7 +62,7 @@ namespace BetterSplitscreen.Layout
             Game1.defaultDeviceViewport = new Viewport(instance.localMultiplayerWindow);
 
             // Replaced base game code for `screen_splits` to instead call custom `GetScreenSplits` method.
-            List<Vector4> screen_splits = GetScreenSplits();
+            Vector4[] screen_splits = GetScreenSplits(GameRunner.instance.gameInstances.Count);
 
             if (GameRunner.instance.gameInstances.Count <= 1)
             {
@@ -124,77 +124,12 @@ namespace BetterSplitscreen.Layout
         /// [TODO: , dependent on the selected layout from ModConfig]
         /// </summary>
         /// <param name="screenSplits">Original instance.</param>
-        /// <returns>The list of screen split locations.</returns>
-        private static List<Vector4> GetScreenSplits()
+        /// <returns>The array of screen split locations.</returns>
+        private static Vector4[] GetScreenSplits(int numScreens)
         {
-            List<Vector4> screenSplits = new();
-
-            // TODO: Conditional logic based on ModConfig.
-            // IDEA: Make a nice pretty graphic with red/blue/green/yellow boxes representing each individual splitscreen position.
-            bool isDefaultLayout = false;
-
             ModEntry.Instance.Monitor.Log($"{nameof(GetScreenSplits)} hit", LogLevel.Debug);
 
-            if (isDefaultLayout)
-            {
-                // DEFAULT GAME LAYOUT
-                if (GameRunner.instance.gameInstances.Count <= 1)
-                {
-                    screenSplits.Add(new Vector4(0f, 0f, 1f, 1f));
-                }
-                else
-                {
-                    switch (GameRunner.instance.gameInstances.Count)
-                    {
-                        case 2:
-                            screenSplits.Add(new Vector4(0f, 0f, 0.5f, 1f));
-                            screenSplits.Add(new Vector4(0.5f, 0f, 0.5f, 1f));
-                            break;
-                        case 3:
-                            screenSplits.Add(new Vector4(0f, 0f, 1f, 0.5f));
-                            screenSplits.Add(new Vector4(0f, 0.5f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0.5f, 0.5f, 0.5f, 0.5f));
-                            break;
-                        case 4:
-                            screenSplits.Add(new Vector4(0f, 0f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0.5f, 0f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0f, 0.5f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0.5f, 0.5f, 0.5f, 0.5f));
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                // CUSTOM LAYOUT
-                if (GameRunner.instance.gameInstances.Count <= 1)
-                {
-                    screenSplits.Add(new Vector4(0f, 0f, 1f, 1f));
-                }
-                else
-                {
-                    switch (GameRunner.instance.gameInstances.Count)
-                    {
-                        case 2:
-                            screenSplits.Add(new Vector4(0.5f, 0f, 0.5f, 1f));
-                            screenSplits.Add(new Vector4(0f, 0f, 0.5f, 1f));
-                            break;
-                        case 3:
-                            screenSplits.Add(new Vector4(0f, 0.5f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0f, 0f, 1f, 0.5f));
-                            screenSplits.Add(new Vector4(0.5f, 0.5f, 0.5f, 0.5f));
-                            break;
-                        case 4:
-                            screenSplits.Add(new Vector4(0.5f, 0f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0f, 0f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0.5f, 0.5f, 0.5f, 0.5f));
-                            screenSplits.Add(new Vector4(0f, 0.5f, 0.5f, 0.5f));
-                            break;
-                    }
-                }
-            }
-
-            return screenSplits;
+            return ModEntry.Config.LayoutFeature.CurrentLayout.GetScreenSplits(numScreens);
         }
     }
 }
