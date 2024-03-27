@@ -44,11 +44,17 @@ namespace BetterSplitscreen
             var api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (api != null)
             {
-                InitializeApi(api);
+                LayoutPreviewHelper layoutPreviewHelper = new();
+                InitializeApi(api, layoutPreviewHelper);
             }
         }
 
-        private void InitializeApi(IGenericModConfigMenuApi api)
+        /// <summary>
+        /// Initializes IGenericModConfigMenuApi.
+        /// </summary>
+        /// <param name="api">API instance.</param>
+        /// <param name="layoutPreviewHelper">LayoutPreviewHelper instance.</param>
+        private void InitializeApi(IGenericModConfigMenuApi api, LayoutPreviewHelper layoutPreviewHelper)
         {
             api.Register(
                 mod: ModManifest,
@@ -58,6 +64,7 @@ namespace BetterSplitscreen
                 },
                 save: () => Helper.WriteConfig(Config));
 
+            const string fieldId_IsModEnabled = "IsModEnabled";
             api.AddBoolOption(
                 mod: ModManifest,
                 getValue: () => Config.IsModEnabled,
@@ -74,12 +81,14 @@ namespace BetterSplitscreen
                     StardewValley.Game1.game1.Window_ClientSizeChanged(null, null);
                 },
                 name: () => "Is Mod Enabled",
-                tooltip: () => "Enables/disables the Better Splitscreen mod. This option has precedence over all others.");
+                tooltip: () => "Enables/disables the Better Splitscreen mod. This option has precedence over all others.",
+                fieldId: fieldId_IsModEnabled);
 
             api.AddSectionTitle(
                 mod: ModManifest,
                 text: () => "Layout");
 
+            const string fieldId_IsLayoutFeatureEnabled = "IsLayoutFeatureEnabled";
             api.AddBoolOption(
                 mod: ModManifest,
                 getValue: () => Config.LayoutFeature.IsFeatureEnabled,
@@ -96,8 +105,10 @@ namespace BetterSplitscreen
                     StardewValley.Game1.game1.Window_ClientSizeChanged(null, null);
                 },
                 name: () => "Is Layout Feature Enabled",
-                tooltip: () => "Enables/disables the custom splitscreen layout feature.");
+                tooltip: () => "Enables/disables the custom splitscreen layout feature.",
+                fieldId: fieldId_IsLayoutFeatureEnabled);
 
+            const string fieldId_LayoutPreset = "LayoutPreset";
             string[] layoutPresetNames = Enum.GetNames(typeof(LayoutPreset));
             api.AddTextOption(
                 mod: ModManifest,
@@ -125,78 +136,48 @@ namespace BetterSplitscreen
                     "'Default' = Vanilla splitscreen layout\n" +
                     "'SwapSides' = Left and right screens are swapped\n" +
                     "'Custom' = Use a custom layout (see below)",
-                allowedValues: layoutPresetNames);
+                allowedValues: layoutPresetNames,
+                fieldId: fieldId_LayoutPreset);
 
             // TODO: Make a nice pretty graphic with red/blue/green/yellow boxes representing each individual splitscreen position.
             api.AddComplexOption(
                 mod: ModManifest,
-                name: () => "Preview Layout:",
-                draw: (sb, p) =>
+                name: () => "Preview:",
+                draw: layoutPreviewHelper.DrawPreview,
+                tooltip: () => "Preview how the currently selected layout preset will be displayed.",
+                height: () => 200);
+
+            string[] playerCountOptions = new string[] { "1", "2", "3", "4" };
+            const string fieldId_PreviewPlayerCount = "PreviewPlayerCount";
+            api.AddTextOption(
+                mod: ModManifest,
+                getValue: () => layoutPreviewHelper.PlayerCount.ToString(),
+                setValue: value => layoutPreviewHelper.PlayerCount = int.Parse(value),
+                name: () => "Preview Player Count",
+                tooltip: () => "The number of players to be displayed in the layout preview.",
+                allowedValues: playerCountOptions,
+                fieldId: fieldId_PreviewPlayerCount);
+
+            // Register OnFieldChanged to support layout preview refreshing live (without requiring saving to config first).
+            api.OnFieldChanged(
+                mod: ModManifest,
+                onChange: (string fieldId, object value) =>
                 {
-                    //sb.Draw(
-                    //    StardewValley.Game1.staminaRect,
-                    //    new Microsoft.Xna.Framework.Rectangle((int)p.X, (int)p.Y, 200, 200),
-                    //    Microsoft.Xna.Framework.Color.Red);
-
-                    int px = (int)p.X;
-                    int py = (int)p.Y;
-
-                    // Border
-                    sb.Draw(
-                        StardewValley.Game1.fadeToBlackRect,
-                        new Microsoft.Xna.Framework.Rectangle(px, py, 208, 208),
-                        Microsoft.Xna.Framework.Color.Black);
-
-                    // TODO: In LayoutManager, dynamically perform the following draw logic:
-
-                    // Player window locations
-                    // TODO: Draw layout preview based on current SplitscreenLayout
-                    int p1_x, p1_y, p2_x, p2_y;
-                    if (Config.LayoutFeature.PresetChoice == LayoutPreset.Default)
+                    switch (fieldId)
                     {
-                        p1_x = px + 4;
-                        p1_y = py + 4;
-                        p2_x = px + 4 + 100;
-                        p2_y = py + 4;
+                        case fieldId_IsModEnabled:
+                        case fieldId_IsLayoutFeatureEnabled:
+                            // TODO: Refresh preview based on IsEnabled value
+                            break;
+                        case fieldId_LayoutPreset:
+                            // TODO: Refresh preview based on LayoutPreset value
+                            break;
+                        case fieldId_PreviewPlayerCount:
+                            int valueInt = int.Parse((string)value);
+                            layoutPreviewHelper.PlayerCount = valueInt;
+                            break;
                     }
-                    else
-                    {
-                        p1_x = px + 4 + 100;
-                        p1_y = py + 4;
-                        p2_x = px + 4;
-                        p2_y = py + 4;
-                    }
-
-                    sb.Draw(
-                        StardewValley.Game1.fadeToBlackRect,
-                        new Microsoft.Xna.Framework.Rectangle(p1_x, p1_y, 100, 200),
-                        Microsoft.Xna.Framework.Color.Red);
-                    sb.Draw(
-                        StardewValley.Game1.fadeToBlackRect,
-                        new Microsoft.Xna.Framework.Rectangle(p2_x, p2_y, 100, 200),
-                        Microsoft.Xna.Framework.Color.Blue);
-
-                    // Player indicators
-                    // TODO: P1, P2, P3, P4; dynamically
-                    sb.DrawString(
-                        StardewValley.Game1.dialogueFont,
-                        "P1",
-                        new Microsoft.Xna.Framework.Vector2(p1_x + 30, p1_y + 30),
-                        Microsoft.Xna.Framework.Color.Black);
-                    sb.DrawString(
-                        StardewValley.Game1.dialogueFont,
-                        "P2",
-                        new Microsoft.Xna.Framework.Vector2(p2_x + 30, p2_y + 30),
-                        Microsoft.Xna.Framework.Color.Black);
-                },
-                tooltip: () => "Preview how the currently selected layout preset will be displayed.\n" +
-                    "Blue = Player 1\n" +
-                    "Red = Player 2\n" +
-                    "Green = Player 3\n" +
-                    "Yellow = Player 4");
-
-            // TODO: Preview Player Count: Dropdown list {1, 2, 3, 4} for number of players to preview splitscreen layout.
-            //api.AddTextOption()
+                });
         }
     }
 }
