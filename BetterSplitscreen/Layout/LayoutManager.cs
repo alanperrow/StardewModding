@@ -14,6 +14,8 @@ namespace BetterSplitscreen.Layout
         /// Sets the window size upon being changed, and if the game is local multiplayer, applies a splitscreen layout via <see cref="GetScreenSplits"/>.
         /// </summary>
         /// <remarks>Avoid making changes to this method, as it is almost entirely copy-pasted from the decompiled game source code.</remarks>
+        // TODO: Research "ChainPatch"; would this solve the issue of delegate method being inlined?
+        //       https://github.com/bcmpinc/StardewHack/blob/main/MovementSpeed/ModEntry.cs
         public static void SetWindowSize(Game1 instance, int w, int h)
         {
             Rectangle oldWindow = new Rectangle(Game1.viewport.X, Game1.viewport.Y, Game1.viewport.Width, Game1.viewport.Height);
@@ -126,8 +128,6 @@ namespace BetterSplitscreen.Layout
         /// <returns>The array of screen split locations.</returns>
         private static Vector4[] GetScreenSplits(int numScreens)
         {
-            ModEntry.Instance.Monitor.Log($"{nameof(GetScreenSplits)} hit", LogLevel.Debug);
-
             return ModEntry.Config.LayoutFeature.CurrentLayout.GetScreenSplits(numScreens);
         }
     }

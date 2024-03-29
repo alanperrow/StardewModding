@@ -16,11 +16,11 @@ namespace BetterSplitscreen
 
             public SplitscreenLayout CurrentLayout { get; set; } = new SplitscreenLayout();
 
-            // IDEA: Add new property: List<SplitscreenLayout> LayoutPresets
+            // IDEA: Remove CurrentLayout and Add new property: List<SplitscreenLayout> LayoutPresets
             //       Should have Default, SwapSides, and Custom preset values already included.
             //       This way users can define custom presets in JSON rather than needing to use GMCM.
         }
 
-        //public MusicConfig MusicConfig { get; set; } = new();
+        //public MusicFeatureConfig MusicFeature { get; set; } = new();
     }
 }
