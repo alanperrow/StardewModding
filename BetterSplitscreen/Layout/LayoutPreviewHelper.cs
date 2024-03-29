@@ -16,6 +16,10 @@ namespace BetterSplitscreen.Layout
 
         public static int PlayerCount { get; set; } = 2;
 
+        public static SplitscreenLayout Layout { get; set; }
+
+        public static bool IsEnabled { get; set; }
+
         /// <summary>
         /// Draws a preview of the current layout with the number of players provided by <see cref="PlayerCount"/>.
         /// </summary>

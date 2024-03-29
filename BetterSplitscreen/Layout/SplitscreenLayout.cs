@@ -13,16 +13,16 @@ namespace BetterSplitscreen.Layout
             FourPlayerLayout = new SplitscreenLayoutData(4, layoutPreset);
         }
 
-        public LayoutPreset Preset { get; }
-
-        // Private access modifier because singleplayer layout should not be configurable.
-        private SplitscreenLayoutData SinglePlayerLayout { get; } = new(1);
-
         public SplitscreenLayoutData TwoPlayerLayout { get; }
 
         public SplitscreenLayoutData ThreePlayerLayout { get; }
 
         public SplitscreenLayoutData FourPlayerLayout { get; }
+
+        private LayoutPreset Preset { get; }
+
+        // Singleplayer layout should not be configurable.
+        private SplitscreenLayoutData SinglePlayerLayout { get; } = new(1);
 
         public Vector4[] GetScreenSplits(int numScreens)
         {

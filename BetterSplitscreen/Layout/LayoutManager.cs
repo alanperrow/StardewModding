@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -9,6 +8,8 @@ namespace BetterSplitscreen.Layout
 {
     internal static class LayoutManager
     {
+        public static SplitscreenLayout CurrentLayout => ModEntry.Config.LayoutFeature.LayoutPresets[ModEntry.Config.LayoutFeature.PresetChoice];
+
         /// <summary>
         /// Modified version of <see cref="Game1.SetWindowSize"/> as the original method gets inlined by the compiler and cannot be modified.
         /// Sets the window size upon being changed, and if the game is local multiplayer, applies a splitscreen layout via <see cref="GetScreenSplits"/>.
@@ -119,16 +120,15 @@ namespace BetterSplitscreen.Layout
             }
             Game1.PopUIMode();
         }
-        
+
         /// <summary>
-        /// Calculates the custom screen split locations for each game instance.
-        /// [TODO: , dependent on the selected layout from ModConfig]
+        /// Calculates the custom screen split locations for each game instance, dependent on <see cref="CurrentLayout"/>.
         /// </summary>
-        /// <param name="screenSplits">Original instance.</param>
+        /// <param name="numScreens">Number of screens.</param>
         /// <returns>The array of screen split locations.</returns>
         private static Vector4[] GetScreenSplits(int numScreens)
         {
-            return ModEntry.Config.LayoutFeature.CurrentLayout.GetScreenSplits(numScreens);
+            return CurrentLayout.GetScreenSplits(numScreens);
         }
     }
 }

@@ -76,11 +76,6 @@ namespace BetterSplitscreen
 
                     Config.LayoutFeature.PresetChoice = valueEnum;
 
-                    // TODO: Temporary solution just to get mod config working.
-                    //       We should be storing each custom layout definition somewhere, rather than simply overwriting it every time.
-                    //       IDEA: Include a json file to store all layout definitions. (See Modconfig comment about saving presets)
-                    Config.LayoutFeature.CurrentLayout = new SplitscreenLayout(Config.LayoutFeature.PresetChoice);
-
                     // Refresh window to apply config change.
                     StardewValley.Game1.game1.Window_ClientSizeChanged(null, null);
                 },
@@ -120,10 +115,12 @@ namespace BetterSplitscreen
                     {
                         case fieldId_IsModEnabled:
                         case fieldId_IsLayoutFeatureEnabled:
-                            // TODO: Refresh preview based on IsEnabled value
+                            bool valueBool = (bool)value;
+                            LayoutPreviewHelper.IsEnabled = valueBool;
                             break;
                         case fieldId_LayoutPreset:
-                            // TODO: Refresh preview based on LayoutPreset value
+                            LayoutPreset valueLayoutPreset = (LayoutPreset)value;
+                            LayoutPreviewHelper.Layout = Config.LayoutFeature.LayoutPresets[valueLayoutPreset];
                             break;
                         case fieldId_PreviewPlayerCount:
                             int valueInt = int.Parse((string)value);

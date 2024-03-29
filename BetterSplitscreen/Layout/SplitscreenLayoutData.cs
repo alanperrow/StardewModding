@@ -16,6 +16,7 @@ namespace BetterSplitscreen.Layout
             {
                 LayoutPreset.SwapSides => GetSwapSidesScreenSplits(),
                 _ => GetDefaultScreenSplits(),
+                // TODO: Custom preset should load from Config.LayoutPresets["Custom"]
             };
         }
 

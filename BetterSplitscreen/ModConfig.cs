@@ -1,4 +1,5 @@
-﻿using BetterSplitscreen.Layout;
+﻿using System.Collections.Generic;
+using BetterSplitscreen.Layout;
 
 namespace BetterSplitscreen
 {
@@ -14,11 +15,12 @@ namespace BetterSplitscreen
 
             public LayoutPreset PresetChoice { get; set; } = LayoutPreset.Default;
 
-            public SplitscreenLayout CurrentLayout { get; set; } = new SplitscreenLayout();
-
-            // IDEA: Remove CurrentLayout and Add new property: List<SplitscreenLayout> LayoutPresets
-            //       Should have Default, SwapSides, and Custom preset values already included.
-            //       This way users can define custom presets in JSON rather than needing to use GMCM.
+            public Dictionary<LayoutPreset, SplitscreenLayout> LayoutPresets { get; } = new()
+            {
+                { LayoutPreset.Default, new SplitscreenLayout(LayoutPreset.Default) },
+                { LayoutPreset.SwapSides, new SplitscreenLayout(LayoutPreset.SwapSides) },
+                { LayoutPreset.Custom, new SplitscreenLayout(LayoutPreset.Custom) },
+            };
         }
 
         //public MusicFeatureConfig MusicFeature { get; set; } = new();
