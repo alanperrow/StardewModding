@@ -131,6 +131,9 @@ namespace BetterSplitscreen
                 allowedValues: playerCountOptions,
                 fieldId: fieldId_PreviewPlayerCount);
 
+            // TODO: Float number sliders for custom preset screen splits
+            //...
+
             // Register OnFieldChanged to support layout preview refreshing live (without requiring saving to config first).
             api.OnFieldChanged(
                 mod: ModManifest,

@@ -70,14 +70,12 @@ namespace BetterSplitscreen.Layout
 
             int x1 = px + (int)(v.X * 200);
             int y1 = py + (int)(v.Y * 200);
-            int x2 = x1 + (int)(v.Z * 200);
-            int y2 = y1 + (int)(v.W * 200);
-            int w = x2 - x1;
-            int h = y2 - y1;
+            int w = (int)(v.Z * 200);
+            int h = (int)(v.W * 200);
             Rectangle rect = new(x1, y1, w, h);
 
-            int tx = ((x1 + x2) / 2) - 20;
-            int ty = ((y1 + y2) / 2) - 20;
+            int tx = x1 + (w / 2) - 20;
+            int ty = y1 + (h / 2) - 20;
             Vector2 textPos = new(tx, ty);
 
             return (rect, textPos);
