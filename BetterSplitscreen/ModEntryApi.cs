@@ -20,7 +20,16 @@ namespace BetterSplitscreen
             const string fieldId_IsModEnabled = "IsModEnabled";
             api.AddBoolOption(
                 mod: ModManifest,
-                getValue: () => Config.IsModEnabled,
+                getValue: () =>
+                {
+                    // Initial assignment for default preview value.
+                    if (!Config.IsModEnabled)
+                    {
+                        LayoutPreviewHelper.IsModEnabled = false;
+                    }
+
+                    return Config.IsModEnabled;
+                },
                 setValue: value =>
                 {
                     if (Config.IsModEnabled == value)
@@ -44,7 +53,16 @@ namespace BetterSplitscreen
             const string fieldId_IsLayoutFeatureEnabled = "IsLayoutFeatureEnabled";
             api.AddBoolOption(
                 mod: ModManifest,
-                getValue: () => Config.LayoutFeature.IsFeatureEnabled,
+                getValue: () =>
+                {
+                    // Initial assignment for default preview value.
+                    if (!Config.LayoutFeature.IsFeatureEnabled)
+                    {
+                        LayoutPreviewHelper.IsLayoutFeatureEnabled = false;
+                    }
+
+                    return Config.LayoutFeature.IsFeatureEnabled;
+                },
                 setValue: value =>
                 {
                     if (Config.LayoutFeature.IsFeatureEnabled == value)
@@ -65,7 +83,15 @@ namespace BetterSplitscreen
             string[] layoutPresetNames = Enum.GetNames(typeof(LayoutPreset));
             api.AddTextOption(
                 mod: ModManifest,
-                getValue: () => Config.LayoutFeature.PresetChoice.ToString(),
+                getValue: () =>
+                {
+                    LayoutPreset preset = Config.LayoutFeature.PresetChoice;
+
+                    // Initial assignment for default preview value.
+                    LayoutPreviewHelper.Layout ??= Config.LayoutFeature.LayoutPresets[preset];
+
+                    return preset.ToString();
+                },
                 setValue: value =>
                 {
                     LayoutPreset valueEnum = Enum.Parse<LayoutPreset>(value);
@@ -81,13 +107,12 @@ namespace BetterSplitscreen
                 },
                 name: () => "Layout Preset",
                 tooltip: () => "The currently selected layout preset.\n" +
-                    "'Default' = Vanilla splitscreen layout\n" +
-                    "'SwapSides' = Left and right screens are swapped\n" +
-                    "'Custom' = Use a custom layout (see below)",
+                    " - 'Default': Vanilla splitscreen layout\n" +
+                    " - 'SwapSides': Left and right screens are swapped\n" +
+                    " - 'Custom': Use a custom layout (see below)",
                 allowedValues: layoutPresetNames,
                 fieldId: fieldId_LayoutPreset);
 
-            // TODO: Make a nice pretty graphic with red/blue/green/yellow boxes representing each individual splitscreen position.
             api.AddComplexOption(
                 mod: ModManifest,
                 name: () => "Preview:",
@@ -102,7 +127,7 @@ namespace BetterSplitscreen
                 getValue: () => LayoutPreviewHelper.PlayerCount.ToString(),
                 setValue: value => LayoutPreviewHelper.PlayerCount = int.Parse(value),
                 name: () => "Preview Player Count",
-                tooltip: () => "The number of players to be displayed in the layout preview.",
+                tooltip: () => "The number of players to be displayed in the layout preview.\n(This value is not saved in the config)",
                 allowedValues: playerCountOptions,
                 fieldId: fieldId_PreviewPlayerCount);
 
@@ -114,12 +139,16 @@ namespace BetterSplitscreen
                     switch (fieldId)
                     {
                         case fieldId_IsModEnabled:
-                        case fieldId_IsLayoutFeatureEnabled:
                             bool valueBool = (bool)value;
-                            LayoutPreviewHelper.IsEnabled = valueBool;
+                            LayoutPreviewHelper.IsModEnabled = valueBool;
+                            break;
+                        case fieldId_IsLayoutFeatureEnabled:
+                            bool valueBool2 = (bool)value;
+                            LayoutPreviewHelper.IsLayoutFeatureEnabled = valueBool2;
                             break;
                         case fieldId_LayoutPreset:
-                            LayoutPreset valueLayoutPreset = (LayoutPreset)value;
+                            Monitor.Log(DateTime.Now.ToString(), StardewModdingAPI.LogLevel.Debug);
+                            LayoutPreset valueLayoutPreset = Enum.Parse<LayoutPreset>((string)value);
                             LayoutPreviewHelper.Layout = Config.LayoutFeature.LayoutPresets[valueLayoutPreset];
                             break;
                         case fieldId_PreviewPlayerCount:
