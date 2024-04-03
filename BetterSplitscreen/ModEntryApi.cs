@@ -127,12 +127,23 @@ namespace BetterSplitscreen
                 getValue: () => LayoutPreviewHelper.PlayerCount.ToString(),
                 setValue: value => LayoutPreviewHelper.PlayerCount = int.Parse(value),
                 name: () => "Preview Player Count",
-                tooltip: () => "The number of players to be displayed in the layout preview.\n(This value is not saved in the config)",
+                tooltip: () => "The number of players to be displayed in the layout preview.\n(This value is not saved to the config)",
                 allowedValues: playerCountOptions,
                 fieldId: fieldId_PreviewPlayerCount);
 
             // TODO: Float number sliders for custom preset screen splits
-            //...
+
+
+            api.AddSectionTitle(
+                mod: ModManifest,
+                text: () => "Miscellaneous");
+
+            api.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => Config.ShowNameFeature.IsFeatureEnabled,
+                setValue: value => Config.ShowNameFeature.IsFeatureEnabled = value,
+                name: () => "Show Player Name In Summary",
+                tooltip: () => "Enables/disables splitscreen player names being shown in end-of-day shipping summary and level up menus.");
 
             // Register OnFieldChanged to support layout preview refreshing live (without requiring saving to config first).
             api.OnFieldChanged(
@@ -150,7 +161,6 @@ namespace BetterSplitscreen
                             LayoutPreviewHelper.IsLayoutFeatureEnabled = valueBool2;
                             break;
                         case fieldId_LayoutPreset:
-                            Monitor.Log(DateTime.Now.ToString(), StardewModdingAPI.LogLevel.Debug);
                             LayoutPreset valueLayoutPreset = Enum.Parse<LayoutPreset>((string)value);
                             LayoutPreviewHelper.Layout = Config.LayoutFeature.LayoutPresets[valueLayoutPreset];
                             break;

@@ -9,6 +9,8 @@ namespace BetterSplitscreen
 
         public LayoutFeatureConfig LayoutFeature { get; set; } = new();
 
+        public ShowNameFeatureConfig ShowNameFeature { get; set; } = new();
+
         public class LayoutFeatureConfig
         {
             public bool IsFeatureEnabled { get; set; } = true;
@@ -21,6 +23,11 @@ namespace BetterSplitscreen
                 { LayoutPreset.SwapSides, new SplitscreenLayout(LayoutPreset.SwapSides) },
                 { LayoutPreset.Custom, new SplitscreenLayout(LayoutPreset.Custom) },
             };
+        }
+
+        public class ShowNameFeatureConfig
+        {
+            public bool IsFeatureEnabled { get; set; } = true;
         }
 
         //public MusicFeatureConfig MusicFeature { get; set; } = new();
