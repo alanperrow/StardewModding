@@ -1,8 +1,8 @@
 ﻿using System;
-using BetterSplitscreen.Compatibility;
-using BetterSplitscreen.Layout;
+using SplitscreenImproved.Compatibility;
+using SplitscreenImproved.Layout;
 
-namespace BetterSplitscreen
+namespace SplitscreenImproved
 {
     public partial class ModEntry
     {

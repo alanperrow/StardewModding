@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace BetterSplitscreen.Layout
+namespace SplitscreenImproved.Layout
 {
     public class SplitscreenLayoutData
     {

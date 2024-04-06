@@ -1,4 +1,4 @@
-﻿namespace BetterSplitscreen.Layout
+﻿namespace SplitscreenImproved.Layout
 {
     public enum LayoutPreset : int
     {

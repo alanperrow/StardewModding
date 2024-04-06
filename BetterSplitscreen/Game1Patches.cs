@@ -1,10 +1,10 @@
 ﻿using System;
-using BetterSplitscreen.Layout;
 using HarmonyLib;
+using SplitscreenImproved.Layout;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace BetterSplitscreen
+namespace SplitscreenImproved
 {
     [HarmonyPatch(typeof(Game1))]
     public class Game1Patches

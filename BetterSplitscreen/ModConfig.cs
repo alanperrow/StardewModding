@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using BetterSplitscreen.Layout;
+using SplitscreenImproved.Layout;
 
-namespace BetterSplitscreen
+namespace SplitscreenImproved
 {
     public class ModConfig
     {

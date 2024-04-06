@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 
-namespace BetterSplitscreen.Layout
+namespace SplitscreenImproved.Layout
 {
     internal static class LayoutManager
     {

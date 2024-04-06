@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 
-namespace BetterSplitscreen.Layout
+namespace SplitscreenImproved.Layout
 {
     internal static class LayoutPreviewHelper
     {

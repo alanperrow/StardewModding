@@ -1,10 +1,10 @@
 ﻿{
-	"Name": "Better Splitscreen",
+	"Name": "Splitscreen Improved",
 	"Author": "gaussfire",
 	"Version": "1.0.0",
 	"Description": "Introduces splitscreen layouts and fixes splitscreen issues such as music not playing.",
-	"UniqueID": "gaussfire.BetterSplitscreen",
-	"EntryDll": "BetterSplitscreen.dll",
+	"UniqueID": "gaussfire.SplitscreenImproved",
+	"EntryDll": "SplitscreenImproved.dll",
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": []
 }

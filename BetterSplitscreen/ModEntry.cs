@@ -1,9 +1,9 @@
-﻿using BetterSplitscreen.Compatibility;
-using HarmonyLib;
+﻿using HarmonyLib;
+using SplitscreenImproved.Compatibility;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
-namespace BetterSplitscreen
+namespace SplitscreenImproved
 {
     /// <summary>
     /// The mod entry class loaded by SMAPI.
