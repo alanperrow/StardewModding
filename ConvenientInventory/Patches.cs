@@ -399,6 +399,59 @@ namespace ConvenientInventory.Patches
         //   - We want to prefix this with our own if-check for "Take All But One" feature:
         //     `if (this.actualInventory[slotNumber].Stack > 1 && {HOTKEY_CHECK_HERE}){ {TAKE_ALL_BUT_ONE_LOGIC_HERE} }`.
         // - Find line before similar `else` logic further down in the method.
+        /*
+        [HarmonyTranspiler]
+        [HarmonyPatch(nameof(InventoryMenu.rightClick))]
+        public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
+        {
+            List<CodeInstruction> instructionsList = instructions.ToList();
+
+            bool flag = false;
+
+            for (int i = 0; i < instructionsList.Count; i++)
+            {
+                // Find instruction after for(int j = 0; j < 12; j++){} block
+                // IL_027c (instructionsList[?])
+                if (i > 0 && i < instructionsList.Count - 2
+                    && instructionsList[i - 1].opcode == OpCodes.Blt
+                    && instructionsList[i].opcode == OpCodes.Ldc_I4_0
+                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
+                    && instructionsList[i + 2].opcode == OpCodes.Br)
+                {
+                    Label label = ilg.DefineLabel();
+
+                    yield return new CodeInstruction(OpCodes.Call, isConfigEnableFavoriteItems)                 // call helper method
+                    {
+                        labels = instructionsList[i].ExtractLabels()
+                    };
+                    yield return new CodeInstruction(OpCodes.Brfalse, label);                                   // break if call => false
+
+                    yield return new CodeInstruction(OpCodes.Ldarg_1);                                          // load SpriteBatch "b" (arg 1)
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
+                    yield return new CodeInstruction(OpCodes.Ldfld, yPositionOnScreen);                         // load local variable "this.yPositionOnScreen"
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
+                    yield return new CodeInstruction(OpCodes.Ldfld, transparency);                              // load local variable "this.transparency"
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
+                    yield return new CodeInstruction(OpCodes.Ldfld, slotText);                                  // load local variable "this.slotText"
+                    yield return new CodeInstruction(OpCodes.Call, DrawFavoriteItemSlotHighlightsInToolbar);    // call DrawFavoriteItemSlotHighlightsInToolbar(b, yPositionOnScreen)
+
+                    instructionsList[i].WithLabels(label);
+
+                    flag = true;
+                }
+
+                yield return instructionsList[i];
+            }
+
+            if (!flag)
+            {
+                ModEntry.Instance.Monitor.Log(
+                    $"{nameof(ToolbarPatches)}.{nameof(RightClick_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.rightClick)}, so no changes were made.", LogLevel.Error);
+            }
+
+            yield break;
+        }
+        */
     }
 
     [HarmonyPatch(typeof(Toolbar))]
