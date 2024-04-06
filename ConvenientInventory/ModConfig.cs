@@ -31,5 +31,9 @@ namespace ConvenientInventory
         public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftShoulder;
 
         public bool IsEnableInventoryPageSideWarp { get; set; } = true;
+
+        //public SButton TakeAllButOneKeyboardHotkey { get; set; } = SButton.K;
+
+        //public SButton TakeAllButOneControllerHotkey { get; set; } = SButton.LeftStick;
     }
 }

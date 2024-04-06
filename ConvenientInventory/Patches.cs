@@ -393,6 +393,12 @@ namespace ConvenientInventory.Patches
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+
+        // TODO: Patch InventoryMenu.rightClick
+        // - Find line before: `if (this.actualInventory[slotNumber].Stack > 1 && Game1.isOneOfTheseKeysDown(...){ ... }`.
+        //   - We want to prefix this with our own if-check for "Take All But One" feature:
+        //     `if (this.actualInventory[slotNumber].Stack > 1 && {HOTKEY_CHECK_HERE}){ {TAKE_ALL_BUT_ONE_LOGIC_HERE} }`.
+        // - Find line before similar `else` logic further down in the method.
     }
 
     [HarmonyPatch(typeof(Toolbar))]

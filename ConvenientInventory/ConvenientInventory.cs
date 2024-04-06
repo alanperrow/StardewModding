@@ -49,6 +49,8 @@ namespace ConvenientInventory
 
         public static Texture2D FavoriteItemsBorderTexture { private get; set; }
 
+        public static Texture2D TakeAllButOneCursorTexture { private get; set; }
+
         private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
         public static bool IsFavoriteItemsHotkeyDown
         {
@@ -165,7 +167,7 @@ namespace ConvenientInventory
                 if (InventoryPage.ShouldShowJunimoNoteIcon())
                 {
                     inventoryPage.inventory.dropItemInvisibleButton.leftNeighborID = inventoryPage.junimoNoteIcon.myID;
-                    inventoryPage.junimoNoteIcon.leftNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
+                    inventoryPage.junimoNoteIcon.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
                 }
                 else
                 {
