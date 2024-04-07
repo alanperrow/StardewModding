@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SplitscreenImproved.Layout;
+using SplitscreenImproved.ShowName;
 
 namespace SplitscreenImproved
 {
@@ -28,6 +29,8 @@ namespace SplitscreenImproved
         public class ShowNameFeatureConfig
         {
             public bool IsFeatureEnabled { get; set; } = true;
+
+            public ShowNamePosition Position { get; set; } = ShowNamePosition.Top;
         }
 
         //public MusicFeatureConfig MusicFeature { get; set; } = new();

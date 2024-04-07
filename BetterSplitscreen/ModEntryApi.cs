@@ -145,6 +145,9 @@ namespace SplitscreenImproved
                 name: () => "Show Player Name In Summary",
                 tooltip: () => "Enables/disables splitscreen player names being shown in end-of-day shipping summary and level up menus.");
 
+            // TODO: Config for ShowName Position.
+            //...
+
             // Register OnFieldChanged to support layout preview refreshing live (without requiring saving to config first).
             api.OnFieldChanged(
                 mod: ModManifest,

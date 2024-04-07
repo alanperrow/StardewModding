@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using SplitscreenImproved.Compatibility;
+using SplitscreenImproved.ShowName;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
@@ -55,32 +56,7 @@ namespace SplitscreenImproved
         /// <param name="e"></param>
         private void OnRenderedActiveMenu(object sender, RenderedActiveMenuEventArgs e)
         {
-            // TODO: Maybe use transpiler instead of post-render call. I don't want the player name scroll to block useful information if the screen is super small.
-
-            if (!Config.IsModEnabled || !Config.ShowNameFeature.IsFeatureEnabled)
-            {
-                return;
-            }
-
-            // TODO: Check if local multiplayer. Do not display for singleplayer.
-
-            var menu = StardewValley.Game1.activeClickableMenu;
-            if (menu is null)
-            {
-                return;
-            }
-            
-            if (menu is StardewValley.Menus.ShippingMenu or StardewValley.Menus.LevelUpMenu)
-            {
-                // TODO: Config setting of where to draw player name: Top or Bottom.
-                //int posY = 30;
-                int posY = StardewValley.Game1.uiViewport.Height - 70;
-
-                StardewValley.BellsAndWhistles.SpriteText.drawStringWithScrollCenteredAt(
-                    e.SpriteBatch, StardewValley.Game1.player.Name, StardewValley.Game1.uiViewport.Width / 2, posY);
-
-                return;
-            }
+            ShowNameHelper.DrawPlayerNameScroll(e.SpriteBatch);
         }
     }
 }
