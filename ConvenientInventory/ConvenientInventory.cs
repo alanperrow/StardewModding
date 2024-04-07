@@ -108,6 +108,20 @@ namespace ConvenientInventory
             set { favoriteItemsLastSelectedSlot.Value = value; }
         }
 
+        private static readonly PerScreen<bool> isTakeAllButOneHotkeyDown = new();
+        public static bool IsTakeAllButOneHotkeyDown
+        {
+            get { return isTakeAllButOneHotkeyDown.Value; }
+            set { isTakeAllButOneHotkeyDown.Value = value; }
+        }
+
+        private static readonly PerScreen<int> takeAllButOneHotkeyDownCounter = new();
+        private static int TakeAllButOneHotkeyDownCounter
+        {
+            get { return takeAllButOneHotkeyDownCounter.Value; }
+            set { takeAllButOneHotkeyDownCounter.Value = value; }
+        }
+
         public static bool[] LoadFavoriteItemSlots()
         {
             Game1.player.modData.TryGetValue(favoriteItemSlotsModDataKey, out string dataStr);
@@ -850,7 +864,9 @@ namespace ConvenientInventory
                 DrawQuickStackButtonToolTip(spriteBatch);
             }
 
-            if (ModEntry.Config.IsEnableFavoriteItems)
+            bool favEnabled = ModEntry.Config.IsEnableFavoriteItems;
+            bool taboEnabled = ModEntry.Config.IsEnableTakeAllButOne && ModEntry.Config.IsDrawTakeAllButOneCursor;
+            if (favEnabled || taboEnabled)
             {
                 // Get inventory if menu has one
                 InventoryMenu inventory = (menu as InventoryMenu)   // Inventory item slots container
@@ -862,14 +878,33 @@ namespace ConvenientInventory
                 // Draw favorite cursor (unless this is an InventoryMenu)
                 if (inventory != null && menu is not InventoryMenu)
                 {
-                    if (IsFavoriteItemsHotkeyDown)
+                    if (favEnabled)
                     {
-                        DrawFavoriteItemsCursor(spriteBatch);
-                        FavoriteItemsHotkeyDownCounter++;
+                        if (IsFavoriteItemsHotkeyDown)
+                        {
+                            DrawFavoriteItemsCursor(spriteBatch);
+                            FavoriteItemsHotkeyDownCounter++;
+                        }
+                        else
+                        {
+                            FavoriteItemsHotkeyDownCounter = 0;
+                        }
                     }
-                    else
+
+                    if (taboEnabled)
                     {
-                        FavoriteItemsHotkeyDownCounter = 0;
+                        // TODO: Check if this works per-screen, or if I need to manually track it like I am for `IsFavoriteItemsHotkeyDown`.
+                        bool taboKeyboardDown = ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown();
+                        bool taboControllerDown = ModEntry.Config.TakeAllButOneControllerHotkey.IsDown();
+                        if (taboKeyboardDown || taboControllerDown)
+                        {
+                            DrawTakeAllButOneCursor(spriteBatch);
+                            TakeAllButOneHotkeyDownCounter++;
+                        }
+                        else
+                        {
+                            TakeAllButOneHotkeyDownCounter++;
+                        }
                     }
                 }
             }
@@ -1072,6 +1107,18 @@ namespace ConvenientInventory
             }
 
             return new Point(x, y);
+        }
+
+        private static void DrawTakeAllButOneCursor(SpriteBatch spriteBatch)
+        {
+            float scale = (float)(3d + 0.15d * Math.Cos(TakeAllButOneHotkeyDownCounter / 15d));
+
+            spriteBatch.Draw(TakeAllButOneCursorTexture,
+               new Vector2(Game1.getOldMouseX() - 16, Game1.getOldMouseY() + 32),
+               new Rectangle(0, 0, TakeAllButOneCursorTexture.Width, TakeAllButOneCursorTexture.Height),
+               Color.White,
+               0f, Vector2.Zero, scale, SpriteEffects.None, 1f
+           );
         }
 
         // Updates transferredItemSprite animation
