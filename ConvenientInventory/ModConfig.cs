@@ -35,8 +35,6 @@ namespace ConvenientInventory
 
         public bool IsEnableTakeAllButOne { get; set; } = true;
 
-        public bool IsDrawTakeAllButOneCursor { get; set; } = true;
-
         public KeybindList TakeAllButOneKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftControl, SButton.LeftShift });
 
         public KeybindList TakeAllButOneControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftTrigger });
