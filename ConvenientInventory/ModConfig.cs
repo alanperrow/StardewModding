@@ -31,12 +31,12 @@ namespace ConvenientInventory
 
         public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftShoulder;
 
-        public bool IsEnableInventoryPageSideWarp { get; set; } = true;
-
         public bool IsEnableTakeAllButOne { get; set; } = true;
 
         public KeybindList TakeAllButOneKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftControl, SButton.LeftShift });
 
         public KeybindList TakeAllButOneControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftTrigger });
+
+        public bool IsEnableInventoryPageSideWarp { get; set; } = true;
     }
 }

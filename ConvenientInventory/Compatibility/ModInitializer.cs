@@ -162,6 +162,35 @@ namespace ConvenientInventory.Compatibility
 
             api.AddSectionTitle(
                 mod: modManifest,
+                text: () => helper.Translation.Get("ModConfigMenu.Label.TakeAllButOne")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsEnableTakeAllButOne,
+                setValue: value => config.IsEnableTakeAllButOne = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableTakeAllButOne.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableTakeAllButOne.Desc")
+            );
+
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.TakeAllButOneKeyboardHotkey,
+                setValue: value => config.TakeAllButOneKeyboardHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneKeyboardHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc")
+            );
+
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.TakeAllButOneControllerHotkey,
+                setValue: value => config.TakeAllButOneControllerHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneControllerHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneControllerHotkey.Desc")
+            );
+
+            api.AddSectionTitle(
+                mod: modManifest,
                 text: () => helper.Translation.Get("ModConfigMenu.Label.Miscellaneous")
             );
 

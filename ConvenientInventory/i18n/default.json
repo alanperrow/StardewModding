@@ -53,6 +53,17 @@
   "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Keybind (controller)",
   "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Hold this button when selecting an item to favorite it.",
 
+  "ModConfigMenu.Label.TakeAllButOne": "Take All But One",
+
+  "ModConfigMenu.IsEnableTakeAllButOne.Name": "Enable take all but one?",
+  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "If enabled, while holding the keybind below, instantly take all but one item from the selected item stack, rather than taking a single item at a time.",
+
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "Keybind (keyboard)",
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "Hold this key when taking an item from an item stack to instantly take all but one of that item.",
+
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "Keybind (controller)",
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "Hold this button when taking an item from an item stack to instantly take all but one of that item.",
+
   "ModConfigMenu.Label.Miscellaneous": "Miscellaneous",
 
   "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "Enable inventory cursor side warp?",
