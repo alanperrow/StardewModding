@@ -398,44 +398,63 @@ namespace ConvenientInventory.Patches
         // - Find line before: `if (this.actualInventory[slotNumber].Stack > 1 && Game1.isOneOfTheseKeysDown(...){ ... }`.
         //   - We want to prefix this with our own if-check for "Take All But One" feature:
         //     `if (this.actualInventory[slotNumber].Stack > 1 && {HOTKEY_CHECK_HERE}){ {TAKE_ALL_BUT_ONE_LOGIC_HERE} }`.
-        // - Find line before similar `else` logic further down in the method.
-        /*
+        // - Also find line before similar `else` logic further down in the method.
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(InventoryMenu.rightClick))]
         public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
+            MethodInfo isTakeAllButOneHotkeyDownMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsTakeAllButOneHotkeyDown));
+            MethodInfo takeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItem));
+            MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItemWithAddTo));
+
             List<CodeInstruction> instructionsList = instructions.ToList();
-
             bool flag = false;
-
             for (int i = 0; i < instructionsList.Count; i++)
             {
-                // Find instruction after for(int j = 0; j < 12; j++){} block
-                // IL_027c (instructionsList[?])
+                // Find instruction for `if (this.actualInventory[slotNumber].Stack > 1 && Game1.isOneOfTheseKeysDown(...){ ... }`
+                // IL_014d (instructionsList[?])
                 if (i > 0 && i < instructionsList.Count - 2
-                    && instructionsList[i - 1].opcode == OpCodes.Blt
-                    && instructionsList[i].opcode == OpCodes.Ldc_I4_0
-                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
-                    && instructionsList[i + 2].opcode == OpCodes.Br)
+                    && instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 4
+                    && instructionsList[i].opcode == OpCodes.Ldarg_0
+                    && instructionsList[i + 1].opcode == OpCodes.Ldfld
+                    && instructionsList[i + 2].opcode == OpCodes.Ldloc_1)
                 {
-                    Label label = ilg.DefineLabel();
+                    // Original source code checks for LeftShift in an if-statement. We want to prefix this with our own if-check for "Take All But One" feature.
+                    // By tracking the original instruction label, we can convert the original if-statement into an else condition of our own if-statement.
+                    Label labelIf = ilg.DefineLabel();
 
-                    yield return new CodeInstruction(OpCodes.Call, isConfigEnableFavoriteItems)                 // call helper method
+                    // Find instruction for `if (this.actualInventory[slotNumber] != null && this.actualInventory[slotNumber].Stack <= 0)`
+                    // IL_0213 (instructionsList[?])
+                    Label labelEndElse = ilg.DefineLabel();
+                    int j = i + 4;
+                    for (; j < instructionsList.Count; j++)
+                    {
+                        if (instructionsList[j - 2].opcode == OpCodes.Sub
+                            && instructionsList[j - 1].opcode == OpCodes.Callvirt
+                            && instructionsList[j].opcode == OpCodes.Ldarg_0
+                            && instructionsList[j + 1].opcode == OpCodes.Ldfld)
+                        {
+                            break;
+                        }
+                    }
+
+                    // Inject "Take All But One" code.
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
+                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
+                    yield return new CodeInstruction(OpCodes.Call, isTakeAllButOneHotkeyDownMethod)             // call helper method `IsTakeAllButOneHotkeyDown(this, num)`
                     {
                         labels = instructionsList[i].ExtractLabels()
                     };
-                    yield return new CodeInstruction(OpCodes.Brfalse, label);                                   // break if call => false
+                    yield return new CodeInstruction(OpCodes.Brfalse, labelIf);                                 // break to original if-statement if call => false
 
-                    yield return new CodeInstruction(OpCodes.Ldarg_1);                                          // load SpriteBatch "b" (arg 1)
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldfld, yPositionOnScreen);                         // load local variable "this.yPositionOnScreen"
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldfld, transparency);                              // load local variable "this.transparency"
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldfld, slotText);                                  // load local variable "this.slotText"
-                    yield return new CodeInstruction(OpCodes.Call, DrawFavoriteItemSlotHighlightsInToolbar);    // call DrawFavoriteItemSlotHighlightsInToolbar(b, yPositionOnScreen)
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
+                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
+                    yield return new CodeInstruction(OpCodes.Ldloc_S, 4);                                       // load `one` Item instance (local var @ short index 4)
+                    yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemMethod);                    // call helper method `TakeAllButOneItem(this, num, one)`
+                    yield return new CodeInstruction(OpCodes.Br, labelEndElse);                                 // break to end of else block
 
-                    instructionsList[i].WithLabels(label);
+                    instructionsList[i].WithLabels(labelIf);
+                    instructionsList[j].WithLabels(labelEndElse);
 
                     flag = true;
                 }
@@ -451,7 +470,26 @@ namespace ConvenientInventory.Patches
 
             yield break;
         }
-        */
+
+        public static bool IsTakeAllButOneHotkeyDown(InventoryMenu inventoryMenu, int slotNumber)
+        {
+            bool moreThanOneItem = inventoryMenu.actualInventory[slotNumber].Stack > 1; // Game logic
+
+            return ModEntry.Config.IsEnableTakeAllButOne
+                && moreThanOneItem
+                && (ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOneControllerHotkey.IsDown());
+        }
+
+        public static void TakeAllButOneItem(InventoryMenu inventoryMenu, int slotNumber, Item newItem)
+        {
+            newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
+            inventoryMenu.actualInventory[slotNumber].Stack = 1;
+        }
+
+        public static void TakeAllButOneItemWithAddTo()
+        {
+            // TODO
+        }
     }
 
     [HarmonyPatch(typeof(Toolbar))]

@@ -1,4 +1,5 @@
 ﻿using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
 {
@@ -32,8 +33,10 @@ namespace ConvenientInventory
 
         public bool IsEnableInventoryPageSideWarp { get; set; } = true;
 
-        //public SButton TakeAllButOneKeyboardHotkey { get; set; } = SButton.K;
+        public bool IsEnableTakeAllButOne { get; set; } = true;
 
-        //public SButton TakeAllButOneControllerHotkey { get; set; } = SButton.LeftStick;
+        public KeybindList TakeAllButOneKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftControl, SButton.LeftShift });
+
+        public KeybindList TakeAllButOneControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
     }
 }
