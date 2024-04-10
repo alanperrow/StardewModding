@@ -12,6 +12,8 @@ namespace SplitscreenImproved
 
         public ShowNameFeatureConfig ShowNameFeature { get; set; } = new();
 
+        public MusicFixFeatureConfig MusicFixFeature { get; set; } = new();
+
         public class LayoutFeatureConfig
         {
             public bool IsFeatureEnabled { get; set; } = true;
@@ -35,6 +37,12 @@ namespace SplitscreenImproved
             public ShowNamePosition Position { get; set; } = ShowNamePosition.Top;
         }
 
-        //public MusicFeatureConfig MusicFeature { get; set; } = new();
+        public class MusicFixFeatureConfig
+        {
+            public bool IsFeatureEnabled { get; set; } = true;
+
+            public int PrecedentPlayerNumber { get; set; } = 1;
+            //public int[] PlayerPrecedence { get; set; } = new[] { 1, 2, 3, 4 };
+        }
     }
 }
