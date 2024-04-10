@@ -17,13 +17,11 @@ namespace SplitscreenImproved.ShowName
                 return;
             }
 
-            // TODO: Do not draw scroll for singleplayer. (Maybe config for "Draw only in splitscreen" / "Always draw"?)
-            /*if (!Game1.IsMultiplayer || (Game1.IsMultiplayer && Game1.local))
+            if (ModEntry.Config.ShowNameFeature.IsSplitscreenOnly && GameRunner.instance.gameInstances.Count == 1)
             {
-                // We are either playing singleplayer, or online multiplayer without any local instances.
-                // We do not need to draw the player name scroll if there is only one screen being displayed, so return early.
+                // We are not currently playing splitscreen.
                 return;
-            }*/
+            }
 
             var menu = Game1.activeClickableMenu;
             if (menu is null)

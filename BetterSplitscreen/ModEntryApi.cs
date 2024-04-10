@@ -1,6 +1,7 @@
 ﻿using System;
 using SplitscreenImproved.Compatibility;
 using SplitscreenImproved.Layout;
+using SplitscreenImproved.ShowName;
 
 namespace SplitscreenImproved
 {
@@ -136,17 +137,30 @@ namespace SplitscreenImproved
 
             api.AddSectionTitle(
                 mod: ModManifest,
-                text: () => "Miscellaneous");
+                text: () => "Show Player Name In Summary");
 
             api.AddBoolOption(
                 mod: ModManifest,
                 getValue: () => Config.ShowNameFeature.IsFeatureEnabled,
                 setValue: value => Config.ShowNameFeature.IsFeatureEnabled = value,
-                name: () => "Show Player Name In Summary",
-                tooltip: () => "Enables/disables splitscreen player names being shown in end-of-day shipping summary and level up menus.");
+                name: () => "Is Show Name Feature Enabled",
+                tooltip: () => "Enables/disables player name banner being shown in end-of-day shipping summary and level up menus.");
 
-            // TODO: Config for ShowName Position.
-            //...
+            api.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => Config.ShowNameFeature.IsSplitscreenOnly,
+                setValue: value => Config.ShowNameFeature.IsSplitscreenOnly = value,
+                name: () => "Is Splitscreen Only",
+                tooltip: () => "Enables/disables player name banner only being shown in splitscreen.");
+
+            string[] showNamePositions = Enum.GetNames(typeof(ShowNamePosition));
+            api.AddTextOption(
+                mod: ModManifest,
+                getValue: () => Config.ShowNameFeature.Position.ToString(),
+                setValue: value => Config.ShowNameFeature.Position = Enum.Parse<ShowNamePosition>(value),
+                name: () => "Position",
+                tooltip: () => "Where to display player name banner on-screen.",
+                allowedValues: showNamePositions);
 
             // Register OnFieldChanged to support layout preview refreshing live (without requiring saving to config first).
             api.OnFieldChanged(

@@ -30,6 +30,8 @@ namespace SplitscreenImproved
         {
             public bool IsFeatureEnabled { get; set; } = true;
 
+            public bool IsSplitscreenOnly { get; set; } = true;
+
             public ShowNamePosition Position { get; set; } = ShowNamePosition.Top;
         }
 
