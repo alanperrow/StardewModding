@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Reflection;
 using HarmonyLib;
 using SplitscreenImproved.Layout;
+using SplitscreenImproved.MusicFix;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData;
@@ -14,12 +16,8 @@ namespace SplitscreenImproved
         [HarmonyPatch(nameof(Game1.SetWindowSize))]
         public static bool SetWindowSize_Prefix(Game1 __instance, int w, int h)
         {
-            if (!ModEntry.Config.IsModEnabled)
-            {
-                return true;
-            }
-
-            if (!ModEntry.Config.LayoutFeature.IsFeatureEnabled)
+            if (!ModEntry.Config.IsModEnabled
+                || !ModEntry.Config.LayoutFeature.IsFeatureEnabled)
             {
                 return true;
             }
@@ -38,29 +36,34 @@ namespace SplitscreenImproved
             return true;
         }
 
-        // TODO: Music bug - still investigating
-        ///*
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Game1.UpdateRequestedMusicTrack))]
+        public static void UpdateRequestedMusicTrack_Postfix()
+        {
+            try
+            {
+                MusicFixHelper.SetActiveMusicContextForImportantSplitScreenMusic();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(UpdateRequestedMusicTrack_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+        /*
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Game1.changeMusicTrack))]
-        public static bool ChangeMusicTrack_Prefix(string newTrackName, bool track_interruptable, MusicContext music_context)
+        public static bool ChangeMusicTrack_Prefix(string newTrackName, bool track_interruptable, ref MusicContext music_context)
         {
-            //var debug_Game1 = Game1.game1;
-
-            //var sf = new StackFrame();
-            //StackTrace st = new StackTrace(1, true);
-            //StackFrame stFrame1 = st.GetFrame(1); // prev frame
-            //string invkMethodName = stFrame1.GetMethod().Name;
-            string invkMethodName = string.Empty;
-
-            string pref1 = Game1.player.IsMainPlayer ? "P1: " : "P2: ";
-
-            ModEntry.Instance.Monitor.Log(
-                //$"newTrackName={newTrackName ?? "NULL"}\t\ttrack_interruptable={track_interruptable}\t\tmusic_context={music_context}\t\t(tick={Game1.ticks})",
-                 pref1 + $"{newTrackName ?? "NULL"}\t{track_interruptable}\t{music_context}\t({Game1.ticks})\t{invkMethodName}",
-                LogLevel.Debug);
+            if (!ModEntry.Config.IsModEnabled
+                || !ModEntry.Config.MusicFixFeature.IsFeatureEnabled
+                || GameRunner.instance.gameInstances.Count == 1)
+            {
+                return true;
+            }
 
             try
             {
+                return MusicFixHelper.OnChangeMusicTrack(newTrackName, track_interruptable, ref music_context);
             }
             catch (Exception e)
             {
@@ -69,7 +72,8 @@ namespace SplitscreenImproved
 
             return true;
         }
-
+        */
+        /*
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Game1.changeMusicTrack))]
         public static void ChangeMusicTrack_Postfix(string newTrackName, bool track_interruptable, MusicContext music_context)

@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
 using SplitscreenImproved.Compatibility;
+using SplitscreenImproved.MusicFix;
 using SplitscreenImproved.ShowName;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using System;
 
 namespace SplitscreenImproved
 {
@@ -27,6 +29,7 @@ namespace SplitscreenImproved
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
+            helper.Events.Display.Rendered += OnRendered;
         }
 
         /// <summary>
@@ -57,6 +60,11 @@ namespace SplitscreenImproved
         private void OnRenderedActiveMenu(object sender, RenderedActiveMenuEventArgs e)
         {
             ShowNameHelper.DrawPlayerNameScroll(e.SpriteBatch);
+        }
+
+        private void OnRendered(object sender, RenderedEventArgs e)
+        {
+            MusicFixHelper.DrawDebugText(e.SpriteBatch);
         }
     }
 }
