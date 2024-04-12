@@ -42,6 +42,11 @@ namespace SplitscreenImproved
         {
             try
             {
+                if (Game1.game1.IsMainInstance)
+                {
+                    return;
+                }
+
                 bool newResult = MusicFixHelper.IsMusicContextActiveButNotPlaying(music_context);
                 if (newResult != __result)
                 {

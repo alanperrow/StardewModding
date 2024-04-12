@@ -39,6 +39,10 @@ namespace SplitscreenImproved
 
         public class MusicFixFeatureConfig
         {
+            // DEBUG
+            public bool IsDebugMode { get; set; } = false;
+            // DEBUG
+
             public bool IsFeatureEnabled { get; set; } = true;
 
             public int PrecedentPlayerNumber { get; set; } = 1;

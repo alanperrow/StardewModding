@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData;
 using System;
@@ -14,6 +13,11 @@ namespace SplitscreenImproved.MusicFix
     {
         internal static void DrawDebugText(SpriteBatch sb)
         {
+            if (!ModEntry.Config.MusicFixFeature.IsDebugMode)
+            {
+                return;
+            }
+
             Game1 thisInstance = Game1.game1;
 
             string playerNum = $"P{thisInstance.instanceIndex + 1}: ";
@@ -65,11 +69,11 @@ namespace SplitscreenImproved.MusicFix
                 }
 
                 //DEBUG
-                string thisCurrentTrack = Game1.getMusicTrackName(music_context);
-                if (thisCurrentTrack != "none")
-                {
+                //string thisCurrentTrack = Game1.getMusicTrackName(music_context);
+                //if (thisCurrentTrack != "none")
+                //{
 
-                }
+                //}
                 //DEBUG
 
                 string mainCurrentTrack = GetMusicTrackNameOfInstance(mainInstance, music_context);
@@ -87,27 +91,28 @@ namespace SplitscreenImproved.MusicFix
                 }
                 return false;
             }
-            // DEBUG
+
+            return false; // return null;
 
             // Base game logic.
-            if (this_activeMusicContext != music_context)
-            {
-                return false;
-            }
-            if (Game1.morningSongPlayAction != null)
-            {
-                return false;
-            }
-            string currentTrack = Game1.getMusicTrackName(music_context);
-            if (currentTrack == "none")
-            {
-                return true;
-            }
-            if (Game1.currentSong != null && Game1.currentSong.Name == currentTrack && !Game1.currentSong.IsPlaying)
-            {
-                return true;
-            }
-            return false;
+            //if (this_activeMusicContext != music_context)
+            //{
+            //    return false;
+            //}
+            //if (Game1.morningSongPlayAction != null)
+            //{
+            //    return false;
+            //}
+            //string currentTrack = Game1.getMusicTrackName(music_context);
+            //if (currentTrack == "none")
+            //{
+            //    return true;
+            //}
+            //if (Game1.currentSong != null && Game1.currentSong.Name == currentTrack && !Game1.currentSong.IsPlaying)
+            //{
+            //    return true;
+            //}
+            //return false;
         }
 
         // Refactored base game method to include a Game1 instance parameter.
