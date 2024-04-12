@@ -37,6 +37,25 @@ namespace SplitscreenImproved
         }
 
         [HarmonyPostfix]
+        [HarmonyPatch(nameof(Game1.isMusicContextActiveButNotPlaying))]
+        public static void IsMusicContextActiveButNotPlaying_Postfix(ref bool __result, MusicContext music_context)
+        {
+            try
+            {
+                bool newResult = MusicFixHelper.IsMusicContextActiveButNotPlaying(music_context);
+                if (newResult != __result)
+                {
+                    __result = newResult;
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(IsMusicContextActiveButNotPlaying_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        /*
+        [HarmonyPostfix]
         [HarmonyPatch(nameof(Game1.UpdateRequestedMusicTrack))]
         public static void UpdateRequestedMusicTrack_Postfix()
         {
@@ -49,6 +68,7 @@ namespace SplitscreenImproved
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(UpdateRequestedMusicTrack_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+        */
         /*
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Game1.changeMusicTrack))]
