@@ -51,6 +51,8 @@ namespace SplitscreenImproved
         public class HudTweaksFeatureConfig
         {
             public bool IsFeatureEnabled { get; set; } = true;
+
+            public bool IsToolbarHudOffsetEnabled { get; set; } = true;
         }
     }
 }

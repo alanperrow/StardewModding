@@ -63,5 +63,7 @@ namespace SplitscreenImproved
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(IsMusicContextActiveButNotPlaying_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+
+
     }
 }

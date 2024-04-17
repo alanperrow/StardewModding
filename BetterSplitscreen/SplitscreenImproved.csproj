@@ -17,8 +17,4 @@
   <ItemGroup>
 	<None Include="manifest.json" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="HudTweaks\" />
-  </ItemGroup>
 </Project>

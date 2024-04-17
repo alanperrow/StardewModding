@@ -133,7 +133,36 @@ namespace SplitscreenImproved
                 fieldId: fieldId_PreviewPlayerCount);
 
             // TODO: Float number sliders for custom preset screen splits
+            //...
 
+            api.AddSectionTitle(
+                mod: ModManifest,
+                text: () => "Music Fix");
+
+            api.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => Config.MusicFixFeature.IsFeatureEnabled,
+                setValue: value => Config.MusicFixFeature.IsFeatureEnabled = value,
+                name: () => "Is Music Fix Enabled",
+                tooltip: () => "Enables/disables fix for bug where music stops and remains silent in splitscreen.");
+
+            api.AddSectionTitle(
+                mod: ModManifest,
+                text: () => "HUD Tweaks");
+
+            api.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => Config.HudTweaksFeature.IsFeatureEnabled,
+                setValue: value => Config.HudTweaksFeature.IsFeatureEnabled = value,
+                name: () => "Is HUD Tweaks Enabled",
+                tooltip: () => "Enables/disables all HUD tweaks.");
+
+            api.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => Config.HudTweaksFeature.IsToolbarHudOffsetEnabled,
+                setValue: value => Config.HudTweaksFeature.IsToolbarHudOffsetEnabled = value,
+                name: () => "Is Toolbar HUD Offset Enabled",
+                tooltip: () => "Enables/disables various HUD UI elements being offset from the toolbar, allowing the toolbar to remain fully visible and not be obscured.");
 
             api.AddSectionTitle(
                 mod: ModManifest,
