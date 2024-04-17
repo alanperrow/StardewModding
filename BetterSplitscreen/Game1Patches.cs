@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using HarmonyLib;
 using SplitscreenImproved.Layout;
 using SplitscreenImproved.MusicFix;

@@ -8,6 +8,8 @@ using StardewValley.Locations;
 
 namespace SplitscreenImproved
 {
+    // TODO: Separate mod: Mine Music Fix.
+
     [HarmonyPatch(typeof(MineShaft))]
     public class MineShaftPatches
     {
