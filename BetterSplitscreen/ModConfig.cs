@@ -14,6 +14,8 @@ namespace SplitscreenImproved
 
         public MusicFixFeatureConfig MusicFixFeature { get; set; } = new();
 
+        public HudTweaksFeatureConfig HudTweaksFeature { get; set; } = new();
+
         public class LayoutFeatureConfig
         {
             public bool IsFeatureEnabled { get; set; } = true;
@@ -43,6 +45,11 @@ namespace SplitscreenImproved
             public bool IsDebugMode { get; set; } = false;
             // DEBUG
 
+            public bool IsFeatureEnabled { get; set; } = true;
+        }
+
+        public class HudTweaksFeatureConfig
+        {
             public bool IsFeatureEnabled { get; set; } = true;
         }
     }

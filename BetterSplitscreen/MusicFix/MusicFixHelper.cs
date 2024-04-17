@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace SplitscreenImproved.MusicFix
 {
-    internal class MusicFixHelper
+    internal static class MusicFixHelper
     {
         internal static void DrawDebugText(SpriteBatch sb)
         {
