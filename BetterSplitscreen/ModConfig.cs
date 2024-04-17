@@ -44,9 +44,6 @@ namespace SplitscreenImproved
             // DEBUG
 
             public bool IsFeatureEnabled { get; set; } = true;
-
-            public int PrecedentPlayerNumber { get; set; } = 1;
-            //public int[] PlayerPrecedence { get; set; } = new[] { 1, 2, 3, 4 };
         }
     }
 }

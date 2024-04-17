@@ -40,6 +40,12 @@ namespace SplitscreenImproved
         [HarmonyPatch(nameof(Game1.isMusicContextActiveButNotPlaying))]
         public static void IsMusicContextActiveButNotPlaying_Postfix(ref bool __result, MusicContext music_context)
         {
+            if (!ModEntry.Config.IsModEnabled
+                || !ModEntry.Config.MusicFixFeature.IsFeatureEnabled)
+            {
+                return;
+            }
+
             try
             {
                 if (Game1.game1.IsMainInstance)
@@ -58,64 +64,5 @@ namespace SplitscreenImproved
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(IsMusicContextActiveButNotPlaying_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
-
-        /*
-        [HarmonyPostfix]
-        [HarmonyPatch(nameof(Game1.UpdateRequestedMusicTrack))]
-        public static void UpdateRequestedMusicTrack_Postfix()
-        {
-            try
-            {
-                MusicFixHelper.SetActiveMusicContextForImportantSplitScreenMusic();
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(UpdateRequestedMusicTrack_Postfix)}:\n{e}", LogLevel.Error);
-            }
-        }
-        */
-        /*
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(Game1.changeMusicTrack))]
-        public static bool ChangeMusicTrack_Prefix(string newTrackName, bool track_interruptable, ref MusicContext music_context)
-        {
-            if (!ModEntry.Config.IsModEnabled
-                || !ModEntry.Config.MusicFixFeature.IsFeatureEnabled
-                || GameRunner.instance.gameInstances.Count == 1)
-            {
-                return true;
-            }
-
-            try
-            {
-                return MusicFixHelper.OnChangeMusicTrack(newTrackName, track_interruptable, ref music_context);
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ChangeMusicTrack_Prefix)}:\n{e}", LogLevel.Error);
-            }
-
-            return true;
-        }
-        */
-        /*
-        [HarmonyPostfix]
-        [HarmonyPatch(nameof(Game1.changeMusicTrack))]
-        public static void ChangeMusicTrack_Postfix(string newTrackName, bool track_interruptable, MusicContext music_context)
-        {
-            //var debug_Game1 = Game1.game1;
-            //ModEntry.Instance.Monitor.Log(
-            //    $"newTrackName={newTrackName ?? "NULL"}\t\ttrack_interruptable={track_interruptable}\t\tmusic_context={music_context}",
-            //    LogLevel.Debug);
-
-            try
-            {
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ChangeMusicTrack_Postfix)}:\n{e}", LogLevel.Error);
-            }
-        }
-        //*/
     }
 }

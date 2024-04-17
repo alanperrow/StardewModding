@@ -68,22 +68,10 @@ namespace SplitscreenImproved.MusicFix
                     return false;
                 }
 
-                //DEBUG
-                //string thisCurrentTrack = Game1.getMusicTrackName(music_context);
-                //if (thisCurrentTrack != "none")
-                //{
-
-                //}
-                //DEBUG
-
                 string mainCurrentTrack = GetMusicTrackNameOfInstance(mainInstance, music_context);
                 if (mainCurrentTrack == "none")
                 {
-                    mainCurrentTrack = GetMusicTrackNameOfInstance(mainInstance, music_context);
-                    if (mainCurrentTrack == "none")
-                    {
-                        return true;
-                    }
+                    return true;
                 }
                 if (Game1.currentSong != null && Game1.currentSong.Name == mainCurrentTrack && !Game1.currentSong.IsPlaying)
                 {
@@ -92,27 +80,7 @@ namespace SplitscreenImproved.MusicFix
                 return false;
             }
 
-            return false; // return null;
-
-            // Base game logic.
-            //if (this_activeMusicContext != music_context)
-            //{
-            //    return false;
-            //}
-            //if (Game1.morningSongPlayAction != null)
-            //{
-            //    return false;
-            //}
-            //string currentTrack = Game1.getMusicTrackName(music_context);
-            //if (currentTrack == "none")
-            //{
-            //    return true;
-            //}
-            //if (Game1.currentSong != null && Game1.currentSong.Name == currentTrack && !Game1.currentSong.IsPlaying)
-            //{
-            //    return true;
-            //}
-            //return false;
+            return false;
         }
 
         // Refactored base game method to include a Game1 instance parameter.
@@ -133,73 +101,5 @@ namespace SplitscreenImproved.MusicFix
 
             return "none";
         }
-
-        /*
-
-        internal static void SetActiveMusicContextForImportantSplitScreenMusic()
-        {
-            if (Game1.game1.instanceIndex == 0)
-            {
-                // Ignore main player instance.
-                return;
-            }
-
-            Game1 instance = Game1.game1;
-
-            // DEBUG - temp disable this
-
-            //// Replicated base game logic.
-            //// Determines if the requested music track was at a context level of MusicContext.ImportantSplitScreenMusic.
-            //// Normally, base game does not set active music context in this case; let's do it anyway.
-            //var requestedMusicTracks = (Dictionary<MusicContext, KeyValuePair<string, bool>>)requestedMusicTracksField.GetValue(instance);
-            //if (requestedMusicTracks.TryGetValue(MusicContext.ImportantSplitScreenMusic, out _))
-            //{
-            //    activeMusicContextField.SetValue(Game1.game1, MusicContext.ImportantSplitScreenMusic);
-            //}
-        }
-
-        internal static bool OnChangeMusicTrack(string newTrackName, bool track_interruptable, ref MusicContext music_context)
-        {
-            if (Game1.game1.instanceIndex == 0)
-            {
-                // player1
-
-                if (music_context == MusicContext.ImportantSplitScreenMusic)
-                {
-                }
-            }
-            else
-            {
-
-            }
-
-            return true;
-
-            string playerNum = $"P{Game1.game1.instanceIndex + 1}: ";
-            ModEntry.Instance.Monitor.Log(
-                 playerNum + $"\t{newTrackName ?? "NULL"}\t{track_interruptable}\t{music_context}\t({Game1.ticks})",
-                LogLevel.Debug);
-            string agg = string.Empty;
-            foreach (MusicContext musicContext in Enum.GetValues<MusicContext>())
-            {
-                string key = Game1.getMusicTrackName(musicContext);
-                agg += "\n" + playerNum + $"{musicContext}: " + key;
-            }
-            ModEntry.Instance.Monitor.Log(agg + "\n", LogLevel.Debug);
-
-            // TODO: Check for config PrecedentPlayer
-            if (Game1.player.IsMainPlayer)
-            {
-                return true;
-            }
-
-            if (music_context == MusicContext.Default)
-            {
-                //music_context = MusicContext.SubLocation;
-            }
-
-            return true;
-        }
-        */
     }
 }
