@@ -1,10 +1,10 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using SplitscreenImproved.Compatibility;
 using SplitscreenImproved.MusicFix;
 using SplitscreenImproved.ShowName;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using System;
 
 namespace SplitscreenImproved
 {

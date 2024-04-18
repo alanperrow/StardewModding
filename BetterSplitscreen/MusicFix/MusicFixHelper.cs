@@ -1,11 +1,11 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
-using StardewValley.GameData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
+using Microsoft.Xna.Framework.Graphics;
+using StardewValley;
+using StardewValley.GameData;
 
 namespace SplitscreenImproved.MusicFix
 {
