@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Extensions;
@@ -69,7 +68,7 @@ namespace SplitscreenImproved.HudTweaks
             }
         }
 
-        internal static void OffsetBuffsDisplayFromToolbar(BuffsDisplay instance, SpriteBatch sb) // DEBUG: SpriteBatch used for debug drawing only.
+        internal static void OffsetBuffsDisplayFromToolbar(BuffsDisplay instance)
         {
             if (!IsEnabled() || !ModEntry.Config.HudTweaksFeature.IsToolbarHudOffsetEnabled)
             {
@@ -83,7 +82,7 @@ namespace SplitscreenImproved.HudTweaks
                 return;
             }
 
-            if (false/*!IsToolbarTopAligned(toolbar)*/)
+            if (!IsToolbarTopAligned(toolbar))
             {
                 ResetBuffsDisplayPositionIfChanged(instance);
             }
@@ -95,30 +94,17 @@ namespace SplitscreenImproved.HudTweaks
                 int actualBuffsWidth = 288;
 
                 int actualToolbarXPos = Game1.uiViewport.Width / 2 - 384 - 32;
-                int actualToolbarRightPos = actualToolbarXPos + toolbar.width - 64;//toolbar.xPositionOnScreen + toolbar.width;//Game1.uiViewport.Width / 2 + 384 + 64 + 16;
-                int actualToolbarWidth = actualToolbarRightPos - actualToolbarXPos;
-                int buffsToolbarRightOverlap = Math.Max(0, actualToolbarRightPos - actualDefaultBuffsXPos + 116);/*actualToolbarRightPos - actualDefaultBuffsXPos;*/
+                int actualToolbarRightPos = actualToolbarXPos + toolbar.width - 64;
+                int buffsToolbarRightOverlap = Math.Max(0, actualToolbarRightPos - actualDefaultBuffsXPos + 116);
                 int squeezedRightBuffsWidth = actualBuffsWidth - buffsToolbarRightOverlap;
-                if (squeezedRightBuffsWidth >= 116/* && squeezedRightBuffsWidth < actualBuffsWidth*/)
+                if (squeezedRightBuffsWidth >= 116)
                 {
                     // Squeeze the width of the buffs display to fit between the right of the toolbar and the game clock.
                     buffsToolbarRightOverlap = (5 - ((squeezedRightBuffsWidth + 64) / 64)) * 64; // Work in intervals of 64.
                     int buffsXPos = actualDefaultBuffsXPos + buffsToolbarRightOverlap;
 
-                    instance.arrangeTheseComponentsInThisRectangle(buffsXPos, instance.yPositionOnScreen, squeezedRightBuffsWidth / 64/* - 1*/, 64, 64, 8, rightToLeft: true);
+                    instance.arrangeTheseComponentsInThisRectangle(buffsXPos, instance.yPositionOnScreen, squeezedRightBuffsWidth / 64, 64, 64, 8, rightToLeft: true);
                     isBuffsDisplayPositionChanged.Value = true;
-
-                    // DEBUG
-                    if (true/*ModEntry.Config.HudTweaksFeature.IsDebugMode*/)
-                    {
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(toolbar.xPositionOnScreen, toolbar.yPositionOnScreen + 1, toolbar.width, toolbar.height / 2), new Color(0, 0, 255, 50)); //blue
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(actualToolbarXPos, 3, actualToolbarRightPos - actualToolbarXPos, toolbar.height / 2), new Color(0, 255, 0, 50)); //green
-
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(instance.xPositionOnScreen, instance.yPositionOnScreen + 1, instance.width, instance.height), new Color(255, 0, 0, 50)); //red
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(actualToolbarRightPos, instance.yPositionOnScreen + 2, squeezedRightBuffsWidth, instance.height), new Color(150, 150, 150, 50)); //ltgray
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(buffsXPos, instance.yPositionOnScreen + 3, squeezedRightBuffsWidth, instance.height), new Color(0, 0, 255, 50)); //blue
-                    }
-                    // DEBUG
                 }
                 else if (instance.xPositionOnScreen <= actualToolbarRightPos)
                 {
@@ -134,17 +120,6 @@ namespace SplitscreenImproved.HudTweaks
 
                     instance.arrangeTheseComponentsInThisRectangle(buffsXPos, buffsYPos, buffsWidth / 64, 64, 64, 8, rightToLeft: false);
                     isBuffsDisplayPositionChanged.Value = true;
-
-                    // DEBUG
-                    if (true/*ModEntry.Config.HudTweaksFeature.IsDebugMode*/)
-                    {
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(toolbar.xPositionOnScreen, toolbar.yPositionOnScreen + 1, toolbar.width, toolbar.height / 2), new Color(0, 0, 255, 50)); //blue
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(actualToolbarXPos, 3, actualToolbarWidth, toolbar.height / 2), new Color(0, 255, 0, 50)); //green
-
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(instance.xPositionOnScreen, instance.yPositionOnScreen + 1, instance.width, instance.height), new Color(255, 0, 0, 50)); //red
-                        sb.Draw(Game1.fadeToBlackRect, new Rectangle(buffsXPos, buffsYPos + 3, buffsWidth, instance.height), new Color(255, 0, 255, 50)); //magenta
-                    }
-                    // DEBUG
                 }
             }
         }
