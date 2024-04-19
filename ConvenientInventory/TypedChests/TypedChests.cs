@@ -110,7 +110,7 @@ namespace ConvenientInventory.TypedChests
             return 0;
         }
 
-        private int DrawFridgeTooltip(SpriteBatch spriteBatch, int x, int y)
+        private static int DrawFridgeTooltip(SpriteBatch spriteBatch, int x, int y)
         {
             if (Game1.currentLocation is StardewValley.Locations.FarmHouse)
             {
@@ -146,7 +146,7 @@ namespace ConvenientInventory.TypedChests
             return 0;
         }
 
-        private int DrawMillTooltip(SpriteBatch spriteBatch, Point toolTipPosition, int posIndex, int x, int y)
+        private static int DrawMillTooltip(SpriteBatch spriteBatch, Point toolTipPosition, int posIndex, int x, int y)
         {
             int newPosIndex = posIndex;
 
@@ -169,7 +169,7 @@ namespace ConvenientInventory.TypedChests
             return newPosIndex - posIndex;
         }
 
-        private int DrawJunimoHutTooltip(SpriteBatch spriteBatch, Point toolTipPosition, int posIndex, int x, int y)
+        private static int DrawJunimoHutTooltip(SpriteBatch spriteBatch, Point toolTipPosition, int posIndex, int x, int y)
         {
             int newPosIndex = posIndex;
 
