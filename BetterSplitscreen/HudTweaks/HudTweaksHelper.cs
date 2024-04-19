@@ -12,6 +12,11 @@ namespace SplitscreenImproved.HudTweaks
 
         internal static bool HasToolbarPositionChanged()
         {
+            if (!IsEnabled())
+            {
+                return false;
+            }
+
             Toolbar toolbar = GetToolbar();
             if (toolbar is null)
             {
@@ -26,6 +31,11 @@ namespace SplitscreenImproved.HudTweaks
 
         internal static void OffsetChatBoxFromToolbar(ChatBox instance)
         {
+            if (!IsEnabled())
+            {
+                return;
+            }
+
             Toolbar toolbar = GetToolbar();
             if (toolbar is null)
             {
@@ -53,6 +63,24 @@ namespace SplitscreenImproved.HudTweaks
                 instance.emojiMenu.xPositionOnScreen = instance.emojiMenuIcon.bounds.Center.X - 146;
                 instance.emojiMenu.yPositionOnScreen = instance.emojiMenuIcon.bounds.Y - 248;
             }
+        }
+
+        private static bool IsEnabled()
+        {
+            if (!ModEntry.Config.IsModEnabled
+                || !ModEntry.Config.HudTweaksFeature.IsFeatureEnabled)
+            {
+                // Mod and/or Feature is disabled.
+                return false;
+            }
+
+            if (ModEntry.Config.HudTweaksFeature.IsSplitscreenOnly && GameRunner.instance.gameInstances.Count == 1)
+            {
+                // We are not currently playing splitscreen.
+                return false;
+            }
+
+            return true;
         }
 
         private static Toolbar GetToolbar()

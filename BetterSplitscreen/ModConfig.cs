@@ -10,11 +10,11 @@ namespace SplitscreenImproved
 
         public LayoutFeatureConfig LayoutFeature { get; set; } = new();
 
-        public ShowNameFeatureConfig ShowNameFeature { get; set; } = new();
-
         public MusicFixFeatureConfig MusicFixFeature { get; set; } = new();
 
         public HudTweaksFeatureConfig HudTweaksFeature { get; set; } = new();
+
+        public ShowNameFeatureConfig ShowNameFeature { get; set; } = new();
 
         public class LayoutFeatureConfig
         {
@@ -51,6 +51,8 @@ namespace SplitscreenImproved
         public class HudTweaksFeatureConfig
         {
             public bool IsFeatureEnabled { get; set; } = true;
+
+            public bool IsSplitscreenOnly { get; set; } = true;
 
             public bool IsToolbarHudOffsetEnabled { get; set; } = true;
         }

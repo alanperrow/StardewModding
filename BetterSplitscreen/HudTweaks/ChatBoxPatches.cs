@@ -12,12 +12,6 @@ namespace SplitscreenImproved.HudTweaks
         [HarmonyPatch(nameof(ChatBox.draw))]
         public static bool Draw_Prefix(ChatBox __instance)
         {
-            if (!ModEntry.Config.IsModEnabled
-                || !ModEntry.Config.HudTweaksFeature.IsFeatureEnabled)
-            {
-                return true;
-            }
-
             try
             {
                 if (HudTweaksHelper.HasToolbarPositionChanged())
@@ -37,12 +31,6 @@ namespace SplitscreenImproved.HudTweaks
         [HarmonyPatch("updatePosition")]
         public static void UpdatePosition_Postfix(ChatBox __instance)
         {
-            if (!ModEntry.Config.IsModEnabled
-                || !ModEntry.Config.HudTweaksFeature.IsFeatureEnabled)
-            {
-                return;
-            }
-
             try
             {
                 HudTweaksHelper.OffsetChatBoxFromToolbar(__instance);

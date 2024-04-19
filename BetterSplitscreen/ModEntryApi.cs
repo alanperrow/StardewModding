@@ -144,7 +144,8 @@ namespace SplitscreenImproved
                 getValue: () => Config.MusicFixFeature.IsFeatureEnabled,
                 setValue: value => Config.MusicFixFeature.IsFeatureEnabled = value,
                 name: () => "Is Music Fix Enabled",
-                tooltip: () => "Enables/disables fix for bug where music stops and remains silent in splitscreen.");
+                tooltip: () => "Enables/disables fix for bug where music stops and remains silent in splitscreen. " +
+                    "This does not affect music in singleplayer or online multiplayer.");
 
             api.AddSectionTitle(
                 mod: ModManifest,
@@ -156,6 +157,13 @@ namespace SplitscreenImproved
                 setValue: value => Config.HudTweaksFeature.IsFeatureEnabled = value,
                 name: () => "Is HUD Tweaks Enabled",
                 tooltip: () => "Enables/disables all HUD tweaks.");
+
+            api.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => Config.HudTweaksFeature.IsSplitscreenOnly,
+                setValue: value => Config.HudTweaksFeature.IsSplitscreenOnly = value,
+                name: () => "Is Splitscreen Only",
+                tooltip: () => "Enables/disables HUD tweaks only being applied in splitscreen.");
 
             api.AddBoolOption(
                 mod: ModManifest,
