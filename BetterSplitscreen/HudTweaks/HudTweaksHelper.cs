@@ -57,7 +57,7 @@ namespace SplitscreenImproved.HudTweaks
 
         private static Toolbar GetToolbar()
         {
-            IClickableMenu toolbarMenu = Game1.onScreenMenus.SingleOrDefault(x => x is Toolbar);
+            IClickableMenu toolbarMenu = Game1.onScreenMenus.FirstOrDefault(x => x is Toolbar);
             if (toolbarMenu == null)
             {
                 // Toolbar not found in Game1.onScreenMenus.
