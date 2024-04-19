@@ -40,8 +40,6 @@ namespace ConvenientInventory
 
         public static Texture2D FavoriteItemsBorderTexture { private get; set; }
 
-        public static Texture2D TakeAllButOneCursorTexture { private get; set; }
-
         private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
         public static bool IsFavoriteItemsHotkeyDown
         {

@@ -11,7 +11,6 @@
     <None Remove="assets\autoOrganize.png" />
     <None Remove="assets\autoOrganizeIcon.png" />
     <None Remove="assets\quickStackIcon.png" />
-    <None Remove="assets\takeAllButOneCursor.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
@@ -28,7 +27,6 @@
     <Content Include="assets\favoriteHighlight_5.png" />
     <Content Include="assets\favoriteHighlight_6.png" />
     <Content Include="assets\quickStackIcon.png" />
-    <Content Include="assets\takeAllButOneCursor.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json" />

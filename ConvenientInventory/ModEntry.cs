@@ -27,7 +27,6 @@ namespace ConvenientInventory
             ConvenientInventory.FavoriteItemsCursorTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteCursor.png");
             ConvenientInventory.FavoriteItemsHighlightTexture = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
             ConvenientInventory.FavoriteItemsBorderTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteBorder.png");
-            ConvenientInventory.TakeAllButOneCursorTexture = helper.ModContent.Load<Texture2D>(@"assets\takeAllButOneCursor.png");
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
