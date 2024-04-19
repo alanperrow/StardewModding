@@ -324,10 +324,15 @@ namespace ConvenientInventory
                         }
                         else if (isRightClick && clickedItem.Stack == 1 && inventoryMenu.highlightMethod(clickedItem))
                         {
-                            // Right click, taking the last item
+                            // We've right clicked a single item.
                             if (!IsCurrentActiveMenuNoHeldItems())
                             {
-                                StartTrackingFavoriteItemSlot(clickPos, clickedItem);
+                                Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
+                                if (cursorSlotItem == null || (cursorSlotItem.canStackWith(clickedItem) && cursorSlotItem.getRemainingStackSpace() != 0))
+                                {
+                                    // We will now be holding the right clicked item, so track it.
+                                    StartTrackingFavoriteItemSlot(clickPos, clickedItem);
+                                }
                             }
                             else
                             {
@@ -525,6 +530,12 @@ namespace ConvenientInventory
         {
             Item item = (Game1.activeClickableMenu as ForgeMenu)?.heldItem  // Forge menu cursor slot item
                 ?? Game1.player.CursorSlotItem;                             // Arbritrary menu cursor slot item
+
+            // Manually check for crafting page - idk why behavior is different from inventory page vs crafting page, but it is.
+            if (item == null && Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is CraftingPage craftingPage)
+            {
+                item = craftingPage.heldItem;
+            }
 
             return item;
         }
