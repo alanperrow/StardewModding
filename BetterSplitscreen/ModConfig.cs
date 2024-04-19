@@ -51,7 +51,7 @@ namespace SplitscreenImproved
         public class HudTweaksFeatureConfig
         {
             // DEBUG
-            public bool IsDebugMode { get; set; } = false;
+            public bool IsDebugMode { get; set; } = true;
             // DEBUG
 
             public bool IsFeatureEnabled { get; set; } = true;
