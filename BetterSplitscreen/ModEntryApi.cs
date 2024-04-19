@@ -171,7 +171,7 @@ namespace SplitscreenImproved
                 setValue: value => Config.HudTweaksFeature.IsToolbarHudOffsetEnabled = value,
                 name: () => "Is Toolbar HUD Offset Enabled",
                 tooltip: () => "Enables/disables various HUD UI elements being offset from the toolbar, " +
-                    "allowing the toolbar to remain fully visible and not be obscured when these UI elements are shown.");
+                    "allowing the toolbar to remain fully visible and not be obscured by them.");
 
             api.AddSectionTitle(
                 mod: ModManifest,

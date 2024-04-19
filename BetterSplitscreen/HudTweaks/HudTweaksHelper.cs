@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Menus;
 
 namespace SplitscreenImproved.HudTweaks
@@ -9,6 +11,7 @@ namespace SplitscreenImproved.HudTweaks
     internal static class HudTweaksHelper
     {
         static readonly PerScreen<int> prevToolbarYPosition = new();
+        static readonly PerScreen<bool> isBuffsDisplayPositionChanged = new();
 
         internal static bool HasToolbarPositionChanged()
         {
@@ -47,11 +50,11 @@ namespace SplitscreenImproved.HudTweaks
 
             if (!IsToolbarTopAligned(toolbar))
             {
-                // Toolbar is at the bottom of the screen, so we offset it to avoid being obstructed by chatbox.
+                // Toolbar is at the bottom of the screen, so we offset our chatbox to avoid it obstructing the toolbar.
                 instance.yPositionOnScreen -= toolbar.height / 2;
             }
 
-            // TODO: Copy-pasted base game logic. Maybe update this to a transpiler call?
+            // Base game logic.
             Utility.makeSafe(ref instance.xPositionOnScreen, ref instance.yPositionOnScreen, instance.chatBox.Width, instance.chatBox.Height);
             instance.chatBox.X = instance.xPositionOnScreen;
             instance.chatBox.Y = instance.yPositionOnScreen;
@@ -62,6 +65,71 @@ namespace SplitscreenImproved.HudTweaks
             {
                 instance.emojiMenu.xPositionOnScreen = instance.emojiMenuIcon.bounds.Center.X - 146;
                 instance.emojiMenu.yPositionOnScreen = instance.emojiMenuIcon.bounds.Y - 248;
+            }
+        }
+
+        internal static void OffsetBuffsDisplayFromToolbar(BuffsDisplay instance)
+        {
+            if (!IsEnabled())
+            {
+                return;
+            }
+
+            Toolbar toolbar = GetToolbar();
+            if (toolbar is null)
+            {
+                return;
+            }
+
+            if (!IsToolbarTopAligned(toolbar))
+            {
+                ResetBuffsDisplayPositionIfChanged(instance);
+            }
+            else
+            {
+                // Toolbar is at the top of the screen, so we check if the buffs display is obstructing it.
+                Rectangle tsarea = Game1.game1.GraphicsDevice.Viewport.GetTitleSafeArea();
+                int actualDefaultBuffsXPos = (int)(tsarea.Right - (588 * Math.Max(1, Game1.options.uiScale)));
+                int actualBuffsWidth = (int)(288 / Math.Max(1, Game1.options.uiScale));
+
+                int actualToolbarRightPos = (int)((Game1.uiViewport.Width / 2 + 384 + 64 + 16) * Math.Max(1, Game1.options.uiScale));
+                int buffsToolbarRightOverlap = actualToolbarRightPos - actualDefaultBuffsXPos;
+                int squeezedRightBuffsWidth = actualBuffsWidth - buffsToolbarRightOverlap;
+                if (squeezedRightBuffsWidth >= 176 && squeezedRightBuffsWidth < actualBuffsWidth)
+                {
+                    // Squeeze the width of the buffs display to fit between the right of the toolbar and the game clock.
+                    buffsToolbarRightOverlap = (6 - ((squeezedRightBuffsWidth + 64) / 64)) * 64; // Work in intervals of 64.
+                    int buffsXPos = actualDefaultBuffsXPos + buffsToolbarRightOverlap;
+
+                    instance.arrangeTheseComponentsInThisRectangle(buffsXPos, instance.yPositionOnScreen, squeezedRightBuffsWidth / 64 - 1, 64, 64, 8, rightToLeft: true);
+                    isBuffsDisplayPositionChanged.Value = true;
+                }
+                else if (instance.xPositionOnScreen <= actualToolbarRightPos)
+                {
+                    // Move the buffs display to the left of the toolbar, squeezing to fit in the available width if necessary.
+                    // If not enough width available, offset the buffs display below the toolbar and use default width.
+                    int buffsXPos = tsarea.Left + 8;
+                    int actualToolbarXPos = (int)((Game1.uiViewport.Width / 2 - 384 - 32) / Math.Max(1, Game1.options.uiScale));
+                    int buffsYPos = actualToolbarXPos >= 136
+                        ? tsarea.Top + 8
+                        : tsarea.Top + 8 + (toolbar.height / 2);
+                    int buffsWidth = actualToolbarXPos >= 136
+                        ? Math.Min(actualToolbarXPos - buffsXPos, instance.width)
+                        : instance.width;
+
+                    instance.arrangeTheseComponentsInThisRectangle(buffsXPos, buffsYPos, buffsWidth / 64, 64, 64, 8, rightToLeft: false);
+                    isBuffsDisplayPositionChanged.Value = true;
+                }
+            }
+        }
+
+        private static void ResetBuffsDisplayPositionIfChanged(BuffsDisplay instance)
+        {
+            if (isBuffsDisplayPositionChanged.Value)
+            {
+                // Reset our changes to the buffs display position.
+                instance.arrangeTheseComponentsInThisRectangle(instance.xPositionOnScreen, instance.yPositionOnScreen, instance.width / 64, 64, 64, 8, rightToLeft: true);
+                isBuffsDisplayPositionChanged.Value = false;
             }
         }
 
