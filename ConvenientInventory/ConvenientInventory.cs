@@ -19,16 +19,26 @@ namespace ConvenientInventory
 
         private static IReadOnlyList<ITypedChest> NearbyTypedChests { get; set; }
 
-        private static ClickableTextureComponent QuickStackButton { get; set; }
+        private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
+        private static ClickableTextureComponent QuickStackButton
+        {
+            get => quickStackButton.Value;
+            set => quickStackButton.Value = value;
+        }
 
         private static readonly PerScreen<InventoryPage> playerInventoryPage = new();
         private static InventoryPage PlayerInventoryPage
         {
-            get { return playerInventoryPage.Value; }
-            set { playerInventoryPage.Value = value; }
+            get => playerInventoryPage.Value;
+            set => playerInventoryPage.Value = value;
         }
 
-        private static bool IsDrawToolTip { get; set; } = false;
+        private static readonly PerScreen<bool> shouldDrawQuickStackToolTip = new();
+        private static bool ShouldDrawQuickStackToolTip
+        {
+            get => shouldDrawQuickStackToolTip.Value;
+            set => shouldDrawQuickStackToolTip.Value = value;
+        }
 
         private const int quickStackButtonID = 918021;  // Unique indentifier
 
@@ -43,15 +53,15 @@ namespace ConvenientInventory
         private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
         public static bool IsFavoriteItemsHotkeyDown
         {
-            get { return isFavoriteItemsHotkeyDown.Value; }
-            set { isFavoriteItemsHotkeyDown.Value = value; }
+            get => isFavoriteItemsHotkeyDown.Value;
+            set => isFavoriteItemsHotkeyDown.Value = value;
         }
 
         private static readonly PerScreen<int> favoriteItemsHotkeyDownCounter = new();
         private static int FavoriteItemsHotkeyDownCounter
         {
-            get { return favoriteItemsHotkeyDownCounter.Value; }
-            set { favoriteItemsHotkeyDownCounter.Value = value; }
+            get => favoriteItemsHotkeyDownCounter.Value;
+            set => favoriteItemsHotkeyDownCounter.Value = value;
         }
 
         private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Instance.ModManifest.UniqueID}/favoriteItemSlots";
@@ -73,28 +83,28 @@ namespace ConvenientInventory
 
                 return favoriteItemSlots.Value;
             }
-            set { favoriteItemSlots.Value = value; }
+            set => favoriteItemSlots.Value = value;
         }
 
         private static readonly PerScreen<bool> favoriteItemsIsItemSelected = new();
         public static bool FavoriteItemsIsItemSelected
         {
-            get { return favoriteItemsIsItemSelected.Value; }
-            set { favoriteItemsIsItemSelected.Value = value; }
+            get => favoriteItemsIsItemSelected.Value;
+            set => favoriteItemsIsItemSelected.Value = value;
         }
 
         private static readonly PerScreen<Item> favoriteItemsSelectedItem = new();
         public static Item FavoriteItemsSelectedItem
         {
-            get { return favoriteItemsSelectedItem.Value; }
-            set { favoriteItemsSelectedItem.Value = value; }
+            get => favoriteItemsSelectedItem.Value;
+            set => favoriteItemsSelectedItem.Value = value;
         }
 
         private static readonly PerScreen<int> favoriteItemsLastSelectedSlot = new();
         public static int FavoriteItemsLastSelectedSlot
         {
-            get { return favoriteItemsLastSelectedSlot.Value; }
-            set { favoriteItemsLastSelectedSlot.Value = value; }
+            get => favoriteItemsLastSelectedSlot.Value;
+            set => favoriteItemsLastSelectedSlot.Value = value;
         }
 
         public static bool[] LoadFavoriteItemSlots()
@@ -132,8 +142,6 @@ namespace ConvenientInventory
 
             if (ModEntry.Config.IsEnableQuickStack)
             {
-                // TODO: Quick stack button weird behavior in splitscreen. Should this property be PerScreen<ClickableTextureComponent>?
-
                 QuickStackButton = new ClickableTextureComponent("",
                     new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
                     string.Empty,
@@ -715,7 +723,7 @@ namespace ConvenientInventory
             if (ModEntry.Config.IsEnableQuickStack)
             {
                 QuickStackButton.tryHover(x, y);
-                IsDrawToolTip = QuickStackButton.containsPoint(x, y);
+                ShouldDrawQuickStackToolTip = QuickStackButton.containsPoint(x, y);
             }
         }
 
@@ -862,7 +870,7 @@ namespace ConvenientInventory
         public static void PostMenuDraw<T>(T menu, SpriteBatch spriteBatch) where T : IClickableMenu
         {
             // Draw quick stack button tooltip (in InventoryPage)
-            if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage && IsDrawToolTip)
+            if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage && ShouldDrawQuickStackToolTip)
             {
                 DrawQuickStackButtonToolTip(spriteBatch);
             }
