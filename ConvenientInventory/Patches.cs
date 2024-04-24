@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Inventories;
 
 namespace ConvenientInventory.Patches
 {
@@ -927,4 +928,33 @@ namespace ConvenientInventory.Patches
             return true;
         }
     }
+
+    [HarmonyPatch(typeof(Inventory))]
+    public class InventoryPatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Inventory.ReduceId))]
+        public static void ReduceId_Postfix()
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                // In case we reduced any item stack(s) to 0, refresh favorite item slots.
+                ConvenientInventory.UnfavoriteEmptyItemSlots();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReduceId_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
+
+    // TODO: patch this behavior:
+    //  - furniture item going into final slot of a full toolbar row when picking it up, pushing previous item in that slot further into inventory.
+
+    // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
 }

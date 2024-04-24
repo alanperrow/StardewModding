@@ -132,6 +132,8 @@ namespace ConvenientInventory
 
             if (ModEntry.Config.IsEnableQuickStack)
             {
+                // TODO: Quick stack button weird behavior in splitscreen. Should this property be PerScreen<ClickableTextureComponent>?
+
                 QuickStackButton = new ClickableTextureComponent("",
                     new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
                     string.Empty,
