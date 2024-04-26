@@ -592,11 +592,11 @@ namespace ConvenientInventory.Patches
 
                     yield return new CodeInstruction(OpCodes.Ldarg_1);                                          // load SpriteBatch "b" (arg 1)
                     yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldfld, yPositionOnScreen);                         // load local variable "this.yPositionOnScreen"
+                    yield return new CodeInstruction(OpCodes.Ldfld, yPositionOnScreen);                         // load field "this.yPositionOnScreen"
                     yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldfld, transparency);                              // load local variable "this.transparency"
+                    yield return new CodeInstruction(OpCodes.Ldfld, transparency);                              // load field "this.transparency"
                     yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load this (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldfld, slotText);                                  // load local variable "this.slotText"
+                    yield return new CodeInstruction(OpCodes.Ldfld, slotText);                                  // load field "this.slotText"
                     yield return new CodeInstruction(OpCodes.Call, DrawFavoriteItemSlotHighlightsInToolbar);    // call DrawFavoriteItemSlotHighlightsInToolbar(b, yPositionOnScreen)
 
                     instructionsList[i].WithLabels(label);
@@ -617,6 +617,65 @@ namespace ConvenientInventory.Patches
         }
 
         public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.IsEnableFavoriteItems;
+
+        [HarmonyTranspiler]
+        [HarmonyPatch(nameof(Toolbar.receiveRightClick))]
+        public static IEnumerable<CodeInstruction> ReceiveRightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
+        {
+            MethodInfo isItemSlotFavoritedMethod = AccessTools.DeclaredMethod(typeof(ToolbarPatches), nameof(ToolbarPatches.IsItemSlotFavorited));
+
+            List<CodeInstruction> instructionsList = instructions.ToList();
+            bool flag = false;
+            for (int i = 0; i < instructionsList.Count; i++)
+            {
+                // Find instruction for `Game1.playSound("throwDownITem");`
+                // IL_000aa (instructionsList[?])
+                if (i > 0 && i < instructionsList.Count
+                    && instructionsList[i].opcode == OpCodes.Ldstr && (instructionsList[i].operand as string).Equals("throwDownITem"))
+                {
+                    // Find instruction for `leave.s` (end loop), searching backwards for efficiency
+                    // IL_0106 (instructionsList[?])
+                    Label labelLeave = ilg.DefineLabel();
+                    int j = instructionsList.Count - 1;
+                    for (; j > i; j--)
+                    {
+                        if (instructionsList[j].opcode == OpCodes.Leave_S)
+                        {
+                            break;
+                        }
+                    }
+
+                    yield return new CodeInstruction(OpCodes.Ldloc_3);                                         // load `slotNumber` int (local var @ index 3)
+                    yield return new CodeInstruction(OpCodes.Call, isItemSlotFavoritedMethod);                 // call helper method `IsItemSlotFavorited`
+                    yield return new CodeInstruction(OpCodes.Brtrue, labelLeave);                              // break if call => true
+
+                    instructionsList[j].WithLabels(labelLeave);
+
+                    flag = true;
+                }
+
+                yield return instructionsList[i];
+            }
+
+            if (!flag)
+            {
+                ModEntry.Instance.Monitor.Log(
+                    $"{nameof(ToolbarPatches)}.{nameof(ReceiveRightClick_Transpiler)} could not find target instruction(s) in {nameof(Toolbar.receiveRightClick)}, so no changes were made.",
+                    LogLevel.Error);
+            }
+
+            yield break;
+        }
+
+        public static bool IsItemSlotFavorited(int slotNumber)
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return false;
+            }
+
+            return ConvenientInventory.FavoriteItemSlots[slotNumber];
+        }
     }
 
     [HarmonyPatch(typeof(ShopMenu))]
@@ -1017,6 +1076,4 @@ namespace ConvenientInventory.Patches
     //  - furniture item going into final slot of a full toolbar row when picking it up, pushing previous item in that slot further into inventory.
 
     // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
-
-    // TODO: patch ctrl+rightclick drop item from toolbar to not drop favorite items.
 }
