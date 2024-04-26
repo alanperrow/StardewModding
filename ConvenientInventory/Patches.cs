@@ -12,10 +12,11 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Inventories;
+using StardewValley.Objects;
 
 namespace ConvenientInventory.Patches
 {
-    public class InventoryPageConstructorPatch
+    public static class InventoryPageConstructorPatch
     {
         public static void Postfix(InventoryPage __instance, int x, int y, int width, int height)
         {
@@ -31,7 +32,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(InventoryPage))]
-    public class InventoryPagePatches
+    public static class InventoryPagePatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(InventoryPage.draw))]
@@ -109,7 +110,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(CraftingPage))]
-    public class CraftingPagePatches
+    public static class CraftingPagePatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(CraftingPage.draw))]
@@ -159,7 +160,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(IClickableMenu))]
-    public class IClickableMenuPatches
+    public static class IClickableMenuPatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(IClickableMenu.populateClickableComponentList))]
@@ -249,7 +250,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(ClickableTextureComponent))]
-    public class ClickableTextureComponentPatches
+    public static class ClickableTextureComponentPatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(ClickableTextureComponent.draw))]
@@ -268,7 +269,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(MenuWithInventory))]
-    public class MenuWithInventoryPatches
+    public static class MenuWithInventoryPatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(MenuWithInventory.draw))]
@@ -319,7 +320,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(InventoryMenu))]
-    public class InventoryMenuPatches
+    public static class InventoryMenuPatches
     {
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(InventoryMenu.draw))]
@@ -554,7 +555,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(Toolbar))]
-    public class ToolbarPatches
+    public static class ToolbarPatches
     {
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(Toolbar.draw))]
@@ -679,7 +680,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(ShopMenu))]
-    public class ShopMenuPatches
+    public static class ShopMenuPatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(ShopMenu.draw))]
@@ -729,7 +730,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(ItemGrabMenu))]
-    public class ItemGrabMenuPatches
+    public static class ItemGrabMenuPatches
     {
         [HarmonyPrefix]
         [HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
@@ -825,7 +826,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(Item))]
-    public class ItemPatches
+    public static class ItemPatches
     {
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Item.canBeTrashed))]
@@ -865,7 +866,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(Farmer))]
-    public class FarmerPatches
+    public static class FarmerPatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Farmer.shiftToolbar))]
@@ -922,7 +923,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(ForgeMenu))]
-    public class ForgeMenuPatches
+    public static class ForgeMenuPatches
     {
         [HarmonyPrefix]
         [HarmonyPatch(nameof(ForgeMenu.receiveKeyPress))]
@@ -1019,7 +1020,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(Utility))]
-    public class UtilityPatches
+    public static class UtilityPatches
     {
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Utility.highlightShippableObjects))]
@@ -1049,7 +1050,7 @@ namespace ConvenientInventory.Patches
     }
 
     [HarmonyPatch(typeof(Inventory))]
-    public class InventoryPatches
+    public static class InventoryPatches
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Inventory.ReduceId))]
@@ -1072,8 +1073,13 @@ namespace ConvenientInventory.Patches
         }
     }
 
-    // TODO: patch this behavior:
-    //  - furniture item going into final slot of a full toolbar row when picking it up, pushing previous item in that slot further into inventory.
+    [HarmonyPatch(typeof(Furniture))]
+    public static class FurniturePatches
+    {
+        // TODO: patch this behavior:
+        //  - furniture item going into final slot of a full toolbar row when picking it up, pushing previous item in that slot further into inventory.
+
+    }
 
     // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
 }
