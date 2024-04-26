@@ -395,11 +395,6 @@ namespace ConvenientInventory.Patches
             }
         }
 
-        // TODO: Patch InventoryMenu.rightClick
-        // - Find line before: `if (this.actualInventory[slotNumber].Stack > 1 && Game1.isOneOfTheseKeysDown(...){ ... }`.
-        //   - We want to prefix this with our own if-check for "Take All But One" feature:
-        //     `if (this.actualInventory[slotNumber].Stack > 1 && {HOTKEY_CHECK_HERE}){ {TAKE_ALL_BUT_ONE_LOGIC_HERE} }`.
-        // - Also find line before similar `else` logic further down in the method.
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(InventoryMenu.rightClick))]
         public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
@@ -409,10 +404,13 @@ namespace ConvenientInventory.Patches
             MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItemWithAddTo));
 
             List<CodeInstruction> instructionsList = instructions.ToList();
-            bool flag = false;
+            bool flag = false, flag2 = false;
+            int patch2MinIndex = int.MaxValue;
+
             for (int i = 0; i < instructionsList.Count; i++)
             {
-                // Find instruction for `if (this.actualInventory[slotNumber].Stack > 1 && Game1.isOneOfTheseKeysDown(...){ ... }`
+                // ==== First case: No item in cursor slot ====
+                // Find instruction for `if (this.actualInventory[slotNumber].Stack > 1 && Game1.isOneOfTheseKeysDown( ... { LeftShift })`
                 // IL_014d (instructionsList[?])
                 if (i > 0 && i < instructionsList.Count - 2
                     && instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 4
@@ -428,7 +426,7 @@ namespace ConvenientInventory.Patches
                     // IL_0213 (instructionsList[?])
                     Label labelEndElse = ilg.DefineLabel();
                     int j = i + 4;
-                    for (; j < instructionsList.Count; j++)
+                    for (; j < instructionsList.Count - 1; j++)
                     {
                         if (instructionsList[j - 2].opcode == OpCodes.Sub
                             && instructionsList[j - 1].opcode == OpCodes.Callvirt
@@ -458,15 +456,75 @@ namespace ConvenientInventory.Patches
                     instructionsList[j].WithLabels(labelEndElse);
 
                     flag = true;
+                    patch2MinIndex = j + 2;
+                }
+
+                // ==== Second case: Has item in cursor slot ====
+                // Find instruction in `else` block for `if (Game1.isOneOfTheseKeysDown( ... { LeftShift })`
+                // IL_028c (instructionsList[?])
+                if (i > patch2MinIndex && i < instructionsList.Count - 2
+                    && instructionsList[i - 1].opcode == OpCodes.Bge
+                    && instructionsList[i].opcode == OpCodes.Ldsfld // valuetype StardewValley.Game1::oldKBState
+                    && instructionsList[i + 1].opcode == OpCodes.Ldc_I4_1
+                    && instructionsList[i + 2].opcode == OpCodes.Newarr)
+                {
+                    // Original source code checks for LeftShift in an if-statement. We want to prefix this with our own if-check for "Take All But One" feature.
+                    // By tracking the original instruction label, we can convert the original if-statement into an else condition of our own if-statement.
+                    Label labelIf = ilg.DefineLabel();
+
+                    // Find instruction for `if (playSound)`
+                    // IL_0343 (instructionsList[?])
+                    Label labelEndElse = ilg.DefineLabel();
+                    int j = i + 4;
+                    for (; j < instructionsList.Count - 1; j++)
+                    {
+                        if (instructionsList[j - 2].opcode == OpCodes.Sub
+                            && instructionsList[j - 1].opcode == OpCodes.Callvirt // instance void StardewValley.Item::set_Stack(int32)
+                            && instructionsList[j].opcode == OpCodes.Ldarg_S
+                            && instructionsList[j + 1].opcode == OpCodes.Brfalse_S)
+                        {
+                            break;
+                        }
+                    }
+
+                    // Inject "Take All But One" code.
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
+                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
+                    yield return new CodeInstruction(OpCodes.Call, isTakeAllButOneHotkeyDownMethod)             // call helper method `IsTakeAllButOneHotkeyDown(this, num)`
+                    {
+                        labels = instructionsList[i].ExtractLabels()
+                    };
+                    yield return new CodeInstruction(OpCodes.Brfalse, labelIf);                                 // break to original if-statement if call => false
+
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
+                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
+                    yield return new CodeInstruction(OpCodes.Ldarg_3);                                          // load `toAddTo` Item instance (arg3)
+                    yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemWithAddToMethod);           // call helper method `TakeAllButOneItemWithAddTo(this, num, toAddTo)`
+                    yield return new CodeInstruction(OpCodes.Br, labelEndElse);                                 // break to end of else block
+
+                    instructionsList[i].WithLabels(labelIf);
+                    instructionsList[j].WithLabels(labelEndElse);
+
+                    flag2 = true;
                 }
 
                 yield return instructionsList[i];
             }
 
-            if (!flag)
+            if (!flag && !flag2)
             {
                 ModEntry.Instance.Monitor.Log(
-                    $"{nameof(ToolbarPatches)}.{nameof(RightClick_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.rightClick)}, so no changes were made.", LogLevel.Error);
+                    $"{nameof(InventoryMenuPatches)}.{nameof(RightClick_Transpiler)} could not find target instruction(s) in {nameof(InventoryMenu.rightClick)}, so no changes were made.",
+                    LogLevel.Error);
+            }
+            else if (!flag || !flag2)
+            {
+                string ordSuccess = !flag ? "First" : "Second";
+                string ordFail = !flag ? "Second" : "First";
+                ModEntry.Instance.Monitor.Log(
+                    $"{nameof(InventoryMenuPatches)}.{nameof(RightClick_Transpiler)}: {ordSuccess} patch was applied successfully. "
+                    + $"{ordFail} patch could not find target instruction(s) in {nameof(InventoryMenu.rightClick)}, so no changes were made.",
+                    LogLevel.Error);
             }
 
             yield break;
@@ -487,9 +545,11 @@ namespace ConvenientInventory.Patches
             inventoryMenu.actualInventory[slotNumber].Stack = 1;
         }
 
-        public static void TakeAllButOneItemWithAddTo()
+        public static void TakeAllButOneItemWithAddTo(InventoryMenu inventoryMenu, int slotNumber, Item toAddTo)
         {
-            // TODO
+            int amountToTake = Math.Min(inventoryMenu.actualInventory[slotNumber].Stack - 1, toAddTo.getRemainingStackSpace());
+            inventoryMenu.actualInventory[slotNumber].Stack -= amountToTake;
+            toAddTo.Stack += amountToTake;
         }
     }
 
@@ -957,4 +1017,6 @@ namespace ConvenientInventory.Patches
     //  - furniture item going into final slot of a full toolbar row when picking it up, pushing previous item in that slot further into inventory.
 
     // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
+
+    // TODO: patch ctrl+rightclick drop item from toolbar to not drop favorite items.
 }
