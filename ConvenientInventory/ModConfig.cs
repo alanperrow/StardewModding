@@ -23,6 +23,8 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
 
+        public bool IsEnableQuickStackAnimation { get; set; } = true;
+
         public bool IsEnableFavoriteItems { get; set; } = true;
 
         public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;

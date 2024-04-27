@@ -32,6 +32,9 @@
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Show nearby chests in tooltip?",
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.",
 
+  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "Show quick stack animation?",
+  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "If enabled, an animation will play when items are quick stacked to visually show where each item was stored.",
+
   "ModConfigMenu.Label.FavoriteItems": "Favorite Items",
 
   "ModConfigMenu.IsEnableFavoriteItems.Name": "Enable favorite items?",

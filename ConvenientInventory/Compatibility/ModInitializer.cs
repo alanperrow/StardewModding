@@ -108,6 +108,14 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc")
             );
 
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsEnableQuickStackAnimation,
+                setValue: value => config.IsEnableQuickStackAnimation = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackAnimation.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackAnimation.Desc")
+            );
+
             api.AddSectionTitle(
                 mod: modManifest,
                 text: () => helper.Translation.Get("ModConfigMenu.Label.FavoriteItems")
