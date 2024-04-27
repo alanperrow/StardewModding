@@ -768,32 +768,43 @@ namespace ConvenientInventory
         // Taken from Item.canStackWith, removing quality check.
         private static bool CanStackWithIgnoreQuality(Item item, ISalable other)
         {
-            if (item == null || other == null)
+            if (other is not Item otherItem || other.GetType() != item.GetType())
             {
                 return false;
             }
 
-            if ((other is StardewValley.Object && item is StardewValley.Object) || (other is ColoredObject && item is ColoredObject))
+            if (item is ColoredObject coloredObj)
             {
-                if ((other as StardewValley.Object).orderData.Value != (item as StardewValley.Object).orderData.Value)
+                if (other is ColoredObject otherColoredObj && !coloredObj.color.Value.Equals(otherColoredObj.color.Value))
                 {
                     return false;
-                }
-
-                if (item is ColoredObject && other is ColoredObject && !(item as ColoredObject).color.Value.Equals((other as ColoredObject).color.Value))
-                {
-                    return false;
-                }
-
-                if (item.maximumStackSize() > 1 && other.maximumStackSize() > 1
-                    && (item as StardewValley.Object).ParentSheetIndex == (other as StardewValley.Object).ParentSheetIndex
-                    && (item as StardewValley.Object).bigCraftable.Value == (other as StardewValley.Object).bigCraftable.Value)
-                {
-                    return item.Name.Equals(other.Name);
                 }
             }
 
-            return false;
+            if (item.maximumStackSize() <= 1 || other.maximumStackSize() <= 1)
+            {
+                return false;
+            }
+
+            if (item is StardewValley.Object obj)
+            {
+                if (other is StardewValley.Object otherObj && otherObj.orderData.Value != obj.orderData.Value)
+                {
+                    return false;
+                }
+            }
+
+            if (item.QualifiedItemId != otherItem.QualifiedItemId)
+            {
+                return false;
+            }
+
+            if (!item.Name.Equals(other.Name))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
