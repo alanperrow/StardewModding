@@ -666,6 +666,8 @@ namespace ConvenientInventory
 
         public static void OnQuickStackHotkeyPressed()
         {
+            // TODO: Check if we are in a chest menu `ItemGrabMenu`. If so, do not perform quick stack.
+
             if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is InventoryPage inventoryPage)
             {
                 QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
