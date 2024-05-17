@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using SplitscreenImproved.Compatibility;
 using SplitscreenImproved.Layout;
 using SplitscreenImproved.ShowName;
@@ -128,12 +129,136 @@ namespace SplitscreenImproved
                 getValue: () => LayoutPreviewHelper.PlayerCount.ToString(),
                 setValue: value => LayoutPreviewHelper.PlayerCount = int.Parse(value),
                 name: () => "Preview Player Count",
-                tooltip: () => "The number of players to be displayed in the layout preview.\n(This value is not saved to the config)",
+                tooltip: () => "The number of players to be displayed in the layout preview above.\n" +
+                    "The selected value can be used to define custom layouts per number of players/screens.",
                 allowedValues: playerCountOptions,
                 fieldId: fieldId_PreviewPlayerCount);
 
-            // TODO: Float number sliders for custom preset screen splits
-            //...
+            string[] customLayoutPlayerNumberOptions = new string[] { "1", "2", "3", "4" };
+            const string fieldId_CustomLayoutPlayerNumber = "CustomLayoutPlayerNumber";
+            api.AddTextOption(
+                mod: ModManifest,
+                getValue: () => LayoutPreviewHelper.CustomLayoutPlayerNumber.ToString(),
+                setValue: value =>
+                {
+                    int valueInt = int.Parse(value);
+                    if (valueInt > LayoutPreviewHelper.PlayerCount)
+                    {
+                        // Cannot set player number to a value greater than the total number of players.
+                        valueInt = LayoutPreviewHelper.PlayerCount;
+                    }
+
+                    LayoutPreviewHelper.CustomLayoutPlayerNumber = valueInt;
+                },
+                name: () => "Customize Layout for Player",
+                tooltip: () => $"The player number for which to define a custom layout when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.\n" +
+                    "This custom layout will be applied when using the \"Custom\" layout preset.\n" +
+                    "To define a custom layout for splitscreen with a different number of players, change the selected value for \"Preview Player Count\" above.",
+                allowedValues: customLayoutPlayerNumberOptions,
+                fieldId: fieldId_CustomLayoutPlayerNumber);
+
+            const string fieldId_CustomLayoutLeft = "CustomLayoutLeft";
+            api.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => GetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber).X,
+                setValue: value => SetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber, ScreenSplitComponent.Left, value),
+                min: 0f,
+                max: 1f,
+                interval: 0.01f,
+                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Left",
+                tooltip: () => $"The left position of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
+                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                fieldId: fieldId_CustomLayoutLeft);
+
+            const string fieldId_CustomLayoutTop = "CustomLayoutTop";
+            api.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => GetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber).Y,
+                setValue: value => SetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber, ScreenSplitComponent.Top, value),
+                min: 0f,
+                max: 1f,
+                interval: 0.01f,
+                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Top",
+                tooltip: () => $"The top position of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
+                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                fieldId: fieldId_CustomLayoutTop);
+
+            const string fieldId_CustomLayoutWidth = "CustomLayoutWidth";
+            api.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => GetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber).Z,
+                setValue: value => SetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber, ScreenSplitComponent.Width, value),
+                min: 0f,
+                max: 1f,
+                interval: 0.01f,
+                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Width",
+                tooltip: () => $"The width of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
+                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                fieldId: fieldId_CustomLayoutWidth);
+
+            const string fieldId_CustomLayoutHeight = "CustomLayoutHeight";
+            api.AddNumberOption(
+                mod: ModManifest,
+                getValue: () => GetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber).W,
+                setValue: value => SetCustomScreenSplitByPlayer(LayoutPreviewHelper.PlayerCount, LayoutPreviewHelper.CustomLayoutPlayerNumber, ScreenSplitComponent.Height, value),
+                min: 0f,
+                max: 1f,
+                interval: 0.01f,
+                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Height",
+                tooltip: () => $"The height of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
+                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                fieldId: fieldId_CustomLayoutHeight);
+
+            Vector4 GetCustomScreenSplitByPlayer(int playerCount, int playerNumber)
+            {
+                SplitscreenLayoutData splitscreenLayoutData = playerCount switch
+                {
+                    4 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].FourPlayerLayout,
+                    3 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].ThreePlayerLayout,
+                    _ => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].TwoPlayerLayout,
+                };
+
+                if (playerNumber > playerCount)
+                {
+                    // This avoids IndexOutOfRange exception.
+                    playerNumber = playerCount;
+                }
+
+                return splitscreenLayoutData.ScreenSplits[playerNumber - 1];
+            }
+
+            void SetCustomScreenSplitByPlayer(int playerCount, int playerNumber, ScreenSplitComponent screenSplitComponent, float value)
+            {
+                SplitscreenLayoutData splitscreenLayoutData = playerCount switch
+                {
+                    4 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].FourPlayerLayout,
+                    3 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].ThreePlayerLayout,
+                    _ => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].TwoPlayerLayout,
+                };
+
+                if (playerNumber > playerCount)
+                {
+                    // This case shouldn't happen, but avoids IndexOutOfRange exception just to be safe.
+                    playerNumber = playerCount;
+                }
+
+                Vector4 playerScreenSplit = splitscreenLayoutData.ScreenSplits[playerNumber - 1];
+                switch (screenSplitComponent)
+                {
+                    case ScreenSplitComponent.Left:
+                        playerScreenSplit.X = value;
+                        break;
+                    case ScreenSplitComponent.Top:
+                        playerScreenSplit.Y = value;
+                        break;
+                    case ScreenSplitComponent.Width:
+                        playerScreenSplit.Z = value;
+                        break;
+                    default:
+                        playerScreenSplit.W = value;
+                        break;
+                };
+            }
 
             api.AddSectionTitle(
                 mod: ModManifest,

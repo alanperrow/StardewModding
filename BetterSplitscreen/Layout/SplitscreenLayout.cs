@@ -19,6 +19,7 @@ namespace SplitscreenImproved.Layout
 
         public SplitscreenLayoutData FourPlayerLayout { get; }
 
+        // TODO: Is this property necessary?
         private LayoutPreset Preset { get; }
 
         // Singleplayer layout should not be configurable.

@@ -16,6 +16,8 @@ namespace SplitscreenImproved.Layout
 
         public static int PlayerCount { get; set; } = 2;
 
+        public static int CustomLayoutPlayerNumber { get; set; } = 1;
+
         public static SplitscreenLayout Layout { get; set; }
 
         public static bool IsModEnabled { get; set; } = true;
