@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.GameData;
 
@@ -11,6 +9,10 @@ namespace SplitscreenImproved.MusicFix
 {
     internal static class MusicFixHelper
     {
+        private static readonly FieldInfo instanceActiveMusicContextField = AccessTools.DeclaredField(typeof(Game1), "_instanceActiveMusicContext");
+        private static readonly FieldInfo instanceRequestedMusicTracksField = AccessTools.DeclaredField(typeof(Game1), "_instanceRequestedMusicTracks");
+
+        /* DEBUG
         internal static void DrawDebugText(SpriteBatch sb)
         {
             if (!ModEntry.Config.MusicFixFeature.IsDebugMode)
@@ -47,8 +49,8 @@ namespace SplitscreenImproved.MusicFix
             sb.DrawString(Game1.smallFont, agg, new Microsoft.Xna.Framework.Vector2(6, 4), Microsoft.Xna.Framework.Color.Black);
             sb.DrawString(Game1.smallFont, agg, new Microsoft.Xna.Framework.Vector2(4, 4), Microsoft.Xna.Framework.Color.White);
         }
+        */
 
-        private static readonly FieldInfo instanceActiveMusicContextField = AccessTools.DeclaredField(typeof(Game1), "_instanceActiveMusicContext");
         internal static bool IsMusicContextActiveButNotPlaying(MusicContext music_context)
         {
             Game1 thisInstance = Game1.game1;
@@ -84,7 +86,6 @@ namespace SplitscreenImproved.MusicFix
         }
 
         // Refactored base game method to include a Game1 instance parameter.
-        private static readonly FieldInfo instanceRequestedMusicTracksField = AccessTools.DeclaredField(typeof(Game1), "_instanceRequestedMusicTracks");
         public static string GetMusicTrackNameOfInstance(Game1 instance, MusicContext music_context = MusicContext.Default)
         {
             var requestedMusicTracks = (Dictionary<MusicContext, KeyValuePair<string, bool>>)instanceRequestedMusicTracksField.GetValue(instance);

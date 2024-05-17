@@ -1,5 +1,4 @@
-﻿using System;
-using HarmonyLib;
+﻿using HarmonyLib;
 using SplitscreenImproved.Compatibility;
 using SplitscreenImproved.MusicFix;
 using SplitscreenImproved.ShowName;
@@ -29,7 +28,9 @@ namespace SplitscreenImproved
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
+            /* DEBUG
             helper.Events.Display.Rendered += OnRendered;
+            */
         }
 
         /// <summary>
@@ -62,9 +63,11 @@ namespace SplitscreenImproved
             ShowNameHelper.DrawPlayerNameScroll(e.SpriteBatch);
         }
 
+        /* DEBUG
         private void OnRendered(object sender, RenderedEventArgs e)
         {
             MusicFixHelper.DrawDebugText(e.SpriteBatch);
         }
+        */
     }
 }
