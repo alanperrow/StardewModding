@@ -15,8 +15,8 @@ namespace SplitscreenImproved.Layout
             ScreenSplits = layoutPreset switch
             {
                 LayoutPreset.SwapSides => GetSwapSidesScreenSplits(),
+                LayoutPreset.Custom => GetCustomScreenSplits(),
                 _ => GetDefaultScreenSplits(),
-                // TODO: Custom preset should load from Config.LayoutPresets["Custom"]
             };
         }
 
@@ -55,31 +55,61 @@ namespace SplitscreenImproved.Layout
 
         private Vector4[] GetSwapSidesScreenSplits()
         {
-            var defaultScreenSplits = new Vector4[NumScreens];
+            var swapScreenSplits = new Vector4[NumScreens];
 
             switch (NumScreens)
             {
                 case 1:
-                    defaultScreenSplits[0] = new Vector4(0f, 0f, 1f, 1f);
+                    swapScreenSplits[0] = new Vector4(0f, 0f, 1f, 1f);
                     break;
                 case 2:
-                    defaultScreenSplits[0] = new Vector4(0.5f, 0f, 0.5f, 1f);
-                    defaultScreenSplits[1] = new Vector4(0f, 0f, 0.5f, 1f);
+                    swapScreenSplits[0] = new Vector4(0.5f, 0f, 0.5f, 1f);
+                    swapScreenSplits[1] = new Vector4(0f, 0f, 0.5f, 1f);
                     break;
                 case 3:
-                    defaultScreenSplits[0] = new Vector4(0f, 0f, 1f, 0.5f);
-                    defaultScreenSplits[1] = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
-                    defaultScreenSplits[2] = new Vector4(0f, 0.5f, 0.5f, 0.5f);
+                    swapScreenSplits[0] = new Vector4(0f, 0f, 1f, 0.5f);
+                    swapScreenSplits[1] = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+                    swapScreenSplits[2] = new Vector4(0f, 0.5f, 0.5f, 0.5f);
                     break;
                 default:
-                    defaultScreenSplits[0] = new Vector4(0.5f, 0f, 0.5f, 0.5f);
-                    defaultScreenSplits[1] = new Vector4(0f, 0f, 0.5f, 0.5f);
-                    defaultScreenSplits[2] = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
-                    defaultScreenSplits[3] = new Vector4(0f, 0.5f, 0.5f, 0.5f);
+                    swapScreenSplits[0] = new Vector4(0.5f, 0f, 0.5f, 0.5f);
+                    swapScreenSplits[1] = new Vector4(0f, 0f, 0.5f, 0.5f);
+                    swapScreenSplits[2] = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+                    swapScreenSplits[3] = new Vector4(0f, 0.5f, 0.5f, 0.5f);
                     break;
             }
 
-            return defaultScreenSplits;
+            return swapScreenSplits;
+        }
+
+        // Default values for Custom preset is a horizontal version of the vanilla splitscreen.
+        private Vector4[] GetCustomScreenSplits()
+        {
+            var customScreenSplits = new Vector4[NumScreens];
+
+            switch (NumScreens)
+            {
+                case 1:
+                    customScreenSplits[0] = new Vector4(0f, 0f, 1f, 1f);
+                    break;
+                case 2:
+                    customScreenSplits[0] = new Vector4(0f, 0f, 1f, 0.5f);
+                    customScreenSplits[1] = new Vector4(0f, 0.5f, 1f, 0.5f);
+                    break;
+                case 3:
+                    customScreenSplits[0] = new Vector4(0f, 0f, 1f, 0.5f);
+                    customScreenSplits[1] = new Vector4(0f, 0.5f, 0.5f, 0.5f);
+                    customScreenSplits[2] = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+                    break;
+                default:
+                    customScreenSplits[0] = new Vector4(0f, 0f, 0.5f, 0.5f);
+                    customScreenSplits[1] = new Vector4(0.5f, 0f, 0.5f, 0.5f);
+                    customScreenSplits[2] = new Vector4(0f, 0.5f, 0.5f, 0.5f);
+                    customScreenSplits[3] = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+                    break;
+            }
+
+            return customScreenSplits;
         }
     }
 }
