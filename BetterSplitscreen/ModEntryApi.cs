@@ -242,20 +242,20 @@ namespace SplitscreenImproved
                     playerNumber = playerCount;
                 }
 
-                Vector4 playerScreenSplit = splitscreenLayoutData.ScreenSplits[playerNumber - 1];
+                Vector4 split = splitscreenLayoutData.ScreenSplits[playerNumber - 1];
                 switch (screenSplitComponent)
                 {
                     case ScreenSplitComponent.Left:
-                        playerScreenSplit.X = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(value, split.Y, split.Z, split.W);
                         break;
                     case ScreenSplitComponent.Top:
-                        playerScreenSplit.Y = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, value, split.Z, split.W);
                         break;
                     case ScreenSplitComponent.Width:
-                        playerScreenSplit.Z = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, value, split.W);
                         break;
                     default:
-                        playerScreenSplit.W = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, split.Z, value);
                         break;
                 };
             }
