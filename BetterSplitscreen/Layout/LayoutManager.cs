@@ -8,7 +8,7 @@ namespace SplitscreenImproved.Layout
 {
     internal static class LayoutManager
     {
-        public static SplitscreenLayout CurrentLayout => ModEntry.Config.LayoutFeature.LayoutPresets[(int)ModEntry.Config.LayoutFeature.PresetChoice];
+        public static SplitscreenLayout CurrentLayout => ModEntry.Config.LayoutFeature.LayoutPresets[ModEntry.Config.LayoutFeature.PresetChoice];
 
         /// <summary>
         /// Modified version of <see cref="Game1.SetWindowSize"/> as the original method gets inlined by the compiler and cannot be modified.

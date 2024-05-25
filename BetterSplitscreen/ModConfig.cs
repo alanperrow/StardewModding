@@ -22,11 +22,12 @@ namespace SplitscreenImproved
 
             public LayoutPreset PresetChoice { get; set; } = LayoutPreset.Default;
 
-            public SplitscreenLayout[] LayoutPresets { get; set; } = new[]
+            // TODO: Does this load correctly? Might have to use an array instead.
+            public Dictionary<LayoutPreset, SplitscreenLayout> LayoutPresets { get; set; } = new()
             {
-                new SplitscreenLayout(LayoutPreset.Default),
-                new SplitscreenLayout(LayoutPreset.SwapSides),
-                new SplitscreenLayout(LayoutPreset.Custom),
+                { LayoutPreset.Default, new SplitscreenLayout(LayoutPreset.Default) },
+                { LayoutPreset.SwapSides, new SplitscreenLayout(LayoutPreset.SwapSides) },
+                { LayoutPreset.Custom, new SplitscreenLayout(LayoutPreset.Custom) },
             };
         }
 
