@@ -90,7 +90,7 @@ namespace SplitscreenImproved
                     LayoutPreset preset = Config.LayoutFeature.PresetChoice;
 
                     // Initial assignment for default preview value.
-                    LayoutPreviewHelper.Layout ??= Config.LayoutFeature.LayoutPresets[preset];
+                    LayoutPreviewHelper.Layout ??= Config.LayoutFeature.LayoutPresets[(int)preset];
 
                     return preset.ToString();
                 },
@@ -153,7 +153,8 @@ namespace SplitscreenImproved
                 name: () => "Customize Layout for Player",
                 tooltip: () => $"The player number for which to define a custom layout when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.\n" +
                     "This custom layout will be applied when using the \"Custom\" layout preset.\n" +
-                    "To define a custom layout for splitscreen with a different number of players, change the selected value for \"Preview Player Count\" above.",
+                    "To define a custom splitscreen layout for a different number of players, change the\n" +
+                    "selected value for \"Preview Player Count\" above.",
                 allowedValues: customLayoutPlayerNumberOptions,
                 fieldId: fieldId_CustomLayoutPlayerNumber);
 
@@ -213,9 +214,9 @@ namespace SplitscreenImproved
             {
                 SplitscreenLayoutData splitscreenLayoutData = playerCount switch
                 {
-                    4 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].FourPlayerLayout,
-                    3 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].ThreePlayerLayout,
-                    _ => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].TwoPlayerLayout,
+                    4 => Config.LayoutFeature.LayoutPresets[(int)LayoutPreset.Custom].FourPlayerLayout,
+                    3 => Config.LayoutFeature.LayoutPresets[(int)LayoutPreset.Custom].ThreePlayerLayout,
+                    _ => Config.LayoutFeature.LayoutPresets[(int)LayoutPreset.Custom].TwoPlayerLayout,
                 };
 
                 if (playerNumber > playerCount)
@@ -231,9 +232,9 @@ namespace SplitscreenImproved
             {
                 SplitscreenLayoutData splitscreenLayoutData = playerCount switch
                 {
-                    4 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].FourPlayerLayout,
-                    3 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].ThreePlayerLayout,
-                    _ => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].TwoPlayerLayout,
+                    4 => Config.LayoutFeature.LayoutPresets[(int)LayoutPreset.Custom].FourPlayerLayout,
+                    3 => Config.LayoutFeature.LayoutPresets[(int)LayoutPreset.Custom].ThreePlayerLayout,
+                    _ => Config.LayoutFeature.LayoutPresets[(int)LayoutPreset.Custom].TwoPlayerLayout,
                 };
 
                 if (playerNumber > playerCount)
@@ -242,20 +243,24 @@ namespace SplitscreenImproved
                     playerNumber = playerCount;
                 }
 
-                Vector4 playerScreenSplit = splitscreenLayoutData.ScreenSplits[playerNumber - 1];
+                Vector4 split = splitscreenLayoutData.ScreenSplits[playerNumber - 1];
                 switch (screenSplitComponent)
                 {
                     case ScreenSplitComponent.Left:
-                        playerScreenSplit.X = value;
+                        //playerScreenSplit.X = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(value, split.Y, split.Z, split.W);
                         break;
                     case ScreenSplitComponent.Top:
-                        playerScreenSplit.Y = value;
+                        //playerScreenSplit.Y = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, value, split.Z, split.W);
                         break;
                     case ScreenSplitComponent.Width:
-                        playerScreenSplit.Z = value;
+                        //playerScreenSplit.Z = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, value, split.W);
                         break;
                     default:
-                        playerScreenSplit.W = value;
+                        //playerScreenSplit.W = value;
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, split.Z, value);
                         break;
                 };
             }
@@ -342,7 +347,7 @@ namespace SplitscreenImproved
                             break;
                         case fieldId_LayoutPreset:
                             LayoutPreset valueLayoutPreset = Enum.Parse<LayoutPreset>((string)value);
-                            LayoutPreviewHelper.Layout = Config.LayoutFeature.LayoutPresets[valueLayoutPreset];
+                            LayoutPreviewHelper.Layout = Config.LayoutFeature.LayoutPresets[(int)valueLayoutPreset];
                             break;
                         case fieldId_PreviewPlayerCount:
                             int valueInt = int.Parse((string)value);
