@@ -16,8 +16,6 @@ namespace SplitscreenImproved.Layout
 
         public static int PlayerCount { get; set; } = 2;
 
-        public static int CustomLayoutPlayerNumber { get; set; } = 1;
-
         public static SplitscreenLayout Layout { get; set; }
 
         public static bool IsModEnabled { get; set; } = true;
@@ -25,16 +23,22 @@ namespace SplitscreenImproved.Layout
         public static bool IsLayoutFeatureEnabled { get; set; } = true;
 
         /// <summary>
-        /// Draws a preview of the current layout with the number of players provided by <see cref="PlayerCount"/>.
+        /// Draws a preview of the current layout with the number of players provided by <see cref="PlayerCount"/>
+        /// (or optionally, <paramref name="playerCount"/>).
         /// </summary>
         /// <param name="sb">SpriteBatch</param>
         /// <param name="p">Vector2</param>
-        public static void DrawPreview(SpriteBatch sb, Vector2 p)
+        /// <param name="playerCount">Optional value for player count, to bypass <see cref="PlayerCount"/>.</param>
+        /// <param name="layoutToPreview">Optional value for layout to preview, to bypass <see cref="Layout"/>.</param>
+        public static void DrawPreview(SpriteBatch sb, Vector2 p, int? playerCount = null, SplitscreenLayout layoutToPreview = null)
         {
+            playerCount ??= PlayerCount;
+            layoutToPreview ??= Layout;
+
             int px = (int)p.X;
             int py = (int)p.Y;
 
-            if (!(IsModEnabled && IsLayoutFeatureEnabled) || Layout is null)
+            if (!(IsModEnabled && IsLayoutFeatureEnabled) || layoutToPreview is null)
             {
                 sb.DrawString(Game1.dialogueFont, "Preview Disabled", new Vector2(px, py + 80), Color.Black);
                 return;
@@ -44,9 +48,9 @@ namespace SplitscreenImproved.Layout
             sb.Draw(Game1.fadeToBlackRect, new Rectangle(px, py, 208, 208), Color.Black);
 
             // Iterate for each player
-            for (int i = 1; i <= PlayerCount; i++)
+            for (int i = 1; i <= playerCount.Value; i++)
             {
-                (Rectangle rectangle, Vector2 textPos) = GetPreviewRectangleAndTextPosition(p, i);
+                (Rectangle rectangle, Vector2 textPos) = GetPreviewRectangleAndTextPosition(p, i, playerCount.Value, layoutToPreview);
 
                 // Player screen location
                 Color color = i switch
@@ -64,9 +68,13 @@ namespace SplitscreenImproved.Layout
             }
         }
 
-        private static (Rectangle PreviewRectangle, Vector2 TextPosition) GetPreviewRectangleAndTextPosition(Vector2 p, int playerNum)
+        private static (Rectangle PreviewRectangle, Vector2 TextPosition) GetPreviewRectangleAndTextPosition(
+            Vector2 p,
+            int playerNum,
+            int playerCount,
+            SplitscreenLayout layoutToPreview)
         {
-            Vector4 v = Layout.GetScreenSplits(PlayerCount)[playerNum - 1];
+            Vector4 v = layoutToPreview.GetScreenSplits(playerCount)[playerNum - 1];
             int px = (int)p.X + 4;
             int py = (int)p.Y + 4;
 
@@ -81,19 +89,6 @@ namespace SplitscreenImproved.Layout
             Vector2 textPos = new(tx, ty);
 
             return (rect, textPos);
-        }
-
-        /// <summary>
-        /// Hacky way to draw <see cref="CustomLayoutPlayerNumber"/> in the previous option's title
-        /// (title should begin with "P :", and will be formatted like "P1:").
-        /// </summary>
-        /// <param name="sb">SpriteBatch</param>
-        /// <param name="p">Vector2</param>
-        public static void DrawCustomLayoutPlayerNumberInNextOptionTitle(SpriteBatch sb, Vector2 p)
-        {
-            sb.DrawString(Game1.dialogueFont, CustomLayoutPlayerNumber.ToString(), new Vector2(126, p.Y + 19), new Color(221, 148, 84));
-            sb.DrawString(Game1.dialogueFont, CustomLayoutPlayerNumber.ToString(), new Vector2(123, p.Y + 19), new Color(221, 148, 84));
-            sb.DrawString(Game1.dialogueFont, CustomLayoutPlayerNumber.ToString(), new Vector2(126, p.Y + 16), Game1.textColor);
         }
     }
 }
