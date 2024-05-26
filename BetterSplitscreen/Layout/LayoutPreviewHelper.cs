@@ -82,5 +82,18 @@ namespace SplitscreenImproved.Layout
 
             return (rect, textPos);
         }
+
+        /// <summary>
+        /// Hacky way to draw <see cref="CustomLayoutPlayerNumber"/> in the previous option's title
+        /// (title should begin with "P :", and will be formatted like "P1:").
+        /// </summary>
+        /// <param name="sb">SpriteBatch</param>
+        /// <param name="p">Vector2</param>
+        public static void DrawCustomLayoutPlayerNumberInNextOptionTitle(SpriteBatch sb, Vector2 p)
+        {
+            sb.DrawString(Game1.dialogueFont, CustomLayoutPlayerNumber.ToString(), new Vector2(126, p.Y + 19), new Color(221, 148, 84));
+            sb.DrawString(Game1.dialogueFont, CustomLayoutPlayerNumber.ToString(), new Vector2(123, p.Y + 19), new Color(221, 148, 84));
+            sb.DrawString(Game1.dialogueFont, CustomLayoutPlayerNumber.ToString(), new Vector2(126, p.Y + 16), Game1.textColor);
+        }
     }
 }

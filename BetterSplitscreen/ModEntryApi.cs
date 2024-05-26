@@ -165,9 +165,9 @@ namespace SplitscreenImproved
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
-                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Left",
-                tooltip: () => $"The left position of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
-                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                name: () => "Left",
+                tooltip: () => "The left position of the screen for the player number specified by \"Customize Layout for Player\".",
+                formatValue: (value) => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: {value}",
                 fieldId: fieldId_CustomLayoutLeft);
 
             const string fieldId_CustomLayoutTop = "CustomLayoutTop";
@@ -178,9 +178,9 @@ namespace SplitscreenImproved
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
-                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Top",
-                tooltip: () => $"The top position of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
-                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                name: () => "Top",
+                tooltip: () => "The top position of the screen for the player number specified by \"Customize Layout for Player\".",
+                formatValue: (value) => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: {value}",
                 fieldId: fieldId_CustomLayoutTop);
 
             const string fieldId_CustomLayoutWidth = "CustomLayoutWidth";
@@ -191,9 +191,9 @@ namespace SplitscreenImproved
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
-                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Width",
-                tooltip: () => $"The width of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
-                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                name: () => "Width",
+                tooltip: () => "The width of the screen for the player number specified by \"Customize Layout for Player\".",
+                formatValue: (value) => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: {value}",
                 fieldId: fieldId_CustomLayoutWidth);
 
             const string fieldId_CustomLayoutHeight = "CustomLayoutHeight";
@@ -204,9 +204,9 @@ namespace SplitscreenImproved
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
-                name: () => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: Height",
-                tooltip: () => $"The height of the screen for player number {LayoutPreviewHelper.CustomLayoutPlayerNumber} " +
-                    $"when playing {LayoutPreviewHelper.PlayerCount}-player splitscreen.",
+                name: () => "Height",
+                tooltip: () => "The height of the screen for the player number specified by \"Customize Layout for Player\".",
+                formatValue: (value) => $"P{LayoutPreviewHelper.CustomLayoutPlayerNumber}: {value}",
                 fieldId: fieldId_CustomLayoutHeight);
 
             Vector4 GetCustomScreenSplitByPlayer(int playerCount, int playerNumber)
@@ -220,7 +220,6 @@ namespace SplitscreenImproved
 
                 if (playerNumber > playerCount)
                 {
-                    // This avoids IndexOutOfRange exception.
                     playerNumber = playerCount;
                 }
 
@@ -238,7 +237,6 @@ namespace SplitscreenImproved
 
                 if (playerNumber > playerCount)
                 {
-                    // This case shouldn't happen, but avoids IndexOutOfRange exception just to be safe.
                     playerNumber = playerCount;
                 }
 
@@ -348,8 +346,72 @@ namespace SplitscreenImproved
                             int valueInt = int.Parse((string)value);
                             LayoutPreviewHelper.PlayerCount = valueInt;
                             break;
+                        case fieldId_CustomLayoutPlayerNumber:
+                            int valueInt2 = int.Parse((string)value);
+                            LayoutPreviewHelper.CustomLayoutPlayerNumber = valueInt2;
+                            break;
+                        case fieldId_CustomLayoutLeft:
+                            SetLayoutPreviewScreenSplitByPlayer(
+                                LayoutPreviewHelper.PlayerCount,
+                                LayoutPreviewHelper.CustomLayoutPlayerNumber,
+                                ScreenSplitComponent.Left,
+                                (float)value);
+                            break;
+                        case fieldId_CustomLayoutTop:
+                            SetLayoutPreviewScreenSplitByPlayer(
+                                LayoutPreviewHelper.PlayerCount,
+                                LayoutPreviewHelper.CustomLayoutPlayerNumber,
+                                ScreenSplitComponent.Top,
+                                (float)value);
+                            break;
+                        case fieldId_CustomLayoutWidth:
+                            SetLayoutPreviewScreenSplitByPlayer(
+                                LayoutPreviewHelper.PlayerCount,
+                                LayoutPreviewHelper.CustomLayoutPlayerNumber,
+                                ScreenSplitComponent.Width,
+                                (float)value);
+                            break;
+                        case fieldId_CustomLayoutHeight:
+                            SetLayoutPreviewScreenSplitByPlayer(
+                                LayoutPreviewHelper.PlayerCount,
+                                LayoutPreviewHelper.CustomLayoutPlayerNumber,
+                                ScreenSplitComponent.Height,
+                                (float)value);
+                            break;
                     }
                 });
+
+            void SetLayoutPreviewScreenSplitByPlayer(int playerCount, int playerNumber, ScreenSplitComponent screenSplitComponent, float value)
+            {
+                SplitscreenLayoutData splitscreenLayoutData = playerCount switch
+                {
+                    4 => LayoutPreviewHelper.Layout.FourPlayerLayout,
+                    3 => LayoutPreviewHelper.Layout.ThreePlayerLayout,
+                    _ => LayoutPreviewHelper.Layout.TwoPlayerLayout,
+                };
+
+                if (playerNumber > playerCount)
+                {
+                    playerNumber = playerCount;
+                }
+
+                Vector4 split = splitscreenLayoutData.ScreenSplits[playerNumber - 1];
+                switch (screenSplitComponent)
+                {
+                    case ScreenSplitComponent.Left:
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(value, split.Y, split.Z, split.W);
+                        break;
+                    case ScreenSplitComponent.Top:
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, value, split.Z, split.W);
+                        break;
+                    case ScreenSplitComponent.Width:
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, value, split.W);
+                        break;
+                    default:
+                        splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, split.Z, value);
+                        break;
+                };
+            }
         }
     }
 }
