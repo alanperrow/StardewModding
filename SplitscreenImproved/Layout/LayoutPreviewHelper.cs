@@ -29,16 +29,14 @@ namespace SplitscreenImproved.Layout
         /// <param name="sb">SpriteBatch</param>
         /// <param name="p">Vector2</param>
         /// <param name="playerCount">Optional value for player count, to bypass <see cref="PlayerCount"/>.</param>
-        /// <param name="layoutToPreview">Optional value for layout to preview, to bypass <see cref="Layout"/>.</param>
-        public static void DrawPreview(SpriteBatch sb, Vector2 p, int? playerCount = null, SplitscreenLayout layoutToPreview = null)
+        public static void DrawPreview(SpriteBatch sb, Vector2 p, int? playerCount = null)
         {
             playerCount ??= PlayerCount;
-            layoutToPreview ??= Layout;
 
             int px = (int)p.X;
             int py = (int)p.Y;
 
-            if (!(IsModEnabled && IsLayoutFeatureEnabled) || layoutToPreview is null)
+            if (!(IsModEnabled && IsLayoutFeatureEnabled) || Layout is null)
             {
                 sb.DrawString(Game1.dialogueFont, "Preview Disabled", new Vector2(px, py + 80), Color.Black);
                 return;
@@ -50,7 +48,7 @@ namespace SplitscreenImproved.Layout
             // Iterate for each player
             for (int i = 1; i <= playerCount.Value; i++)
             {
-                (Rectangle rectangle, Vector2 textPos) = GetPreviewRectangleAndTextPosition(p, i, playerCount.Value, layoutToPreview);
+                (Rectangle rectangle, Vector2 textPos) = GetPreviewRectangleAndTextPosition(p, i, playerCount.Value, Layout);
 
                 // Player screen location
                 Color color = i switch

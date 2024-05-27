@@ -248,10 +248,14 @@ namespace SplitscreenImproved
                 mod: ModManifest,
                 pageId: "Custom Layout: 2-Player");
 
+            api.AddParagraph(
+                mod: ModManifest,
+                text: () => "NOTE: \"Custom\" layout preset must be selected to view any changes here.");
+
             api.AddComplexOption(
                 mod: ModManifest,
                 name: () => "Preview:",
-                draw: (sb, p) => LayoutPreviewHelper.DrawPreview(sb, p, 2, Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom]),
+                draw: (sb, p) => LayoutPreviewHelper.DrawPreview(sb, p, 2),
                 tooltip: () => "Preview how the \"Custom\" layout preset will be displayed for 2-player splitscreen.",
                 height: () => 200);
 
@@ -262,10 +266,14 @@ namespace SplitscreenImproved
                 mod: ModManifest,
                 pageId: "Custom Layout: 3-Player");
 
+            api.AddParagraph(
+                mod: ModManifest,
+                text: () => "NOTE: \"Custom\" layout preset must be selected to view any changes here.");
+
             api.AddComplexOption(
                 mod: ModManifest,
                 name: () => "Preview:",
-                draw: (sb, p) => LayoutPreviewHelper.DrawPreview(sb, p, 3, Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom]),
+                draw: (sb, p) => LayoutPreviewHelper.DrawPreview(sb, p, 3),
                 tooltip: () => "Preview how the \"Custom\" layout preset will be displayed for 3-player splitscreen.",
                 height: () => 200);
 
@@ -277,10 +285,14 @@ namespace SplitscreenImproved
                 mod: ModManifest,
                 pageId: "Custom Layout: 4-Player");
 
+            api.AddParagraph(
+                mod: ModManifest,
+                text: () => "NOTE: \"Custom\" layout preset must be selected to view any changes here.");
+
             api.AddComplexOption(
                 mod: ModManifest,
                 name: () => "Preview:",
-                draw: (sb, p) => LayoutPreviewHelper.DrawPreview(sb, p, 4, Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom]),
+                draw: (sb, p) => LayoutPreviewHelper.DrawPreview(sb, p, 4),
                 tooltip: () => "Preview how the \"Custom\" layout preset will be displayed for 4-player splitscreen.",
                 height: () => 200);
 
