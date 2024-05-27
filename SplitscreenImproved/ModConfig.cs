@@ -22,7 +22,6 @@ namespace SplitscreenImproved
 
             public LayoutPreset PresetChoice { get; set; } = LayoutPreset.Default;
 
-            // TODO: Does this load correctly? Might have to use an array instead.
             public Dictionary<LayoutPreset, SplitscreenLayout> LayoutPresets { get; set; } = new()
             {
                 { LayoutPreset.Default, new SplitscreenLayout(LayoutPreset.Default) },

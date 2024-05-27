@@ -6,8 +6,6 @@ namespace SplitscreenImproved.Layout
     {
         public SplitscreenLayout(LayoutPreset layoutPreset = LayoutPreset.Default)
         {
-            Preset = layoutPreset;
-
             TwoPlayerLayout = new SplitscreenLayoutData(2, layoutPreset);
             ThreePlayerLayout = new SplitscreenLayoutData(3, layoutPreset);
             FourPlayerLayout = new SplitscreenLayoutData(4, layoutPreset);
@@ -18,9 +16,6 @@ namespace SplitscreenImproved.Layout
         public SplitscreenLayoutData ThreePlayerLayout { get; }
 
         public SplitscreenLayoutData FourPlayerLayout { get; }
-
-        // TODO: Is this property necessary?
-        private LayoutPreset Preset { get; }
 
         // Singleplayer layout should not be configurable.
         private SplitscreenLayoutData SinglePlayerLayout { get; } = new(1);
