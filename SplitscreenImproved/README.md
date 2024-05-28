@@ -1,12 +1,10 @@
 ﻿# Splitscreen Improved
 Improves gameplay for splitscreen/local co-op multiplayer. Adds splitscreen layouts, fixes issues such as music not playing, and other tweaks.
 
+![](https://i.imgur.com/rg0XCY0.png)
+
 ## Features
 **Splitscreen Layouts**: Adds customizable splitscreen layouts to adjust where each player's screen is positioned.
-<details><summary>Preview</summary>
-
-  ![](https://i.imgur.com/LKLsy9l.gif)
-</details>
 
 **Splitscreen Music Fix**: Fixes issue with splitscreen/local co-op music not playing & suddenly stopping. (Not a perfect fix, but works much better than before)
 
