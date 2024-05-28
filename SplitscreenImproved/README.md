@@ -1,4 +1,6 @@
-﻿# Splitscreen Improved
+NexusMods link: https://www.nexusmods.com/stardewvalley/mods/24507
+
+# Splitscreen Improved
 Improves gameplay for splitscreen/local co-op multiplayer. Adds splitscreen layouts, fixes issues such as music not playing, and other tweaks.
 
 ![](https://i.imgur.com/rg0XCY0.png)
