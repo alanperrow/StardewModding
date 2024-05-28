@@ -6,5 +6,5 @@
 	"UniqueID": "gaussfire.SplitscreenImproved",
 	"EntryDll": "SplitscreenImproved.dll",
 	"MinimumApiVersion": "4.0.7",
-	"UpdateKeys": []
+	"UpdateKeys": [ "Nexus:24507" ]
 }
