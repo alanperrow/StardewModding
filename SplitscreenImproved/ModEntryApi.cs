@@ -8,6 +8,8 @@ namespace SplitscreenImproved
 {
     public partial class ModEntry
     {
+        private const string CustomNumberOptionFieldIdPrefix = "CustomNumberOption";
+
         /// <summary>
         /// Initializes IGenericModConfigMenuApi.
         /// </summary>
@@ -90,7 +92,8 @@ namespace SplitscreenImproved
                     LayoutPreset preset = Config.LayoutFeature.PresetChoice;
 
                     // Initial assignment for default preview value.
-                    LayoutPreviewHelper.Layout ??= Config.LayoutFeature.LayoutPresets[preset];
+                    LayoutPreviewHelper.Layout ??= Config.LayoutFeature.GetSplitscreenLayoutByPreset(preset);
+                    LayoutPreviewHelper.Preset ??= preset;
 
                     return preset.ToString();
                 },
@@ -234,12 +237,31 @@ namespace SplitscreenImproved
                             break;
                         case fieldId_LayoutPreset:
                             LayoutPreset valueLayoutPreset = Enum.Parse<LayoutPreset>((string)value);
-                            LayoutPreviewHelper.Layout = Config.LayoutFeature.LayoutPresets[valueLayoutPreset];
+                            LayoutPreviewHelper.Layout = Config.LayoutFeature.GetSplitscreenLayoutByPreset(valueLayoutPreset);
+                            LayoutPreviewHelper.Preset = valueLayoutPreset;
                             break;
                         case fieldId_PreviewPlayerCount:
                             int valueInt = int.Parse((string)value);
                             LayoutPreviewHelper.PlayerCount = valueInt;
                             break;
+                    }
+
+                    if (fieldId.StartsWith(CustomNumberOptionFieldIdPrefix))
+                    {
+                        if (LayoutPreviewHelper.Preset != LayoutPreset.Custom)
+                        {
+                            return;
+                        }
+
+                        // We are adjusting the values for a custom layout, so parse the fieldId and update the layout preview accordingly.
+                        string[] tokens = fieldId.Split('_');
+                        int playerCount = int.Parse(tokens[1]);
+                        int playerNumber = int.Parse(tokens[2]);
+                        ScreenSplitComponent component = Enum.Parse<ScreenSplitComponent>(tokens[3]);
+
+                        float valueFloat = (float)value;
+
+                        SetScreenSplitsByPlayer(LayoutPreviewHelper.Layout, playerCount, playerNumber, component, valueFloat);
                     }
                 });
 
@@ -304,54 +326,59 @@ namespace SplitscreenImproved
 
         private void CreateNumberOptionsForScreenSplitsByPlayer(IGenericModConfigMenuApi api, int playerCount, int playerNumber)
         {
+            string uniqueFieldIdPrefix = $"{CustomNumberOptionFieldIdPrefix}_{playerCount}_{playerNumber}_";
             api.AddNumberOption(
                 mod: ModManifest,
-                getValue: () => GetCustomScreenSplitByPlayer(playerCount, playerNumber).X,
-                setValue: value => SetCustomScreenSplitByPlayer(playerCount, playerNumber, ScreenSplitComponent.Left, value),
+                getValue: () => GetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber).X,
+                setValue: value => SetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber, ScreenSplitComponent.Left, value),
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
                 name: () => $"P{playerNumber}: Left",
-                tooltip: () => $"The left position of the screen for player {playerNumber}.");
+                tooltip: () => $"The left position of the screen for player {playerNumber}.",
+                fieldId: uniqueFieldIdPrefix + ScreenSplitComponent.Left.ToString());
 
             api.AddNumberOption(
                 mod: ModManifest,
-                getValue: () => GetCustomScreenSplitByPlayer(playerCount, playerNumber).Y,
-                setValue: value => SetCustomScreenSplitByPlayer(playerCount, playerNumber, ScreenSplitComponent.Top, value),
+                getValue: () => GetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber).Y,
+                setValue: value => SetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber, ScreenSplitComponent.Top, value),
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
                 name: () => $"P{playerNumber}: Top",
-                tooltip: () => $"The top position of the screen for player {playerNumber}.");
+                tooltip: () => $"The top position of the screen for player {playerNumber}.",
+                fieldId: uniqueFieldIdPrefix + ScreenSplitComponent.Top.ToString());
 
             api.AddNumberOption(
                 mod: ModManifest,
-                getValue: () => GetCustomScreenSplitByPlayer(playerCount, playerNumber).Z,
-                setValue: value => SetCustomScreenSplitByPlayer(playerCount, playerNumber, ScreenSplitComponent.Width, value),
+                getValue: () => GetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber).Z,
+                setValue: value => SetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber, ScreenSplitComponent.Width, value),
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
                 name: () => $"P{playerNumber}: Width",
-                tooltip: () => $"The width of the screen for player {playerNumber}.");
+                tooltip: () => $"The width of the screen for player {playerNumber}.",
+                fieldId: uniqueFieldIdPrefix + ScreenSplitComponent.Width.ToString());
 
             api.AddNumberOption(
                 mod: ModManifest,
-                getValue: () => GetCustomScreenSplitByPlayer(playerCount, playerNumber).W,
-                setValue: value => SetCustomScreenSplitByPlayer(playerCount, playerNumber, ScreenSplitComponent.Height, value),
+                getValue: () => GetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber).W,
+                setValue: value => SetScreenSplitsByPlayer(Config.LayoutFeature.CustomSplitscreenLayout, playerCount, playerNumber, ScreenSplitComponent.Height, value),
                 min: 0f,
                 max: 1f,
                 interval: 0.01f,
                 name: () => $"P{playerNumber}: Height",
-                tooltip: () => $"The height of the screen for player {playerNumber}.");
+                tooltip: () => $"The height of the screen for player {playerNumber}.",
+                fieldId: uniqueFieldIdPrefix + ScreenSplitComponent.Height.ToString());
         }
 
-        private static Vector4 GetCustomScreenSplitByPlayer(int playerCount, int playerNumber)
+        private static Vector4 GetScreenSplitsByPlayer(SplitscreenLayout layout, int playerCount, int playerNumber)
         {
-            SplitscreenLayoutData splitscreenLayoutData = playerCount switch
+            SplitscreenLayoutData layoutData = playerCount switch
             {
-                4 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].FourPlayerLayout,
-                3 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].ThreePlayerLayout,
-                _ => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].TwoPlayerLayout,
+                4 => layout.FourPlayerLayout,
+                3 => layout.ThreePlayerLayout,
+                _ => layout.TwoPlayerLayout,
             };
 
             if (playerNumber > playerCount)
@@ -359,16 +386,16 @@ namespace SplitscreenImproved
                 playerNumber = playerCount;
             }
 
-            return splitscreenLayoutData.ScreenSplits[playerNumber - 1];
+            return layoutData.ScreenSplits[playerNumber - 1];
         }
 
-        private static void SetCustomScreenSplitByPlayer(int playerCount, int playerNumber, ScreenSplitComponent screenSplitComponent, float value)
+        private static void SetScreenSplitsByPlayer(SplitscreenLayout layout, int playerCount, int playerNumber, ScreenSplitComponent screenSplitComponent, float value)
         {
-            SplitscreenLayoutData splitscreenLayoutData = playerCount switch
+            SplitscreenLayoutData layoutData = playerCount switch
             {
-                4 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].FourPlayerLayout,
-                3 => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].ThreePlayerLayout,
-                _ => Config.LayoutFeature.LayoutPresets[LayoutPreset.Custom].TwoPlayerLayout,
+                4 => layout.FourPlayerLayout,
+                3 => layout.ThreePlayerLayout,
+                _ => layout.TwoPlayerLayout,
             };
 
             if (playerNumber > playerCount)
@@ -376,21 +403,13 @@ namespace SplitscreenImproved
                 playerNumber = playerCount;
             }
 
-            Vector4 split = splitscreenLayoutData.ScreenSplits[playerNumber - 1];
-            switch (screenSplitComponent)
+            Vector4 split = layoutData.ScreenSplits[playerNumber - 1];
+            layoutData.ScreenSplits[playerNumber - 1] = screenSplitComponent switch
             {
-                case ScreenSplitComponent.Left:
-                    splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(value, split.Y, split.Z, split.W);
-                    break;
-                case ScreenSplitComponent.Top:
-                    splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, value, split.Z, split.W);
-                    break;
-                case ScreenSplitComponent.Width:
-                    splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, value, split.W);
-                    break;
-                default:
-                    splitscreenLayoutData.ScreenSplits[playerNumber - 1] = new Vector4(split.X, split.Y, split.Z, value);
-                    break;
+                ScreenSplitComponent.Left => new Vector4(value, split.Y, split.Z, split.W),
+                ScreenSplitComponent.Top => new Vector4(split.X, value, split.Z, split.W),
+                ScreenSplitComponent.Width => new Vector4(split.X, split.Y, value, split.W),
+                _ => new Vector4(split.X, split.Y, split.Z, value),
             };
         }
     }

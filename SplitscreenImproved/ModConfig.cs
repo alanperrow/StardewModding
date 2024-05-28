@@ -22,11 +22,17 @@ namespace SplitscreenImproved
 
             public LayoutPreset PresetChoice { get; set; } = LayoutPreset.Default;
 
-            public Dictionary<LayoutPreset, SplitscreenLayout> LayoutPresets { get; set; } = new()
+            public SplitscreenLayout DefaultSplitscreenLayout { get; set; } = new(LayoutPreset.Default);
+
+            public SplitscreenLayout SwapSidesSplitscreenLayout { get; set; } = new(LayoutPreset.SwapSides);
+
+            public SplitscreenLayout CustomSplitscreenLayout { get; set; } = new(LayoutPreset.Custom);
+
+            public SplitscreenLayout GetSplitscreenLayoutByPreset(LayoutPreset preset) => preset switch
             {
-                { LayoutPreset.Default, new SplitscreenLayout(LayoutPreset.Default) },
-                { LayoutPreset.SwapSides, new SplitscreenLayout(LayoutPreset.SwapSides) },
-                { LayoutPreset.Custom, new SplitscreenLayout(LayoutPreset.Custom) },
+                LayoutPreset.Default => DefaultSplitscreenLayout,
+                LayoutPreset.SwapSides => SwapSidesSplitscreenLayout,
+                _ => CustomSplitscreenLayout,
             };
         }
 

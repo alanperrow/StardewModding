@@ -20,7 +20,7 @@ namespace SplitscreenImproved.Layout
             };
         }
 
-        public Vector4[] ScreenSplits { get; }
+        public Vector4[] ScreenSplits { get; set; }
 
         private byte NumScreens { get; }
 

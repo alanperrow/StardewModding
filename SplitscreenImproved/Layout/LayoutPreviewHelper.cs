@@ -18,6 +18,8 @@ namespace SplitscreenImproved.Layout
 
         public static SplitscreenLayout Layout { get; set; }
 
+        public static LayoutPreset? Preset { get; set; }
+
         public static bool IsModEnabled { get; set; } = true;
 
         public static bool IsLayoutFeatureEnabled { get; set; } = true;

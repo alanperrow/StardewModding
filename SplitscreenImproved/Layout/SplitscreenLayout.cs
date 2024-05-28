@@ -13,11 +13,11 @@ namespace SplitscreenImproved.Layout
             FourPlayerLayout = new SplitscreenLayoutData(4, layoutPreset);
         }
 
-        public SplitscreenLayoutData TwoPlayerLayout { get; }
+        public SplitscreenLayoutData TwoPlayerLayout { get; set; }
 
-        public SplitscreenLayoutData ThreePlayerLayout { get; }
+        public SplitscreenLayoutData ThreePlayerLayout { get; set; }
 
-        public SplitscreenLayoutData FourPlayerLayout { get; }
+        public SplitscreenLayoutData FourPlayerLayout { get; set; }
 
         // Singleplayer layout should not be configurable.
         private SplitscreenLayoutData SinglePlayerLayout { get; } = new(1);
@@ -32,17 +32,13 @@ namespace SplitscreenImproved.Layout
                 numScreens = 1;
             }
 
-            switch (numScreens)
+            return numScreens switch
             {
-                case 1:
-                    return SinglePlayerLayout.ScreenSplits;
-                case 2:
-                    return TwoPlayerLayout.ScreenSplits;
-                case 3:
-                    return ThreePlayerLayout.ScreenSplits;
-                default:
-                    return FourPlayerLayout.ScreenSplits;
-            }
+                1 => SinglePlayerLayout.ScreenSplits,
+                2 => TwoPlayerLayout.ScreenSplits,
+                3 => ThreePlayerLayout.ScreenSplits,
+                _ => FourPlayerLayout.ScreenSplits,
+            };
         }
     }
 }
