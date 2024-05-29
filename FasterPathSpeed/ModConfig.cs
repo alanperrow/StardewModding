@@ -12,6 +12,8 @@
 
         public bool IsEnablePathReplace { get; set; } = true;
 
+        public bool IsTownPathSpeedBuff { get; set; } = true;
+
         public bool IsUseCustomPathSpeedBuffValues { get; set; } = false;
 
         public CustomPathSpeedBuffValues CustomPathSpeedBuffValues { get; set; } = new();
