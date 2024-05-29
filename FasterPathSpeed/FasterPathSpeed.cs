@@ -38,7 +38,42 @@ namespace FasterPathSpeed
 
                     refMovementSpeed += (who.movementDirections.Count > 1) ? (0.7f * pathSpeedBoost * mult) : (pathSpeedBoost * mult);
                 }
+                else
+                {
+                    var backLayers = Game1.currentLocation.backgroundLayers;
+                    int tileIndex = Game1.currentLocation.getTileIndexAt(new xTile.Dimensions.Location((int)who.Tile.X, (int)who.Tile.Y), "Back");
+
+                    // Check if farmer is located on a town path tile.
+                    string tileSheetID = Game1.currentLocation.getTileSheetIDAt((int)who.Tile.X, (int)who.Tile.Y, "Back");
+                    if (tileSheetID == "Town")
+                    {
+                        string tileIndexPropertyName = "Type";
+                        string tileIndexPropertyValue = "Stone";
+                        bool x = Game1.currentLocation
+                            .doesEitherTileOrTileIndexPropertyEqual((int)who.Tile.X, (int)who.Tile.Y, tileIndexPropertyName, "Back", tileIndexPropertyValue);
+
+                        ModEntry.DEBUG_IsTownPath.Value = true;
+                        return;
+                    }
+
+                    ModEntry.DEBUG_IsTownPath.Value = false;
+                    return;
+                }
             }
+        }
+
+        public static bool IsFarmerOnTownPathTile(Farmer who)
+        {
+            // First, check if farmer is located on a tile from the Town tile sheet.
+            string tileSheetID = Game1.currentLocation.getTileSheetIDAt((int)who.Tile.X, (int)who.Tile.Y, "Back");
+            if (tileSheetID != "Town")
+            {
+                return false;
+            }
+
+            // HACK: Check if the Town tile that the farmer is standing on has a property "Type" with a value of "Stone".
+            //       This returns true for the stone town path tiles (also returns true for the stone bridges in town, but that's fine).
+            return Game1.currentLocation.doesEitherTileOrTileIndexPropertyEqual((int)who.Tile.X, (int)who.Tile.Y, "Type", "Back", "Stone");
         }
 
         public static float GetPathSpeedBoostByFlooring(Flooring flooring)

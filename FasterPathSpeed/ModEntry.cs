@@ -3,6 +3,7 @@ using GenericModConfigMenu;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
 
 namespace FasterPathSpeed
 {
@@ -12,12 +13,42 @@ namespace FasterPathSpeed
 
         public static ModConfig Config { get; private set; }
 
+        public static PerScreen<bool> DEBUG_IsTownPath { get; set; } = new();
+
         public override void Entry(IModHelper helper)
         {
             Instance = this;
             Config = helper.ReadConfig<ModConfig>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+
+            helper.Events.Display.Rendered += OnRendered_DEBUG;
+        }
+
+        private void OnRendered_DEBUG(object sender, RenderedEventArgs e)
+        {
+            if (!Context.IsWorldReady)
+            {
+                return;
+            }
+
+            e.SpriteBatch.DrawString(
+                StardewValley.Game1.dialogueFont,
+                $"{nameof(DEBUG_IsTownPath)}: {DEBUG_IsTownPath.Value}",
+                new Microsoft.Xna.Framework.Vector2(0, 3),
+                Microsoft.Xna.Framework.Color.Black);
+
+            e.SpriteBatch.DrawString(
+                StardewValley.Game1.dialogueFont,
+                $"{nameof(DEBUG_IsTownPath)}: {DEBUG_IsTownPath.Value}",
+                new Microsoft.Xna.Framework.Vector2(-3, 3),
+                Microsoft.Xna.Framework.Color.Black);
+
+            e.SpriteBatch.DrawString(
+                StardewValley.Game1.dialogueFont,
+                $"{nameof(DEBUG_IsTownPath)}: {DEBUG_IsTownPath.Value}",
+                new Microsoft.Xna.Framework.Vector2(0, 0),
+                DEBUG_IsTownPath.Value ? Microsoft.Xna.Framework.Color.Lime : Microsoft.Xna.Framework.Color.Red);
         }
 
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
