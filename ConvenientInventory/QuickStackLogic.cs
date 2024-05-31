@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
@@ -66,8 +67,19 @@ namespace ConvenientInventory
 
                         if (movedAtLeastOne)
                         {
-                            // TODO: Add item to quick stack bundle animation here.
-                            //...
+                            if (ModEntry.Config.IsEnableQuickStackAnimation)
+                            {
+                                // Add item sprite to quick stack animation.
+                                ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(playerItem.QualifiedItemId);
+                                var sprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), who.Position + new Vector2(0, -64), flipped: false, 0, Color.White)
+                                {
+                                    motion = new Vector2(new Random().Next(100) / 50f - 1, new Random().Next(100) / 50f - 1), // random on [-1, 1] with 0.01 intervals
+                                    scale = 4,
+                                    scaleChangeChange = -0.001f,
+                                };
+
+                                ConvenientInventory.AddQuickStackAnimationItemSprite(who, sprite);
+                            }
 
                             if (inventoryPage != null)
                             {

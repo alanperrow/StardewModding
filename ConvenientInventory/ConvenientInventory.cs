@@ -42,7 +42,19 @@ namespace ConvenientInventory
 
         private const int quickStackButtonID = 918021;  // Unique indentifier
 
-        private static readonly List<ItemGrabMenu.TransferredItemSprite> transferredItemSprites = new();
+        private static readonly PerScreen<List<ItemGrabMenu.TransferredItemSprite>> transferredItemSprites = new(() => new List<ItemGrabMenu.TransferredItemSprite>());
+        private static List<ItemGrabMenu.TransferredItemSprite> TransferredItemSprites
+        {
+            get => transferredItemSprites.Value;
+            set => transferredItemSprites.Value = value;
+        }
+
+        private static readonly PerScreen<TemporaryAnimatedSpriteList> quickStackAnimationItemSprites = new(() => new TemporaryAnimatedSpriteList());
+        private static TemporaryAnimatedSpriteList QuickStackAnimationItemSprites
+        {
+            get => quickStackAnimationItemSprites.Value;
+            set => quickStackAnimationItemSprites.Value = value;
+        }
 
         public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
@@ -1037,7 +1049,7 @@ namespace ConvenientInventory
             if (ModEntry.Config.IsEnableQuickStack)
             {
                 // Draw transferred item sprites
-                foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in transferredItemSprites)
+                foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in TransferredItemSprites)
                 {
                     transferredItemSprite.Draw(spriteBatch);
                 }
@@ -1106,23 +1118,39 @@ namespace ConvenientInventory
         }
 
         /// <summary>
-        /// Updates transferredItemSprite animation
+        /// Updates item sprite animations.
         /// </summary>
         public static void Update(GameTime time)
         {
-            for (int i = 0; i < transferredItemSprites.Count; i++)
+            for (int i = 0; i < TransferredItemSprites.Count; i++)
             {
-                if (transferredItemSprites[i].Update(time))
+                if (TransferredItemSprites[i].Update(time))
                 {
-                    transferredItemSprites.RemoveAt(i);
+                    TransferredItemSprites.RemoveAt(i);
                     i--;
                 }
             }
+
+            // TODO: quick stack animation sprites.
+            // Currently, `TemporaryAnimatedSpriteList` automatically updates via `Game1.Multiplayer.broadcastSprites()` adding sprites to `GameLocation.temporarySprites`.
         }
 
+        /// <summary>
+        /// Add transferred item sprite upon performing quick stack in the inventory page.
+        /// </summary>
         public static void AddTransferredItemSprite(ItemGrabMenu.TransferredItemSprite itemSprite)
         {
-            transferredItemSprites.Add(itemSprite);
+            TransferredItemSprites.Add(itemSprite);
+        }
+
+
+        /// <summary>
+        /// Add item sprite upon performing quick stack to display animation.
+        /// </summary>
+        public static void AddQuickStackAnimationItemSprite(Farmer who, TemporaryAnimatedSprite itemSprite)
+        {
+            QuickStackAnimationItemSprites.Add(itemSprite);
+            Game1.Multiplayer.broadcastSprites(who.currentLocation, QuickStackAnimationItemSprites);
         }
     }
 }
