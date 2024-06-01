@@ -1147,10 +1147,15 @@ namespace ConvenientInventory
         /// <summary>
         /// Add item sprite upon performing quick stack to display animation.
         /// </summary>
-        public static void AddQuickStackAnimationItemSprite(Farmer who, TemporaryAnimatedSprite itemSprite)
+        public static void AddQuickStackAnimationItemSprite(TemporaryAnimatedSprite itemSprite)
         {
             QuickStackAnimationItemSprites.Add(itemSprite);
+        }
+
+        public static void BroadcastQuickStackAnimationItemSprites(Farmer who)
+        {
             Game1.Multiplayer.broadcastSprites(who.currentLocation, QuickStackAnimationItemSprites);
+            QuickStackAnimationItemSprites = new();
         }
     }
 }

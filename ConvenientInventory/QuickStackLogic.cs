@@ -11,6 +11,7 @@ using StardewValley.ItemTypeDefinitions;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
+using static StardewValley.Minigames.CraneGame;
 
 namespace ConvenientInventory
 {
@@ -41,6 +42,7 @@ namespace ConvenientInventory
                         continue;
                     }
 
+                    int numItemsQuickStacked = 0;
                     foreach (Item playerItem in playerInventory)
                     {
                         if (playerItem is null || !playerItem.canStackWith(chestItem))
@@ -69,16 +71,30 @@ namespace ConvenientInventory
                         {
                             if (ModEntry.Config.IsEnableQuickStackAnimation)
                             {
+                                // Get direction vector
+                                // TODO: Optimization: This only needs to be calculated once per chest.
+                                Vector2 chestCenterPosition = (chest.TileLocation * Game1.tileSize);// + new Vector2(Game1.tileSize / 2);
+                                Vector2 farmerPosition = who.Position;// + new Vector2(Game1.tileSize / 2);
+                                Vector2 directionNorm = (chestCenterPosition - farmerPosition) / Game1.tileSize / 2;
+                                int delay = numItemsQuickStacked * 10;
+
                                 // Add item sprite to quick stack animation.
                                 ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(playerItem.QualifiedItemId);
                                 var sprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), who.Position + new Vector2(0, -64), flipped: false, 0, Color.White)
                                 {
-                                    motion = new Vector2(new Random().Next(100) / 50f - 1, new Random().Next(100) / 50f - 1), // random on [-1, 1] with 0.01 intervals
+                                    layerDepthOffset = 0.01f,
                                     scale = 4,
-                                    scaleChangeChange = -0.001f,
+                                    //delayBeforeAnimationStart = delay, // For each item in the animation, delay animation start by a couple frames for a nice staggered look
+                                    //ticksBeforeAnimationStart = delay,
+                                    motion = directionNorm,
+                                    xStopCoordinate = (int)chestCenterPosition.X,
+                                    yStopCoordinate = (int)chestCenterPosition.Y,
+                                    //scaleChangeChange = -0.001f,
+                                    animationLength = 2,
                                 };
 
-                                ConvenientInventory.AddQuickStackAnimationItemSprite(who, sprite);
+                                ConvenientInventory.AddQuickStackAnimationItemSprite(sprite);
+                                numItemsQuickStacked++;
                             }
 
                             if (inventoryPage != null)
@@ -104,6 +120,12 @@ namespace ConvenientInventory
                             inventoryPage?.inventory.ShakeItem(playerItem);
                             break;
                         }
+                    }
+
+                    // Broadcast any item sprites for quick stack animation.
+                    if (numItemsQuickStacked > 0)
+                    {
+                        ConvenientInventory.BroadcastQuickStackAnimationItemSprites(who);
                     }
                 }
 
