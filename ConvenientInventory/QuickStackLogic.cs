@@ -71,42 +71,54 @@ namespace ConvenientInventory
                         {
                             if (ModEntry.Config.IsEnableQuickStackAnimation)
                             {
-                                // TODO 1: See FishPond.showObjectThrownIntoPondAnimation()
-                                // Seems like you can create a time interval using kinematic equations solved for t.
-                                // This quick stack animation should be very similar. We are "lobbing" the items into chests, which could be modeled as a projectile motion equation.
-                                /*
-			                    float horizontalDistance = this.GetCenterTile().X * 64f - who.position.X;
-			                    float gravity2 = 0.0025f;
-			                    float velocity2 = (float)Math.Sqrt(2f * gravity2 * height);
-			                    float t2 = (float)(Math.Sqrt(2f * (height - distance2) / gravity2) + (double)(velocity2 / gravity2));
-			                    t2 *= 1.05f;
-			                    t2 = ((who.FacingDirection != 0) ? (t2 * 2.5f) : (t2 * 0.7f));
-			                    t2 -= Math.Abs(horizontalDistance) / ((who.FacingDirection == 0) ? 100f : 2f);
-			                    Game1.playSound("throwDownITem");
-			                    TemporaryAnimatedSpriteList fishTossSprites2 = new TemporaryAnimatedSpriteList();
-			                    ParsedItemData itemData2 = ItemRegistry.GetDataOrErrorItem(whichObject.QualifiedItemId);
-			                    fishTossSprites2.Add(new TemporaryAnimatedSprite(itemData2.GetTextureName(), itemData2.GetSourceRect(), who.Position + new Vector2(0f, -64f), flipped: false, 0f, Color.White)
-			                    {
-				                    scale = 4f,
-				                    layerDepth = 1f,
-				                    totalNumberOfLoops = 1,
-				                    interval = t2,
-				                    motion = new Vector2(horizontalDistance / ((who.FacingDirection == 0) ? 900f : 1000f), 0f - velocity2),
-				                    acceleration = new Vector2(0f, gravity2),
+                                // TODO: When quick stack animation begins, visually open all chests which were quick stacked into, then visually close them after animation ends.
+
+                                // Projectile motion-esque code refactored from game source: `FishPond.showObjectThrownIntoPondAnimation()`.
+                                Vector2 chestPosition = chest.TileLocation * Game1.tileSize;
+                                float distance = Vector2.Distance(who.Position, chestPosition);
+                                float height = Math.Abs(distance);
+                                if (who.FacingDirection == 0)
+                                {
+                                    distance = -distance;
+                                    height += Game1.tileSize;
+                                }
+
+                                float horizontalDistance = chestPosition.X - who.Position.X;
+			                    float gravity = 0.0025f;
+			                    float velocity = (float)Math.Sqrt(2f * gravity * height);
+			                    float t = (float)(Math.Sqrt(2f * (height - distance) / gravity) + (double)(velocity / gravity));
+			                    t *= 1.05f;
+			                    t = (who.FacingDirection != 0) ? t * 2.5f : t * 0.7f;
+			                    t -= Math.Abs(horizontalDistance) / ((who.FacingDirection == 0) ? 100f : 2f);
+
+			                    ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(playerItem.QualifiedItemId);
+			                    var itemTossSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), who.Position + new Vector2(0f, -64f), flipped: false, 0f, Color.White)
+                                {
+                                    delayBeforeAnimationStart = numItemsQuickStackAnimation * 25,
+                                    scale = 4f,
+                                    layerDepth = 1f + 1E-09f * numItemsQuickStackAnimation,
+                                    totalNumberOfLoops = 0,
+				                    interval = t,
+				                    motion = new Vector2(horizontalDistance / ((who.FacingDirection == 0) ? 900f : 1000f), 0f - velocity),
+				                    acceleration = new Vector2(0f, gravity),
 				                    timeBasedMotion = true
-			                    });
-			                    fishTossSprites2.Add(new TemporaryAnimatedSprite(28, 100f, 2, 1, this.GetCenterTile() * 64f, flicker: false, flipped: false)
+			                    };
+			                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition + new Vector2(0f, -64f), flipped: false, 0.04f, Color.White)
 			                    {
-				                    delayBeforeAnimationStart = (int)t2,
-				                    layerDepth = (((float)(int)base.tileY + 0.5f) * 64f + 2f) / 10000f
-			                    });
-                                */
+				                    delayBeforeAnimationStart = numItemsQuickStackAnimation * 25 + (int)t,
+                                    scale = 4f,
+                                    layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f + 1E-09f * numItemsQuickStackAnimation,
+                                    motion = new Vector2(0.3f, 3f),
+                                    acceleration = new Vector2(0f, -0.1f),
+                                    scaleChange = -0.05f,
+			                    };
 
-                                // TODO 2: When quick stack animation begins, visually open all chests which were quick stacked into, then visually close them after animation ends.
+                                //chest.drawAboveFrontLayer
 
+                                /*
                                 // Get direction vector
                                 // TODO: Optimization: This only needs to be calculated once per chest.
-                                Vector2 chestPosition = (chest.TileLocation * Game1.tileSize);// + new Vector2(Game1.tileSize / 2);
+                                //Vector2 chestPosition = (chest.TileLocation * Game1.tileSize);// + new Vector2(Game1.tileSize / 2);
                                 Vector2 farmerPosition = who.Position;// + new Vector2(Game1.tileSize / 2);
                                 Vector2 directionToChest = (chestPosition - farmerPosition) / Game1.tileSize / 2;
 
@@ -125,8 +137,10 @@ namespace ConvenientInventory
                                     //animationLength = 2,
                                     alphaFadeFade = -0.0005f,
                                 };
+                                */
 
-                                ConvenientInventory.AddQuickStackAnimationItemSprite(sprite);
+                                ConvenientInventory.AddQuickStackAnimationItemSprite(itemTossSprite);
+                                ConvenientInventory.AddQuickStackAnimationItemSprite(itemFadeSprite);
                                 numItemsQuickStackAnimation++;
                             }
 
