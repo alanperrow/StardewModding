@@ -41,14 +41,17 @@ namespace ConvenientInventory
                 Vector2 farmerPosition = who.Position + farmerOffset;
 
                 float distance = Vector2.Distance(farmerPosition, chestPosition);
-                float time = (float)(15 * Math.Pow(distance, 0.5)) + 200;
                 Vector2 motionVec = chestPosition - farmerPosition;
 
-                float extraHeight = 128;
+                float CONFIG_animationSpeed = 1f; // range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
+                float time = (float)(10 * Math.Pow(distance, 0.5)) + 400 - Math.Min(0, motionVec.Y);
+                time /= CONFIG_animationSpeed;
+
+                float extraHeight = 128 - Math.Min(0, motionVec.Y);
                 float gravity = 2 * extraHeight / time;
                 motionVec.Y -= extraHeight;
 
-                int delayPerItem = 0;
+                int delayPerItem = 0;//50; // TODO: This should be for add'l items per-chest, and reset to 0 for each chest. That way when items fade into the chest, each sprite is slightly staggered.
                 float addlayerDepth = 1E-07f * numItemsQuickStackAnimation;
 
                 ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem("(O)" + new Random().Next(100)); // DEBUG: Get random item sprite.
