@@ -41,11 +41,12 @@ namespace ConvenientInventory
                 Vector2 farmerPosition = who.Position + farmerOffset;
 
                 float distance = Vector2.Distance(farmerPosition, chestPosition);
-                float deltaX = chestPosition.X - farmerPosition.X;
-                float deltaY = chestPosition.Y - farmerPosition.Y;
+                float time = (float)(15 * Math.Pow(distance, 0.5)) + 200;
+                Vector2 motionVec = chestPosition - farmerPosition;
 
-                float time = (float)(25 * Math.Pow(distance, 0.5)) + 100;
-                Vector2 motionVec = new Vector2(deltaX, deltaY);
+                float extraHeight = 128;
+                float gravity = 2 * extraHeight / time;
+                motionVec.Y -= extraHeight;
 
                 int delayPerItem = 0;
                 float addlayerDepth = 1E-07f * numItemsQuickStackAnimation;
@@ -60,9 +61,9 @@ namespace ConvenientInventory
                     totalNumberOfLoops = 0,
                     //interval = t,
                     //motion = new Vector2(horizontalDistance / ((who.FacingDirection == 0) ? 900f : 1000f), 0f - velocity),
-                    //acceleration = new Vector2(0f, gravity),
                     interval = time,
                     motion = motionVec / time,
+                    acceleration = new Vector2(0f, gravity) / time,
                     timeBasedMotion = true,
                 };
                 var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0.04f, Color.White)
