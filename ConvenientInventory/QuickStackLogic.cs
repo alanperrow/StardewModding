@@ -59,14 +59,17 @@ namespace ConvenientInventory
                     float xAccel = -2 * motionVec.X / time;
                     motionVec.X += extraX;
 
+                    float addlayerDepth = 1E-06f * numItemsQuickStackAnimation; // Avoids z-fighting by drawing each sprite on a separate layer depth.
+
                     int delayPerItem = 0;
+
+                    float CONFIG_animationHoverSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
                     int hoverTimePerItem = 150;
-                    hoverTimePerItem = (int)(hoverTimePerItem / CONFIG_animationSpeed);
-                    float addlayerDepth = 1E-06f * numItemsQuickStackAnimation; // Avoid z-fighting by drawing each sprite above the previous.
+                    hoverTimePerItem = (int)(hoverTimePerItem / CONFIG_animationHoverSpeed);
 
                     ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem("(O)" + new Random().Next(100)); // DEBUG: Get random item sprite.
                     //ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(playerItem.QualifiedItemId);
-                    var itemTossSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, flipped: false, alphaFade: 0f, Color.White)
+                    var itemTossSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
                     {
                         delayBeforeAnimationStart = i * delayPerItem,
                         scale = 4f,
@@ -77,14 +80,14 @@ namespace ConvenientInventory
                         acceleration = new Vector2(xAccel, gravity) / time,
                         timeBasedMotion = true,
                     };
-                    var itemHoverSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0f, Color.White)
+                    var itemHoverSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
                     {
                         delayBeforeAnimationStart = i * delayPerItem + (int)time,
                         scale = 4f,
                         layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f - addlayerDepth, // Refactored from Object.draw()
                         interval = i * hoverTimePerItem,
                     };
-                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0.04f, Color.White)
+                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0.04f, Color.White)
                     {
                         delayBeforeAnimationStart = i * delayPerItem + (int)time + i * hoverTimePerItem,
                         scale = 4f,
