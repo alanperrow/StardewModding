@@ -11,7 +11,6 @@ using StardewValley.ItemTypeDefinitions;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
-using static StardewValley.Minigames.CraneGame;
 
 namespace ConvenientInventory
 {
@@ -30,58 +29,61 @@ namespace ConvenientInventory
             foreach (Chest chest in chests)
             {
                 #region DEBUG
-                Vector2 chestPosition = (chest.TileLocation + new Vector2(0, -1)) * Game1.tileSize;
-                Vector2 farmerOffset = who.FacingDirection switch
+                int numChestItemStacks = new Random().Next(8) + 1;
+                for (int i = 0; i < numChestItemStacks; i++)
                 {
-                    0 => new Vector2(0f, -1.5f) * Game1.tileSize,   // Up
-                    1 => new Vector2(0.5f, -1f) * Game1.tileSize,   // Right
-                    3 => new Vector2(-0.5f, -1f) * Game1.tileSize,  // Left
-                    _ => new Vector2(0f, -0.5f) * Game1.tileSize,   // Down
-                };
-                Vector2 farmerPosition = who.Position + farmerOffset;
+                    Vector2 chestPosition = (chest.TileLocation + new Vector2(0, -1)) * Game1.tileSize;
+                    Vector2 farmerOffset = who.FacingDirection switch
+                    {
+                        0 => new Vector2(0f, -1.5f) * Game1.tileSize,   // Up
+                        1 => new Vector2(0.5f, -1f) * Game1.tileSize,   // Right
+                        3 => new Vector2(-0.5f, -1f) * Game1.tileSize,  // Left
+                        _ => new Vector2(0f, -0.5f) * Game1.tileSize,   // Down
+                    };
+                    Vector2 farmerPosition = who.Position + farmerOffset;
 
-                float distance = Vector2.Distance(farmerPosition, chestPosition);
-                Vector2 motionVec = chestPosition - farmerPosition;
+                    float distance = Vector2.Distance(farmerPosition, chestPosition);
+                    Vector2 motionVec = chestPosition - farmerPosition;
 
-                float CONFIG_animationSpeed = 1f; // range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
-                float time = (float)(10 * Math.Pow(distance, 0.5)) + 400 - Math.Min(0, motionVec.Y);
-                time /= CONFIG_animationSpeed;
+                    float CONFIG_animationSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
+                    float time = (float)(10 * Math.Pow(distance, 0.5)) + 400 - Math.Min(0, motionVec.Y);
+                    time /= CONFIG_animationSpeed;
 
-                float extraHeight = 128 - Math.Min(0, motionVec.Y);
-                float gravity = 2 * extraHeight / time;
-                motionVec.Y -= extraHeight;
+                    int randExtraHeight = new Random().Next(160);
+                    float extraHeight = 128 + randExtraHeight - Math.Min(0, motionVec.Y);
+                    float gravity = 2 * extraHeight / time;
+                    motionVec.Y -= extraHeight;
 
-                int delayPerItem = 0;//50; // TODO: This should be for add'l items per-chest, and reset to 0 for each chest. That way when items fade into the chest, each sprite is slightly staggered.
-                float addlayerDepth = 1E-07f * numItemsQuickStackAnimation;
+                    int delayPerItem = 50;
+                    float addlayerDepth = 1E-06f * numItemsQuickStackAnimation; // Avoid z-fighting by drawing each sprite above the previous.
 
-                ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem("(O)" + new Random().Next(100)); // DEBUG: Get random item sprite.
-                //ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(playerItem.QualifiedItemId);
-                var itemTossSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, flipped: false, alphaFade: 0f, Color.White)
-                {
-                    delayBeforeAnimationStart = numItemsQuickStackAnimation * delayPerItem,
-                    scale = 4f,
-                    layerDepth = 1f + addlayerDepth,
-                    totalNumberOfLoops = 0,
-                    //interval = t,
-                    //motion = new Vector2(horizontalDistance / ((who.FacingDirection == 0) ? 900f : 1000f), 0f - velocity),
-                    interval = time,
-                    motion = motionVec / time,
-                    acceleration = new Vector2(0f, gravity) / time,
-                    timeBasedMotion = true,
-                };
-                var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0.04f, Color.White)
-                {
-                    delayBeforeAnimationStart = numItemsQuickStackAnimation * delayPerItem + (int)time,
-                    scale = 4f,
-                    layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f + addlayerDepth, // Refactored from Object.draw()
-                    motion = new Vector2(0.3f, 3f),
-                    acceleration = new Vector2(0f, -0.1f),
-                    scaleChange = -0.05f,
-                };
+                    ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem("(O)" + new Random().Next(100)); // DEBUG: Get random item sprite.
+                    //ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(playerItem.QualifiedItemId);
+                    var itemTossSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, flipped: false, alphaFade: 0f, Color.White)
+                    {
+                        delayBeforeAnimationStart = i * delayPerItem,
+                        scale = 4f,
+                        layerDepth = 1f + addlayerDepth,
+                        totalNumberOfLoops = 0,
+                        interval = time,
+                        motion = motionVec / time,
+                        acceleration = new Vector2(0f, gravity) / time,
+                        timeBasedMotion = true,
+                    };
+                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0.04f, Color.White)
+                    {
+                        delayBeforeAnimationStart = i * delayPerItem + (int)time,
+                        scale = 4f,
+                        layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f + addlayerDepth, // Refactored from Object.draw()
+                        motion = new Vector2(0.3f, 3f),
+                        acceleration = new Vector2(0f, -0.1f),
+                        scaleChange = -0.05f,
+                    };
 
-                ConvenientInventory.AddQuickStackAnimationItemSprite(itemTossSprite);
-                ConvenientInventory.AddQuickStackAnimationItemSprite(itemFadeSprite);
-                numItemsQuickStackAnimation++;
+                    ConvenientInventory.AddQuickStackAnimationItemSprite(itemTossSprite);
+                    ConvenientInventory.AddQuickStackAnimationItemSprite(itemFadeSprite);
+                    numItemsQuickStackAnimation++;
+                }
                 #endregion DEBUG
 
                 List<Item> stackOverflowItems = new();
