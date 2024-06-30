@@ -29,6 +29,8 @@ namespace ConvenientInventory
             foreach (Chest chest in chests)
             {
                 #region DEBUG
+                // TODO: Junimo Hut item stack is being tossed toward top-left of current location, near (0,0). Investigate and fix.
+
                 int numChestItemStacks = new Random().Next(8) + 1;
                 for (int i = 0; i < numChestItemStacks; i++)
                 {
@@ -46,15 +48,20 @@ namespace ConvenientInventory
                     Vector2 motionVec = chestPosition - farmerPosition;
 
                     float CONFIG_animationSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
-                    float time = (float)(10 * Math.Pow(distance, 0.5)) + 400 - Math.Min(0, motionVec.Y);
+                    float time = (float)(10 * Math.Pow(distance, 0.5)) + 400 - (0.5f * Math.Min(0, motionVec.Y));
                     time /= CONFIG_animationSpeed;
 
-                    int randExtraHeight = new Random().Next(160);
+                    int randExtraHeight = 60;// new Random().Next(160);
                     float extraHeight = 128 + randExtraHeight - Math.Min(0, motionVec.Y);
                     float gravity = 2 * extraHeight / time;
                     motionVec.Y -= extraHeight;
+                    float extraX = motionVec.X;
+                    float xAccel = -2 * motionVec.X / time;
+                    motionVec.X += extraX;
 
-                    int delayPerItem = 50;
+                    int delayPerItem = 0;
+                    int hoverTimePerItem = 150;
+                    hoverTimePerItem = (int)(hoverTimePerItem / CONFIG_animationSpeed);
                     float addlayerDepth = 1E-06f * numItemsQuickStackAnimation; // Avoid z-fighting by drawing each sprite above the previous.
 
                     ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem("(O)" + new Random().Next(100)); // DEBUG: Get random item sprite.
@@ -63,24 +70,32 @@ namespace ConvenientInventory
                     {
                         delayBeforeAnimationStart = i * delayPerItem,
                         scale = 4f,
-                        layerDepth = 1f + addlayerDepth,
+                        layerDepth = 1f - addlayerDepth,
                         totalNumberOfLoops = 0,
                         interval = time,
                         motion = motionVec / time,
-                        acceleration = new Vector2(0f, gravity) / time,
+                        acceleration = new Vector2(xAccel, gravity) / time,
                         timeBasedMotion = true,
                     };
-                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0.04f, Color.White)
+                    var itemHoverSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0f, Color.White)
                     {
                         delayBeforeAnimationStart = i * delayPerItem + (int)time,
                         scale = 4f,
+                        layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f - addlayerDepth, // Refactored from Object.draw()
+                        interval = i * hoverTimePerItem,
+                    };
+                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, flipped: false, alphaFade: 0.04f, Color.White)
+                    {
+                        delayBeforeAnimationStart = i * delayPerItem + (int)time + i * hoverTimePerItem,
+                        scale = 4f,
                         layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f + addlayerDepth, // Refactored from Object.draw()
-                        motion = new Vector2(0.3f, 3f),
+                        motion = new Vector2(0.6f, 3f),
                         acceleration = new Vector2(0f, -0.1f),
-                        scaleChange = -0.05f,
+                        scaleChange = -0.07f,
                     };
 
                     ConvenientInventory.AddQuickStackAnimationItemSprite(itemTossSprite);
+                    ConvenientInventory.AddQuickStackAnimationItemSprite(itemHoverSprite);
                     ConvenientInventory.AddQuickStackAnimationItemSprite(itemFadeSprite);
                     numItemsQuickStackAnimation++;
                 }
@@ -128,7 +143,11 @@ namespace ConvenientInventory
                         {
                             if (ModEntry.Config.IsEnableQuickStackAnimation)
                             {
-                                // TODO: When quick stack animation begins, visually open all chests which were quick stacked into, then visually close them after animation ends.
+                                // When quick stack animation begins, visually open all chests which were quick stacked into, then visually close them after animation ends.
+                                  // Invoke the "open chest" animation, and
+                                  // Start a stopwatch, and
+                                  // Use a float var to track the longest `time` value out of all the sprites stacked into this chest.
+                                  // Once `stopWatch.ElapsedMilliseconds` is >= time float var, invoke the "close chest" animation.
 
                                 // TODO: Quick stack animation here
                                 // ...
