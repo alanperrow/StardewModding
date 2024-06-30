@@ -59,6 +59,7 @@ namespace ConvenientInventory
                     float xAccel = -2 * motionVec.X / time;
                     motionVec.X += extraX;
 
+                    float baseLayerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f; // Refactored from Object.draw()
                     float addlayerDepth = 1E-06f * numItemsQuickStackAnimation; // Avoids z-fighting by drawing each sprite on a separate layer depth.
 
                     int delayPerItem = 0;
@@ -84,14 +85,14 @@ namespace ConvenientInventory
                     {
                         delayBeforeAnimationStart = i * delayPerItem + (int)time,
                         scale = 4f,
-                        layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f - addlayerDepth, // Refactored from Object.draw()
+                        layerDepth = baseLayerDepth - addlayerDepth,
                         interval = i * hoverTimePerItem,
                     };
                     var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0.04f, Color.White)
                     {
                         delayBeforeAnimationStart = i * delayPerItem + (int)time + i * hoverTimePerItem,
                         scale = 4f,
-                        layerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f + addlayerDepth, // Refactored from Object.draw()
+                        layerDepth = baseLayerDepth + addlayerDepth,
                         motion = new Vector2(0.6f, 3f),
                         acceleration = new Vector2(0f, -0.1f),
                         scaleChange = -0.07f,
