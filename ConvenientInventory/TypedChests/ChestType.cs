@@ -4,6 +4,9 @@
     {
         Normal,
         Stone,
+        // TODO: Big chest support
+        //BigNormal,
+        //BigStone,
         Fridge,
         MiniFridge,
         Mill,

@@ -29,6 +29,7 @@ namespace ConvenientInventory.TypedChests
 
             return chest.ParentSheetIndex switch
             {
+                // TODO: Big chest support
                 232 => ChestType.Stone,
                 216 => ChestType.MiniFridge,
                 -1 => ChestType.Package,
@@ -48,6 +49,7 @@ namespace ConvenientInventory.TypedChests
 
             return this.ChestType switch
             {
+                // TODO: Big chest support
                 ChestType.Normal => DrawNormalChestTooltip(spriteBatch, x, y),
                 ChestType.Stone => DrawStoneChestTooltip(spriteBatch, x, y),
                 ChestType.Fridge => DrawFridgeTooltip(spriteBatch, x, y),
