@@ -88,14 +88,15 @@ namespace ConvenientInventory
                         layerDepth = baseLayerDepth - addlayerDepth,
                         interval = i * hoverTimePerItem,
                     };
-                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0.04f, Color.White)
+                    var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
                     {
                         delayBeforeAnimationStart = i * delayPerItem + (int)time + i * hoverTimePerItem,
                         scale = 4f,
                         layerDepth = baseLayerDepth + addlayerDepth,
-                        motion = new Vector2(0.6f, 3f),
-                        acceleration = new Vector2(0f, -0.1f),
-                        scaleChange = -0.07f,
+                        alphaFade = 0.04f * CONFIG_animationHoverSpeed,
+                        motion = new Vector2(0.6f, 3f) * CONFIG_animationHoverSpeed,
+                        acceleration = new Vector2(0f, -0.1f) * CONFIG_animationHoverSpeed,
+                        scaleChange = -0.07f * CONFIG_animationHoverSpeed,
                     };
 
                     ConvenientInventory.AddQuickStackAnimationItemSprite(itemTossSprite);
