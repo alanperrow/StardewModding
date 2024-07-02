@@ -34,7 +34,7 @@ namespace ConvenientInventory.QuickStack
                 {
                     var quickStackAnimation = new QuickStackAnimation();
                     quickStackAnimation.Begin(numItemsQuickStackAnimation);
-                    quickStackAnimation.Method(chest, who);
+                    quickStackAnimation.DebugAnimate(chest, who);
 
                     numItemsQuickStackAnimation = quickStackAnimation.End();
                 }

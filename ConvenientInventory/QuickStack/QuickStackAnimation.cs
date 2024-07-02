@@ -20,7 +20,7 @@ namespace ConvenientInventory.QuickStack
             return numItemsAnimated;
         }
 
-        public void Method(Chest chest, Farmer who)
+        public void DebugAnimate(Chest chest, Farmer who)
         {
             // Restart the quick stack animation stopwatch so that chests can be visually opened during animation.
             ConvenientInventory.QuickStackAnimationStopwatch.Restart();
