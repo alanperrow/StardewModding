@@ -1110,6 +1110,27 @@ namespace ConvenientInventory.Patches
 
                 // TODO: Think of a way to do this that supports online multiplayer.
                 //       I think sprites will get broadcast, but chest animation will not work if relying on Stopwatch.
+                //
+                // NOTE: modData is multiplayer synced, so take advantage of this.
+                //
+                // IDEA: Timeline style with designated "keyframes"
+                //
+                //       |--:--:--:--:--X------...------X--:--:--:--:--|
+                //       ^  \________/  ^  \_________/  ^  \________/  ^
+                //       |  "keyframes" |  chest stays  |  "keyframes" |
+                //       |              |     open      |              |
+                //  Start chest     End chest       Start chest    End chest
+                //  open anim.      open anim.      close anim.    close anim.
+                //
+                // - Need to define:
+                //      - number of intervals for animation in one direction
+                //      - interval between animation "keyframes"
+                //      - start time for open animation
+                //          - end time not specified; we can calculate the end time for open animation @ the final interval.
+                //      - time duration for how long chest stays open while items are visually being stacked into it
+                //      - use this^ duration to calculate start time for close animation
+                //          - end time not specified; we can calculate the end time for close animation @ the final interval.
+
                 string chestOpenMsStr = __instance.modData[ConvenientInventory.quickStackAnimationChestOpenMsModDataKey];
                 int chestOpenMs = int.Parse(chestOpenMsStr);
                 if (ConvenientInventory.QuickStackAnimationStopwatch.ElapsedMilliseconds >= chestOpenMs)
