@@ -1081,5 +1081,53 @@ namespace ConvenientInventory.Patches
 
     }
 
+    [HarmonyPatch(typeof(Chest))]
+    public static class ChestPatches
+    {
+        private static readonly FieldInfo chestCurrentLidFrameField = typeof(Chest)
+            .GetField("currentLidFrame", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(Chest.draw))]
+        [HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) })]
+        public static bool Draw_Prefix(Chest __instance)
+        {
+            if (!ModEntry.Config.IsEnableQuickStack
+                || !ModEntry.Config.IsEnableQuickStackAnimation
+                || !ModEntry.Config.IsEnableQuickStackChestAnimation)
+            {
+                return true;
+            }
+
+            try
+            {
+                if (!__instance.modData.ContainsKey(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey))
+                {
+                    return true;
+                }
+
+                chestCurrentLidFrameField.SetValue(__instance, __instance.getLastLidFrame());
+
+                // TODO: Think of a way to do this that supports online multiplayer.
+                //       I think sprites will get broadcast, but chest animation will not work if relying on Stopwatch.
+                string chestOpenMsStr = __instance.modData[ConvenientInventory.quickStackAnimationChestOpenMsModDataKey];
+                int chestOpenMs = int.Parse(chestOpenMsStr);
+                if (ConvenientInventory.QuickStackAnimationStopwatch.ElapsedMilliseconds >= chestOpenMs)
+                {
+                    __instance.modData.Remove(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey);
+                    __instance.fixLidFrame();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Prefix)}:\n{e}", LogLevel.Error);
+            }
+
+            return true;
+        }
+    }
+
     // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
 }

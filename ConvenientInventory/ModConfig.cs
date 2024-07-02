@@ -25,6 +25,8 @@ namespace ConvenientInventory
 
         public bool IsEnableQuickStackAnimation { get; set; } = true;
 
+        public bool IsEnableQuickStackChestAnimation { get; set; } = true;
+
         public bool IsEnableFavoriteItems { get; set; } = true;
 
         public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;

@@ -29,6 +29,10 @@ namespace ConvenientInventory
             foreach (Chest chest in chests)
             {
                 #region DEBUG
+
+                // Restart the quick stack animation stopwatch so that chests can be visually opened during animation.
+                ConvenientInventory.QuickStackAnimationStopwatch.Restart();
+
                 // TODO: Junimo Hut item stack is being tossed toward top-left of current location, near (0,0). Investigate and fix.
 
                 int numChestItemStacks = new Random().Next(8) + 1;
@@ -95,7 +99,7 @@ namespace ConvenientInventory
                         layerDepth = baseLayerDepth + addlayerDepth,
                         alphaFade = 0.04f * CONFIG_animationHoverSpeed,
                         motion = new Vector2(0.6f, 3f) * CONFIG_animationHoverSpeed,
-                        acceleration = new Vector2(0f, -0.1f) * CONFIG_animationHoverSpeed,
+                        acceleration = new Vector2(0f, -0.08f) * CONFIG_animationHoverSpeed,
                         scaleChange = -0.07f * CONFIG_animationHoverSpeed,
                     };
 
@@ -103,7 +107,22 @@ namespace ConvenientInventory
                     ConvenientInventory.AddQuickStackAnimationItemSprite(itemHoverSprite);
                     ConvenientInventory.AddQuickStackAnimationItemSprite(itemFadeSprite);
                     numItemsQuickStackAnimation++;
+
+                    // Here we use 500ms as an estimate for how long fade animation takes to complete.
+                    int totalAnimationTimeMs = (int)(i * delayPerItem + (int)time + i * hoverTimePerItem + 500 / CONFIG_animationHoverSpeed);
+
+                    // Add total animation time to chest's mod data.
+                    // This is used to override the draw animation to display the chest as "opened", even though it really isn't.
+                    if (!chest.modData.TryAdd(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey, totalAnimationTimeMs.ToString()))
+                    {
+                        // Could not add mod data; Overwrite existing mod data entry, if any.
+                        if (chest.modData.ContainsKey(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey))
+                        {
+                            chest.modData[ConvenientInventory.quickStackAnimationChestOpenMsModDataKey] = totalAnimationTimeMs.ToString();
+                        }
+                    }
                 }
+
                 #endregion DEBUG
 
                 List<Item> stackOverflowItems = new();
