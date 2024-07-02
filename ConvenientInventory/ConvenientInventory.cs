@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using ConvenientInventory.Compatibility;
+using ConvenientInventory.QuickStack;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
