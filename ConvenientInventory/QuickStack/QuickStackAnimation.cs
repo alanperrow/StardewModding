@@ -22,9 +22,6 @@ namespace ConvenientInventory.QuickStack
 
         public void DebugAnimate(Chest chest, Farmer who)
         {
-            // Restart the quick stack animation stopwatch so that chests can be visually opened during animation.
-            ConvenientInventory.QuickStackAnimationStopwatch.Restart();
-
             // TODO: Junimo Hut item stack is being tossed toward top-left of current location, near (0,0). Investigate and fix.
 
             int numChestItemStacks = new Random().Next(8) + 1;

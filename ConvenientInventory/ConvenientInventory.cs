@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.QuickStack;
@@ -50,9 +49,6 @@ namespace ConvenientInventory
             get => transferredItemSprites.Value;
             set => transferredItemSprites.Value = value;
         }
-
-        public static readonly string quickStackAnimationChestOpenMsModDataKey = $"{ModEntry.Instance.ModManifest.UniqueID}/quickStackAnimation/chestOpenMs";
-        public static Stopwatch QuickStackAnimationStopwatch { get; } = new();
 
         private static readonly PerScreen<TemporaryAnimatedSpriteList> quickStackAnimationItemSprites = new(() => new TemporaryAnimatedSpriteList());
         private static TemporaryAnimatedSpriteList QuickStackAnimationItemSprites

@@ -13,6 +13,7 @@ using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Inventories;
 using StardewValley.Objects;
+using ConvenientInventory.QuickStack;
 
 namespace ConvenientInventory.Patches
 {
@@ -1084,52 +1085,27 @@ namespace ConvenientInventory.Patches
     [HarmonyPatch(typeof(Chest))]
     public static class ChestPatches
     {
-        private static readonly FieldInfo chestCurrentLidFrameField = typeof(Chest)
-            .GetField("currentLidFrame", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Chest.draw))]
         [HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) })]
         public static bool Draw_Prefix(Chest __instance)
         {
-            if (!ModEntry.Config.IsEnableQuickStack
-                || !ModEntry.Config.IsEnableQuickStackAnimation
-                || !ModEntry.Config.IsEnableQuickStackChestAnimation)
-            {
-                return true;
-            }
-
             try
             {
-                if (!__instance.modData.ContainsKey(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey))
-                {
-                    return true;
-                }
+                
 
-                chestCurrentLidFrameField.SetValue(__instance, __instance.getLastLidFrame());
+                int lidFrame = __instance.getLastLidFrame();
 
-                // TODO: Think of a way to do this that supports online multiplayer.
-                //       I think sprites will get broadcast, but chest animation will not work if relying on Stopwatch.
-                //
-                // NOTE: modData is multiplayer synced, so take advantage of this.
-                //
-                // IDEA: Timeline style with designated "keyframes"
-                //
-                //       |--:--:--:--:--X------...------X--:--:--:--:--|
-                //       ^  \________/  ^  \_________/  ^  \________/  ^
-                //       |  "keyframes" |  chest stays  |  "keyframes" |
-                //       |              |     open      |              |
-                //  Start chest     End chest       Start chest    End chest
-                //  open anim.      open anim.      close anim.    close anim.
-                //
-                // - Need to define:
-                //      - number of intervals for animation in one direction
-                //      - interval between animation "keyframes"
-                //      - start time for open animation
-                //          - end time not specified; we can calculate the end time for open animation @ the final interval.
-                //      - time duration for how long chest stays open while items are visually being stacked into it
-                //      - use this^ duration to calculate start time for close animation
-                //          - end time not specified; we can calculate the end time for close animation @ the final interval.
+                chestCurrentLidFrameField.SetValue(__instance, lidFrame);
+
+
+
+
+
+
+
+                string x1 = __instance.modData[QuickStackChestAnimation.StartTimeModDataKey].ToString();
+
 
                 string chestOpenMsStr = __instance.modData[ConvenientInventory.quickStackAnimationChestOpenMsModDataKey];
                 int chestOpenMs = int.Parse(chestOpenMsStr);
