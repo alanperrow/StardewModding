@@ -105,8 +105,55 @@ namespace ConvenientInventory.QuickStack
         {
             int elapsedMs = (int)(anim.CurrentTime - anim.StartTime).TotalMilliseconds;
 
-            int numFrames = chest.getLastLidFrame() - chest.startingLidFrame.Value;
-            int[] keyframesMs = new int[2 + 2 * numFrames]; // Start frame -> numFrames -> wait (until all items are stacked into chest) -> numFrames (reversed) -> end frame.
+            int startingLidFrame = chest.startingLidFrame.Value;
+            int numFrames = chest.getLastLidFrame() - startingLidFrame;
+            int[] keyframesMs = new int[2 * numFrames + 1]; // numFrames (open) -> wait (until all items are stacked into chest) -> numFrames (close; reversed) -> closed.
+
+            // IDEA: Optimization: Should I store `keyframesMs` as a serialized string in modData, rather than recalculating it each frame?
+            //                     That way, every frame would just do a lookup with `elapsedMs` to see where we land in terms of `keyframesMs`.
+            //                     Not sure which is more expensive:
+            //                      - storing `keyframesMs` in modData as string and parsing it as int[] every frame, or
+            //                      - manually recalculate `keyframesMs` every frame (as we are doing here).
+
+            // == Calculate keyframe timings. ==
+            // Open animation.
+            int i = 0;
+            for (; i < numFrames; i++)
+            {
+                keyframesMs[i] = i * FrameIntervalMs;
+            }
+
+            // Close animation.
+            int j = 0;
+            for (; i < 2 * numFrames; i++, j++)
+            {
+                keyframesMs[i] = anim.ItemAnimationTotalMs + (j * FrameIntervalMs);
+            }
+
+            // End of animation; chest is closed.
+            keyframesMs[i] = anim.ItemAnimationTotalMs + (j * FrameIntervalMs);
+
+            // == Determine which keyframe should be used at the current time. ==
+            int currentKeyframeIndex = 0;
+            while (currentKeyframeIndex < keyframesMs.Length - 1 && elapsedMs > keyframesMs[currentKeyframeIndex + 1])
+            {
+                currentKeyframeIndex++;
+            }
+
+            // == Map the found keyframe index to the correct chest lid frame. ==
+            if (currentKeyframeIndex < numFrames)
+            {
+                // Open animation, 
+                return startingLidFrame + 1 + currentKeyframeIndex;
+            }
+            else if (currentKeyframeIndex < 2 * numFrames)
+            {
+                return startingLidFrame + 1 + numFrames - currentKeyframeIndex;
+            }
+            else
+            {
+                return startingLidFrame;
+            }
         }
     }
 }
