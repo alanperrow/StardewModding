@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using StardewValley;
 using StardewValley.Objects;
 
 namespace ConvenientInventory.QuickStack
@@ -26,6 +27,33 @@ namespace ConvenientInventory.QuickStack
 
         private static readonly FieldInfo chestCurrentLidFrameField = typeof(Chest)
             .GetField("currentLidFrame", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+        /// <summary>
+        /// Iterates through all chests in each game location and removes any quick stack chest animation mod data.
+        /// </summary>
+        // TODO: Call this method before save game occurs so we don't save mod data unnecessarily.
+        public static void CleanupModData()
+        {
+            Utility.ForEachLocation(loc =>
+            {
+                foreach (var obj in loc.Objects.Values)
+                {
+                    if (obj is not Chest chest)
+                    {
+                        continue;
+                    }
+
+                    // If this works, great.
+                    // If not, will have to adjust logic below to a TryGetValue() first to ensure the key exists before removing it for each chest.
+                    chest.modData.Remove("What happens if i remove a key that DNE?");
+
+                    chest.modData.Remove(StartTimeModDataKey);
+                    chest.modData.Remove(ItemAnimationTotalMsModDataKey);
+                }
+
+                return true;
+            });
+        }
 
         /// <summary>
         /// Sets the provided chest's lid frame depending on its quick stack chest animation data, if any.
@@ -84,7 +112,7 @@ namespace ConvenientInventory.QuickStack
             return new ChestAnimationData(startTime, endTime, currentTime, itemAnimationTotalMs);
         }
 
-        // IDEA: Timeline style with designated "keyframes"
+        // Timeline style with designated "keyframes"
         //
         //       |--:--:--:--:--X------...------X--:--:--:--:--|
         //       ^  \________/  ^  \_________/  ^  \________/  ^
@@ -92,15 +120,6 @@ namespace ConvenientInventory.QuickStack
         //       |              |     open      |              |
         //  Start chest     End chest       Start chest    End chest
         //  open anim.      open anim.      close anim.    close anim.
-        //
-        // - Need to define:
-        //      - number of intervals for animation in one direction 
-        //      - interval between animation "keyframes"
-        //      - start time for open animation
-        //          - end time not specified; we can calculate the end time for open animation @ the final interval.
-        //      - time duration for how long chest stays open while items are visually being stacked into it
-        //      - use this^ duration to calculate start time for close animation
-        //          - end time not specified; we can calculate the end time for close animation @ the final interval.
         private static int GetCurrentAnimationLidFrame(Chest chest, ChestAnimationData anim)
         {
             int elapsedMs = (int)(anim.CurrentTime - anim.StartTime).TotalMilliseconds;

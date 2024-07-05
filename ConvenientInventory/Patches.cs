@@ -1092,30 +1092,7 @@ namespace ConvenientInventory.Patches
         {
             try
             {
-                
-
-                int lidFrame = __instance.getLastLidFrame();
-
-                chestCurrentLidFrameField.SetValue(__instance, lidFrame);
-
-
-
-
-
-
-
-                string x1 = __instance.modData[QuickStackChestAnimation.StartTimeModDataKey].ToString();
-
-
-                string chestOpenMsStr = __instance.modData[ConvenientInventory.quickStackAnimationChestOpenMsModDataKey];
-                int chestOpenMs = int.Parse(chestOpenMsStr);
-                if (ConvenientInventory.QuickStackAnimationStopwatch.ElapsedMilliseconds >= chestOpenMs)
-                {
-                    __instance.modData.Remove(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey);
-                    __instance.fixLidFrame();
-                }
-
-                return true;
+                QuickStackChestAnimation.Animate(__instance);
             }
             catch (Exception e)
             {

@@ -1,6 +1,7 @@
 ﻿using System;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.Patches;
+using ConvenientInventory.QuickStack;
 using GenericModConfigMenu;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
@@ -90,6 +91,20 @@ namespace ConvenientInventory
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
+
+
+
+            // DEBUG
+            if (e.Button == SButton.P)
+            {
+                QuickStackChestAnimation.CleanupModData();
+            }
+            // DEBUG
+
+
+
+
+
             // Handle favorite items hotkey being pressed
             if (Config.IsEnableFavoriteItems
                 && Context.IsWorldReady
