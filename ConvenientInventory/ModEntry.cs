@@ -97,7 +97,7 @@ namespace ConvenientInventory
             // DEBUG
             if (e.Button == SButton.P)
             {
-                QuickStackChestAnimation.CleanupModData();
+                QuickStackChestAnimation.CleanupAllModData();
             }
             // DEBUG
 

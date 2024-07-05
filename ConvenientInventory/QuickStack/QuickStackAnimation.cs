@@ -41,15 +41,14 @@ namespace ConvenientInventory.QuickStack
                 Vector2 motionVec = (chestPosition - farmerPosition) * 0.98f; // 0.98 multiplier gives a better result in-game; without it, items slightly overshoot the chest.
 
                 float CONFIG_animationSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
-                float time = (float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y);
-                time /= CONFIG_animationSpeed;
+                float tossTime = (float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y) / CONFIG_animationSpeed;
 
                 int randExtraHeight = 60;// new Random().Next(160);
                 float extraHeight = 128 + randExtraHeight - Math.Min(0, motionVec.Y);
-                float gravity = 2 * extraHeight / time;
+                float gravity = 2 * extraHeight / tossTime;
                 motionVec.Y -= extraHeight;
                 float extraX = motionVec.X;
-                float xAccel = -2 * motionVec.X / time;
+                float xAccel = -2 * motionVec.X / tossTime;
                 motionVec.X += extraX;
 
                 float baseLayerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f; // Refactored from Object.draw()
@@ -58,8 +57,8 @@ namespace ConvenientInventory.QuickStack
                 int delayPerItem = 0;
 
                 float CONFIG_animationHoverSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
-                int hoverTimePerItem = 150;
-                hoverTimePerItem = (int)(hoverTimePerItem / CONFIG_animationHoverSpeed);
+                int hoverTimePerItem = (int)(150 / CONFIG_animationHoverSpeed);
+                int fadeTime = (int)(500 / CONFIG_animationHoverSpeed);
 
                 ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem("(O)" + new Random().Next(100)); // DEBUG: Get random item sprite.
                                                                                                            //ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(playerItem.QualifiedItemId);
@@ -69,28 +68,28 @@ namespace ConvenientInventory.QuickStack
                     scale = 4f,
                     layerDepth = 1f - addlayerDepth,
                     totalNumberOfLoops = 0,
-                    interval = time,
-                    motion = motionVec / time,
-                    acceleration = new Vector2(xAccel, gravity) / time,
+                    interval = tossTime,
+                    motion = motionVec / tossTime,
+                    acceleration = new Vector2(xAccel, gravity) / tossTime,
                     timeBasedMotion = true,
                 };
                 var itemHoverSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
                 {
-                    delayBeforeAnimationStart = i * delayPerItem + (int)time,
+                    delayBeforeAnimationStart = i * delayPerItem + (int)tossTime,
                     scale = 4f,
                     layerDepth = baseLayerDepth - addlayerDepth,
                     interval = i * hoverTimePerItem,
                 };
                 var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
                 {
-                    delayBeforeAnimationStart = i * delayPerItem + (int)time + i * hoverTimePerItem,
+                    delayBeforeAnimationStart = i * delayPerItem + (int)tossTime + i * hoverTimePerItem,
                     scale = 4f,
                     layerDepth = baseLayerDepth + addlayerDepth,
-                    alphaFade = 0.04f * CONFIG_animationHoverSpeed,
-                    interval = 500 * CONFIG_animationHoverSpeed,
-                    motion = new Vector2(0.6f, 4.5f) * CONFIG_animationHoverSpeed,
-                    acceleration = new Vector2(0f, -0.08f) * CONFIG_animationHoverSpeed,
-                    scaleChange = -0.07f * CONFIG_animationHoverSpeed,
+                    alphaFade = 0.04f / CONFIG_animationHoverSpeed,
+                    interval = fadeTime,
+                    motion = new Vector2(0.6f, 4.5f) / CONFIG_animationHoverSpeed,
+                    acceleration = new Vector2(0f, -0.08f) / CONFIG_animationHoverSpeed,
+                    scaleChange = -0.07f / CONFIG_animationHoverSpeed,
                 };
 
                 ConvenientInventory.AddQuickStackAnimationItemSprite(itemTossSprite);
@@ -98,19 +97,9 @@ namespace ConvenientInventory.QuickStack
                 ConvenientInventory.AddQuickStackAnimationItemSprite(itemFadeSprite);
                 numItemsAnimated++;
 
-                // Here we use 500ms as an estimate for how long fade animation takes to complete.
-                int totalAnimationTimeMs = (int)(i * delayPerItem + (int)time + i * hoverTimePerItem + 500 / CONFIG_animationHoverSpeed);
+                int totalAnimationTimeMs = (i * delayPerItem + (int)tossTime + i * hoverTimePerItem + fadeTime);
 
-                // Add total animation time to chest's mod data.
-                // This is used to override the draw animation to display the chest as "opened", even though it really isn't.
-                if (!chest.modData.TryAdd(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey, totalAnimationTimeMs.ToString()))
-                {
-                    // Could not add mod data; Overwrite existing mod data entry, if any.
-                    if (chest.modData.ContainsKey(ConvenientInventory.quickStackAnimationChestOpenMsModDataKey))
-                    {
-                        chest.modData[ConvenientInventory.quickStackAnimationChestOpenMsModDataKey] = totalAnimationTimeMs.ToString();
-                    }
-                }
+                QuickStackChestAnimation.SetModData(chest, totalAnimationTimeMs);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using StardewValley;
 using StardewValley.Objects;
@@ -28,21 +29,42 @@ namespace ConvenientInventory.QuickStack
         private static readonly FieldInfo chestCurrentLidFrameField = typeof(Chest)
             .GetField("currentLidFrame", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
+        public static void SetModData(Chest chest, int itemAnimationTotalMs)
+        {
+            string startTimeStr = DateTimeOffset.Now.ToString();
+            string itemAnimationTotalMsStr = itemAnimationTotalMs.ToString();
+
+            chest.modData["what happens if i assign to a key that DNE?"] = "TEST";
+
+            if (!chest.modData.TryAdd(StartTimeModDataKey, startTimeStr))
+            {
+                // Could not add mod data; Overwrite existing mod data entry, if any.
+                if (chest.modData.ContainsKey(StartTimeModDataKey))
+                {
+                    chest.modData[StartTimeModDataKey] = startTimeStr;
+                }
+            }
+
+            if (!chest.modData.TryAdd(ItemAnimationTotalMsModDataKey, itemAnimationTotalMsStr))
+            {
+                // Could not add mod data; Overwrite existing mod data entry, if any.
+                if (chest.modData.ContainsKey(ItemAnimationTotalMsModDataKey))
+                {
+                    chest.modData[ItemAnimationTotalMsModDataKey] = itemAnimationTotalMsStr;
+                }
+            }
+        }
+
         /// <summary>
         /// Iterates through all chests in each game location and removes any quick stack chest animation mod data.
         /// </summary>
         // TODO: Call this method before save game occurs so we don't save mod data unnecessarily.
-        public static void CleanupModData()
+        public static void CleanupAllModData()
         {
             Utility.ForEachLocation(loc =>
             {
-                foreach (var obj in loc.Objects.Values)
+                foreach (Chest chest in loc.Objects.Values.OfType<Chest>())
                 {
-                    if (obj is not Chest chest)
-                    {
-                        continue;
-                    }
-
                     // If this works, great.
                     // If not, will have to adjust logic below to a TryGetValue() first to ensure the key exists before removing it for each chest.
                     chest.modData.Remove("What happens if i remove a key that DNE?");
@@ -57,6 +79,7 @@ namespace ConvenientInventory.QuickStack
 
         /// <summary>
         /// Sets the provided chest's lid frame depending on its quick stack chest animation data, if any.
+        /// Visually, this makes the chest appear "open" without it actually being in use.
         /// </summary>
         /// <param name="chest"></param>
         public static void Animate(Chest chest)
