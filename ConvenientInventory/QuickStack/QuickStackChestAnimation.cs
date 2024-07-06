@@ -14,21 +14,20 @@ namespace ConvenientInventory.QuickStack
             DateTimeOffset CurrentTime,
             int ItemAnimationTotalMs);
 
-        private const int FrameIntervalMs = 83; // 83ms @ 60fps ~= 5 frames.
-
-        // Actually don't need this; can be calculated: numIntervals = (LastFrame - StartFrame)
-        //public static string NumIntervalsModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/QuickStackAnimation/NumIntervals";
+        private const int FrameIntervalMs = 83; // 83ms ~= 5 frames @ 60fps.
 
         private static string StartTimeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/QuickStackAnimation/StartTime";
 
         private static string ItemAnimationTotalMsModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/QuickStackAnimation/ItemAnimationTotalMs";
 
-        // We'll just make this simpler and set the interval to a constant value (see above: FrameIntervalMs).
-        //private static string FrameIntervalMsModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/QuickStackAnimation/FrameIntervalMs";
-
         private static readonly FieldInfo chestCurrentLidFrameField = typeof(Chest)
             .GetField("currentLidFrame", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
+        /// <summary>
+        /// Sets the mod data for the provided chest that will be used to animate its quick stack chest animation.
+        /// </summary>
+        /// <param name="chest">The chest to set mod data for.</param>
+        /// <param name="itemAnimationTotalMs">Total time (in ms) of the quick stack item animation.</param>
         public static void SetModData(Chest chest, int itemAnimationTotalMs)
         {
             string startTimeStr = DateTimeOffset.Now.ToString("O");
@@ -111,14 +110,17 @@ namespace ConvenientInventory.QuickStack
             return new ChestAnimationData(startTime, endTime, currentTime, itemAnimationTotalMs);
         }
 
-        // Timeline style with designated "keyframes"
-        //
-        //       |--:--:--:--:--X------...------X--:--:--:--:--|
-        //       ^  \________/  ^  \_________/  ^  \________/  ^
-        //       |  "keyframes" |  chest stays  |  "keyframes" |
-        //       |              |     open      |              |
-        //  Start chest     End chest       Start chest    End chest
-        //  open anim.      open anim.      close anim.    close anim.
+        /// <summary>
+        /// Gets the current frame of animation to use for this chest based on its animation data.
+        /// <para/>Timeline style with designated "keyframes":
+        /// <code>
+        ///       |--:--:--:--:--X------...------X--:--:--:--:--|
+        ///       ^  \________/  ^  \_________/  ^  \________/  ^
+        ///       |  "keyframes" |  chest stays  |  "keyframes" |
+        ///       |              |     open      |              |
+        ///  Start chest     End chest       Start chest    End chest
+        ///  open anim.      open anim.      close anim.    close anim.
+        /// </code></summary>
         private static int GetCurrentAnimationLidFrame(Chest chest, ChestAnimationData anim)
         {
             int elapsedMs = (int)(anim.CurrentTime - anim.StartTime).TotalMilliseconds;
