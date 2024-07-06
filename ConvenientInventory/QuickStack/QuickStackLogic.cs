@@ -33,18 +33,6 @@ namespace ConvenientInventory.QuickStack
 
             foreach (Chest chest in chests)
             {
-                #region DEBUG
-
-                if (ModEntry.Instance.Helper.Input.IsDown(StardewModdingAPI.SButton.LeftShift))
-                {
-                    quickStackAnimation.Begin(numItemsQuickStackAnimation);
-                    quickStackAnimation.DebugAnimate(chest, who);
-
-                    numItemsQuickStackAnimation = quickStackAnimation.Complete();
-                }
-
-                #endregion DEBUG
-
                 List<Item> stackOverflowItems = new();
 
                 IInventory chestItems = chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest
@@ -81,22 +69,10 @@ namespace ConvenientInventory.QuickStack
                         playerItem.Stack = chestItem.addToStack(playerItem);
                         bool movedAtLeastOne = beforeStack != playerItem.Stack;
 
-                        movedAtLeastOneTotal = movedAtLeastOneTotal || movedAtLeastOne;
+                        movedAtLeastOneTotal |= movedAtLeastOne;
 
                         if (movedAtLeastOne)
                         {
-                            if (ModEntry.Config.IsEnableQuickStackAnimation)
-                            {
-                                // When quick stack animation begins, visually open all chests which were quick stacked into, then visually close them after animation ends.
-                                // Invoke the "open chest" animation, and
-                                // Start a stopwatch, and
-                                // Use a float var to track the longest `time` value out of all the sprites stacked into this chest.
-                                // Once `stopWatch.ElapsedMilliseconds` is >= time float var, invoke the "close chest" animation.
-
-                                // TODO: Quick stack animation here
-                                // ...
-                            }
-
                             if (inventoryPage != null)
                             {
                                 ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[playerInventory.IndexOf(playerItem)];
@@ -108,6 +84,8 @@ namespace ConvenientInventory.QuickStack
                             {
                                 who.removeItemFromInventory(playerItem);
                             }
+
+                            quickStackAnimation?.AddToAnimation(chest, playerItem);
                         }
 
                         if (chestItem.Stack == chestItem.maximumStackSize())
@@ -150,19 +128,18 @@ namespace ConvenientInventory.QuickStack
                             Item leftoverItem = chest.addItem(playerItem);
                             bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
 
-                            movedAtLeastOneTotal = movedAtLeastOneTotal || movedAtLeastOne;
+                            movedAtLeastOneTotal |= movedAtLeastOne;
 
                             if (movedAtLeastOne)
                             {
-                                // TODO: Add item to quick stack bundle animation here.
-                                //...
-
                                 if (inventoryPage != null)
                                 {
                                     ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[playerInventory.IndexOf(playerItem)];
                                     ConvenientInventory.AddTransferredItemSprite(
                                         new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                                 }
+
+                                quickStackAnimation?.AddToAnimation(chest, playerItem);
                             }
 
                             if (leftoverItem is null)
@@ -178,11 +155,7 @@ namespace ConvenientInventory.QuickStack
                 }
             }
 
-            // Broadcast any item sprites for quick stack animation.
-            if (numItemsQuickStackAnimation > 0)
-            {
-                ConvenientInventory.BroadcastQuickStackAnimationItemSprites(who);
-            }
+            quickStackAnimation?.Complete();
 
             Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
 

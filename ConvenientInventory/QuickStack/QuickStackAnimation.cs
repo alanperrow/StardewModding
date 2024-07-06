@@ -46,6 +46,8 @@ namespace ConvenientInventory.QuickStack
         /// <param name="item">The item being quick stacked.</param>
         public void AddToAnimation(Chest chest, Item item)
         {
+            // TODO: Create a Dictionary<Chest, int> so each chest can have its own count, so that item delay is calculated per-chest.
+
             // DEBUG: Currently adding random number of item stacks for testing purposes.
             int numChestItemStacks = new Random().Next(8) + 1;
             for (int i = 0; i < numChestItemStacks; i++)
