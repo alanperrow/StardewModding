@@ -31,7 +31,7 @@ namespace ConvenientInventory.QuickStack
 
         public static void SetModData(Chest chest, int itemAnimationTotalMs)
         {
-            string startTimeStr = DateTimeOffset.Now.ToString();
+            string startTimeStr = DateTimeOffset.Now.ToString("O");
             string itemAnimationTotalMsStr = itemAnimationTotalMs.ToString();
 
             chest.modData[StartTimeModDataKey] = startTimeStr;
@@ -123,9 +123,10 @@ namespace ConvenientInventory.QuickStack
         {
             int elapsedMs = (int)(anim.CurrentTime - anim.StartTime).TotalMilliseconds;
 
+            // Length of keyframesMs = numFrames (open) -> wait (until all items are stacked into chest) -> numFrames (close; reversed) -> closed.
             int startingLidFrame = chest.startingLidFrame.Value;
             int numFrames = chest.getLastLidFrame() - startingLidFrame;
-            int[] keyframesMs = new int[2 * numFrames + 1]; // numFrames (open) -> wait (until all items are stacked into chest) -> numFrames (close; reversed) -> closed.
+            int[] keyframesMs = new int[2 * numFrames + 1];
 
             // IDEA: Optimization: Should I store `keyframesMs` as a serialized string in modData, rather than recalculating it each frame?
             //                     That way, every frame would just do a lookup with `elapsedMs` to see where we land in terms of `keyframesMs`.
@@ -142,14 +143,14 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Close animation.
-            int j = 0;
-            for (; i < 2 * numFrames; i++, j++)
+            int j = numFrames;
+            for (; i < 2 * numFrames; i++, j--)
             {
-                keyframesMs[i] = anim.ItemAnimationTotalMs + (j * FrameIntervalMs);
+                keyframesMs[i] = anim.ItemAnimationTotalMs - (j * FrameIntervalMs);
             }
 
             // End of animation; chest is closed.
-            keyframesMs[i] = anim.ItemAnimationTotalMs + (j * FrameIntervalMs);
+            keyframesMs[i] = anim.ItemAnimationTotalMs;
 
             // == Determine which keyframe should be used at the current time. ==
             int currentKeyframeIndex = 0;
@@ -166,7 +167,7 @@ namespace ConvenientInventory.QuickStack
             }
             else if (currentKeyframeIndex < 2 * numFrames)
             {
-                return startingLidFrame + 1 + numFrames - currentKeyframeIndex;
+                return startingLidFrame + numFrames - (currentKeyframeIndex - numFrames);
             }
             else
             {
