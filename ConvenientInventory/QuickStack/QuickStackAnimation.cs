@@ -61,9 +61,15 @@ namespace ConvenientInventory.QuickStack
                 0 => new Vector2(0f, -1.5f) * Game1.tileSize,   // Up
                 1 => new Vector2(0.5f, -1f) * Game1.tileSize,   // Right
                 3 => new Vector2(-0.5f, -1f) * Game1.tileSize,  // Left
-                _ => new Vector2(0f, -0.5f) * Game1.tileSize,   // Down
+                _ => new Vector2(0f, -1f) * Game1.tileSize,   // Down
             };
-            Vector2 farmerPosition = Farmer.Position + farmerOffset;
+
+            // TODO: Instead of randomizing farmer offset, we should do a spiral pattern to offset hover position.
+            //       The more items we stack per chest, the further we should increase the radial offset, spirally, from the original hover position.
+            //       When hovering, use a motion vector that slowly moves to the original hover position, so when it is time to fade, we are back at the og hover position.
+            Vector2 randFarmerOffset = new(new Random().NextSingle() * 16f - 8f, new Random().NextSingle() * 16f - 8f);
+
+            Vector2 farmerPosition = Farmer.Position + farmerOffset + randFarmerOffset;
 
             float distance = Vector2.Distance(farmerPosition, chestPosition);
             Vector2 motionVec = (chestPosition - farmerPosition) * 0.98f; // 0.98 multiplier gives a better result in-game; without it, items slightly overshoot the chest.
