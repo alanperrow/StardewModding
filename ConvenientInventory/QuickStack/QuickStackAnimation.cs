@@ -74,8 +74,7 @@ namespace ConvenientInventory.QuickStack
             float distance = Vector2.Distance(farmerPosition, chestPosition);
             Vector2 motionVec = (chestPosition - farmerPosition) * 0.98f; // 0.98 multiplier gives a better result in-game; without it, items slightly overshoot the chest.
 
-            float CONFIG_animationSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
-            float tossTime = (float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y) / CONFIG_animationSpeed;
+            float tossTime = (float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y) / ModEntry.Config.QuickStackAnimationItemSpeed;
 
             float extraHeight = 192 - Math.Min(0, motionVec.Y);
             float gravity = 2 * extraHeight / tossTime;
@@ -91,12 +90,11 @@ namespace ConvenientInventory.QuickStack
 
             // TODO: Experiment with hoverTimePerItem using sigmoid curve; each item being stacked gets less and less hover time.
             //       Precalculate two arrays (avoids expensive math for every sprite), one with with all values, and the other with the sum of all prev values at any index:
-            //          private static int[] hoverTimesPerItem = new int[20] { 150, 149, 147, 142, 136, 127, ... , 53, 51, 50 };
-            //          private static int[] sumHoverTimesPerItem = new int[20] { 150, 299, 446, ... , {sum of all elements} };
+            //          private static int[] hoverTimesPerItem = new int[20] { 150, 149, 147, 142, 136, 127, ... , 53, 51, 50 }; // these are made up numbers, use formula below
+            //          private static int[] totalHoverTimesPerItem = new int[20] { 150, 299, 446, ... , {sum of all elements} }; // these are made up numbers, use formula below
             //
             //       Sigmoid formula that seems to be similar enough to the desired behavior:
             //          y = 50 + (100 / (1 + e^(x/2 - 6))
-            //
             //
             //       Max hover time @ first item stack.
             //       v
@@ -110,9 +108,8 @@ namespace ConvenientInventory.QuickStack
             //                                                  Min hover time @ ~20 item stacks.
             //                                                  At this point, delay is very short between each item being stacked into chest.
             //     
-            float CONFIG_animationHoverSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
-            int hoverTimePerItem = (int)(150 / CONFIG_animationHoverSpeed);
-            int fadeTime = (int)(500 / CONFIG_animationHoverSpeed);
+            int hoverTimePerItem = (int)(150 / ModEntry.Config.QuickStackAnimationStackSpeed);
+            int fadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationStackSpeed);
 
             ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
             var itemTossSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
@@ -138,11 +135,11 @@ namespace ConvenientInventory.QuickStack
                 delayBeforeAnimationStart = itemHoverSprite.delayBeforeAnimationStart + (int)itemHoverSprite.interval,
                 scale = 4f,
                 layerDepth = baseLayerDepth + addlayerDepth,
-                alphaFade = 0.04f / CONFIG_animationHoverSpeed,
+                alphaFade = 0.04f / ModEntry.Config.QuickStackAnimationStackSpeed,
                 interval = fadeTime,
-                motion = new Vector2(0.6f, 4.5f) / CONFIG_animationHoverSpeed,
-                acceleration = new Vector2(0f, -0.08f) / CONFIG_animationHoverSpeed,
-                scaleChange = -0.07f / CONFIG_animationHoverSpeed,
+                motion = new Vector2(0.6f, 4.5f) / ModEntry.Config.QuickStackAnimationStackSpeed,
+                acceleration = new Vector2(0f, -0.08f) / ModEntry.Config.QuickStackAnimationStackSpeed,
+                scaleChange = -0.07f / ModEntry.Config.QuickStackAnimationStackSpeed,
             };
 
             ItemSprites.Add(itemTossSprite);

@@ -27,6 +27,12 @@ namespace ConvenientInventory
 
         public bool IsEnableQuickStackChestAnimation { get; set; } = true;
 
+        // TODO: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
+        public float QuickStackAnimationItemSpeed { get; set; } = 1.0f;
+
+        // TODO: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
+        public float QuickStackAnimationStackSpeed { get; set; } = 1.0f;
+
         public bool IsEnableFavoriteItems { get; set; } = true;
 
         public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;

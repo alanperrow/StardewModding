@@ -1124,9 +1124,6 @@ namespace ConvenientInventory
                     i--;
                 }
             }
-
-            // TODO: quick stack animation sprites.
-            // Currently, `TemporaryAnimatedSpriteList` automatically updates via `Game1.Multiplayer.broadcastSprites()` adding sprites to `GameLocation.temporarySprites`.
         }
 
         /// <summary>
