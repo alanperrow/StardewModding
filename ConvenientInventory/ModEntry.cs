@@ -87,24 +87,12 @@ namespace ConvenientInventory
             {
                 ConvenientInventory.SaveFavoriteItemSlots();
             }
+
+            QuickStackChestAnimation.CleanupAllModData();
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-
-
-
-            // DEBUG
-            if (e.Button == SButton.P)
-            {
-                QuickStackChestAnimation.CleanupAllModData();
-            }
-            // DEBUG
-
-
-
-
-
             // Handle favorite items hotkey being pressed
             if (Config.IsEnableFavoriteItems
                 && Context.IsWorldReady

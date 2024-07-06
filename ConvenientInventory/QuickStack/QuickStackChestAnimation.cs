@@ -34,41 +34,19 @@ namespace ConvenientInventory.QuickStack
             string startTimeStr = DateTimeOffset.Now.ToString();
             string itemAnimationTotalMsStr = itemAnimationTotalMs.ToString();
 
-            chest.modData["what happens if i assign to a key that DNE?"] = "TEST";
-
-            if (!chest.modData.TryAdd(StartTimeModDataKey, startTimeStr))
-            {
-                // Could not add mod data; Overwrite existing mod data entry, if any.
-                if (chest.modData.ContainsKey(StartTimeModDataKey))
-                {
-                    chest.modData[StartTimeModDataKey] = startTimeStr;
-                }
-            }
-
-            if (!chest.modData.TryAdd(ItemAnimationTotalMsModDataKey, itemAnimationTotalMsStr))
-            {
-                // Could not add mod data; Overwrite existing mod data entry, if any.
-                if (chest.modData.ContainsKey(ItemAnimationTotalMsModDataKey))
-                {
-                    chest.modData[ItemAnimationTotalMsModDataKey] = itemAnimationTotalMsStr;
-                }
-            }
+            chest.modData[StartTimeModDataKey] = startTimeStr;
+            chest.modData[ItemAnimationTotalMsModDataKey] = itemAnimationTotalMsStr;
         }
 
         /// <summary>
         /// Iterates through all chests in each game location and removes any quick stack chest animation mod data.
         /// </summary>
-        // TODO: Call this method before save game occurs so we don't save mod data unnecessarily.
         public static void CleanupAllModData()
         {
             Utility.ForEachLocation(loc =>
             {
                 foreach (Chest chest in loc.Objects.Values.OfType<Chest>())
                 {
-                    // If this works, great.
-                    // If not, will have to adjust logic below to a TryGetValue() first to ensure the key exists before removing it for each chest.
-                    chest.modData.Remove("What happens if i remove a key that DNE?");
-
                     chest.modData.Remove(StartTimeModDataKey);
                     chest.modData.Remove(ItemAnimationTotalMsModDataKey);
                 }
@@ -115,8 +93,6 @@ namespace ConvenientInventory.QuickStack
                 return null;
             }
 
-            // TODO: In ModEntry, on game start & on game end, do a cleanup of these modData values for all chests.
-            //       We don't need these modData values to persist in the game save, we are just using them for the convenient multiplayer-sync.
             if (!chest.modData.ContainsKey(StartTimeModDataKey)
                 || !chest.modData.ContainsKey(ItemAnimationTotalMsModDataKey))
             {
