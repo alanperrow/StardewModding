@@ -89,6 +89,27 @@ namespace ConvenientInventory.QuickStack
 
             int delayPerItem = 0;
 
+            // TODO: Experiment with hoverTimePerItem using sigmoid curve; each item being stacked gets less and less hover time.
+            //       Precalculate two arrays (avoids expensive math for every sprite), one with with all values, and the other with the sum of all prev values at any index:
+            //          private static int[] hoverTimesPerItem = new int[20] { 150, 149, 147, 142, 136, 127, ... , 53, 51, 50 };
+            //          private static int[] sumHoverTimesPerItem = new int[20] { 150, 299, 446, ... , {sum of all elements} };
+            //
+            //       Sigmoid formula that seems to be similar enough to the desired behavior:
+            //          y = 50 + (100 / (1 + e^(x/2 - 6))
+            //
+            //
+            //       Max hover time @ first item stack.
+            //       v
+            // 150ms |-------..._____,
+            //       |                `-.,
+            //       |                    `-,
+            //       |                       `--,
+            //  50ms |                           ``-----..._________
+            //       |__________________________________________^______
+            //       0          5         10         15         20
+            //                                                  Min hover time @ ~20 item stacks.
+            //                                                  At this point, delay is very short between each item being stacked into chest.
+            //     
             float CONFIG_animationHoverSpeed = 1.0f; // TODO: Implement in ModConfig: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
             int hoverTimePerItem = (int)(150 / CONFIG_animationHoverSpeed);
             int fadeTime = (int)(500 / CONFIG_animationHoverSpeed);
