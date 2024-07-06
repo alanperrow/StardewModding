@@ -6,6 +6,9 @@ using StardewValley.Objects;
 
 namespace ConvenientInventory.QuickStack
 {
+    /// <summary>
+    /// Handles the animation of a chest to visually appear "open" when a <see cref="QuickStackAnimation"/> is depositing items into it.
+    /// </summary>
     public static class QuickStackChestAnimation
     {
         private record ChestAnimationData(

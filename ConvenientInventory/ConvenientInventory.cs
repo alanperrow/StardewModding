@@ -50,13 +50,6 @@ namespace ConvenientInventory
             set => transferredItemSprites.Value = value;
         }
 
-        private static readonly PerScreen<TemporaryAnimatedSpriteList> quickStackAnimationItemSprites = new(() => new TemporaryAnimatedSpriteList());
-        private static TemporaryAnimatedSpriteList QuickStackAnimationItemSprites
-        {
-            get => quickStackAnimationItemSprites.Value;
-            set => quickStackAnimationItemSprites.Value = value;
-        }
-
         public static Texture2D FavoriteItemsCursorTexture { private get; set; }
 
         public static Texture2D FavoriteItemsHighlightTexture { private get; set; }
@@ -1142,21 +1135,6 @@ namespace ConvenientInventory
         public static void AddTransferredItemSprite(ItemGrabMenu.TransferredItemSprite itemSprite)
         {
             TransferredItemSprites.Add(itemSprite);
-        }
-
-
-        /// <summary>
-        /// Add item sprite upon performing quick stack to display animation.
-        /// </summary>
-        public static void AddQuickStackAnimationItemSprite(TemporaryAnimatedSprite itemSprite)
-        {
-            QuickStackAnimationItemSprites.Add(itemSprite);
-        }
-
-        public static void BroadcastQuickStackAnimationItemSprites(Farmer who)
-        {
-            Game1.Multiplayer.broadcastSprites(who.currentLocation, QuickStackAnimationItemSprites);
-            QuickStackAnimationItemSprites = new();
         }
     }
 }

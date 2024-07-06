@@ -25,18 +25,22 @@ namespace ConvenientInventory.QuickStack
 
             IList<Item> playerInventory = who.Items;
 
-            int numItemsQuickStackAnimation = 0;
+            QuickStackAnimation quickStackAnimation = null;
+            if (ModEntry.Config.IsEnableQuickStackAnimation)
+            {
+                quickStackAnimation = new(who);
+            }
+
             foreach (Chest chest in chests)
             {
                 #region DEBUG
 
                 if (ModEntry.Instance.Helper.Input.IsDown(StardewModdingAPI.SButton.LeftShift))
                 {
-                    var quickStackAnimation = new QuickStackAnimation();
                     quickStackAnimation.Begin(numItemsQuickStackAnimation);
                     quickStackAnimation.DebugAnimate(chest, who);
 
-                    numItemsQuickStackAnimation = quickStackAnimation.End();
+                    numItemsQuickStackAnimation = quickStackAnimation.Complete();
                 }
 
                 #endregion DEBUG
