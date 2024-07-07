@@ -2,11 +2,11 @@
 {
     internal class TypedChestWithDistance
     {
-        public ITypedChest TypedChest { get; private set; }
+        public TypedChest TypedChest { get; private set; }
 
         public double Distance { get; private set; }
 
-        public TypedChestWithDistance(ITypedChest chest, double distance)
+        public TypedChestWithDistance(TypedChest chest, double distance)
         {
             TypedChest = chest;
             Distance = distance;

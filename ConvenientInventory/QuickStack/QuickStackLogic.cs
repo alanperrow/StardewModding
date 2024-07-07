@@ -178,11 +178,11 @@ namespace ConvenientInventory.QuickStack
                 : GetNearbyChests(farmerTileLocation, range, gameLocation);
         }
 
-        public static List<ITypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
+        public static List<TypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
         {
             if (who is null)
             {
-                return new List<ITypedChest>();
+                return new List<TypedChest>();
             }
 
             Vector2 farmerPosition = who.getStandingPosition();
@@ -240,9 +240,9 @@ namespace ConvenientInventory.QuickStack
             return chests;
         }
 
-        private static List<ITypedChest> GetNearbyTypedChests(Point originTile, int range, GameLocation gameLocation)
+        private static List<TypedChest> GetNearbyTypedChests(Point originTile, int range, GameLocation gameLocation)
         {
-            var typedChests = new List<ITypedChest>((2 * range + 1) * (2 * range + 1));
+            var typedChests = new List<TypedChest>((2 * range + 1) * (2 * range + 1));
 
             AddNearbyChestsToList(
                 chestList: typedChests,

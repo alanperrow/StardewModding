@@ -18,7 +18,7 @@ namespace ConvenientInventory
     {
         public static Texture2D QuickStackButtonIcon { private get; set; }
 
-        private static IReadOnlyList<ITypedChest> NearbyTypedChests { get; set; }
+        private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
         private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
         private static ClickableTextureComponent QuickStackButton
@@ -1052,7 +1052,7 @@ namespace ConvenientInventory
             }
         }
 
-        private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<ITypedChest> chests)
+        private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<TypedChest> chests)
         {
             int extraNumPos = 0;
 
@@ -1071,7 +1071,7 @@ namespace ConvenientInventory
             return extraNumPos;
         }
 
-        private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<ITypedChest> typedChests)
+        private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<TypedChest> typedChests)
         {
             Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
 
