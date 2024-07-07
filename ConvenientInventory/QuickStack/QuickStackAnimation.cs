@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
@@ -28,7 +29,7 @@ namespace ConvenientInventory.QuickStack
 
         private Farmer Farmer { get; }
 
-        private Dictionary<Chest, int> NumAnimatedItemsByChest { get; } = new();
+        private Dictionary<TypedChest, int> NumAnimatedItemsByChest { get; } = new();
 
         /// <summary>
         /// Broadcasts item sprites to begin animation, synced with multiplayer.
@@ -42,33 +43,34 @@ namespace ConvenientInventory.QuickStack
         }
 
         /// <summary>
-        /// Adds sprites to this <see cref="QuickStackAnimation"/> for <paramref name="item"/> to be visually quick stacked into <paramref name="chest"/>.
+        /// Adds sprites to this <see cref="QuickStackAnimation"/> for <paramref name="item"/> to be visually quick stacked into <paramref name="typedChest"/>.
         /// </summary>
-        /// <param name="chest">The chest to be quick stacked into.</param>
+        /// <param name="typedChest">The chest to be quick stacked into.</param>
         /// <param name="item">The item being quick stacked.</param>
-        public void AddToAnimation(Chest chest, Item item)
+        public void AddToAnimation(TypedChest typedChest, Item item)
         {
-            if (!NumAnimatedItemsByChest.TryGetValue(chest, out int numChestAnimatedItems))
+            if (!NumAnimatedItemsByChest.TryGetValue(typedChest, out int numChestAnimatedItems))
             {
                 numChestAnimatedItems = 0;
-                NumAnimatedItemsByChest[chest] = 0;
+                NumAnimatedItemsByChest[typedChest] = 0;
             }
 
-            // TODO: Junimo Hut/Fridge/Mill item stack is being tossed toward top-left of current location, near (0,0). Investigate and fix.
-            Vector2 chestPosition = (chest.TileLocation + new Vector2(0, -1.5f)) * Game1.tileSize;
+            Chest chest = typedChest.Chest;
+            Vector2 chestTileLocation = typedChest.VisualTileLocation ?? chest.TileLocation;
+            Vector2 chestPosition = (chestTileLocation + new Vector2(0, -1.5f)) * Game1.tileSize;
+
             Vector2 farmerOffset = Farmer.FacingDirection switch
             {
                 0 => new Vector2(0f, -1.5f) * Game1.tileSize,   // Up
                 1 => new Vector2(0.5f, -1f) * Game1.tileSize,   // Right
                 3 => new Vector2(-0.5f, -1f) * Game1.tileSize,  // Left
-                _ => new Vector2(0f, -1f) * Game1.tileSize,   // Down
+                _ => new Vector2(0f, -1f) * Game1.tileSize,     // Down
             };
-
             // TODO: Instead of randomizing farmer offset, we should do a spiral pattern to offset hover position.
             //       The more items we stack per chest, the further we should increase the radial offset, spirally, from the original hover position.
             //       When hovering, use a motion vector that slowly moves to the original hover position, so when it is time to fade, we are back at the og hover position.
-            Vector2 randFarmerOffset = new(new Random().NextSingle() * 16f - 8f, new Random().NextSingle() * 16f - 8f);
-
+            Random rand = new();
+            Vector2 randFarmerOffset = new(rand.NextSingle() * 16f - 8f, rand.NextSingle() * 16f - 8f);
             Vector2 farmerPosition = Farmer.Position + farmerOffset + randFarmerOffset;
 
             float distance = Vector2.Distance(farmerPosition, chestPosition);
@@ -83,7 +85,7 @@ namespace ConvenientInventory.QuickStack
             float xAccel = -2 * motionVec.X / tossTime;
             motionVec.X += extraX;
 
-            float baseLayerDepth = (float)((chest.TileLocation.Y + 1) * 64) / 10000f + chest.TileLocation.X / 50000f; // Refactored from Object.draw()
+            float baseLayerDepth = (float)((chestTileLocation.Y + 1) * 64) / 10000f + chestTileLocation.X / 50000f; // Refactored from Object.draw()
             float addlayerDepth = 1E-06f * NumAnimatedItems; // Avoids z-fighting by drawing each sprite on a separate layer depth.
 
             int delayPerItem = 0;
@@ -112,7 +114,7 @@ namespace ConvenientInventory.QuickStack
             int fadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationStackSpeed);
 
             ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
-            var itemTossSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
+            TemporaryAnimatedSprite itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
             {
                 delayBeforeAnimationStart = numChestAnimatedItems * delayPerItem,
                 scale = 4f,
@@ -123,14 +125,14 @@ namespace ConvenientInventory.QuickStack
                 acceleration = new Vector2(xAccel, gravity) / tossTime,
                 timeBasedMotion = true,
             };
-            var itemHoverSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
+            TemporaryAnimatedSprite itemHoverSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
             {
                 delayBeforeAnimationStart = itemTossSprite.delayBeforeAnimationStart + (int)itemTossSprite.interval,
                 scale = 4f,
                 layerDepth = baseLayerDepth - addlayerDepth,
                 interval = numChestAnimatedItems * hoverTimePerItem,
             };
-            var itemFadeSprite = new TemporaryAnimatedSprite(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
+            TemporaryAnimatedSprite itemFadeSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
             {
                 delayBeforeAnimationStart = itemHoverSprite.delayBeforeAnimationStart + (int)itemHoverSprite.interval,
                 scale = 4f,
@@ -147,7 +149,7 @@ namespace ConvenientInventory.QuickStack
             ItemSprites.Add(itemFadeSprite);
 
             NumAnimatedItems++;
-            NumAnimatedItemsByChest[chest]++;
+            NumAnimatedItemsByChest[typedChest]++;
 
             int totalAnimationTimeMs = itemFadeSprite.delayBeforeAnimationStart + (int)itemFadeSprite.interval;
             QuickStackChestAnimation.SetModData(chest, totalAnimationTimeMs);
