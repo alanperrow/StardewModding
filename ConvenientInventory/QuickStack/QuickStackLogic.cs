@@ -164,23 +164,6 @@ namespace ConvenientInventory.QuickStack
             return movedAtLeastOneTotal;
         }
 
-        // TODO: This method is no longer used. Remove no longer necessary methods.
-        public static List<Chest> GetChestsAroundFarmer(Farmer who, int range, bool sorted = false)
-        {
-            if (who is null)
-            {
-                return new List<Chest>();
-            }
-
-            Vector2 farmerPosition = who.getStandingPosition();
-            Point farmerTileLocation = who.TilePoint;
-            GameLocation gameLocation = who.currentLocation;
-
-            return sorted
-                ? GetNearbyChestsWithDistance(farmerPosition, range, gameLocation).OrderBy(x => x.Distance).Select(x => x.Chest).ToList()
-                : GetNearbyChests(farmerTileLocation, range, gameLocation);
-        }
-
         public static List<TypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
         {
             if (who is null)
@@ -197,29 +180,15 @@ namespace ConvenientInventory.QuickStack
                 : GetNearbyTypedChests(farmerTileLocation, range, gameLocation);
         }
 
-        // From origin, return all nearby chests, including the point-distance from their tile-center to origin, within a given square range.
-        private static List<ChestWithDistance> GetNearbyChestsWithDistance(Vector2 origin, int range, GameLocation gameLocation)
-        {
-            var chestsWithDistance = new List<ChestWithDistance>((2 * range + 1) * (2 * range + 1));
-
-            AddNearbyChestsToList(
-                chestList: chestsWithDistance,
-                withType: false,
-                withDist: true,
-                range: range,
-                gameLocation: gameLocation,
-                originPosition: origin);
-
-            return chestsWithDistance;
-        }
-
+        /// <summary>
+        /// From origin, return all nearby chests, including the point-distance from their tile-center to origin, within a given square range.
+        /// </summary>
         private static List<TypedChestWithDistance> GetNearbyTypedChestsWithDistance(Vector2 origin, int range, GameLocation gameLocation)
         {
             var typedChestsWithDistance = new List<TypedChestWithDistance>((2 * range + 1) * (2 * range + 1));
 
             AddNearbyChestsToList(
                 chestList: typedChestsWithDistance,
-                withType: true,
                 withDist: true,
                 range: range,
                 gameLocation: gameLocation,
@@ -228,28 +197,15 @@ namespace ConvenientInventory.QuickStack
             return typedChestsWithDistance;
         }
 
-        private static List<Chest> GetNearbyChests(Point originTile, int range, GameLocation gameLocation)
-        {
-            var chests = new List<Chest>((2 * range + 1) * (2 * range + 1));
-
-            AddNearbyChestsToList(
-                chestList: chests,
-                withType: false,
-                withDist: false,
-                range: range,
-                gameLocation: gameLocation,
-                originTile: originTile);
-
-            return chests;
-        }
-
+        /// <summary>
+        /// From originTile, return all nearby chests within a given square range.
+        /// </summary>
         private static List<TypedChest> GetNearbyTypedChests(Point originTile, int range, GameLocation gameLocation)
         {
             var typedChests = new List<TypedChest>((2 * range + 1) * (2 * range + 1));
 
             AddNearbyChestsToList(
                 chestList: typedChests,
-                withType: true,
                 withDist: false,
                 range: range,
                 gameLocation: gameLocation,
@@ -260,7 +216,6 @@ namespace ConvenientInventory.QuickStack
 
         private static void AddNearbyChestsToList(
             IList chestList,
-            bool withType,
             bool withDist,
             int range,
             GameLocation gameLocation,
@@ -308,7 +263,7 @@ namespace ConvenientInventory.QuickStack
                             continue;
                         }
 
-                        AddChestToList(chest, chestList, withType, withDist, tx, ty, originPosition ?? default, chestType);
+                        AddChestToList(chest, chestList, withDist, tx, ty, originPosition ?? default, chestType);
                     }
                 }
             }
@@ -331,7 +286,7 @@ namespace ConvenientInventory.QuickStack
                             tx = (int)fridgeTileCenterPosition.X;
                             ty = (int)fridgeTileCenterPosition.Y;
                             Chest fridgeChest = farmHouse.fridge.Value;
-                            AddChestToList(fridgeChest, chestList, withType, withDist, tx, ty, originPosition.Value, ChestType.Fridge, visualTileLoc: fridgeTileLoc);
+                            AddChestToList(fridgeChest, chestList, withDist, tx, ty, originPosition.Value, ChestType.Fridge, visualTileLoc: fridgeTileLoc);
                         }
                     }
                 }
@@ -347,7 +302,7 @@ namespace ConvenientInventory.QuickStack
                                 farmHouse.fridgePosition.Y);
 
                             Chest fridgeChest = farmHouse.fridge.Value;
-                            AddChestToList(fridgeChest, chestList, withType, withDist, chestType: ChestType.Fridge, visualTileLoc: fridgeTileLoc);
+                            AddChestToList(fridgeChest, chestList, withDist, chestType: ChestType.Fridge, visualTileLoc: fridgeTileLoc);
                         }
                     }
                 }
@@ -371,7 +326,7 @@ namespace ConvenientInventory.QuickStack
                             tx = (int)fridgeTileCenterPosition.X;
                             ty = (int)fridgeTileCenterPosition.Y;
                             Chest fridgeChest = islandFarmHouse.fridge.Value;
-                            AddChestToList(fridgeChest, chestList, withType, withDist, tx, ty, originPosition.Value, ChestType.Fridge, visualTileLoc: islandFridgeTileLoc);
+                            AddChestToList(fridgeChest, chestList, withDist, tx, ty, originPosition.Value, ChestType.Fridge, visualTileLoc: islandFridgeTileLoc);
                         }
                     }
                 }
@@ -387,7 +342,7 @@ namespace ConvenientInventory.QuickStack
                                 islandFarmHouse.fridgePosition.Y);
 
                             Chest fridgeChest = islandFarmHouse.fridge.Value;
-                            AddChestToList(fridgeChest, chestList, withType, withDist, chestType: ChestType.Fridge, visualTileLoc: islandFridgeTileLoc);
+                            AddChestToList(fridgeChest, chestList, withDist, chestType: ChestType.Fridge, visualTileLoc: islandFridgeTileLoc);
                         }
                     }
                 }
@@ -418,7 +373,7 @@ namespace ConvenientInventory.QuickStack
                                 tx = (int)buildingTileCenterPosition.X;
                                 ty = (int)buildingTileCenterPosition.Y;
                                 Chest hutChest = junimoHut.GetOutputChest();
-                                AddChestToList(hutChest, chestList, withType, withDist, tx, ty, originPosition.Value, ChestType.JunimoHut, visualTileLoc: hutVisualTileLoc);
+                                AddChestToList(hutChest, chestList, withDist, tx, ty, originPosition.Value, ChestType.JunimoHut, visualTileLoc: hutVisualTileLoc);
                             }
                             else if (building.buildingType.Value == "Mill")
                             {
@@ -434,7 +389,7 @@ namespace ConvenientInventory.QuickStack
                                 tx = (int)buildingTileCenterPosition.X;
                                 ty = (int)buildingTileCenterPosition.Y;
                                 Chest millChest = building.GetBuildingChest("Input");
-                                AddChestToList(millChest, chestList, withType, withDist, tx, ty, originPosition.Value, ChestType.Mill, visualTileLoc: millVisualTileLoc);
+                                AddChestToList(millChest, chestList, withDist, tx, ty, originPosition.Value, ChestType.Mill, visualTileLoc: millVisualTileLoc);
                             }
                         }
                     }
@@ -455,7 +410,7 @@ namespace ConvenientInventory.QuickStack
                                     junimoHut.tileY.Value + junimoHut.tilesHigh.Value - 1);
 
                                 Chest hutChest = junimoHut.GetOutputChest();
-                                AddChestToList(hutChest, chestList, withType, withDist, chestType: ChestType.JunimoHut, visualTileLoc: hutVisualTileLoc);
+                                AddChestToList(hutChest, chestList, withDist, chestType: ChestType.JunimoHut, visualTileLoc: hutVisualTileLoc);
                             }
                             else if (building.buildingType.Value == "Mill")
                             {
@@ -469,7 +424,7 @@ namespace ConvenientInventory.QuickStack
                                     building.tileY.Value + building.tilesHigh.Value - 1);
 
                                 Chest millChest = building.GetBuildingChest("Input");
-                                AddChestToList(millChest, chestList, withType, withDist, chestType: ChestType.Mill, visualTileLoc: millVisualTileLoc);
+                                AddChestToList(millChest, chestList, withDist, chestType: ChestType.Mill, visualTileLoc: millVisualTileLoc);
                             }
                         }
                     }
@@ -480,7 +435,6 @@ namespace ConvenientInventory.QuickStack
         private static void AddChestToList(
             Chest chest,
             IList chestList,
-            bool withType,
             bool withDist,
             int posX = default,
             int posY = default,
@@ -488,25 +442,11 @@ namespace ConvenientInventory.QuickStack
             ChestType chestType = default,
             Vector2? visualTileLoc = default)
         {
-            if (!withType && !withDist)
-            {
-                // Chest
-                chestList.Add(chest);
-            }
-            else if (withType && !withDist)
+            if (!withDist)
             {
                 // TypedChest
                 var typedChest = new TypedChest(chest, chestType, visualTileLoc);
                 chestList.Add(typedChest);
-            }
-            else if (!withType && withDist)
-            {
-                // ChestWithDistance
-                int dx = posX - (int)origin.X;
-                int dy = posY - (int)origin.Y;
-
-                var chestWithDistance = new ChestWithDistance(chest, Math.Sqrt(dx * dx + dy * dy));
-                chestList.Add(chestWithDistance);
             }
             else
             {
