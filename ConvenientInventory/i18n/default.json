@@ -36,10 +36,10 @@
   "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "If enabled, an animation will play when items are quick stacked to visually show where each item was stored.",
 
   "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "Animation: Item Speed",
-  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "Animation speed modifier to adjust the speed at which quick stacked items move toward their stored chest.\n\n0.5x = Half speed\n1x = Normal speed\n3x = Triple speed",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "Animation speed modifier to adjust the speed at which quick stacked items move toward their stored chest.\n\n0.5x -- Half speed\n1x -- Normal speed\n3x -- Triple speed",
 
   "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "Animation: Stack Speed",
-  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "Animation speed modifier to adjust the speed at which items are individually stacked into their stored chest.\n\n0.5x = Half speed\n1x = Normal speed\n3x = Triple speed",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "Animation speed modifier to adjust the speed at which items are individually stacked into their stored chest.\n\n0.5x -- Half speed\n1x -- Normal speed\n3x -- Triple speed",
 
   "ModConfigMenu.Label.FavoriteItems": "Favorite Items",
 

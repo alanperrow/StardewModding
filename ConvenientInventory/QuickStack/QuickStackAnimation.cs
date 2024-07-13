@@ -76,7 +76,7 @@ namespace ConvenientInventory.QuickStack
             float distance = Vector2.Distance(farmerPosition, chestPosition);
             Vector2 motionVec = (chestPosition - farmerPosition) * 0.98f; // 0.98 multiplier gives a better result in-game; without it, items slightly overshoot the chest.
 
-            float tossTime = (float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y) / ModEntry.Config.QuickStackAnimationItemSpeed;
+            float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStackAnimationItemSpeed;
 
             float extraHeight = 192 - Math.Min(0, motionVec.Y);
             float gravity = 2 * extraHeight / tossTime;
@@ -139,9 +139,9 @@ namespace ConvenientInventory.QuickStack
                 layerDepth = baseLayerDepth + addlayerDepth,
                 alphaFade = 0.04f / ModEntry.Config.QuickStackAnimationStackSpeed,
                 interval = fadeTime,
-                motion = new Vector2(0.6f, 4.5f) / ModEntry.Config.QuickStackAnimationStackSpeed,
-                acceleration = new Vector2(0f, -0.08f) / ModEntry.Config.QuickStackAnimationStackSpeed,
-                scaleChange = -0.07f / ModEntry.Config.QuickStackAnimationStackSpeed,
+                motion = new Vector2(0.6f, 4.5f) * ModEntry.Config.QuickStackAnimationStackSpeed,
+                acceleration = new Vector2(0f, -0.08f) * ModEntry.Config.QuickStackAnimationStackSpeed,
+                scaleChange = -0.07f * ModEntry.Config.QuickStackAnimationStackSpeed,
             };
 
             ItemSprites.Add(itemTossSprite);
