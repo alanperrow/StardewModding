@@ -51,7 +51,12 @@ namespace ConvenientInventory.QuickStack
 
                     foreach (Item playerItem in playerInventory)
                     {
-                        if (playerItem is null || !playerItem.canStackWith(chestItem))
+                        if (playerItem is null)
+                        {
+                            continue;
+                        }
+                        
+                        if (!playerItem.canStackWith(chestItem))
                         {
                             if (ModEntry.Config.IsQuickStackOverflowItems && ModEntry.Config.IsQuickStackIgnoreItemQuality && CanStackWithIgnoreQuality(playerItem, chestItem))
                             {
@@ -158,7 +163,6 @@ namespace ConvenientInventory.QuickStack
             }
 
             quickStackAnimation?.Complete();
-
             Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
 
             return movedAtLeastOneTotal;
