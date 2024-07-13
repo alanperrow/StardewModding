@@ -59,7 +59,7 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackHotkey.Desc")
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.QuickStackKeyboardHotkey,
                 setValue: value => config.QuickStackKeyboardHotkey = value,
@@ -67,7 +67,7 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackKeyboardHotkey.Desc")
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.QuickStackControllerHotkey,
                 setValue: value => config.QuickStackControllerHotkey = value,
@@ -181,7 +181,7 @@ namespace ConvenientInventory.Compatibility
                 allowedValues: highlightStyleDescriptions
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.FavoriteItemsKeyboardHotkey,
                 setValue: value => config.FavoriteItemsKeyboardHotkey = value,
@@ -189,7 +189,7 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc")
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.FavoriteItemsControllerHotkey,
                 setValue: value => config.FavoriteItemsControllerHotkey = value,

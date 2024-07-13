@@ -5,6 +5,7 @@ namespace ConvenientInventory
 {
     public class ModConfig
     {
+        // ===== Quick Stack To Nearby Chests =====
         public bool IsEnableQuickStack { get; set; } = true;
 
         public int QuickStackRange { get; set; } = 5;
@@ -17,11 +18,9 @@ namespace ConvenientInventory
 
         public bool IsEnableQuickStackHotkey { get; set; } = false;
 
-        // TODO: Replace with KeybindList to support key combination hotkey
-        public SButton QuickStackKeyboardHotkey { get; set; } = SButton.K;
+        public KeybindList QuickStackKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
 
-        // TODO: Replace with KeybindList to support key combination hotkey
-        public SButton QuickStackControllerHotkey { get; set; } = SButton.LeftStick;
+        public KeybindList QuickStackControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
 
         public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
 
@@ -33,22 +32,23 @@ namespace ConvenientInventory
 
         public float QuickStackAnimationStackSpeed { get; set; } = 1.0f;
 
+        // ===== Favorite Items =====
         public bool IsEnableFavoriteItems { get; set; } = true;
 
         public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;
 
-        // TODO: Replace with KeybindList to support key combination hotkey
-        public SButton FavoriteItemsKeyboardHotkey { get; set; } = SButton.LeftAlt;
+        public KeybindList FavoriteItemsKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftAlt });
 
-        // TODO: Replace with KeybindList to support key combination hotkey
-        public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftShoulder;
+        public KeybindList FavoriteItemsControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftShoulder });
 
+        // ===== Take All But One =====
         public bool IsEnableTakeAllButOne { get; set; } = true;
 
         public KeybindList TakeAllButOneKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftControl, SButton.LeftShift });
 
         public KeybindList TakeAllButOneControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftTrigger });
 
+        // ===== Miscellaneous =====
         public bool IsEnableInventoryPageSideWarp { get; set; } = true;
     }
 }

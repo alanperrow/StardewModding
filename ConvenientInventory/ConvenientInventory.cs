@@ -159,8 +159,8 @@ namespace ConvenientInventory
                 {
                     myID = quickStackButtonID,
                     downNeighborID = 105,  // trash can
-                    upNeighborID = 106,  // organize button
-                    leftNeighborID = 11  // top-right inventory slot
+                    upNeighborID = 106,    // organize button
+                    leftNeighborID = 11    // top-right inventory slot
                 };
 
                 inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
@@ -673,6 +673,9 @@ namespace ConvenientInventory
         public static void OnQuickStackHotkeyPressed()
         {
             // TODO: Check if we are in a chest menu `ItemGrabMenu`. If so, do not perform quick stack.
+            //        - Or maybe perform base game Add To Existing Stacks logic?
+            //       Alternatively, should we just disable hotkey if a menu is open?
+            //        - Trying to think of a case where it would be useful to be able to quick stack while in a menu (besides InventoryPage or maybe chest menu).
 
             if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is InventoryPage inventoryPage)
             {
