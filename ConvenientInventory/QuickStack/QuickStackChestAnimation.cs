@@ -43,18 +43,22 @@ namespace ConvenientInventory.QuickStack
         /// <summary>
         /// Iterates through all chests in each game location and removes any quick stack chest animation mod data.
         /// </summary>
-        public static void CleanupAllModData()
+        public static bool CleanupChestAnimationModDataByLocation(GameLocation gameLocation)
         {
-            Utility.ForEachLocation(loc =>
+            try
             {
-                foreach (Chest chest in loc.Objects.Values.OfType<Chest>())
+                foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
                 {
                     chest.modData.Remove(StartTimeModDataKey);
                     chest.modData.Remove(ItemAnimationTotalMsModDataKey);
                 }
+            }
+            catch
+            {
+                return false;
+            }
 
-                return true;
-            });
+            return true;
         }
 
         /// <summary>

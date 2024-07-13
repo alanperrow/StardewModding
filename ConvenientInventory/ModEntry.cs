@@ -7,6 +7,7 @@ using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley;
 
 namespace ConvenientInventory
 {
@@ -73,6 +74,7 @@ namespace ConvenientInventory
             }
         }
 
+        /// <summary>Raised after the player loads a save slot and the world is initialized.</summary>
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             if (Config.IsEnableFavoriteItems)
@@ -81,6 +83,7 @@ namespace ConvenientInventory
             }
         }
 
+        /// <summary>Raised before the game begins writing data to the save file (except the initial save creation).</summary>
         private void OnSaving(object sender, SavingEventArgs e)
         {
             if (Config.IsEnableFavoriteItems)
@@ -88,21 +91,23 @@ namespace ConvenientInventory
                 ConvenientInventory.SaveFavoriteItemSlots();
             }
 
-            QuickStackChestAnimation.CleanupAllModData();
+            Utility.ForEachLocation(loc => QuickStackChestAnimation.CleanupChestAnimationModDataByLocation(loc));
         }
 
+        /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             // Handle quick stack hotkey being pressed.
             if (Config.IsEnableQuickStackHotkey
                 && Context.IsWorldReady
-                && StardewValley.Game1.CurrentEvent is null
+                && Game1.CurrentEvent is null
                 && (Config.QuickStackKeyboardHotkey.JustPressed() || Config.QuickStackControllerHotkey.JustPressed()))
             {
                 ConvenientInventory.OnQuickStackHotkeyPressed();
             }
         }
 
+        /// <summary>Raised after the player presses or releases any buttons on the keyboard, controller, or mouse.</summary>
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
             // Handle favorite items hotkey being toggled.

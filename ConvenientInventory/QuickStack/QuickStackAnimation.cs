@@ -14,6 +14,8 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public class QuickStackAnimation
     {
+        private readonly Random random = new();
+
         /// <summary>
         /// Creates a new instance of <see cref="QuickStackAnimation"/> with reference to the provided farmer.
         /// </summary>
@@ -66,11 +68,7 @@ namespace ConvenientInventory.QuickStack
                 3 => new Vector2(-0.5f, -1f) * Game1.tileSize,  // Left
                 _ => new Vector2(0f, -1f) * Game1.tileSize,     // Down
             };
-            // TODO: Instead of randomizing farmer offset, we should do a spiral pattern to offset hover position.
-            //       The more items we stack per chest, the further we should increase the radial offset, spirally, from the original hover position.
-            //       When hovering, use a motion vector that slowly moves to the original hover position, so when it is time to fade, we are back at the og hover position.
-            Random rand = new();
-            Vector2 randFarmerOffset = new(rand.NextSingle() * 16f - 8f, rand.NextSingle() * 16f - 8f);
+            Vector2 randFarmerOffset = new(random.NextSingle() * 16f - 8f, random.NextSingle() * 16f - 8f);
             Vector2 farmerPosition = Farmer.Position + farmerOffset + randFarmerOffset;
 
             float distance = Vector2.Distance(farmerPosition, chestPosition);
@@ -87,36 +85,13 @@ namespace ConvenientInventory.QuickStack
 
             float baseLayerDepth = (float)((chestTileLocation.Y + 1) * 64) / 10000f + chestTileLocation.X / 50000f; // Refactored from Object.draw()
             float addlayerDepth = 1E-06f * NumAnimatedItems; // Avoids z-fighting by drawing each sprite on a separate layer depth.
-
-            int delayPerItem = 0;
-
-            // TODO: Experiment with hoverTimePerItem using sigmoid curve; each item being stacked gets less and less hover time.
-            //       Precalculate two arrays (avoids expensive math for every sprite), one with with all values, and the other with the sum of all prev values at any index:
-            //          private static int[] hoverTimesPerItem = new int[20] { 150, 149, 147, 142, 136, 127, ... , 53, 51, 50 }; // these are made up numbers, use formula below
-            //          private static int[] totalHoverTimesPerItem = new int[20] { 150, 299, 446, ... , {sum of all elements} }; // these are made up numbers, use formula below
-            //
-            //       Sigmoid formula that seems to be similar enough to the desired behavior:
-            //          y = 50 + (100 / (1 + e^(x/2 - 6))
-            //
-            //       Max hover time @ first item stack.
-            //       v
-            // 150ms |-------..._____,
-            //       |                `-.,
-            //       |                    `-,
-            //       |                       `--,
-            //  50ms |                           ``-----..._________
-            //       |__________________________________________^______
-            //       0          5         10         15         20
-            //                                                  Min hover time @ ~20 item stacks.
-            //                                                  At this point, delay is very short between each item being stacked into chest.
-            //     
+    
             int hoverTimePerItem = (int)(150 / ModEntry.Config.QuickStackAnimationStackSpeed);
             int fadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationStackSpeed);
 
             ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
             TemporaryAnimatedSprite itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
             {
-                delayBeforeAnimationStart = numChestAnimatedItems * delayPerItem,
                 scale = 4f,
                 layerDepth = 1f - addlayerDepth,
                 totalNumberOfLoops = 0,
