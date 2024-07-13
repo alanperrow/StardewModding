@@ -111,9 +111,38 @@ namespace ConvenientInventory.Compatibility
             api.AddBoolOption(
                 mod: modManifest,
                 getValue: () => config.IsEnableQuickStackAnimation,
-                setValue: value => config.IsEnableQuickStackAnimation = value,
+                setValue: value =>
+                {
+                    // In GMCM, we tie together IsEnableQuickStackAnimation with IsEnableQuickStackChestAnimation.
+                    // Most users should only care about whether the entire animation is enabled or disabled.
+                    // Keeping these as separate config values, however, allows users to manually edit the config file to set either value independently, if necessary.
+                    config.IsEnableQuickStackAnimation = value;
+                    config.IsEnableQuickStackChestAnimation = value;
+                },
                 name: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackAnimation.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackAnimation.Desc")
+            );
+
+            api.AddNumberOption(
+                mod: modManifest,
+                getValue: () => config.QuickStackAnimationItemSpeed,
+                setValue: value => config.QuickStackAnimationItemSpeed = value,
+                name: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationItemSpeed.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationItemSpeed.Desc"),
+                min: 0.5f,
+                max: 3f,
+                interval: 0.1f
+            );
+
+            api.AddNumberOption(
+                mod: modManifest,
+                getValue: () => config.QuickStackAnimationStackSpeed,
+                setValue: value => config.QuickStackAnimationStackSpeed = value,
+                name: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationStackSpeed.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationStackSpeed.Desc"),
+                min: 0.5f,
+                max: 3f,
+                interval: 0.1f
             );
 
             api.AddSectionTitle(

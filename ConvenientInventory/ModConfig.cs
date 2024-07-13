@@ -17,8 +17,10 @@ namespace ConvenientInventory
 
         public bool IsEnableQuickStackHotkey { get; set; } = false;
 
+        // TODO: Replace with KeybindList to support key combination hotkey
         public SButton QuickStackKeyboardHotkey { get; set; } = SButton.K;
 
+        // TODO: Replace with KeybindList to support key combination hotkey
         public SButton QuickStackControllerHotkey { get; set; } = SButton.LeftStick;
 
         public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
@@ -27,18 +29,18 @@ namespace ConvenientInventory
 
         public bool IsEnableQuickStackChestAnimation { get; set; } = true;
 
-        // TODO: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
         public float QuickStackAnimationItemSpeed { get; set; } = 1.0f;
 
-        // TODO: range = [0.5 to 3, 0.1 interval]; 0.5x speed (half speed) up to 3x speed (triple speed).
         public float QuickStackAnimationStackSpeed { get; set; } = 1.0f;
 
         public bool IsEnableFavoriteItems { get; set; } = true;
 
         public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;
 
+        // TODO: Replace with KeybindList to support key combination hotkey
         public SButton FavoriteItemsKeyboardHotkey { get; set; } = SButton.LeftAlt;
 
+        // TODO: Replace with KeybindList to support key combination hotkey
         public SButton FavoriteItemsControllerHotkey { get; set; } = SButton.LeftShoulder;
 
         public bool IsEnableTakeAllButOne { get; set; } = true;
