@@ -35,7 +35,7 @@ namespace ConvenientInventory
             helper.Events.GameLoop.Saving += OnSaving;
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
-            helper.Events.Input.ButtonReleased += OnButtonReleased;
+            helper.Events.Input.ButtonsChanged += OnButtonsChanged;
 
             // TODO: IDEA: Subscribe to player inventory changed and see if that works as a catch-all approach for clearing leftover empty favorited slots.
 
@@ -93,30 +93,30 @@ namespace ConvenientInventory
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            // Handle favorite items hotkey being pressed
-            if (Config.IsEnableFavoriteItems
-                && Context.IsWorldReady
-                && (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey))
-            {
-                ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
-            }
-
-            // Handle quick stack hotkey being pressed
+            // Handle quick stack hotkey being pressed.
             if (Config.IsEnableQuickStackHotkey
                 && Context.IsWorldReady
                 && StardewValley.Game1.CurrentEvent is null
-                && (e.Button == Config.QuickStackKeyboardHotkey || e.Button == Config.QuickStackControllerHotkey))
+                && (Config.QuickStackKeyboardHotkey.JustPressed() || Config.QuickStackControllerHotkey.JustPressed()))
             {
                 ConvenientInventory.OnQuickStackHotkeyPressed();
             }
         }
 
-        private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
+        private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
-            // Handle favorite items hotkey being released
-            if (Config.IsEnableFavoriteItems && (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey))
+            // Handle favorite items hotkey being toggled.
+            if (Config.IsEnableFavoriteItems)
             {
-                ConvenientInventory.IsFavoriteItemsHotkeyDown = false;
+                bool isHotkeyDown = Config.FavoriteItemsKeyboardHotkey.IsDown() || Config.FavoriteItemsControllerHotkey.IsDown();
+                if (!ConvenientInventory.IsFavoriteItemsHotkeyDown && Context.IsWorldReady && isHotkeyDown)
+                {
+                    ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
+                }
+                else if (ConvenientInventory.IsFavoriteItemsHotkeyDown && !isHotkeyDown)
+                {
+                    ConvenientInventory.IsFavoriteItemsHotkeyDown = false;
+                }
             }
         }
 
