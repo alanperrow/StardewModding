@@ -1,4 +1,5 @@
 ﻿using System;
+using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.Patches;
 using ConvenientInventory.QuickStack;
@@ -29,6 +30,7 @@ namespace ConvenientInventory
             ConvenientInventory.FavoriteItemsCursorTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteCursor.png");
             ConvenientInventory.FavoriteItemsHighlightTexture = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
             ConvenientInventory.FavoriteItemsBorderTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteBorder.png");
+            AutoOrganizeLogic.AutoOrganizeIcon = helper.ModContent.Load<Texture2D>(@"assets\autoOrganizeIcon.png");
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 

@@ -13,7 +13,6 @@ using StardewValley.Objects;
 
 namespace ConvenientInventory.QuickStack
 {
-
     public static class QuickStackLogic
     {
         public static bool StackToNearbyChests(int range, InventoryPage inventoryPage = null)

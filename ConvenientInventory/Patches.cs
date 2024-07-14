@@ -14,6 +14,7 @@ using StardewValley.Menus;
 using StardewValley.Inventories;
 using StardewValley.Objects;
 using ConvenientInventory.QuickStack;
+using ConvenientInventory.AutoOrganize;
 
 namespace ConvenientInventory.Patches
 {
@@ -824,6 +825,28 @@ namespace ConvenientInventory.Patches
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(FillOutStacks_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
+        public static void ReceiveRightClick_Postfix(ItemGrabMenu __instance, int x, int y)
+        {
+            // TODO: Investigate long left click to toggle auto organize, instead of right click.
+
+            try
+            {
+                if (ModEntry.Config.IsEnableAutoOrganizeChest
+                    && __instance.source == ItemGrabMenu.source_chest
+                    && __instance.organizeButton.containsPoint(x, y)
+                    && __instance.sourceItem is Chest chest)
+                {
+                    AutoOrganizeLogic.ToggleChestAutoOrganize(__instance.organizeButton, chest);
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
     }
 
     [HarmonyPatch(typeof(Item))]
@@ -939,7 +962,7 @@ namespace ConvenientInventory.Patches
             {
                 if (key == Keys.Delete)
                 {
-                    // Prevents deletion of selected favorited item in some cases where "canBeTrashed" condition is modified (such as ForgeMenu).
+                    // Prevents deletion of selected favorited item in ForgeMenu since "canBeTrashed" condition is modified.
                     return false;
                 }
             }
@@ -1050,6 +1073,8 @@ namespace ConvenientInventory.Patches
         }
     }
 
+    // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
+
     [HarmonyPatch(typeof(Inventory))]
     public static class InventoryPatches
     {
@@ -1101,7 +1126,27 @@ namespace ConvenientInventory.Patches
 
             return true;
         }
-    }
 
-    // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
+        // TODO: Instead of postfix Chest.ShowMenu, we need to postfix ItemGrabMenu constructor (the one with lots of args).
+        //       Reasoning: After clicking Organize button, a new ItemGrabMenu gets constructed and replaces old menu as Game1.activeClickableMenu.
+        //                  Thus, this new menu's Organize button does not get the auto-organize texture applied to it immediately.
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Chest.ShowMenu))]
+        public static void ShowMenu_Postfix(Chest __instance)
+        {
+            try
+            {
+                if (Game1.activeClickableMenu is not ItemGrabMenu chestMenu)
+                {
+                    return;
+                }
+
+                AutoOrganizeLogic.TryApplyAutoOrganizeButton(__instance, chestMenu);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ShowMenu_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
 }

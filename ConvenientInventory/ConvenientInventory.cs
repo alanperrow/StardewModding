@@ -16,7 +16,7 @@ namespace ConvenientInventory
 {
     public static class ConvenientInventory
     {
-        public static Texture2D QuickStackButtonIcon { private get; set; }
+        public static Texture2D QuickStackButtonIcon { get; set; }
 
         private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
@@ -50,11 +50,11 @@ namespace ConvenientInventory
             set => transferredItemSprites.Value = value;
         }
 
-        public static Texture2D FavoriteItemsCursorTexture { private get; set; }
+        public static Texture2D FavoriteItemsCursorTexture { get; set; }
 
-        public static Texture2D FavoriteItemsHighlightTexture { private get; set; }
+        public static Texture2D FavoriteItemsHighlightTexture { get; set; }
 
-        public static Texture2D FavoriteItemsBorderTexture { private get; set; }
+        public static Texture2D FavoriteItemsBorderTexture { get; set; }
 
         private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
         public static bool IsFavoriteItemsHotkeyDown
