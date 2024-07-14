@@ -75,7 +75,7 @@ namespace ConvenientInventory.QuickStack
                 return;
             }
 
-            if (anim.CurrentTime < anim.StartTime || anim.EndTime < anim.CurrentTime)
+            if (anim.CurrentTime > anim.EndTime || anim.StartTime > anim.CurrentTime)
             {
                 // We are outside of the time interval for this chest animation.
                 return;
