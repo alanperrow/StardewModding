@@ -857,7 +857,7 @@ namespace ConvenientInventory.Patches
                     && source == ItemGrabMenu.source_chest
                     && sourceItem is Chest chest)
                 {
-                    AutoOrganizeLogic.TryApplyAutoOrganizeButton(__instance, chest);
+                    AutoOrganizeLogic.TrySetupAutoOrganizeButton(__instance, chest);
                 }
             }
             catch (Exception e)
@@ -880,6 +880,32 @@ namespace ConvenientInventory.Patches
                     && __instance.sourceItem is Chest chest)
                 {
                     AutoOrganizeLogic.ToggleChestAutoOrganize(__instance.organizeButton, chest);
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        // ItemGrabMenu does not override `IClickableMenu.setUpForGamePadMode`, so we cannot postfix it directly.
+        // Instead, we postfix the base class method and manually perform a pattern match for ItemGrabMenu.
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(IClickableMenu), nameof(IClickableMenu.setUpForGamePadMode))]
+        public static void SetUpForGamePadMode_Postfix(IClickableMenu __instance)
+        {
+            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            {
+                return;
+            }
+
+            try
+            {
+                if (__instance is ItemGrabMenu itemGrabMenu
+                    && itemGrabMenu.source == ItemGrabMenu.source_chest
+                    && itemGrabMenu.sourceItem is Chest chest)
+                {
+                    AutoOrganizeLogic.TryUpdateAutoOrganizeButtonHoverTextByGamePadMode(itemGrabMenu.organizeButton, chest);
                 }
             }
             catch (Exception e)
