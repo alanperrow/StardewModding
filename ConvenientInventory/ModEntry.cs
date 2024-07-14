@@ -47,6 +47,8 @@ namespace ConvenientInventory
                 "causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.)" +
                 "\n\nUsage: player_fixinventory",
                 FixInventory);
+
+            // TODO: New command to clear all chest mod data stored by this mod.
         }
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).

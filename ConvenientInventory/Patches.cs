@@ -827,6 +827,46 @@ namespace ConvenientInventory.Patches
         }
 
         [HarmonyPostfix]
+        [HarmonyPatch(MethodType.Constructor, new Type[]
+        {
+            typeof(IList<Item>),                        // inventory
+            typeof(bool),                               // reverseGrab
+            typeof(bool),                               // showReceivingMenu
+            typeof(InventoryMenu.highlightThisItem),    // highlightFunction
+            typeof(ItemGrabMenu.behaviorOnItemSelect),  // behaviorOnItemSelectFunction
+            typeof(string),                             // message
+            typeof(ItemGrabMenu.behaviorOnItemSelect),  // behaviorOnItemGrab
+            typeof(bool),                               // snapToBottom
+            typeof(bool),                               // canBeExitedWithKey
+            typeof(bool),                               // playRightClickSound
+            typeof(bool),                               // allowRightClick
+            typeof(bool),                               // showOrganizeButton
+            typeof(int),                                // source
+            typeof(Item),                               // sourceItem
+            typeof(int),                                // whichSpecialButton
+            typeof(object),                             // context
+            typeof(ItemExitBehavior),                   // heldItemExitBehavior
+            typeof(bool)                                // allowExitWithHeldItem
+        })]
+        public static void Constructor18_Postfix(ItemGrabMenu __instance, bool showOrganizeButton, int source, Item sourceItem)
+        {
+            try
+            {
+                if (ModEntry.Config.IsEnableAutoOrganizeChest
+                    && showOrganizeButton
+                    && source == ItemGrabMenu.source_chest
+                    && sourceItem is Chest chest)
+                {
+                    AutoOrganizeLogic.TryApplyAutoOrganizeButton(__instance, chest);
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Constructor18_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
         public static void ReceiveRightClick_Postfix(ItemGrabMenu __instance, int x, int y)
         {
@@ -1125,28 +1165,6 @@ namespace ConvenientInventory.Patches
             }
 
             return true;
-        }
-
-        // TODO: Instead of postfix Chest.ShowMenu, we need to postfix ItemGrabMenu constructor (the one with lots of args).
-        //       Reasoning: After clicking Organize button, a new ItemGrabMenu gets constructed and replaces old menu as Game1.activeClickableMenu.
-        //                  Thus, this new menu's Organize button does not get the auto-organize texture applied to it immediately.
-        [HarmonyPostfix]
-        [HarmonyPatch(nameof(Chest.ShowMenu))]
-        public static void ShowMenu_Postfix(Chest __instance)
-        {
-            try
-            {
-                if (Game1.activeClickableMenu is not ItemGrabMenu chestMenu)
-                {
-                    return;
-                }
-
-                AutoOrganizeLogic.TryApplyAutoOrganizeButton(__instance, chestMenu);
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ShowMenu_Postfix)}:\n{e}", LogLevel.Error);
-            }
         }
     }
 }
