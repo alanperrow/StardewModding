@@ -112,7 +112,7 @@ namespace ConvenientInventory.QuickStack
                 delayBeforeAnimationStart = itemHoverSprite.delayBeforeAnimationStart + (int)itemHoverSprite.interval,
                 scale = 4f,
                 layerDepth = baseLayerDepth + addlayerDepth,
-                alphaFade = 0.04f / ModEntry.Config.QuickStackAnimationStackSpeed,
+                alphaFade = 0.04f * ModEntry.Config.QuickStackAnimationStackSpeed,
                 interval = fadeTime,
                 motion = new Vector2(0.6f, 4.5f) * ModEntry.Config.QuickStackAnimationStackSpeed,
                 acceleration = new Vector2(0f, -0.08f) * ModEntry.Config.QuickStackAnimationStackSpeed,

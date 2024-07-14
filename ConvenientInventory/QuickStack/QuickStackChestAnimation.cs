@@ -171,15 +171,17 @@ namespace ConvenientInventory.QuickStack
             // == Map the found keyframe index to the correct chest lid frame. ==
             if (currentKeyframeIndex < numFrames)
             {
-                // Open animation, 
+                // Open animation.
                 return startingLidFrame + 1 + currentKeyframeIndex;
             }
             else if (currentKeyframeIndex < 2 * numFrames)
             {
+                // Close animation.
                 return startingLidFrame + numFrames - (currentKeyframeIndex - numFrames);
             }
             else
             {
+                // Closed.
                 return startingLidFrame;
             }
         }
