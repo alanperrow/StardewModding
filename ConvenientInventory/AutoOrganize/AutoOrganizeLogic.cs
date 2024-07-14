@@ -11,8 +11,6 @@ namespace ConvenientInventory.AutoOrganize
     /// </summary>
     public static class AutoOrganizeLogic
     {
-        public static Texture2D AutoOrganizeIcon { get; set; }
-
         private static string AutoOrganizeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/AutoOrganize";
 
         /// <summary>
@@ -49,8 +47,8 @@ namespace ConvenientInventory.AutoOrganize
 
         private static void UpdateToAutoOrganizeButton(ClickableTextureComponent organizeButton)
         {
-            organizeButton.texture = AutoOrganizeIcon;
-            organizeButton.sourceRect = new Rectangle(0, 0, AutoOrganizeIcon.Width, AutoOrganizeIcon.Height);
+            organizeButton.texture = CachedTextures.AutoOrganizeButtonIcon;
+            organizeButton.sourceRect = CachedTextures.AutoOrganizeButtonIcon.Bounds;
             organizeButton.hoverText = "Auto Organize ON\n(Right click to disable)"; // ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText");
             // TODO: "Right click" should dynamically change to whichever hotkey is correct for the current input (keyboard vs controller).
             //       Alternatively, investigate long-click to toggle auto organize. This would have no confusion.

@@ -174,7 +174,7 @@ namespace ConvenientInventory.Compatibility
                 setValue: value =>
                 {
                     config.FavoriteItemsHighlightTextureChoice = int.Parse(value[..1]);
-                    ConvenientInventory.FavoriteItemsHighlightTexture = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
+                    CachedTextures.FavoriteItemsHighlight = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
                 },
                 name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc"),

@@ -16,8 +16,6 @@ namespace ConvenientInventory
 {
     public static class ConvenientInventory
     {
-        public static Texture2D QuickStackButtonIcon { get; set; }
-
         private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
         private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
@@ -49,12 +47,6 @@ namespace ConvenientInventory
             get => transferredItemSprites.Value;
             set => transferredItemSprites.Value = value;
         }
-
-        public static Texture2D FavoriteItemsCursorTexture { get; set; }
-
-        public static Texture2D FavoriteItemsHighlightTexture { get; set; }
-
-        public static Texture2D FavoriteItemsBorderTexture { get; set; }
 
         private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
         public static bool IsFavoriteItemsHotkeyDown
@@ -152,15 +144,15 @@ namespace ConvenientInventory
                     new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
                     string.Empty,
                     ModEntry.Instance.Helper.Translation.Get("QuickStackButton.hoverText"),
-                    QuickStackButtonIcon,
+                    CachedTextures.QuickStackButtonIcon,
                     Rectangle.Empty,
                     4f,
                     false)
                 {
                     myID = quickStackButtonID,
-                    downNeighborID = 105,  // trash can
-                    upNeighborID = 106,    // organize button
-                    leftNeighborID = 11    // top-right inventory slot
+                    downNeighborID = InventoryPage.region_trashCan,
+                    upNeighborID = InventoryPage.region_organizeButton,
+                    leftNeighborID = 11, // top-right inventory slot
                 };
 
                 inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
@@ -948,9 +940,9 @@ namespace ConvenientInventory
                     continue;
                 }
 
-                spriteBatch.Draw(FavoriteItemsHighlightTexture,
+                spriteBatch.Draw(CachedTextures.FavoriteItemsHighlight,
                     slotDrawPositions[i],
-                    new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
+                    CachedTextures.FavoriteItemsHighlight.Bounds,
                     Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
                 );
@@ -971,9 +963,9 @@ namespace ConvenientInventory
 
                 Vector2 toDraw = new(Game1.uiViewport.Width / 2 - 384 + i * 64, yPositionOnScreen - 96 + 8);
 
-                spriteBatch.Draw(FavoriteItemsHighlightTexture,
+                spriteBatch.Draw(CachedTextures.FavoriteItemsHighlight,
                     toDraw,
-                    new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
+                    CachedTextures.FavoriteItemsHighlight.Bounds,
                     Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
                 );
@@ -994,9 +986,9 @@ namespace ConvenientInventory
         {
             float scale = (float)(3d + 0.15d * Math.Cos(FavoriteItemsHotkeyDownCounter / 15d));
 
-            spriteBatch.Draw(FavoriteItemsCursorTexture,
+            spriteBatch.Draw(CachedTextures.FavoriteItemsCursor,
                new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
-               new Rectangle(0, 0, FavoriteItemsCursorTexture.Width, FavoriteItemsCursorTexture.Height),
+               CachedTextures.FavoriteItemsCursor.Bounds,
                Color.White,
                0f, Vector2.Zero, scale, SpriteEffects.None, 1f
            );
@@ -1008,9 +1000,9 @@ namespace ConvenientInventory
 
             if (ModEntry.Config.IsEnableFavoriteItems && index != -1 && FavoriteItemSlots[index])
             {
-                spriteBatch.Draw(FavoriteItemsBorderTexture,
+                spriteBatch.Draw(CachedTextures.FavoriteItemsBorder,
                     new Vector2(x, y),
-                    new Rectangle(0, 0, FavoriteItemsBorderTexture.Width, FavoriteItemsBorderTexture.Height),
+                    CachedTextures.FavoriteItemsBorder.Bounds,
                     Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
                 );
