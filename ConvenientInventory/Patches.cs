@@ -883,7 +883,7 @@ namespace ConvenientInventory.Patches
                     && __instance.organizeButton.containsPoint(x, y)
                     && __instance.sourceItem is Chest chest)
                 {
-                    AutoOrganizeLogic.ToggleChestAutoOrganize(__instance.organizeButton, chest);
+                    AutoOrganizeLogic.ToggleChestAutoOrganize(__instance, chest);
                 }
             }
             catch (Exception e)
@@ -1198,5 +1198,32 @@ namespace ConvenientInventory.Patches
 
             return true;
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Chest.grabItemFromInventory))]
+        public static void GrabItemFromInventory_Postfix()
+        {
+            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            {
+                return;
+            }
+
+            try
+            {
+                if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu
+                    && itemGrabMenu.source == ItemGrabMenu.source_chest
+                    && itemGrabMenu.organizeButton != null
+                    && itemGrabMenu.sourceItem is Chest chest)
+                {
+                    AutoOrganizeLogic.TryOrganizeChest(itemGrabMenu, chest);
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(GrabItemFromInventory_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        // TODO: Auto Organize: Postfix `Chest.addItem()`, call `ItemGrabMenu.organizeItemsInList()` immediately after.
     }
 }

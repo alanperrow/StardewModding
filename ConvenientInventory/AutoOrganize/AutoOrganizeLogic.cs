@@ -13,6 +13,19 @@ namespace ConvenientInventory.AutoOrganize
         private static string AutoOrganizeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/AutoOrganize";
 
         /// <summary>
+        /// Determines if this chest's mod data contains auto organize data, and if so, calls <see cref="OrganizeAndCreateNewItemGrabMenu"/>.
+        /// </summary>
+        public static void TryOrganizeChest(ItemGrabMenu chestMenu, Chest chest)
+        {
+            if (!chest.modData.ContainsKey(AutoOrganizeModDataKey))
+            {
+                return;
+            }
+
+            OrganizeAndCreateNewItemGrabMenu(chestMenu);
+        }
+
+        /// <summary>
         /// Determines if this chest's mod data contains auto organize data, and if so, applies the auto organize icon texture
         /// to the chest menu's organize button.
         /// </summary>
@@ -27,21 +40,24 @@ namespace ConvenientInventory.AutoOrganize
         /// <summary>
         /// Toggles the auto organize state of the chest in its mod data, and updates the chest menu's organize button approppriately.
         /// </summary>
-        public static void ToggleChestAutoOrganize(ClickableTextureComponent organizeButton, Chest chest)
+        public static void ToggleChestAutoOrganize(ItemGrabMenu itemGrabMenu, Chest chest)
         {
             if (chest.modData.ContainsKey(AutoOrganizeModDataKey))
             {
+                // Reset to default
                 chest.modData.Remove(AutoOrganizeModDataKey);
-                ResetToDefaultOrganizeButton(organizeButton);
+                ResetToDefaultOrganizeButton(itemGrabMenu.organizeButton);
                 Game1.playSound("dialogueCharacter");
             }
             else
             {
+                // Update to Auto Organize
                 chest.modData[AutoOrganizeModDataKey] = "1";
-                UpdateToAutoOrganizeButton(organizeButton);
+                OrganizeAndCreateNewItemGrabMenu(itemGrabMenu);
+                Game1.playSound("Ship");
                 Game1.playSound("smallSelect");
 
-                // TODO: Organize chest upon toggling on auto organize.
+                // No need to update organize button here because we postfix ItemGrabMenu constructor with TrySetupAutoOrganizeButton.
             }
 
             Game1.playSound("openBox");
@@ -76,16 +92,62 @@ namespace ConvenientInventory.AutoOrganize
 
         private static void UpdateHoverTextByGamePadMode(ClickableTextureComponent organizeButton)
         {
-            // TODO: (?) Config option: Show disable instructions in hover text.
-            //       If this bool was false, hover text would simply be "Auto Organize ON".
-            //          - Would require splitting the translation file into three strings: hoverText, hoverText-disable, hoverText-disable-gamepad
-
             // TODO: Slight bug: This is working when switching from kbm to gamepad, but is not getting triggered from gamepad to kbm.
             //       Not a big deal as the hover text resets when re-activating auto organize. Probably fine to leave as is.
+
+            // TODO: (?) Config option: Show instructions in hover text.
+            //       If this bool was false, hover text would simply be "Auto Organize ON".
+            //          - Would require splitting the translation file into three strings: hoverText, hoverText-disable, hoverText-disable-gamepad
 
             organizeButton.hoverText = Game1.options.gamepadControls
                 ? "Auto Organize ON\n(X to disable)" // ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText-gamepad");
                 : "Auto Organize ON\n(Right click to disable)"; // ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText");
+        }
+
+        /// <summary>
+        /// Organizes the provided <paramref name="chestMenu"/>, and creates a new <see cref="ItemGrabMenu"/> using the organized inventory
+        /// which is then assigned to <see cref="Game1.activeClickableMenu"/>.
+        /// </summary>
+        private static void OrganizeAndCreateNewItemGrabMenu(ItemGrabMenu chestMenu)
+        {
+            // Taken from base game ItemGrabMenu.receiveLeftClick (when checking if organizeButton was clicked).
+            ClickableComponent lastSnappedComponent = chestMenu.currentlySnappedComponent;
+            ItemGrabMenu.organizeItemsInList(chestMenu.ItemsToGrabMenu.actualInventory);
+            Item heldItem = chestMenu.heldItem;
+            chestMenu.heldItem = null;
+
+            ItemGrabMenu newMenu = new ItemGrabMenu(
+                chestMenu.ItemsToGrabMenu.actualInventory,
+                reverseGrab: false,
+                showReceivingMenu: true,
+                InventoryMenu.highlightAllItems,
+                chestMenu.behaviorFunction,
+                null,
+                chestMenu.behaviorOnItemGrab,
+                snapToBottom: false,
+                canBeExitedWithKey: true,
+                playRightClickSound: true,
+                allowRightClick: true,
+                showOrganizeButton: true,
+                chestMenu.source,
+                chestMenu.sourceItem,
+                chestMenu.whichSpecialButton,
+                chestMenu.context,
+                chestMenu.HeldItemExitBehavior,
+                chestMenu.AllowExitWithHeldItem)
+                .setEssential(chestMenu.essential);
+
+            if (lastSnappedComponent != null)
+            {
+                newMenu.setCurrentlySnappedComponentTo(lastSnappedComponent.myID);
+                if (Game1.options.SnappyMenus)
+                {
+                    chestMenu.snapCursorToCurrentSnappedComponent();
+                }
+            }
+
+            newMenu.heldItem = heldItem;
+            Game1.activeClickableMenu = newMenu;
         }
     }
 }
