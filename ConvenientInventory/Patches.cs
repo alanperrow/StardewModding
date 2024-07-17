@@ -871,11 +871,15 @@ namespace ConvenientInventory.Patches
         public static void ReceiveRightClick_Postfix(ItemGrabMenu __instance, int x, int y)
         {
             // TODO: Investigate long left click to toggle auto organize, instead of right click.
+            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            {
+                return;
+            }
 
             try
             {
-                if (ModEntry.Config.IsEnableAutoOrganizeChest
-                    && __instance.source == ItemGrabMenu.source_chest
+                if (__instance.source == ItemGrabMenu.source_chest
+                    && __instance.organizeButton != null
                     && __instance.organizeButton.containsPoint(x, y)
                     && __instance.sourceItem is Chest chest)
                 {
@@ -903,6 +907,7 @@ namespace ConvenientInventory.Patches
             {
                 if (__instance is ItemGrabMenu itemGrabMenu
                     && itemGrabMenu.source == ItemGrabMenu.source_chest
+                    && itemGrabMenu.organizeButton != null
                     && itemGrabMenu.sourceItem is Chest chest)
                 {
                     AutoOrganizeLogic.TryUpdateAutoOrganizeButtonHoverTextByGamePadMode(itemGrabMenu.organizeButton, chest);
