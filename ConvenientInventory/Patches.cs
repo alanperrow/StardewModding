@@ -1176,18 +1176,22 @@ namespace ConvenientInventory.Patches
     [HarmonyPatch(typeof(Chest))]
     public static class ChestPatches
     {
-        [HarmonyPostfix]
-        [HarmonyPatch(nameof(Chest.updateWhenCurrentLocation))]
-        public static void UpdateWhenCurrentLocation_Postfix(Chest __instance)
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(Chest.draw))]
+        [HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) })]
+        public static bool Draw_Prefix(Chest __instance)
         {
+            // TODO: Investigate IModHelper.Multiplayer.SendMessage()
             try
             {
                 QuickStackChestAnimation.Animate(__instance);
             }
             catch (Exception e)
             {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(UpdateWhenCurrentLocation_Postfix)}:\n{e}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Draw_Prefix)}:\n{e}", LogLevel.Error);
             }
+
+            return true;
         }
     }
 }
