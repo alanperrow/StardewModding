@@ -77,6 +77,14 @@
   "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "Keybind (controller)",
   "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "Hold this button when taking an item from an item stack to instantly take all but one of that item.",
 
+  "ModConfigMenu.Label.AutoOrganizeChest": "Auto Organize Chest",
+
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "Enable auto organize chest button?",
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "If enabled, right-clicking a chest menu's organize button (or pressing (X) on gamepad) will toggle Auto Organize ON/OFF for that chest. When a chest has Auto Organize ON, all of its items will remain organized, even when new items are added.",
+
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "Show instructions in hover text?",
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "If enabled, the hover text for the Auto Organize button will include an additional line explaining how to toggle off Auto Organize.",
+
   "ModConfigMenu.Label.Miscellaneous": "Miscellaneous",
 
   "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "Enable inventory cursor side warp?",

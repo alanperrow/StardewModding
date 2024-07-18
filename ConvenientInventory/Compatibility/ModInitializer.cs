@@ -228,6 +228,27 @@ namespace ConvenientInventory.Compatibility
 
             api.AddSectionTitle(
                 mod: modManifest,
+                text: () => helper.Translation.Get("ModConfigMenu.Label.AutoOrganizeChest")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsEnableAutoOrganizeChest,
+                setValue: value => config.IsEnableAutoOrganizeChest = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableAutoOrganizeChest.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableAutoOrganizeChest.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsShowAutoOrganizeButtonInstructions,
+                setValue: value => config.IsShowAutoOrganizeButtonInstructions = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc")
+            );
+
+            api.AddSectionTitle(
+                mod: modManifest,
                 text: () => helper.Translation.Get("ModConfigMenu.Label.Miscellaneous")
             );
 
