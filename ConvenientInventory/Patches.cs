@@ -870,7 +870,6 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
         public static void ReceiveRightClick_Postfix(ItemGrabMenu __instance, int x, int y)
         {
-            // TODO: Investigate long left click to toggle auto organize, instead of right click.
             if (!ModEntry.Config.IsEnableAutoOrganizeChest)
             {
                 return;

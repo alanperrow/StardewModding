@@ -36,8 +36,6 @@ namespace ConvenientInventory
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
 
-            // TODO: IDEA: Subscribe to player inventory changed and see if that works as a catch-all approach for clearing leftover empty favorited slots.
-
             helper.ConsoleCommands.Add("player_fixinventory",
                 "Resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory. (Some mods directly modify the player's inventory size, " +
                 "causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.)" +
