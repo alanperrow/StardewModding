@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Inventories;
 using StardewValley.Menus;
 using StardewValley.Objects;
 
@@ -13,9 +15,40 @@ namespace ConvenientInventory.AutoOrganize
         private static string AutoOrganizeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/AutoOrganize";
 
         /// <summary>
+        /// Determines if this chest's mod data contains auto organize data, and if so, organizes the chest's inventory.
+        /// </summary>
+        public static void TryOrganizeChest(Chest chest)
+        {
+            if (!chest.modData.ContainsKey(AutoOrganizeModDataKey))
+            {
+                return;
+            }
+
+            chest.GetMutex().RequestLock(
+                acquired: () =>
+                {
+                    IInventory chestInventory = chest.GetItemsForPlayer();
+                    ItemGrabMenu.organizeItemsInList(chestInventory);
+                },
+                failed: () =>
+                {
+                    // Debug log, as this shouldn't happen.
+                    string itemNames = string.Empty;
+                    foreach (Item item in chest.GetItemsForPlayer())
+                    {
+                        itemNames += $"'{item.Name}' x {item.Stack}, ";
+                    }
+
+                    ModEntry.Instance.Monitor.Log(
+                        $"Could not acquire chest mutex lock before auto organizing. Chest items: {itemNames}.",
+                        LogLevel.Debug);
+                });
+        }
+
+        /// <summary>
         /// Determines if this chest's mod data contains auto organize data, and if so, calls <see cref="OrganizeAndCreateNewItemGrabMenu"/>.
         /// </summary>
-        public static void TryOrganizeChest(ItemGrabMenu chestMenu, Chest chest)
+        public static void TryOrganizeChestInMenu(ItemGrabMenu chestMenu, Chest chest)
         {
             if (!chest.modData.ContainsKey(AutoOrganizeModDataKey))
             {

@@ -1215,7 +1215,7 @@ namespace ConvenientInventory.Patches
                     && itemGrabMenu.organizeButton != null
                     && itemGrabMenu.sourceItem is Chest chest)
                 {
-                    AutoOrganizeLogic.TryOrganizeChest(itemGrabMenu, chest);
+                    AutoOrganizeLogic.TryOrganizeChestInMenu(itemGrabMenu, chest);
                 }
             }
             catch (Exception e)
@@ -1224,6 +1224,23 @@ namespace ConvenientInventory.Patches
             }
         }
 
-        // TODO: Auto Organize: Postfix `Chest.addItem()`, call `ItemGrabMenu.organizeItemsInList()` immediately after.
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Chest.addItem))]
+        public static void AddItem_Postfix(Chest __instance)
+        {
+            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            {
+                return;
+            }
+
+            try
+            {
+                AutoOrganizeLogic.TryOrganizeChest(__instance);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(AddItem_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
     }
 }
