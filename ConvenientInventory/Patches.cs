@@ -1186,7 +1186,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) })]
         public static bool Draw_Prefix(Chest __instance)
         {
-            // TODO: Investigate IModHelper.Multiplayer.SendMessage()
+            // TODO: Optimization: Investigate IModHelper.Multiplayer.SendMessage()
             try
             {
                 QuickStackChestAnimation.Animate(__instance);

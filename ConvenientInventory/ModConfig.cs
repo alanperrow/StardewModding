@@ -48,9 +48,12 @@ namespace ConvenientInventory
 
         public KeybindList TakeAllButOneControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftTrigger });
 
+        // ===== Auto Organize Chest =====
+        public bool IsEnableAutoOrganizeChest { get; set; } = true;
+
+        public bool IsShowAutoOrganizeButtonInstructions { get; set; } = true;
+
         // ===== Miscellaneous =====
         public bool IsEnableInventoryPageSideWarp { get; set; } = true;
-
-        public bool IsEnableAutoOrganizeChest { get; set; } = true;
     }
 }

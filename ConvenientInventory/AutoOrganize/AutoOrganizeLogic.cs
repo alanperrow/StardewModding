@@ -32,7 +32,7 @@ namespace ConvenientInventory.AutoOrganize
                 },
                 failed: () =>
                 {
-                    // Debug log, as this shouldn't happen.
+                    // Debug log; this shouldn't happen.
                     string itemNames = string.Empty;
                     foreach (Item item in chest.GetItemsForPlayer())
                     {
@@ -40,7 +40,7 @@ namespace ConvenientInventory.AutoOrganize
                     }
 
                     ModEntry.Instance.Monitor.Log(
-                        $"Could not acquire chest mutex lock before auto organizing. Chest items: {itemNames}.",
+                        $"Failed to acquire chest mutex lock before auto organizing. Chest items: {itemNames}.",
                         LogLevel.Debug);
                 });
         }
@@ -125,16 +125,14 @@ namespace ConvenientInventory.AutoOrganize
 
         private static void UpdateHoverTextByGamePadMode(ClickableTextureComponent organizeButton)
         {
-            // TODO: Slight bug: This is working when switching from kbm to gamepad, but is not getting triggered from gamepad to kbm.
-            //       Not a big deal as the hover text resets when re-activating auto organize. Probably fine to leave as is.
-
-            // TODO: (?) Config option: Show instructions in hover text.
-            //       If this bool was false, hover text would simply be "Auto Organize ON".
-            //          - Would require splitting the translation file into three strings: hoverText, hoverText-disable, hoverText-disable-gamepad
-
-            organizeButton.hoverText = Game1.options.gamepadControls
-                ? "Auto Organize ON\n(X to disable)" // ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText-gamepad");
-                : "Auto Organize ON\n(Right click to disable)"; // ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText");
+            organizeButton.hoverText = ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText");
+            if (ModEntry.Config.IsShowAutoOrganizeButtonInstructions)
+            {
+                organizeButton.hoverText += '\n';
+                organizeButton.hoverText += Game1.options.gamepadControls
+                    ? ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText.disable-gamepad")
+                    : ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText.disable");
+            }
         }
 
         /// <summary>

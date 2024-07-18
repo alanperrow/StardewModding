@@ -2,6 +2,10 @@
   // UI
   "QuickStackButton.hoverText": "Quick Stack To Nearby Chests", // If this is translated, try to keep the string length as close to the original as possible.
 
+  "AutoOrganizeButton.hoverText": "Auto Organize ON",
+  "AutoOrganizeButton.hoverText.disable": "(Right click to disable)",
+  "AutoOrganizeButton.hoverText.disable-gamepad": "(X to disable)",
+
   // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "Quick Stack To Nearby Chests",
 
