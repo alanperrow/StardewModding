@@ -5,10 +5,8 @@ using ConvenientInventory.Patches;
 using ConvenientInventory.QuickStack;
 using GenericModConfigMenu;
 using HarmonyLib;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 
 namespace ConvenientInventory
 {
@@ -42,7 +40,12 @@ namespace ConvenientInventory
                 "\n\nUsage: player_fixinventory",
                 FixInventory);
 
-            // TODO: New command to clear all chest mod data stored by this mod.
+            helper.ConsoleCommands.Add("convinv_clearmoddata",
+                "Clears all mod data set by Convenient Inventory for the currently loaded save; no other mod data is removed. " +
+                "Changes to the save file will take effect the next time the game is saved." +
+                "\n(This command is intended for players who want to remove any Convenient Inventory mod data from their save file for a complete uninstallation.)" +
+                "\n\nUsage: convinv_cleanup_autoorganize",
+                ClearModDataForCurrentlyLoadedSave);
         }
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).
@@ -89,7 +92,7 @@ namespace ConvenientInventory
                 ConvenientInventory.SaveFavoriteItemSlots();
             }
 
-            Utility.ForEachLocation(loc => QuickStackChestAnimation.CleanupChestAnimationModDataByLocation(loc));
+            StardewValley.Utility.ForEachLocation(loc => QuickStackChestAnimation.CleanupChestAnimationModDataByLocation(loc));
         }
 
         /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
@@ -98,7 +101,7 @@ namespace ConvenientInventory
             // Handle quick stack hotkey being pressed.
             if (Config.IsEnableQuickStackHotkey
                 && Context.IsWorldReady
-                && Game1.CurrentEvent is null
+                && StardewValley.Game1.CurrentEvent is null
                 && (Config.QuickStackKeyboardHotkey.JustPressed() || Config.QuickStackControllerHotkey.JustPressed()))
             {
                 ConvenientInventory.OnQuickStackHotkeyPressed();
@@ -166,6 +169,31 @@ namespace ConvenientInventory
                 // Remove the last item of the list
                 items.RemoveAt(index);
             }
+        }
+
+        /// <summary>
+        /// Clears all mod data set by Convenient Inventory for the currently loaded save.
+        /// </summary>
+        /// <param name="command">The name of the command invoked.</param>
+        /// <param name="args">The arguments received by the command. Each word after the command name is a separate argument.</param>
+        private void ClearModDataForCurrentlyLoadedSave(string command, string[] args)
+        {
+            if (!Context.IsWorldReady)
+            {
+                Monitor.Log("Please load a save before using this command.", LogLevel.Info);
+                return;
+            }
+
+            StardewValley.Utility.ForEachLocation(loc =>
+            {
+                bool result = true;
+                result &= AutoOrganizeLogic.CleanupAutoOrganizeModDataByLocation(loc);
+
+                // This shouldn't be necessary as we already do this before saving, but just in case...
+                result &= QuickStackChestAnimation.CleanupChestAnimationModDataByLocation(loc);
+
+                return result;
+            });
         }
     }
 }

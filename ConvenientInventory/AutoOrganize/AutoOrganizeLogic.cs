@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Inventories;
@@ -13,6 +14,26 @@ namespace ConvenientInventory.AutoOrganize
     public static class AutoOrganizeLogic
     {
         private static string AutoOrganizeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/AutoOrganize";
+
+        /// <summary>
+        /// Iterates through all chests in each game location and removes any auto organize mod data.
+        /// </summary>
+        public static bool CleanupAutoOrganizeModDataByLocation(GameLocation gameLocation)
+        {
+            try
+            {
+                foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
+                {
+                    chest.modData.Remove(AutoOrganizeModDataKey);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Determines if this chest's mod data contains auto organize data, and if so, organizes the chest's inventory.
