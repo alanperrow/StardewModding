@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Objects;
 
 namespace ConvenientInventory.TypedChests
@@ -25,6 +26,11 @@ namespace ConvenientInventory.TypedChests
 
         public static ChestType DetermineChestType(Chest chest)
         {
+            if (chest.SpecialChestType == Chest.SpecialChestTypes.BigChest)
+            {
+                return chest.QualifiedItemId == "(BC)BigStoneChest" ? ChestType.BigStone : ChestType.BigNormal;
+            }
+
             if (chest.SpecialChestType != Chest.SpecialChestTypes.None)
             {
                 return ChestType.Special;
@@ -32,7 +38,6 @@ namespace ConvenientInventory.TypedChests
 
             return chest.ParentSheetIndex switch
             {
-                // TODO: Big chest support
                 232 => ChestType.Stone,
                 216 => ChestType.MiniFridge,
                 -1 => ChestType.Package,
@@ -52,9 +57,9 @@ namespace ConvenientInventory.TypedChests
 
             return this.ChestType switch
             {
-                // TODO: Big chest support
                 ChestType.Normal => DrawNormalChestTooltip(spriteBatch, x, y),
-                ChestType.Stone => DrawStoneChestTooltip(spriteBatch, x, y),
+                ChestType.BigNormal => DrawBigNormalChestTooltip(spriteBatch, x, y),
+                ChestType.Stone or ChestType.BigStone => DrawStoneChestTooltip(spriteBatch, x, y),
                 ChestType.Fridge => DrawFridgeTooltip(spriteBatch, x, y),
                 ChestType.MiniFridge => DrawMiniFridgeTooltip(spriteBatch, x, y),
                 ChestType.Mill => DrawMillTooltip(spriteBatch, toolTipPosition, posIndex, x, y),
@@ -89,10 +94,38 @@ namespace ConvenientInventory.TypedChests
             return 0;
         }
 
+        private int DrawBigNormalChestTooltip(SpriteBatch spriteBatch, int x, int y)
+        {
+            ParsedItemData chestItemData = ItemRegistry.GetDataOrErrorItem(this.Chest.QualifiedItemId);
+            Texture2D chestTexture = chestItemData.GetTexture();
+            Color chestColor = this.Chest.playerChoiceColor.Value;
+
+            if (chestColor.Equals(Color.Black))
+            {
+                spriteBatch.Draw(chestTexture, new Vector2(x, y), chestItemData.GetSourceRect(), this.Chest.Tint, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
+                spriteBatch.Draw(chestTexture, new Vector2(x, y), chestItemData.GetSourceRect(0, this.Chest.startingLidFrame.Value), this.Chest.Tint, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f + 1E-05f);
+            }
+            else
+            {
+                int spriteIndex = 312;
+                int lidIndex = this.Chest.startingLidFrame.Value + 16;
+                int coloredLidIndex = this.Chest.startingLidFrame.Value + 8;
+                Rectangle drawRect = chestItemData.GetSourceRect(0, spriteIndex);
+                Rectangle lidRect = chestItemData.GetSourceRect(0, lidIndex);
+                Rectangle coloredLidRect = chestItemData.GetSourceRect(0, coloredLidIndex);
+
+                spriteBatch.Draw(chestTexture, new Vector2(x, y), drawRect, chestColor, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
+                spriteBatch.Draw(chestTexture, new Vector2(x, y + 20), new Rectangle(0, spriteIndex / 8 * 32 + 53, 16, 11), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f + 2E-05f);
+                spriteBatch.Draw(chestTexture, new Vector2(x, y), coloredLidRect, chestColor, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f + 1E-05f);
+                spriteBatch.Draw(chestTexture, new Vector2(x, y), lidRect, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f + 2E-05f);
+            }
+
+            return 0;
+        }
         private int DrawStoneChestTooltip(SpriteBatch spriteBatch, int x, int y)
         {
             spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
-                new Vector2(x, y),
+            new Vector2(x, y),
                 Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, this.Chest.ParentSheetIndex, 16, 32),
                 this.Chest.playerChoiceColor.Value.Equals(Color.Black) ? this.Chest.Tint : this.Chest.playerChoiceColor.Value,
                 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
