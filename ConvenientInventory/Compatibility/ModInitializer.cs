@@ -40,15 +40,18 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStack.Desc")
             );
 
+            // (?) TODO: "Global" option should only be enabled if Chests Anywhere is installed. Check for API in ModEntry.
+            //            - If API is not found and config value is loaded as "Global", log a warning message to SMAPI log and overwrite the config value to "Location".
             api.AddNumberOption(
                 mod: modManifest,
-                getValue: () => config.QuickStackRange,
-                setValue: value => config.QuickStackRange = value,
+                getValue: () => ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStackRange),
+                setValue: value => config.QuickStackRange = ConfigHelper.FormatQuickStackRange(value),
                 name: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Desc"),
-                min: 0,
-                max: 10,
-                interval: 1
+                min: 1,
+                max: 17,
+                interval: 1,
+                formatValue: ConfigHelper.FormatQuickStackRange
             );
 
             api.AddBoolOption(

@@ -8,7 +8,7 @@ namespace ConvenientInventory
         // ===== Quick Stack To Nearby Chests =====
         public bool IsEnableQuickStack { get; set; } = true;
 
-        public int QuickStackRange { get; set; } = 5;
+        public string QuickStackRange { get; set; } = ConfigHelper.QuickStackRange_Default;
 
         public bool IsQuickStackIntoBuildingsWithInventories { get; set; } = true;
 

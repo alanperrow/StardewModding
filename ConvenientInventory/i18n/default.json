@@ -13,7 +13,7 @@
   "ModConfigMenu.IsEnableQuickStack.Desc": "If enabled, adds a \"Quick Stack To Nearby Chests\" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.",
 
   "ModConfigMenu.QuickStackRange.Name": "Range",
-  "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.",
+  "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.\n\nIf set to \"Location\", all chests in the player's current location will be considered.\n\nIf set to \"Global\", all chests in the world will be considered.",
 
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
   "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
@@ -40,10 +40,10 @@
   "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "If enabled, an animation will play when items are quick stacked to visually show where each item was stored.",
 
   "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "Animation: Item Speed",
-  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "Animation speed modifier to adjust the speed at which quick stacked items move toward their stored chest.\n\n0.5x: Half speed\n1x: Normal speed\n3x: Triple speed",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "For quick stack animation:\nAdjusts the speed at which quick stacked items move toward their stored chest.\n\n0.5x: Half speed\n1x: Normal speed\n3x: Triple speed",
 
   "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "Animation: Stack Speed",
-  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "Animation speed modifier to adjust the speed at which items are individually stacked into their stored chest.\n\n0.5x: Half speed\n1x: Normal speed\n3x: Triple speed",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "For quick stack animation:\nAdjusts the speed at which items are individually stacked into their stored chest.\n\n0.5x: Half speed\n1x: Normal speed\n3x: Triple speed",
 
   "ModConfigMenu.Label.FavoriteItems": "Favorite Items",
 
