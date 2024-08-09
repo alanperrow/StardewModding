@@ -191,12 +191,10 @@ namespace ConvenientInventory.QuickStack
             else if (rangeType == QuickStackRangeType.Location)
             {
                 // Get all chests in the player's current location.
+                Vector2 farmerPosition = who.getStandingPosition();
                 GameLocation gameLocation = who.currentLocation;
 
-                // TODO: Logic
-                //...
-
-                return new List<TypedChest>();
+                return GetLocationTypedChestsWithDistance(farmerPosition, gameLocation).OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList();
             }
             else
             {
@@ -208,6 +206,45 @@ namespace ConvenientInventory.QuickStack
 
                 return new List<TypedChest>();
             }
+        }
+
+        /// <summary>
+        /// From origin, return all chests in the provided location, including the point-distance from their tile-center to origin.
+        /// </summary>
+        private static List<TypedChestWithDistance> GetLocationTypedChestsWithDistance(Vector2 origin, GameLocation gameLocation)
+        {
+            List<TypedChestWithDistance> typedChestsWithDistance = new();
+
+            foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
+            {
+                // Make sure chest is not in-use by another player (easy fix to avoid concurrency issues and possibly item deletion/duplication)
+                if (chest.GetMutex().IsLocked())
+                {
+                    continue;
+                }
+
+                ChestType chestType = TypedChest.DetermineChestType(chest);
+                if (chestType == ChestType.Package)
+                {
+                    // Do not consider new farmer packages as chests for quick stack
+                    continue;
+                }
+
+                Vector2 chestTileCenterPosition = GetTileCenterPosition((int)chest.TileLocation.X, (int)chest.TileLocation.Y);
+
+                int chestPosX = (int)chestTileCenterPosition.X;
+                int chestPosY = (int)chestTileCenterPosition.Y;
+
+                AddChestToList(chest, typedChestsWithDistance, true, chestPosX, chestPosY, origin, chestType);
+            }
+
+            // TODO: Add kitchen fridge chests
+            //...
+
+            // TODO: Add building chests
+            //...
+
+            return typedChestsWithDistance;
         }
 
         /// <summary>
@@ -485,7 +522,7 @@ namespace ConvenientInventory.QuickStack
                 int dy = posY - (int)origin.Y;
 
                 var typedChest = new TypedChest(chest, chestType, visualTileLoc);
-                var typedChestWithDistance = new TypedChestWithDistance(typedChest, Math.Sqrt(dx * dx + dy * dy));
+                var typedChestWithDistance = new TypedChestWithDistance(typedChest, Math.Sqrt(((long)dx * dx) + ((long)dy * dy)));
                 chestList.Add(typedChestWithDistance);
             }
         }
