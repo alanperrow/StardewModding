@@ -658,11 +658,7 @@ namespace ConvenientInventory
             // Quick stack button clicked (in InventoryPage)
             if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage inventoryPage && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
             {
-                QuickStackLogic.StackToNearbyChests(
-
-                    int.Parse(ModEntry.Config.QuickStackRange), // TODO: Support "Location" and "Global" values.
-
-                    inventoryPage);
+                QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
             }
         }
 
@@ -675,15 +671,11 @@ namespace ConvenientInventory
 
             if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is InventoryPage inventoryPage)
             {
-                QuickStackLogic.StackToNearbyChests(
-                    int.Parse(ModEntry.Config.QuickStackRange), // TODO: Support "Location" and "Global" values.
-                    inventoryPage);
+                QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
                 return;
             }
 
-            QuickStackLogic.StackToNearbyChests(
-                    int.Parse(ModEntry.Config.QuickStackRange) // TODO: Support "Location" and "Global" values.
-            );
+            QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange);
         }
 
         /// <summary>
@@ -913,11 +905,7 @@ namespace ConvenientInventory
 
         private static void DrawQuickStackButtonToolTip(SpriteBatch spriteBatch)
         {
-            NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(
-                Game1.player,
-                int.Parse(ModEntry.Config.QuickStackRange), // TODO: Support "Location" and "Global" values.
-                true)
-                .AsReadOnly();
+            NearbyTypedChests = QuickStackLogic.GetTypedChestsWithinRange(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
 
             if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
             {

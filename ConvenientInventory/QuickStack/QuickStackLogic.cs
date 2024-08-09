@@ -15,12 +15,12 @@ namespace ConvenientInventory.QuickStack
 {
     public static class QuickStackLogic
     {
-        public static bool StackToNearbyChests(int range, InventoryPage inventoryPage = null)
+        public static bool StackToNearbyChests(string rangeStr, InventoryPage inventoryPage = null)
         {
             bool movedAtLeastOneTotal = false;
             Farmer who = Game1.player;
 
-            List<TypedChest> chests = GetTypedChestsAroundFarmer(who, range, true);
+            List<TypedChest> chests = GetTypedChestsWithinRange(who, rangeStr, true);
 
             Inventory playerInventory = who.Items;
 
@@ -167,20 +167,47 @@ namespace ConvenientInventory.QuickStack
             return movedAtLeastOneTotal;
         }
 
-        public static List<TypedChest> GetTypedChestsAroundFarmer(Farmer who, int range, bool sorted = false)
+        public static List<TypedChest> GetTypedChestsWithinRange(Farmer who, string rangeStr, bool sorted = false)
         {
             if (who is null)
             {
                 return new List<TypedChest>();
             }
 
-            Vector2 farmerPosition = who.getStandingPosition();
-            Point farmerTileLocation = who.TilePoint;
-            GameLocation gameLocation = who.currentLocation;
+            QuickStackRangeType rangeType = ConfigHelper.GetQuickStackRangeType(rangeStr);
+            if (rangeType == QuickStackRangeType.Tile)
+            {
+                // Get all chests within the given tile range.
+                int tileRange = ConfigHelper.GetQuickStackTileRange(rangeStr);
 
-            return sorted
-                ? GetNearbyTypedChestsWithDistance(farmerPosition, range, gameLocation).OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList()
-                : GetNearbyTypedChests(farmerTileLocation, range, gameLocation);
+                Vector2 farmerPosition = who.getStandingPosition();
+                Point farmerTileLocation = who.TilePoint;
+                GameLocation gameLocation = who.currentLocation;
+
+                return sorted
+                    ? GetNearbyTypedChestsWithDistance(farmerPosition, tileRange, gameLocation).OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList()
+                    : GetNearbyTypedChests(farmerTileLocation, tileRange, gameLocation);
+            }
+            else if (rangeType == QuickStackRangeType.Location)
+            {
+                // Get all chests in the player's current location.
+                GameLocation gameLocation = who.currentLocation;
+
+                // TODO: Logic
+                //...
+
+                return new List<TypedChest>();
+            }
+            else
+            {
+                // Get all chests in the world.
+                // TODO: In multiplayer, if not main player, only get chests in active locations.
+
+                // TODO: Logic
+                //...
+
+                return new List<TypedChest>();
+            }
         }
 
         /// <summary>

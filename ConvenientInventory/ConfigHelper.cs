@@ -1,4 +1,6 @@
-﻿namespace ConvenientInventory
+﻿using ConvenientInventory.QuickStack;
+
+namespace ConvenientInventory
 {
     public static class ConfigHelper
     {
@@ -64,5 +66,40 @@
                 _ => QuickStackRange_Default,
             };
         }
+
+        /// <summary>
+        /// Parses a provided config value for <see cref="ModConfig.QuickStackRange"/>, validates and constrains it, and returns the corresponding
+        /// string of the constrained value.
+        /// </summary>
+        /// <param name="value">The config value to validate and constrain.</param>
+        /// <returns>The validated and constrained value.</returns>
+        public static string ValidateAndConstrainQuickStackRange(string value) => FormatQuickStackRange(ParseQuickStackRangeFromConfig(value));
+
+        /// <summary>
+        /// Parses a config value for <see cref="ModConfig.QuickStackRange"/> and returns the <see cref="QuickStackRangeType"/> associated with the value.
+        /// </summary>
+        /// <param name="value">The config value to parse.</param>
+        /// <returns>The <see cref="QuickStackRangeType"/> associated with the parsed value.</returns>
+        public static QuickStackRangeType GetQuickStackRangeType(string value)
+        {
+            if (int.TryParse(value, out _))
+            {
+                return QuickStackRangeType.Tile;
+            }
+
+            return value switch
+            {
+                QuickStackRange_Global => QuickStackRangeType.Global,
+                _ => QuickStackRangeType.Location,
+            };
+        }
+
+        /// <summary>
+        /// Parses a config value for <see cref="ModConfig.QuickStackRange"/> as an <see langword="int"/> which represents the quick stack tile range.
+        /// Throws an exception if <see cref="ModConfig.QuickStackRange"/> is not of type <see cref="QuickStackRangeType.Tile"/>.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int GetQuickStackTileRange(string value) => int.Parse(value);
     }
 }

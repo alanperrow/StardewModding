@@ -23,6 +23,7 @@ namespace ConvenientInventory
         {
             Instance = this;
             Config = helper.ReadConfig<ModConfig>();
+            Config.QuickStackRange = ConfigHelper.ValidateAndConstrainQuickStackRange(Config.QuickStackRange);
 
             CachedTextures.LoadCachedTextures(helper, Config);
 
@@ -35,8 +36,9 @@ namespace ConvenientInventory
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
 
             helper.ConsoleCommands.Add("player_fixinventory",
-                "Resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory. (Some mods directly modify the player's inventory size, " +
-                "causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.)" +
+                "Resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory." +
+                "\n(Some mods directly modify the player's inventory size, causing compatibility issues and/or leaving extra null items when uninstalled; " +
+                "this command should fix these issues.)" +
                 "\n\nUsage: player_fixinventory",
                 FixInventory);
 
