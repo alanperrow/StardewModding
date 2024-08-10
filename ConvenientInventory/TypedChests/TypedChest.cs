@@ -60,8 +60,9 @@ namespace ConvenientInventory.TypedChests
                 ChestType.Normal => DrawNormalChestTooltip(spriteBatch, x, y),
                 ChestType.BigNormal => DrawBigNormalChestTooltip(spriteBatch, x, y),
                 ChestType.Stone or ChestType.BigStone => DrawStoneChestTooltip(spriteBatch, x, y),
-                ChestType.Fridge => DrawFridgeTooltip(spriteBatch, x, y),
                 ChestType.MiniFridge => DrawMiniFridgeTooltip(spriteBatch, x, y),
+                ChestType.Fridge => DrawFridgeTooltip(spriteBatch, x, y),
+                ChestType.IslandFridge => DrawIslandFridgeTooltip(spriteBatch, x, y),
                 ChestType.Mill => DrawMillTooltip(spriteBatch, toolTipPosition, posIndex, x, y),
                 ChestType.JunimoHut => DrawJunimoHutTooltip(spriteBatch, toolTipPosition, posIndex, x, y),
                 _ => DrawSpecialChestTooltip(spriteBatch, x, y),
@@ -148,30 +149,6 @@ namespace ConvenientInventory.TypedChests
             return 0;
         }
 
-        private static int DrawFridgeTooltip(SpriteBatch spriteBatch, int x, int y)
-        {
-            if (Game1.currentLocation is StardewValley.Locations.FarmHouse)
-            {
-                spriteBatch.Draw(CachedTextures.FarmHouse,
-                    new Vector2(x, y + 3),
-                    new Rectangle(16 * 5, 48 * 4 + 13, 16, 35),
-                    Color.White,
-                    0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f);
-            }
-            else
-            {
-                // Island house
-                spriteBatch.Draw(CachedTextures.FarmHouse,
-                    new Vector2(x, y + 3),
-                    new Rectangle(16 * 6, 48 * 6 + 29, 16, 35),
-                    Color.White,
-                    0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
-                );
-            }
-
-            return 0;
-        }
-
         private int DrawMiniFridgeTooltip(SpriteBatch spriteBatch, int x, int y)
         {
             spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
@@ -180,6 +157,28 @@ namespace ConvenientInventory.TypedChests
                 Color.White,
                 0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
             );
+
+            return 0;
+        }
+
+        private static int DrawFridgeTooltip(SpriteBatch spriteBatch, int x, int y)
+        {
+            spriteBatch.Draw(CachedTextures.FarmHouse,
+                new Vector2(x, y + 3),
+                new Rectangle(16 * 5, 48 * 4 + 13, 16, 35),
+                Color.White,
+                0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f);
+
+            return 0;
+        }
+
+        private static int DrawIslandFridgeTooltip(SpriteBatch spriteBatch, int x, int y)
+        {
+            spriteBatch.Draw(CachedTextures.FarmHouse,
+                new Vector2(x, y + 3),
+                new Rectangle(16 * 6, 48 * 6 + 29, 16, 35),
+                Color.White,
+                0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f);
 
             return 0;
         }

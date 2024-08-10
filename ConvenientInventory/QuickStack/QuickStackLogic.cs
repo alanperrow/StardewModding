@@ -209,7 +209,7 @@ namespace ConvenientInventory.QuickStack
         }
 
         /// <summary>
-        /// From origin, return all chests in the provided location, including the point-distance from their tile-center to origin.
+        /// Returns all chests in the provided game location, including the point-distance from their tile-center to origin.
         /// </summary>
         private static List<TypedChestWithDistance> GetLocationTypedChestsWithDistance(Vector2 origin, GameLocation gameLocation)
         {
@@ -231,18 +231,86 @@ namespace ConvenientInventory.QuickStack
                 }
 
                 Vector2 chestTileCenterPosition = GetTileCenterPosition((int)chest.TileLocation.X, (int)chest.TileLocation.Y);
-
                 int chestPosX = (int)chestTileCenterPosition.X;
                 int chestPosY = (int)chestTileCenterPosition.Y;
-
                 AddChestToList(chest, typedChestsWithDistance, true, chestPosX, chestPosY, origin, chestType);
             }
 
-            // TODO: Add kitchen fridge chests
-            //...
+            // Kitchen fridge
+            if (gameLocation is FarmHouse farmHouse && farmHouse.upgradeLevel > 0)  // Kitchen only exists when upgradeLevel > 0
+            {
+                if (farmHouse.fridge.Value != null && !farmHouse.fridge.Value.GetMutex().IsLocked())
+                {
+                    Vector2 fridgeTileLoc = new(
+                        farmHouse.fridgePosition.X,
+                        farmHouse.fridgePosition.Y);
 
-            // TODO: Add building chests
-            //...
+                    Vector2 fridgeTileCenterPosition = GetTileCenterPosition(farmHouse.fridgePosition);
+                    int fridgePosX = (int)fridgeTileCenterPosition.X;
+                    int fridgePosY = (int)fridgeTileCenterPosition.Y;
+                    Chest fridgeChest = farmHouse.fridge.Value;
+                    AddChestToList(fridgeChest, typedChestsWithDistance, true, fridgePosX, fridgePosY, origin, ChestType.Fridge, fridgeTileLoc);
+                }
+            }
+
+            // Island kitchen fridge
+            if (gameLocation is IslandFarmHouse islandFarmHouse)
+            {
+                if (islandFarmHouse.fridge.Value != null && !islandFarmHouse.fridge.Value.GetMutex().IsLocked())
+                {
+                    Vector2 islandFridgeTileLoc = new(
+                        islandFarmHouse.fridgePosition.X,
+                        islandFarmHouse.fridgePosition.Y);
+
+                    Vector2 islandFridgeTileCenterPosition = GetTileCenterPosition(islandFarmHouse.fridgePosition);
+                    int fridgePosX = (int)islandFridgeTileCenterPosition.X;
+                    int fridgePosY = (int)islandFridgeTileCenterPosition.Y;
+                    Chest fridgeChest = islandFarmHouse.fridge.Value;
+                    AddChestToList(fridgeChest, typedChestsWithDistance, true, fridgePosX, fridgePosY, origin, ChestType.IslandFridge, islandFridgeTileLoc);
+                }
+            }
+
+            // Buildings
+            if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
+            {
+                foreach (Building building in gameLocation.buildings)
+                {
+                    if (building is JunimoHut junimoHut)
+                    {
+                        if (junimoHut.GetOutputChest().GetMutex().IsLocked())
+                        {
+                            continue;
+                        }
+
+                        Vector2 hutVisualTileLoc = new(
+                            junimoHut.tileX.Value + junimoHut.tilesWide.Value / 2,
+                            junimoHut.tileY.Value + junimoHut.tilesHigh.Value - 1);
+
+                        Vector2 hutTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
+                        int hutPosX = (int)hutTileCenterPosition.X;
+                        int hutPosY = (int)hutTileCenterPosition.Y;
+                        Chest hutChest = junimoHut.GetOutputChest();
+                        AddChestToList(hutChest, typedChestsWithDistance, true, hutPosX, hutPosY, origin, ChestType.JunimoHut, hutVisualTileLoc);
+                    }
+                    else if (building.buildingType.Value == "Mill")
+                    {
+                        if (building.isUnderConstruction() || building.GetBuildingChest("Input").GetMutex().IsLocked())
+                        {
+                            continue;
+                        }
+
+                        Vector2 millVisualTileLoc = new(
+                            building.tileX.Value + building.tilesWide.Value / 2,
+                            building.tileY.Value + building.tilesHigh.Value - 1);
+
+                        Vector2 millTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
+                        int millPosX = (int)millTileCenterPosition.X;
+                        int millPosY = (int)millTileCenterPosition.Y;
+                        Chest millChest = building.GetBuildingChest("Input");
+                        AddChestToList(millChest, typedChestsWithDistance, true, millPosX, millPosY, origin, ChestType.Mill, millVisualTileLoc);
+                    }
+                }
+            }
 
             return typedChestsWithDistance;
         }
@@ -393,7 +461,7 @@ namespace ConvenientInventory.QuickStack
                             tx = (int)fridgeTileCenterPosition.X;
                             ty = (int)fridgeTileCenterPosition.Y;
                             Chest fridgeChest = islandFarmHouse.fridge.Value;
-                            AddChestToList(fridgeChest, chestList, withDist, tx, ty, originPosition.Value, ChestType.Fridge, visualTileLoc: islandFridgeTileLoc);
+                            AddChestToList(fridgeChest, chestList, withDist, tx, ty, originPosition.Value, ChestType.IslandFridge, visualTileLoc: islandFridgeTileLoc);
                         }
                     }
                 }
@@ -409,7 +477,7 @@ namespace ConvenientInventory.QuickStack
                                 islandFarmHouse.fridgePosition.Y);
 
                             Chest fridgeChest = islandFarmHouse.fridge.Value;
-                            AddChestToList(fridgeChest, chestList, withDist, chestType: ChestType.Fridge, visualTileLoc: islandFridgeTileLoc);
+                            AddChestToList(fridgeChest, chestList, withDist, chestType: ChestType.IslandFridge, visualTileLoc: islandFridgeTileLoc);
                         }
                     }
                 }
