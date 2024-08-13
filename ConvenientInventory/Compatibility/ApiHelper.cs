@@ -1,22 +1,31 @@
-﻿using GenericModConfigMenu;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 
 namespace ConvenientInventory.Compatibility
 {
-    public class ModInitializer
+    public static class ApiHelper
     {
-        private readonly IManifest modManifest;
-        private readonly IModHelper helper;
+        public static IChestsAnywhereApi ChestsAnywhereApi { get; private set; }
 
-        public ModInitializer(IManifest modManifest, IModHelper helper)
+        public static void Initialize(IChestsAnywhereApi api)
         {
-            this.modManifest = modManifest;
-            this.helper = helper;
+            ChestsAnywhereApi = api;
         }
 
-        public void Initialize(IGenericModConfigMenuApi api, ModConfig config)
+        public static void Initialize(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IModHelper helper, IMonitor monitor)
         {
+            // == Config Validation ==
+            bool isChestsAnywhereInstalled = ChestsAnywhereApi != null;
+            if (!isChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStackRange) == ConfigHelper.QuickStackRange_GlobalInt)
+            {
+                // QuickStackRange: "Global" option is only supported if the Chests Anywhere mod is installed.
+                // If Chests Anywhere API is not found and config value is loaded as "Global", log a warning message to SMAPI and overwrite the config value to "Location".
+                monitor.Log(helper.Translation.Get("ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning"), LogLevel.Warn);
+                config.QuickStackRange = ConfigHelper.FormatQuickStackRange(ConfigHelper.QuickStackRange_LocationInt);
+                helper.WriteConfig(config);
+            }
+
+            // == Register GMCM ==
             api.Register(
                 mod: modManifest,
                 reset: () =>
@@ -40,8 +49,6 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStack.Desc")
             );
 
-            // (?) TODO: "Global" option should only be enabled if Chests Anywhere is installed. Check for API in ModEntry.
-            //            - If API is not found and config value is loaded as "Global", log a warning message to SMAPI log and overwrite the config value to "Location".
             api.AddNumberOption(
                 mod: modManifest,
                 getValue: () => ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStackRange),
@@ -49,7 +56,7 @@ namespace ConvenientInventory.Compatibility
                 name: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Desc"),
                 min: 1,
-                max: 17,
+                max: isChestsAnywhereInstalled ? ConfigHelper.QuickStackRange_GlobalInt : ConfigHelper.QuickStackRange_LocationInt,
                 interval: 1,
                 formatValue: ConfigHelper.FormatQuickStackRange
             );

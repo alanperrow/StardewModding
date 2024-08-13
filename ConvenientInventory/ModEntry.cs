@@ -3,7 +3,6 @@ using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.Patches;
 using ConvenientInventory.QuickStack;
-using GenericModConfigMenu;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -66,14 +65,17 @@ namespace ConvenientInventory
 
             harmony.PatchAll();
 
-            // Initialize mod(s)
-            ModInitializer modInitializer = new(ModManifest, Helper);
-
-            // Get Generic Mod Config Menu API (if it's installed)
-            var api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (api != null)
+            // Initialize mod API integrations
+            var apiCA = Helper.ModRegistry.GetApi<IChestsAnywhereApi>("Pathoschild.ChestsAnywhere");
+            if (apiCA != null)
             {
-                modInitializer.Initialize(api, Config);
+                ApiHelper.Initialize(apiCA);
+            }
+
+            var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (apiGMCM != null)
+            {
+                ApiHelper.Initialize(apiGMCM, Config, ModManifest, Helper, Monitor);
             }
         }
 

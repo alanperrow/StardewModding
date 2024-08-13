@@ -5,11 +5,12 @@ namespace ConvenientInventory
     public static class ConfigHelper
     {
         public const string QuickStackRange_Default = "5";
+        public const int QuickStackRange_LocationInt = 16;
+        public const int QuickStackRange_GlobalInt = 17;
+
         private const int QuickStackRange_DefaultInt = 5;
         private const int QuickStackRange_MinInt = 1;
         private const int QuickStackRange_MaxInt = 15;
-        private const int QuickStackRange_LocationInt = 16;
-        private const int QuickStackRange_GlobalInt = 17;
         private const string QuickStackRange_Location = "Location";
         private const string QuickStackRange_Global = "Global";
 

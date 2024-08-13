@@ -14,6 +14,7 @@
 
   "ModConfigMenu.QuickStackRange.Name": "Range",
   "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.\n\nIf set to \"Location\", all chests in the player's current location will be considered.\n\nIf set to \"Global\", all chests in the world will be considered.",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange config value was \"Global\" but has been reset to \"Location\". \"Global\" is only supported if the Chests Anywhere mod is installed.",
 
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
   "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
