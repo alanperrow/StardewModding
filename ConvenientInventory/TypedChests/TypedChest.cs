@@ -11,11 +11,12 @@ namespace ConvenientInventory.TypedChests
     /// </summary>
     public class TypedChest : ITypedChest
     {
-        public TypedChest(Chest chest, ChestType chestType, Vector2? visualTileLocation = default)
+        public TypedChest(Chest chest, ChestType chestType, Vector2? visualTileLocation = default, bool canAnimate = true)
         {
             this.Chest = chest;
             this.ChestType = chestType;
             this.VisualTileLocation = visualTileLocation;
+            this.CanAnimate = canAnimate;
         }
 
         public Chest Chest { get; private set; }
@@ -23,6 +24,8 @@ namespace ConvenientInventory.TypedChests
         public ChestType ChestType { get; private set; }
 
         public Vector2? VisualTileLocation { get; private set; }
+
+        public bool CanAnimate { get; private set; }
 
         public static ChestType DetermineChestType(Chest chest)
         {

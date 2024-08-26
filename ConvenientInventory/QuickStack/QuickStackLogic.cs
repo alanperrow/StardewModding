@@ -92,7 +92,10 @@ namespace ConvenientInventory.QuickStack
                                 who.removeItemFromInventory(playerItem);
                             }
 
-                            quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                            if (typedChest.CanAnimate)
+                            {
+                                quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                            }
                         }
 
                         if (chestItem.Stack == chestItem.maximumStackSize())
@@ -146,7 +149,10 @@ namespace ConvenientInventory.QuickStack
                                         new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                                 }
 
-                                quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                                if (typedChest.CanAnimate)
+                                {
+                                    quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                                }
                             }
 
                             if (leftoverItem is null)
@@ -221,8 +227,8 @@ namespace ConvenientInventory.QuickStack
             List<TypedChest> chests = GetLocationTypedChests(origin, gameLocation, orderByDistance: true);
 
             // Then, get all chests in all instanced interiors of the player's current location.
-            IEnumerable<GameLocation> interiorLocations = gameLocation.GetInstancedBuildingInteriors().Where(x => x.IsActiveLocation());
-            foreach (GameLocation interiorLocation in interiorLocations)
+            IEnumerable<GameLocation> gameLocationInteriors = gameLocation.GetInstancedBuildingInteriors().Where(x => x.IsActiveLocation());
+            foreach (GameLocation interiorLocation in gameLocationInteriors)
             {
                 List<TypedChest> interiorChests = GetLocationTypedChests(Vector2.Zero, interiorLocation);
                 chests.AddRange(interiorChests);
@@ -236,7 +242,7 @@ namespace ConvenientInventory.QuickStack
 
             IEnumerable<GameLocation> otherLocations = accessibleLocations
                 .Except(new[] { gameLocation })
-                .Except(interiorLocations);
+                .Except(gameLocationInteriors);
             foreach (GameLocation otherLocation in otherLocations)
             {
                 List<TypedChest> otherChests = GetLocationTypedChests(Vector2.Zero, otherLocation);
