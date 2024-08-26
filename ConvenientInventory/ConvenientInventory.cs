@@ -7,6 +7,7 @@ using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
@@ -115,7 +116,7 @@ namespace ConvenientInventory
                 ?? new bool[Game1.player.MaxItems];
 
             dataStr ??= new string('0', FavoriteItemSlots.Length);
-            ModEntry.Instance.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
+            ModEntry.Instance.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", LogLevel.Trace);
             return FavoriteItemSlots;
         }
 
@@ -130,7 +131,7 @@ namespace ConvenientInventory
 
             Game1.player.modData[favoriteItemSlotsModDataKey] = saveStr;
 
-            ModEntry.Instance.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", StardewModdingAPI.LogLevel.Trace);
+            ModEntry.Instance.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", LogLevel.Trace);
             return saveStr;
         }
 
@@ -242,7 +243,7 @@ namespace ConvenientInventory
             {
                 ModEntry.Instance.Monitor
                     .Log($"{(FavoriteItemSlots[clickPos] ? "Un-" : string.Empty)}Favorited item slot {clickPos}: {inventoryMenu.actualInventory[clickPos]?.Name}",
-                    StardewModdingAPI.LogLevel.Trace);
+                    LogLevel.Trace);
 
                 Game1.playSound("smallSelect");
 
@@ -664,14 +665,15 @@ namespace ConvenientInventory
 
         public static void OnQuickStackHotkeyPressed()
         {
-            // TODO: Check if we are in a chest menu `ItemGrabMenu`. If so, do not perform quick stack.
-            //        - Or maybe perform base game Add To Existing Stacks logic?
-            //       Alternatively, should we just disable hotkey if a menu is open?
-            //        - Trying to think of a case where it would be useful to be able to quick stack while in a menu (besides InventoryPage or maybe chest menu).
-
             if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is InventoryPage inventoryPage)
             {
                 QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
+                return;
+            }
+
+            if (!Context.IsPlayerFree)
+            {
+                // Suppress quick stack hotkey if the player is not free to act in the world.
                 return;
             }
 
@@ -838,7 +840,7 @@ namespace ConvenientInventory
                             ModEntry.Instance.Monitor
                                 .Log($"Found non-null item: '{items[items.Count - 1].Name}' (x {items[items.Count - 1].Stack}) out of bounds of inventory list (index={i}) " +
                                 "when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
-                                StardewModdingAPI.LogLevel.Warn);
+                                LogLevel.Warn);
                         }
 
                         // Remove the null "Item" we just pushed past the end of the list
@@ -857,7 +859,7 @@ namespace ConvenientInventory
                             ModEntry.Instance.Monitor
                                 .Log($"Found non-null item: '{items[i].Name}' (x {items[i].Stack}) in unexpected position (index={i}) " +
                                 "when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
-                                StardewModdingAPI.LogLevel.Warn);
+                                LogLevel.Warn);
                         }
 
                         items[i] = extractedItems[i];
