@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
@@ -175,7 +176,23 @@ namespace ConvenientInventory.QuickStack
             }
 
             QuickStackRangeType rangeType = ConfigHelper.GetQuickStackRangeType(rangeStr);
-            if (rangeType == QuickStackRangeType.Tile)
+            if (rangeType == QuickStackRangeType.Global)
+            {
+                // Get all chests in the world.
+                Vector2 farmerPosition = who.getStandingPosition();
+                GameLocation gameLocation = who.currentLocation;
+
+                return GetGlobalTypedChests(farmerPosition, gameLocation);
+            }
+            else if (rangeType == QuickStackRangeType.Location)
+            {
+                // Get all chests in the player's current location.
+                Vector2 farmerPosition = who.getStandingPosition();
+                GameLocation gameLocation = who.currentLocation;
+
+                return GetLocationTypedChests(farmerPosition, gameLocation, orderByDistance: true);
+            }
+            else
             {
                 // Get all chests within the given tile range.
                 int tileRange = ConfigHelper.GetQuickStackTileRange(rangeStr);
@@ -188,32 +205,68 @@ namespace ConvenientInventory.QuickStack
                     ? GetNearbyTypedChestsWithDistance(farmerPosition, tileRange, gameLocation).OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList()
                     : GetNearbyTypedChests(farmerTileLocation, tileRange, gameLocation);
             }
-            else if (rangeType == QuickStackRangeType.Location)
-            {
-                // Get all chests in the player's current location.
-                Vector2 farmerPosition = who.getStandingPosition();
-                GameLocation gameLocation = who.currentLocation;
+        }
 
-                return GetLocationTypedChestsWithDistance(farmerPosition, gameLocation).OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList();
+        /// <summary>
+        /// Returns all chests from all locations in the world.
+        /// Priority is given to chests in <paramref name="gameLocation"/>, which are ordered by the point-distance from their tile-center to origin.
+        /// The remainder of chests in other locations of the world are returned in an arbitrary order.
+        /// </summary>
+        /// <remarks>In multiplayer, only the host has access to all locations in the world;
+        /// non-host players will only be able to access chests in active locations.</remarks>
+        private static List<TypedChest> GetGlobalTypedChests(Vector2 origin, GameLocation gameLocation)
+        {
+            // First, get all chests in the player's current location.
+            List<TypedChest> locationChests = GetLocationTypedChests(origin, gameLocation, orderByDistance: true);
+
+            // Then, get all chests in all instanced interiors of the player's current location.
+            IEnumerable<GameLocation> interiorLocations = gameLocation.GetInstancedBuildingInteriors();
+            foreach (GameLocation interiorGameLocation in interiorLocations)
+            {
+                List<TypedChest> interiorChests = GetLocationTypedChests(Vector2.Zero, interiorGameLocation, false);
+                locationChests.AddRange(interiorChests);
             }
-            else
+
+            // Finally, get chests from all other locations and their instanced interiors. 
+            IEnumerable<GameLocation> otherLocations = Context.IsMainPlayer
+                ? Game1.locations
+                    .Concat(Game1.locations.SelectMany(x => x.GetInstancedBuildingInteriors()))
+                : ModEntry.Instance.Helper.Multiplayer.GetActiveLocations();
+
+            // TODO: In multiplayer, if not main player, only get chests in active locations.
+            // (See https://github.com/Pathoschild/StardewMods/blob/stable/ChestsAnywhere/ChestFactory.cs)
+            //...
+
+        }
+
+        private static IEnumerable<GameLocation> GetLocationsAndInteriorsRecursive(IEnumerable<GameLocation> gameLocations)
+        {
+            foreach (GameLocation loc in gameLocations)
             {
-                // Get all chests in the world.
-                // TODO: In multiplayer, if not main player, only get chests in active locations.
+                yield return loc;
 
-                // TODO: Logic
-                //...
+                IEnumerable<GameLocation> interiors = loc.GetInstancedBuildingInteriors();
+                if (!interiors.Any())
+                {
+                    continue;
+                }
 
-                return new List<TypedChest>();
+                IEnumerable<GameLocation> interiorsRecursive = GetLocationsAndInteriorsRecursive(interiors);
+                foreach (GameLocation recursiveInteriorLoc in interiorsRecursive)
+                {
+                    yield return recursiveInteriorLoc;
+                }
             }
         }
 
         /// <summary>
-        /// Returns all chests in the provided game location, including the point-distance from their tile-center to origin.
+        /// Returns all chests in the provided game location.
+        /// If <paramref name="orderByDistance"/> is <see langword="true"/>, these chests are ordered by the point-distance from their tile-center to origin.
         /// </summary>
-        private static List<TypedChestWithDistance> GetLocationTypedChestsWithDistance(Vector2 origin, GameLocation gameLocation)
+        private static List<TypedChest> GetLocationTypedChests(Vector2 origin, GameLocation gameLocation, bool orderByDistance = false)
         {
-            List<TypedChestWithDistance> typedChestsWithDistance = new();
+            List<TypedChestWithDistance> typedChestsWithDistance = orderByDistance ? new() : null;
+            List<TypedChest> typedChests = orderByDistance ? null : new();
 
             foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
             {
@@ -230,10 +283,17 @@ namespace ConvenientInventory.QuickStack
                     continue;
                 }
 
-                Vector2 chestTileCenterPosition = GetTileCenterPosition((int)chest.TileLocation.X, (int)chest.TileLocation.Y);
-                int chestPosX = (int)chestTileCenterPosition.X;
-                int chestPosY = (int)chestTileCenterPosition.Y;
-                AddChestToList(chest, typedChestsWithDistance, true, chestPosX, chestPosY, origin, chestType);
+                if (orderByDistance)
+                {
+                    Vector2 chestTileCenterPosition = GetTileCenterPosition((int)chest.TileLocation.X, (int)chest.TileLocation.Y);
+                    int chestPosX = (int)chestTileCenterPosition.X;
+                    int chestPosY = (int)chestTileCenterPosition.Y;
+                    AddChestToList(chest, typedChestsWithDistance, true, chestPosX, chestPosY, origin, chestType);
+                }
+                else
+                {
+                    AddChestToList(chest, typedChests, false, chestType: chestType);
+                }
             }
 
             // Kitchen fridge
@@ -241,15 +301,22 @@ namespace ConvenientInventory.QuickStack
             {
                 if (farmHouse.fridge.Value != null && !farmHouse.fridge.Value.GetMutex().IsLocked())
                 {
+                    Chest fridgeChest = farmHouse.fridge.Value;
                     Vector2 fridgeTileLoc = new(
                         farmHouse.fridgePosition.X,
                         farmHouse.fridgePosition.Y);
 
-                    Vector2 fridgeTileCenterPosition = GetTileCenterPosition(farmHouse.fridgePosition);
-                    int fridgePosX = (int)fridgeTileCenterPosition.X;
-                    int fridgePosY = (int)fridgeTileCenterPosition.Y;
-                    Chest fridgeChest = farmHouse.fridge.Value;
-                    AddChestToList(fridgeChest, typedChestsWithDistance, true, fridgePosX, fridgePosY, origin, ChestType.Fridge, fridgeTileLoc);
+                    if (orderByDistance)
+                    {
+                        Vector2 fridgeTileCenterPosition = GetTileCenterPosition(farmHouse.fridgePosition);
+                        int fridgePosX = (int)fridgeTileCenterPosition.X;
+                        int fridgePosY = (int)fridgeTileCenterPosition.Y;
+                        AddChestToList(fridgeChest, typedChestsWithDistance, true, fridgePosX, fridgePosY, origin, ChestType.Fridge, fridgeTileLoc);
+                    }
+                    else
+                    {
+                        AddChestToList(fridgeChest, typedChests, false, chestType: ChestType.Fridge, visualTileLoc: fridgeTileLoc);
+                    }
                 }
             }
 
@@ -258,15 +325,22 @@ namespace ConvenientInventory.QuickStack
             {
                 if (islandFarmHouse.fridge.Value != null && !islandFarmHouse.fridge.Value.GetMutex().IsLocked())
                 {
+                    Chest islandFridgeChest = islandFarmHouse.fridge.Value;
                     Vector2 islandFridgeTileLoc = new(
                         islandFarmHouse.fridgePosition.X,
                         islandFarmHouse.fridgePosition.Y);
 
-                    Vector2 islandFridgeTileCenterPosition = GetTileCenterPosition(islandFarmHouse.fridgePosition);
-                    int fridgePosX = (int)islandFridgeTileCenterPosition.X;
-                    int fridgePosY = (int)islandFridgeTileCenterPosition.Y;
-                    Chest fridgeChest = islandFarmHouse.fridge.Value;
-                    AddChestToList(fridgeChest, typedChestsWithDistance, true, fridgePosX, fridgePosY, origin, ChestType.IslandFridge, islandFridgeTileLoc);
+                    if (orderByDistance)
+                    {
+                        Vector2 islandFridgeTileCenterPosition = GetTileCenterPosition(islandFarmHouse.fridgePosition);
+                        int fridgePosX = (int)islandFridgeTileCenterPosition.X;
+                        int fridgePosY = (int)islandFridgeTileCenterPosition.Y;
+                        AddChestToList(islandFridgeChest, typedChestsWithDistance, true, fridgePosX, fridgePosY, origin, ChestType.IslandFridge, islandFridgeTileLoc);
+                    }
+                    else
+                    {
+                        AddChestToList(islandFridgeChest, typedChests, false, chestType: ChestType.IslandFridge, visualTileLoc: islandFridgeTileLoc);
+                    }
                 }
             }
 
@@ -282,15 +356,23 @@ namespace ConvenientInventory.QuickStack
                             continue;
                         }
 
+                        Chest hutChest = junimoHut.GetOutputChest();
                         Vector2 hutVisualTileLoc = new(
                             junimoHut.tileX.Value + junimoHut.tilesWide.Value / 2,
                             junimoHut.tileY.Value + junimoHut.tilesHigh.Value - 1);
 
-                        Vector2 hutTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
-                        int hutPosX = (int)hutTileCenterPosition.X;
-                        int hutPosY = (int)hutTileCenterPosition.Y;
-                        Chest hutChest = junimoHut.GetOutputChest();
-                        AddChestToList(hutChest, typedChestsWithDistance, true, hutPosX, hutPosY, origin, ChestType.JunimoHut, hutVisualTileLoc);
+                        if (orderByDistance)
+                        {
+                            Vector2 hutTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
+                            int hutPosX = (int)hutTileCenterPosition.X;
+                            int hutPosY = (int)hutTileCenterPosition.Y;
+                            AddChestToList(hutChest, typedChestsWithDistance, true, hutPosX, hutPosY, origin, ChestType.JunimoHut, hutVisualTileLoc);
+                        }
+                        else
+                        {
+                            AddChestToList(hutChest, typedChests, false, chestType: ChestType.JunimoHut, visualTileLoc: hutVisualTileLoc);
+                        }
+
                     }
                     else if (building.buildingType.Value == "Mill")
                     {
@@ -299,20 +381,29 @@ namespace ConvenientInventory.QuickStack
                             continue;
                         }
 
+                        Chest millChest = building.GetBuildingChest("Input");
                         Vector2 millVisualTileLoc = new(
                             building.tileX.Value + building.tilesWide.Value / 2,
                             building.tileY.Value + building.tilesHigh.Value - 1);
 
-                        Vector2 millTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
-                        int millPosX = (int)millTileCenterPosition.X;
-                        int millPosY = (int)millTileCenterPosition.Y;
-                        Chest millChest = building.GetBuildingChest("Input");
-                        AddChestToList(millChest, typedChestsWithDistance, true, millPosX, millPosY, origin, ChestType.Mill, millVisualTileLoc);
+                        if (orderByDistance)
+                        {
+                            Vector2 millTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
+                            int millPosX = (int)millTileCenterPosition.X;
+                            int millPosY = (int)millTileCenterPosition.Y;
+                            AddChestToList(millChest, typedChestsWithDistance, true, millPosX, millPosY, origin, ChestType.Mill, millVisualTileLoc);
+                        }
+                        else
+                        {
+                            AddChestToList(millChest, typedChests, false, chestType: ChestType.Mill, visualTileLoc: millVisualTileLoc);
+                        }
                     }
                 }
             }
 
-            return typedChestsWithDistance;
+            return orderByDistance
+                ? typedChestsWithDistance.OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList()
+                : typedChests;
         }
 
         /// <summary>
