@@ -922,9 +922,6 @@ namespace ConvenientInventory.Patches
     [HarmonyPatch(typeof(Item))]
     public static class ItemPatches
     {
-
-        // TODO: Investigate if this patch is preventing items from being lost on death.
-
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Item.canBeTrashed))]
         public static bool CanBeTrashed_Prefix(Item __instance, ref bool __result)
@@ -1140,14 +1137,6 @@ namespace ConvenientInventory.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Furniture))]
-    public static class FurniturePatches
-    {
-        // TODO: patch this behavior:
-        //  - furniture item going into final slot of a full toolbar row when picking it up, pushing previous item in that slot further into inventory.
-
-    }
-
     [HarmonyPatch(typeof(Chest))]
     public static class ChestPatches
     {
@@ -1246,6 +1235,91 @@ namespace ConvenientInventory.Patches
             catch (Exception e)
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(CanBeShipped_PostFix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(GameLocation))]
+    public static class GameLocationPatches
+    {
+        private static Item lastToolbarSlotItem;
+
+        [HarmonyPrefix]
+        [HarmonyPatch("removeQueuedFurniture")]
+        public static bool RemoveQueuedFurniture_Prefix()
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return true;
+            }
+
+            try
+            {
+                if (!ConvenientInventory.FavoriteItemSlots[11])
+                {
+                    // No need to track anything since the last toolbar slot is not favorited.
+                    return true;
+                }
+
+                // Track the last slot of the inventory toolbar to handle base game behavior where, if all toolbar slots have an item,
+                // the removed furniture will be placed into the last toolbar slot and add the previous item into the inventory.
+                lastToolbarSlotItem = Game1.player.Items[11];
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(RemoveQueuedFurniture_Prefix)}:\n{e}", LogLevel.Error);
+            }
+
+            return true;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("removeQueuedFurniture")]
+        public static void RemoveQueuedFurniture_Postfix()
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            if (lastToolbarSlotItem == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (Game1.player.Items[11] != lastToolbarSlotItem)
+                {
+                    // Find where the previous item was "pushed" to, and move the favorited item slot accordingly.
+                    ConvenientInventory.FavoriteItemSlots[11] = false;
+                    int index = ConvenientInventory.GetPlayerInventoryIndexOfItem(lastToolbarSlotItem);
+                    if (index != -1)
+                    {
+                        // We found the "pushed" item, so favorite it.
+                        ConvenientInventory.FavoriteItemSlots[index] = true;
+                    }
+                    else
+                    {
+                        // The "pushed" item has merged with another stack; favorite the slot of the first inventory item that the "pushed" item can stack with.
+                        for (int i = 0; i < Game1.player.Items.Count; i++)
+                        {
+                            if (lastToolbarSlotItem.canStackWith(Game1.player.Items[i]))
+                            {
+                                ConvenientInventory.FavoriteItemSlots[i] = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(RemoveQueuedFurniture_Postfix)}:\n{e}", LogLevel.Error);
+            }
+            finally
+            {
+                lastToolbarSlotItem = null;
             }
         }
     }
