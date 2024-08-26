@@ -914,7 +914,7 @@ namespace ConvenientInventory.Patches
             }
             catch (Exception e)
             {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveRightClick_Postfix)}:\n{e}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetUpForGamePadMode_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
     }
@@ -922,6 +922,9 @@ namespace ConvenientInventory.Patches
     [HarmonyPatch(typeof(Item))]
     public static class ItemPatches
     {
+
+        // TODO: Investigate if this patch is preventing items from being lost on death.
+
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Item.canBeTrashed))]
         public static bool CanBeTrashed_Prefix(Item __instance, ref bool __result)
@@ -1113,38 +1116,6 @@ namespace ConvenientInventory.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Utility))]
-    public static class UtilityPatches
-    {
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(Utility.highlightShippableObjects))]
-        public static bool HighlightShippableObjects_Prefix(Item i)
-        {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
-            {
-                return true;
-            }
-
-            try
-            {
-                int index = ConvenientInventory.GetPlayerInventoryIndexOfItem(i);
-                if (index != -1 && ConvenientInventory.FavoriteItemSlots[index])
-                {
-                    // Prevents shipping of favorited items.
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(HighlightShippableObjects_Prefix)}:\n{e}", LogLevel.Error);
-            }
-
-            return true;
-        }
-    }
-
-    // TODO: patch directly dropping item into shipping bin -- favorited items should not be able to be shipped.
-
     [HarmonyPatch(typeof(Inventory))]
     public static class InventoryPatches
     {
@@ -1185,7 +1156,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) })]
         public static bool Draw_Prefix(Chest __instance)
         {
-            // TODO: Optimization: Investigate IModHelper.Multiplayer.SendMessage()
+            // Optimization idea: Investigate IModHelper.Multiplayer.SendMessage()
             try
             {
                 QuickStackChestAnimation.Animate(__instance);
@@ -1239,6 +1210,42 @@ namespace ConvenientInventory.Patches
             catch (Exception e)
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(AddItem_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(StardewValley.Object))]
+    public static class ObjectPatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(StardewValley.Object.canBeShipped))]
+        public static void CanBeShipped_PostFix(StardewValley.Object __instance, ref bool __result)
+        {
+            if (!__result)
+            {
+                // Result is already false, so no need to perform additional logic.
+                return;
+            }
+
+
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                int index = ConvenientInventory.GetPlayerInventoryIndexOfItem(__instance);
+                if (index != -1 && ConvenientInventory.FavoriteItemSlots[index])
+                {
+                    // Prevent shipping of favorited items.
+                    __result = false;
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(CanBeShipped_PostFix)}:\n{e}", LogLevel.Error);
             }
         }
     }
