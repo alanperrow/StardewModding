@@ -27,7 +27,7 @@ namespace ConvenientInventory.QuickStack
 
         public int NumAnimatedItems { get; private set; }
 
-        private TemporaryAnimatedSpriteList ItemSprites { get; } = new();
+        private Dictionary<GameLocation, TemporaryAnimatedSpriteList> ItemSpritesByLocation { get; } = new();
 
         private Farmer Farmer { get; }
 
@@ -40,7 +40,12 @@ namespace ConvenientInventory.QuickStack
         /// <returns>The total number of item stacks in the animation.</returns>
         public int Complete()
         {
-            Game1.Multiplayer.broadcastSprites(Farmer.currentLocation, ItemSprites);
+            foreach (GameLocation location in ItemSpritesByLocation.Keys)
+            {
+                TemporaryAnimatedSpriteList locationItemSprites = ItemSpritesByLocation[location];
+                Game1.Multiplayer.broadcastSprites(location, locationItemSprites);
+            }
+
             return NumAnimatedItems;
         }
 
@@ -74,35 +79,43 @@ namespace ConvenientInventory.QuickStack
             float distance = Vector2.Distance(farmerPosition, chestPosition);
             Vector2 motionVec = (chestPosition - farmerPosition) * 0.98f; // 0.98 multiplier gives a better result in-game; without it, items slightly overshoot the chest.
 
-            float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStackAnimationItemSpeed;
-
-            float extraHeight = 192 - Math.Min(0, motionVec.Y);
-            float gravity = 2 * extraHeight / tossTime;
-            motionVec.Y -= extraHeight;
-            float extraX = motionVec.X;
-            float xAccel = -2 * motionVec.X / tossTime;
-            motionVec.X += extraX;
-
             float baseLayerDepth = (float)((chestTileLocation.Y + 1) * 64) / 10000f + chestTileLocation.X / 50000f; // Refactored from Object.draw()
             float addlayerDepth = 1E-06f * NumAnimatedItems; // Avoids z-fighting by drawing each sprite on a separate layer depth.
-    
+
             int hoverTimePerItem = (int)(150 / ModEntry.Config.QuickStackAnimationStackSpeed);
             int fadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationStackSpeed);
 
             ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
-            TemporaryAnimatedSprite itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
+
+            bool isChestInCurrentLocation = typedChest.ChestGameLocation == Game1.currentLocation;
+            TemporaryAnimatedSprite itemTossSprite = null;
+            if (isChestInCurrentLocation)
             {
-                scale = 4f,
-                layerDepth = 1f - addlayerDepth,
-                totalNumberOfLoops = 0,
-                interval = tossTime,
-                motion = motionVec / tossTime,
-                acceleration = new Vector2(xAccel, gravity) / tossTime,
-                timeBasedMotion = true,
-            };
+                // Only animate this item toss if the chest is in the current GameLocation.
+                float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStackAnimationItemSpeed;
+
+                float extraHeight = 192 - Math.Min(0, motionVec.Y);
+                float gravity = 2 * extraHeight / tossTime;
+                motionVec.Y -= extraHeight;
+                float extraX = motionVec.X;
+                float xAccel = -2 * motionVec.X / tossTime;
+                motionVec.X += extraX;
+
+                itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
+                {
+                    scale = 4f,
+                    layerDepth = 1f - addlayerDepth,
+                    totalNumberOfLoops = 0,
+                    interval = tossTime,
+                    motion = motionVec / tossTime,
+                    acceleration = new Vector2(xAccel, gravity) / tossTime,
+                    timeBasedMotion = true,
+                };
+            }
+            
             TemporaryAnimatedSprite itemHoverSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
             {
-                delayBeforeAnimationStart = itemTossSprite.delayBeforeAnimationStart + (int)itemTossSprite.interval,
+                delayBeforeAnimationStart = itemTossSprite == null ? 0 : itemTossSprite.delayBeforeAnimationStart + (int)itemTossSprite.interval,
                 scale = 4f,
                 layerDepth = baseLayerDepth - addlayerDepth,
                 interval = numChestAnimatedItems * hoverTimePerItem,
@@ -119,9 +132,20 @@ namespace ConvenientInventory.QuickStack
                 scaleChange = -0.07f * ModEntry.Config.QuickStackAnimationStackSpeed,
             };
 
-            ItemSprites.Add(itemTossSprite);
-            ItemSprites.Add(itemHoverSprite);
-            ItemSprites.Add(itemFadeSprite);
+            // Animate sprites separately by game location.
+            if (!ItemSpritesByLocation.TryGetValue(typedChest.ChestGameLocation, out TemporaryAnimatedSpriteList itemSprites))
+            {
+                ItemSpritesByLocation.Add(typedChest.ChestGameLocation, new TemporaryAnimatedSpriteList());
+            }
+
+            if (isChestInCurrentLocation)
+            {
+                // Only animate this item toss if the chest is in the current GameLocation.
+                ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemTossSprite);
+            }
+
+            ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemHoverSprite);
+            ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemFadeSprite);
 
             NumAnimatedItems++;
             NumAnimatedItemsByChest[typedChest]++;
