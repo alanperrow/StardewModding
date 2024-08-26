@@ -239,26 +239,6 @@ namespace ConvenientInventory.QuickStack
 
         }
 
-        private static IEnumerable<GameLocation> GetLocationsAndInteriorsRecursive(IEnumerable<GameLocation> gameLocations)
-        {
-            foreach (GameLocation loc in gameLocations)
-            {
-                yield return loc;
-
-                IEnumerable<GameLocation> interiors = loc.GetInstancedBuildingInteriors();
-                if (!interiors.Any())
-                {
-                    continue;
-                }
-
-                IEnumerable<GameLocation> interiorsRecursive = GetLocationsAndInteriorsRecursive(interiors);
-                foreach (GameLocation recursiveInteriorLoc in interiorsRecursive)
-                {
-                    yield return recursiveInteriorLoc;
-                }
-            }
-        }
-
         /// <summary>
         /// Returns all chests in the provided game location.
         /// If <paramref name="orderByDistance"/> is <see langword="true"/>, these chests are ordered by the point-distance from their tile-center to origin.
