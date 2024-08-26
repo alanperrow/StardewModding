@@ -87,11 +87,11 @@ namespace ConvenientInventory.QuickStack
 
             ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
 
+            TemporaryAnimatedSprite itemTossSprite;
             bool isChestInCurrentLocation = typedChest.ChestGameLocation == Game1.currentLocation;
-            TemporaryAnimatedSprite itemTossSprite = null;
             if (isChestInCurrentLocation)
             {
-                // Only animate this item toss if the chest is in the current GameLocation.
+                // "Item toss" animation is used if the chest is in the current GameLocation.
                 float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStackAnimationItemSpeed;
 
                 float extraHeight = 192 - Math.Min(0, motionVec.Y);
@@ -112,15 +112,30 @@ namespace ConvenientInventory.QuickStack
                     timeBasedMotion = true,
                 };
             }
+            else
+            {
+                // "Upward item fade" animation is used if the chest is in a separate GameLocation.
+                int upwardFadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationItemSpeed);
+                itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, 0f, Color.White)
+                {
+                    scale = 4f,
+                    layerDepth = 1f - addlayerDepth,
+                    alphaFade = 0.04f * ModEntry.Config.QuickStackAnimationItemSpeed,
+                    interval = upwardFadeTime,
+                    motion = new Vector2(0.6f, -4.5f) * ModEntry.Config.QuickStackAnimationItemSpeed,
+                    acceleration = new Vector2(0f, 0.08f) * ModEntry.Config.QuickStackAnimationItemSpeed,
+                    scaleChange = -0.07f * ModEntry.Config.QuickStackAnimationItemSpeed,
+                };
+            }
             
             TemporaryAnimatedSprite itemHoverSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
             {
-                delayBeforeAnimationStart = itemTossSprite == null ? 0 : itemTossSprite.delayBeforeAnimationStart + (int)itemTossSprite.interval,
+                delayBeforeAnimationStart = isChestInCurrentLocation ? itemTossSprite.delayBeforeAnimationStart + (int)itemTossSprite.interval : 0,
                 scale = 4f,
                 layerDepth = baseLayerDepth - addlayerDepth,
                 interval = numChestAnimatedItems * hoverTimePerItem,
             };
-            TemporaryAnimatedSprite itemFadeSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
+            TemporaryAnimatedSprite itemFadeSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, 0f, Color.White)
             {
                 delayBeforeAnimationStart = itemHoverSprite.delayBeforeAnimationStart + (int)itemHoverSprite.interval,
                 scale = 4f,
@@ -133,15 +148,24 @@ namespace ConvenientInventory.QuickStack
             };
 
             // Animate sprites separately by game location.
-            if (!ItemSpritesByLocation.TryGetValue(typedChest.ChestGameLocation, out TemporaryAnimatedSpriteList itemSprites))
+            if (!ItemSpritesByLocation.ContainsKey(typedChest.ChestGameLocation))
             {
                 ItemSpritesByLocation.Add(typedChest.ChestGameLocation, new TemporaryAnimatedSpriteList());
             }
 
             if (isChestInCurrentLocation)
             {
-                // Only animate this item toss if the chest is in the current GameLocation.
                 ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemTossSprite);
+            }
+            else
+            {
+                // Handle "upward item fade" animation in current GameLocation if chest is in a separate location.
+                if (!ItemSpritesByLocation.ContainsKey(Game1.currentLocation))
+                {
+                    ItemSpritesByLocation.Add(Game1.currentLocation, new TemporaryAnimatedSpriteList());
+                }
+
+                ItemSpritesByLocation[Game1.currentLocation].Add(itemTossSprite);
             }
 
             ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemHoverSprite);
