@@ -210,33 +210,40 @@ namespace ConvenientInventory.QuickStack
         /// <summary>
         /// Returns all chests from all locations in the world.
         /// Priority is given to chests in <paramref name="gameLocation"/>, which are ordered by the point-distance from their tile-center to origin.
+        /// Next priority is given to any interior locations of <paramref name="gameLocation"/>.
         /// The remainder of chests in other locations of the world are returned in an arbitrary order.
         /// </summary>
-        /// <remarks>In multiplayer, only the host has access to all locations in the world;
+        /// <remarks>In multiplayer, only the host (main player) has access to all locations in the world;
         /// non-host players will only be able to access chests in active locations.</remarks>
         private static List<TypedChest> GetGlobalTypedChests(Vector2 origin, GameLocation gameLocation)
         {
             // First, get all chests in the player's current location.
-            List<TypedChest> locationChests = GetLocationTypedChests(origin, gameLocation, orderByDistance: true);
+            List<TypedChest> chests = GetLocationTypedChests(origin, gameLocation, orderByDistance: true);
 
             // Then, get all chests in all instanced interiors of the player's current location.
-            IEnumerable<GameLocation> interiorLocations = gameLocation.GetInstancedBuildingInteriors();
-            foreach (GameLocation interiorGameLocation in interiorLocations)
+            IEnumerable<GameLocation> interiorLocations = gameLocation.GetInstancedBuildingInteriors().Where(x => x.IsActiveLocation());
+            foreach (GameLocation interiorLocation in interiorLocations)
             {
-                List<TypedChest> interiorChests = GetLocationTypedChests(Vector2.Zero, interiorGameLocation, false);
-                locationChests.AddRange(interiorChests);
+                List<TypedChest> interiorChests = GetLocationTypedChests(Vector2.Zero, interiorLocation);
+                chests.AddRange(interiorChests);
             }
 
-            // Finally, get chests from all other locations and their instanced interiors. 
-            IEnumerable<GameLocation> otherLocations = Context.IsMainPlayer
-                ? Game1.locations
-                    .Concat(Game1.locations.SelectMany(x => x.GetInstancedBuildingInteriors()))
+            // Finally, get chests from all other locations and their instanced interiors.
+            // If not main player, only get chests in active locations.
+            IEnumerable<GameLocation> accessibleLocations = Context.IsMainPlayer
+                ? Game1.locations.Concat(Game1.locations.SelectMany(x => x.GetInstancedBuildingInteriors()))
                 : ModEntry.Instance.Helper.Multiplayer.GetActiveLocations();
 
-            // TODO: In multiplayer, if not main player, only get chests in active locations.
-            // (See https://github.com/Pathoschild/StardewMods/blob/stable/ChestsAnywhere/ChestFactory.cs)
-            //...
+            IEnumerable<GameLocation> otherLocations = accessibleLocations
+                .Except(new[] { gameLocation })
+                .Except(interiorLocations);
+            foreach (GameLocation otherLocation in otherLocations)
+            {
+                List<TypedChest> otherChests = GetLocationTypedChests(Vector2.Zero, otherLocation);
+                chests.AddRange(otherChests);
+            }
 
+            return chests;
         }
 
         /// <summary>
