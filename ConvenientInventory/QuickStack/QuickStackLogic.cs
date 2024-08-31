@@ -207,6 +207,8 @@ namespace ConvenientInventory.QuickStack
             }
         }
 
+        // TODO: Check for dressers in quick stack logic.
+
         /// <summary>
         /// Returns all chests from all locations in the world.
         /// Priority is given to chests in <paramref name="gameLocation"/>, which are ordered by the point-distance from their tile-center to origin.

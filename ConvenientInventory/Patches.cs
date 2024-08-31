@@ -1323,4 +1323,60 @@ namespace ConvenientInventory.Patches
             }
         }
     }
+
+    [HarmonyPatch(typeof(JunimoNoteMenu))]
+    public static class JunimoNoteMenuPatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(JunimoNoteMenu.HandlePartialDonation))]
+        public static void HandlePartialDonation_Postfix(Item item)
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                if (item.Stack == 0)
+                {
+                    // We donated all the items in our held item stack, so cleanup leftover favorite item slots.
+                    ConvenientInventory.UnfavoriteEmptyItemSlots();
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(HandlePartialDonation_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Bundle))]
+    public static class BundlePatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Bundle.tryToDepositThisItem))]
+        public static void TryToDepositThisItem_Postfix(Item __result)
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                if (__result == null)
+                {
+                    // The item was deposited into the bundle and its stack was depleted, so cleanup leftover favorite item slots.
+                    ConvenientInventory.UnfavoriteEmptyItemSlots();
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(TryToDepositThisItem_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
+
+    // TODO: Double check favorite items tracking behavior in forge... noticed strange unfavoriting, maybe unrelated.
 }
