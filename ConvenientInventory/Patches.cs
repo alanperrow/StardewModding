@@ -1377,6 +1377,4 @@ namespace ConvenientInventory.Patches
             }
         }
     }
-
-    // TODO: Double check favorite items tracking behavior in forge... noticed strange unfavoriting, maybe unrelated.
 }
