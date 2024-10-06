@@ -12,6 +12,7 @@
         Mill,
         JunimoHut,
         Special,
-        Package
+        Package,
+        Dresser
     }
 }

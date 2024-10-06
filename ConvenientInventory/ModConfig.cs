@@ -12,6 +12,10 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIntoBuildingsWithInventories { get; set; } = true;
 
+        // TODO: GMCM IsQuickStackIntoDressers
+        //          - Mention that `IsQuickStackOverflowItems` is required for this to work.
+        public bool IsQuickStackIntoDressers { get; set; } = true;
+
         public bool IsQuickStackOverflowItems { get; set; } = true;
 
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;

@@ -68,6 +68,7 @@ namespace ConvenientInventory.TypedChests
                 ChestType.IslandFridge => DrawIslandFridgeTooltip(spriteBatch, x, y),
                 ChestType.Mill => DrawMillTooltip(spriteBatch, toolTipPosition, posIndex, x, y),
                 ChestType.JunimoHut => DrawJunimoHutTooltip(spriteBatch, toolTipPosition, posIndex, x, y),
+                ChestType.Dresser => DrawDresserTooltip(spriteBatch, x, y),
                 _ => DrawSpecialChestTooltip(spriteBatch, x, y),
             };
         }
@@ -230,6 +231,27 @@ namespace ConvenientInventory.TypedChests
             newPosIndex++;
 
             return newPosIndex - posIndex;
+        }
+
+        private int DrawDresserTooltip(SpriteBatch spriteBatch, int x, int y)
+        {
+            if (this.Chest is not DresserFakeChest dresserFakeChest)
+            {
+                return 0;
+            }
+
+            ParsedItemData dresserItemData = ItemRegistry.GetDataOrErrorItem(dresserFakeChest.Dresser.QualifiedItemId);
+            Texture2D dresserTexture = dresserItemData.GetTexture();
+            Rectangle dresserSourceRect = dresserItemData.GetSourceRect();
+
+            spriteBatch.Draw(dresserTexture,
+                new Vector2(x - 8, y + 12),
+                dresserSourceRect,
+                Color.White,
+                0f, Vector2.Zero, 1.5f, SpriteEffects.None, 1f
+            );
+
+            return 0;
         }
 
         private int DrawSpecialChestTooltip(SpriteBatch spriteBatch, int x, int y)

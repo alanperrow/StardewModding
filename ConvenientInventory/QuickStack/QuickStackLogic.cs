@@ -34,12 +34,20 @@ namespace ConvenientInventory.QuickStack
             foreach (TypedChest typedChest in chests)
             {
                 Chest chest = typedChest.Chest;
+                DresserFakeChest dresserFakeChest = chest as DresserFakeChest;
+                ICollection<Item> chestItems;
+                if (dresserFakeChest != null)
+                {
+                    chestItems = dresserFakeChest.Dresser.heldItems.ToList();
+                }
+                else
+                {
+                    chestItems = chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest
+                        ? chest.GetItemsForPlayer(who.UniqueMultiplayerID)
+                        : chest.Items;
+                }
 
-                List<Item> stackOverflowItems = new();
-
-                IInventory chestItems = chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest
-                    ? chest.GetItemsForPlayer(who.UniqueMultiplayerID)
-                    : chest.Items;
+                List<Item> overflowItems = new();
 
                 // Fill chest stacks with player inventory items
                 foreach (Item chestItem in chestItems)
@@ -55,20 +63,33 @@ namespace ConvenientInventory.QuickStack
                         {
                             continue;
                         }
-                        
-                        if (!playerItem.canStackWith(chestItem))
-                        {
-                            if (ModEntry.Config.IsQuickStackOverflowItems && ModEntry.Config.IsQuickStackIgnoreItemQuality && CanStackWithIgnoreQuality(playerItem, chestItem))
-                            {
-                                stackOverflowItems.Add(playerItem.getOne());
-                            }
-
-                            continue;
-                        }
 
                         if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
                         {
                             // Skip favorited items
+                            continue;
+                        }
+
+                        if (dresserFakeChest != null)
+                        {
+                            if (ModEntry.Config.IsQuickStackOverflowItems && playerItem.QualifiedItemId == chestItem.QualifiedItemId)
+                            {
+                                // We found an existing occurence of this item in this Dresser, so add it to overflowItems.
+                                overflowItems.Add(playerItem.getOne());
+                            }
+
+                            // In a Dresser, never attempt to add to existing stacks, as we only deal with single-stack items.
+                            continue;
+                        }
+                        else if (!playerItem.canStackWith(chestItem))
+                        {
+                            if (ModEntry.Config.IsQuickStackOverflowItems
+                                && ModEntry.Config.IsQuickStackIgnoreItemQuality
+                                && CanStackWithIgnoreQuality(playerItem, chestItem))
+                            {
+                                overflowItems.Add(playerItem.getOne());
+                            }
+
                             continue;
                         }
 
@@ -99,7 +120,7 @@ namespace ConvenientInventory.QuickStack
                         {
                             if (ModEntry.Config.IsQuickStackOverflowItems)
                             {
-                                stackOverflowItems.Add(chestItem.getOne());
+                                overflowItems.Add(chestItem.getOne());
                             }
 
                             inventoryPage?.inventory.ShakeItem(playerItem);
@@ -111,16 +132,16 @@ namespace ConvenientInventory.QuickStack
                 // Add overflow stacks to chest when applicable
                 if (ModEntry.Config.IsQuickStackOverflowItems && chestItems.Count < chest.GetActualCapacity())
                 {
-                    foreach (Item stackOverflowItem in stackOverflowItems)
+                    foreach (Item overflowItem in overflowItems)
                     {
-                        if (stackOverflowItem is null)
+                        if (overflowItem is null)
                         {
                             continue;
                         }
 
                         foreach (Item playerItem in playerInventory)
                         {
-                            if (playerItem is null || !playerItem.canStackWith(stackOverflowItem))
+                            if (playerItem is null)
                             {
                                 continue;
                             }
@@ -128,6 +149,20 @@ namespace ConvenientInventory.QuickStack
                             if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
                             {
                                 // Skip favorited items
+                                continue;
+                            }
+
+                            if (dresserFakeChest != null)
+                            {
+                                if (playerItem.QualifiedItemId != overflowItem.QualifiedItemId)
+                                {
+                                    // In a Dresser, skip overflow item if it doesn't match player item.
+                                    continue;
+                                }
+                            }
+                            else if (!playerItem.canStackWith(overflowItem))
+                            {
+                                // Skip overflow item if it doesn't stack with player item.
                                 continue;
                             }
 
@@ -206,8 +241,6 @@ namespace ConvenientInventory.QuickStack
                     : GetNearbyTypedChests(farmerTileLocation, tileRange, gameLocation);
             }
         }
-
-        // TODO: Check for dressers in quick stack logic.
 
         /// <summary>
         /// Returns all chests from all locations in the world.
@@ -386,6 +419,41 @@ namespace ConvenientInventory.QuickStack
                         {
                             AddChestToList(millChest, typedChests, false, gameLocation, chestType: ChestType.Mill, visualTileLoc: millVisualTileLoc);
                         }
+                    }
+                }
+            }
+
+            // Dressers
+            if (ModEntry.Config.IsQuickStackIntoDressers)
+            {
+                foreach (StorageFurniture dresser in gameLocation.furniture.Where(x => x is StorageFurniture and not FishTankFurniture).Cast<StorageFurniture>())
+                {
+                    if (dresser.QualifiedItemId == "(F)CCFishTank" && gameLocation is CommunityCenter)
+                    {
+                        // Do not consider temporary Community Center fish tank.
+                        continue;
+                    }
+
+                    if (dresser.mutex.IsLocked())
+                    {
+                        continue;
+                    }
+
+                    Vector2 dresserVisualTileLoc = new(
+                        dresser.TileLocation.X + (dresser.getTilesWide() - 1) / 2f,
+                        dresser.TileLocation.Y + dresser.getTilesHigh() - 1);
+
+                    Chest dresserFakeChest = new DresserFakeChest(dresser);
+                    if (orderByDistance)
+                    {
+                        Vector2 dresserTileCenterPosition = GetTileCenterPosition((int)dresser.TileLocation.X, (int)dresser.TileLocation.Y);
+                        int dresserPosX = (int)dresserTileCenterPosition.X;
+                        int dresserPosY = (int)dresserTileCenterPosition.Y;
+                        AddChestToList(dresserFakeChest, typedChestsWithDistance, true, gameLocation, dresserPosX, dresserPosY, origin, ChestType.Dresser, dresserVisualTileLoc);
+                    }
+                    else
+                    {
+                        AddChestToList(dresserFakeChest, typedChests, false, gameLocation, chestType: ChestType.Dresser, visualTileLoc: dresserVisualTileLoc);
                     }
                 }
             }
@@ -645,6 +713,50 @@ namespace ConvenientInventory.QuickStack
                     }
                 }
             }
+
+            // Dressers
+            if (ModEntry.Config.IsQuickStackIntoDressers)
+            {
+                foreach (StorageFurniture dresser in gameLocation.furniture.Where(x => x is StorageFurniture and not FishTankFurniture).Cast<StorageFurniture>())
+                {
+                    if (dresser.QualifiedItemId == "(F)CCFishTank" && gameLocation is CommunityCenter)
+                    {
+                        // Do not consider temporary Community Center fish tank.
+                        continue;
+                    }
+
+                    if (dresser.mutex.IsLocked())
+                    {
+                        continue;
+                    }
+
+                    Vector2 dresserVisualTileLoc = new(
+                        dresser.TileLocation.X + (dresser.getTilesWide() - 1) / 2f,
+                        dresser.TileLocation.Y + dresser.getTilesHigh() - 1);
+
+                    if (originTile == null)
+                    {
+                        // We are dealing with actual positions.
+                        Vector2 dresserTileCenterPosition = GetTileCenterPosition((int)dresser.TileLocation.X, (int)dresser.TileLocation.Y);
+                        if (IsPositionWithinRange(originPosition.Value, dresserTileCenterPosition, range))
+                        {
+                            tx = (int)dresserTileCenterPosition.X;
+                            ty = (int)dresserTileCenterPosition.Y;
+                            Chest dresserFakeChest = new DresserFakeChest(dresser);
+                            AddChestToList(dresserFakeChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.Dresser, dresserVisualTileLoc);
+                        }
+                    }
+                    else
+                    {
+                        // We have a specified tile origin point
+                        if (IsTileWithinRange(originTile.Value, (int)dresser.TileLocation.X, (int)dresser.TileLocation.Y, range))
+                        {
+                            Chest dresserFakeChest = new DresserFakeChest(dresser);
+                            AddChestToList(dresserFakeChest, chestList, withDist, gameLocation, chestType: ChestType.Dresser, visualTileLoc: dresserVisualTileLoc);
+                        }
+                    }
+                }
+            }
         }
 
         private static void AddChestToList(
@@ -712,7 +824,7 @@ namespace ConvenientInventory.QuickStack
             return Math.Abs(origin.X - target.X) <= range * Game1.tileSize && Math.Abs(origin.Y - target.Y) <= range * Game1.tileSize;
         }
 
-        // Taken from Item.canStackWith, removing quality check.
+        // Taken from `Item.canStackWith`, removing quality check.
         private static bool CanStackWithIgnoreQuality(Item item, ISalable other)
         {
             if (other is not Item otherItem || other.GetType() != item.GetType())
