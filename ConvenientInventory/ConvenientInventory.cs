@@ -485,6 +485,20 @@ namespace ConvenientInventory
         /// </summary>
         private static void OnEquipmentSlotClickedWithFavoriteItem(ClickableComponent equipmentSlot, Item cursorSlotItem)
         {
+            if (ApiHelper.IsWearMoreRingsInstalled)
+            {
+                // Wear More Rings mod changes ring equipment slot names; starts with "Ring 0", then "Ring 1", "Ring 2", etc.
+                if (equipmentSlot.name.StartsWith("Ring "))
+                {
+                    if (cursorSlotItem is Ring)
+                    {
+                        ResetFavoriteItemSlotsTracking();
+                    }
+
+                    return;
+                }
+            }
+
             switch (equipmentSlot.name)
             {
                 case "Left Ring":   // Inventory Page

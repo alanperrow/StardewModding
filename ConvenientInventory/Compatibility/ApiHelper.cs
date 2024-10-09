@@ -5,6 +5,8 @@ namespace ConvenientInventory.Compatibility
 {
     public static class ApiHelper
     {
+        public static bool IsWearMoreRingsInstalled { get; set; }
+
         public static IChestsAnywhereApi ChestsAnywhereApi { get; private set; }
 
         public static void Initialize(IChestsAnywhereApi api)

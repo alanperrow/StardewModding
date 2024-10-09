@@ -77,6 +77,8 @@ namespace ConvenientInventory
             {
                 ApiHelper.Initialize(apiGMCM, Config, ModManifest, Helper, Monitor);
             }
+
+            ApiHelper.IsWearMoreRingsInstalled = Helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
         }
 
         /// <summary>Raised after the player loads a save slot and the world is initialized.</summary>
