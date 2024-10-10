@@ -116,8 +116,7 @@ namespace ConvenientInventory.Compatibility
                 getValue: () => config.IsQuickStackIgnoreItemQuality,
                 setValue: value => config.IsQuickStackIgnoreItemQuality = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Name"),
-                tooltip: () => $"(Requires \"{helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name")}\" to be enabled.) " +
-                    helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc")
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc")
             );
 
             api.AddBoolOption(
