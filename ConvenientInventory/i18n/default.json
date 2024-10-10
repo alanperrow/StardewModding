@@ -2,6 +2,10 @@
   // UI
   "QuickStackButton.hoverText": "Quick Stack To Nearby Chests", // If this is translated, try to keep the string length as close to the original as possible.
 
+  "AutoOrganizeButton.hoverText": "Auto Organize ON",
+  "AutoOrganizeButton.hoverText.disable": "(Right click to disable)",
+  "AutoOrganizeButton.hoverText.disable-gamepad": "(X to disable)",
+
   // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "Quick Stack To Nearby Chests",
 
@@ -9,7 +13,8 @@
   "ModConfigMenu.IsEnableQuickStack.Desc": "If enabled, adds a \"Quick Stack To Nearby Chests\" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.",
 
   "ModConfigMenu.QuickStackRange.Name": "Range",
-  "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.",
+  "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.\n\nIf set to \"Location\", all chests in the player's current location will be considered.\n\nIf set to \"Global\", all chests in the world will be considered.",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange config value was \"Global\" but has been reset to \"Location\". \"Global\" is only supported if the Chests Anywhere mod is installed.",
 
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
   "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
@@ -21,16 +26,28 @@
   "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
 
   "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "Quick stack into buildings?",
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will also be checked when quick stacking.",
+  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "Quick stack into dressers?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, nearby dressers will be considered when quick stacking.",
 
   "ModConfigMenu.IsQuickStackOverflowItems.Name": "Quick stack overflow items?",
   "ModConfigMenu.IsQuickStackOverflowItems.Desc": "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
 
   "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Quick stack ignore item quality?",
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "If enabled, quick stack will place items into chests which contain ANY quality of that same item.",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain ANY quality of that same item.",
 
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Show nearby chests in tooltip?",
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.",
+
+  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "Enable quick stack animation?",
+  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "If enabled, an animation will play when items are quick stacked to visually show where each item was stored.",
+
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "Animation: Item Speed",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "For quick stack animation:\nAdjusts the speed at which quick stacked items move toward their stored chest.\n\n0.5x: Half speed\n1x: Normal speed\n3x: Triple speed",
+
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "Animation: Stack Speed",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "For quick stack animation:\nAdjusts the speed at which items are individually stacked into their stored chest.\n\n0.5x: Half speed\n1x: Normal speed\n3x: Triple speed",
 
   "ModConfigMenu.Label.FavoriteItems": "Favorite Items",
 
@@ -52,6 +69,25 @@
 
   "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Keybind (controller)",
   "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Hold this button when selecting an item to favorite it.",
+
+  "ModConfigMenu.Label.TakeAllButOne": "Take All But One",
+
+  "ModConfigMenu.IsEnableTakeAllButOne.Name": "Enable take all but one?",
+  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "If enabled, while holding the keybind below, instantly take all but one item from the selected item stack, rather than taking a single item at a time.",
+
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "Keybind (keyboard)",
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "Hold this key when taking an item from an item stack to instantly take all but one of that item.",
+
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "Keybind (controller)",
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "Hold this button when taking an item from an item stack to instantly take all but one of that item.",
+
+  "ModConfigMenu.Label.AutoOrganizeChest": "Auto Organize Chest",
+
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "Enable auto organize chest button?",
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "If enabled, right-clicking a chest menu's organize button (or pressing (X) on gamepad) will toggle Auto Organize ON/OFF for that chest. When a chest has Auto Organize ON, all of its items will remain organized, even when new items are added.",
+
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "Show instructions in hover text?",
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "If enabled, the hover text for the Auto Organize button will include an additional line explaining how to toggle off Auto Organize.",
 
   "ModConfigMenu.Label.Miscellaneous": "Miscellaneous",
 

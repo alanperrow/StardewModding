@@ -12,7 +12,7 @@ What if you could stow away all the items taking up space in your backpack, inst
 
 ## Features
 #### Quick Stack to Nearby Chests
-Click the new "Quick Stack to Nearby Chests" button in the player's inventory UI to quickly deposit items into chests within a nearby range.
+Click the new "Quick Stack to Nearby Chests" button in the player's inventory UI to quickly deposit items from your inventory into any nearby chests which contain that item.
 
 #### Favorite Items
 Hold the favorite-hotkey (Left Alt, by default) and select items in the player's inventory to favorite them.

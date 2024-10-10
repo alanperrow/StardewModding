@@ -1,9 +1,9 @@
 ﻿using System;
+using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.Patches;
-using GenericModConfigMenu;
+using ConvenientInventory.QuickStack;
 using HarmonyLib;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
@@ -22,11 +22,9 @@ namespace ConvenientInventory
         {
             Instance = this;
             Config = helper.ReadConfig<ModConfig>();
+            Config.QuickStackRange = ConfigHelper.ValidateAndConstrainQuickStackRange(Config.QuickStackRange);
 
-            ConvenientInventory.QuickStackButtonIcon = helper.ModContent.Load<Texture2D>(@"assets\icon.png");
-            ConvenientInventory.FavoriteItemsCursorTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteCursor.png");
-            ConvenientInventory.FavoriteItemsHighlightTexture = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{Config.FavoriteItemsHighlightTextureChoice}.png");
-            ConvenientInventory.FavoriteItemsBorderTexture = helper.ModContent.Load<Texture2D>(@"assets\favoriteBorder.png");
+            CachedTextures.LoadCachedTextures(helper, Config);
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
@@ -34,13 +32,21 @@ namespace ConvenientInventory
             helper.Events.GameLoop.Saving += OnSaving;
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
-            helper.Events.Input.ButtonReleased += OnButtonReleased;
+            helper.Events.Input.ButtonsChanged += OnButtonsChanged;
 
             helper.ConsoleCommands.Add("player_fixinventory",
-                "Resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory. (Some mods directly modify the player's inventory size, " +
-                "causing compatibility issues and/or leaving extra null items when uninstalled; this command should fix these issues.)" +
+                "Resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory." +
+                "\n(Some mods directly modify the player's inventory size, causing compatibility issues and/or leaving extra null items when uninstalled; " +
+                "this command should fix these issues.)" +
                 "\n\nUsage: player_fixinventory",
                 FixInventory);
+
+            helper.ConsoleCommands.Add("convinv_clearmoddata",
+                "Clears all mod data set by Convenient Inventory for the currently loaded save; no other mod data is removed. " +
+                "Changes to the save file will take effect the next time the game is saved." +
+                "\n(This command is intended for players who want to remove any Convenient Inventory mod data from their save file for a complete uninstallation.)" +
+                "\n\nUsage: convinv_cleanup_autoorganize",
+                ClearModDataForCurrentlyLoadedSave);
         }
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).
@@ -59,17 +65,23 @@ namespace ConvenientInventory
 
             harmony.PatchAll();
 
-            // Initialize mod(s)
-            ModInitializer modInitializer = new(ModManifest, Helper);
-
-            // Get Generic Mod Config Menu API (if it's installed)
-            var api = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (api != null)
+            // Initialize mod API integrations
+            var apiCA = Helper.ModRegistry.GetApi<IChestsAnywhereApi>("Pathoschild.ChestsAnywhere");
+            if (apiCA != null)
             {
-                modInitializer.Initialize(api, Config);
+                ApiHelper.Initialize(apiCA);
             }
+
+            var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+            if (apiGMCM != null)
+            {
+                ApiHelper.Initialize(apiGMCM, Config, ModManifest, Helper, Monitor);
+            }
+
+            ApiHelper.IsWearMoreRingsInstalled = Helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
         }
 
+        /// <summary>Raised after the player loads a save slot and the world is initialized.</summary>
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
             if (Config.IsEnableFavoriteItems)
@@ -78,40 +90,45 @@ namespace ConvenientInventory
             }
         }
 
+        /// <summary>Raised before the game begins writing data to the save file (except the initial save creation).</summary>
         private void OnSaving(object sender, SavingEventArgs e)
         {
             if (Config.IsEnableFavoriteItems)
             {
                 ConvenientInventory.SaveFavoriteItemSlots();
             }
+
+            StardewValley.Utility.ForEachLocation(loc => QuickStackChestAnimation.CleanupChestAnimationModDataByLocation(loc));
         }
 
+        /// <summary>Raised after the player presses a button on the keyboard, controller, or mouse.</summary>
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            // Handle favorite items hotkey being pressed
-            if (Config.IsEnableFavoriteItems
-                && Context.IsWorldReady
-                && (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey))
-            {
-                ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
-            }
-
-            // Handle quick stack hotkey being pressed
+            // Handle quick stack hotkey being pressed.
             if (Config.IsEnableQuickStackHotkey
                 && Context.IsWorldReady
                 && StardewValley.Game1.CurrentEvent is null
-                && (e.Button == Config.QuickStackKeyboardHotkey || e.Button == Config.QuickStackControllerHotkey))
+                && (Config.QuickStackKeyboardHotkey.JustPressed() || Config.QuickStackControllerHotkey.JustPressed()))
             {
                 ConvenientInventory.OnQuickStackHotkeyPressed();
             }
         }
 
-        private void OnButtonReleased(object sender, ButtonReleasedEventArgs e)
+        /// <summary>Raised after the player presses or releases any buttons on the keyboard, controller, or mouse.</summary>
+        private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
-            // Handle favorite items hotkey being released
-            if (Config.IsEnableFavoriteItems && (e.Button == Config.FavoriteItemsKeyboardHotkey || e.Button == Config.FavoriteItemsControllerHotkey))
+            // Handle favorite items hotkey being toggled.
+            if (Config.IsEnableFavoriteItems)
             {
-                ConvenientInventory.IsFavoriteItemsHotkeyDown = false;
+                bool isHotkeyDown = Config.FavoriteItemsKeyboardHotkey.IsDown() || Config.FavoriteItemsControllerHotkey.IsDown();
+                if (!ConvenientInventory.IsFavoriteItemsHotkeyDown && Context.IsWorldReady && isHotkeyDown)
+                {
+                    ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
+                }
+                else if (ConvenientInventory.IsFavoriteItemsHotkeyDown && !isHotkeyDown)
+                {
+                    ConvenientInventory.IsFavoriteItemsHotkeyDown = false;
+                }
             }
         }
 
@@ -158,6 +175,31 @@ namespace ConvenientInventory
                 // Remove the last item of the list
                 items.RemoveAt(index);
             }
+        }
+
+        /// <summary>
+        /// Clears all mod data set by Convenient Inventory for the currently loaded save.
+        /// </summary>
+        /// <param name="command">The name of the command invoked.</param>
+        /// <param name="args">The arguments received by the command. Each word after the command name is a separate argument.</param>
+        private void ClearModDataForCurrentlyLoadedSave(string command, string[] args)
+        {
+            if (!Context.IsWorldReady)
+            {
+                Monitor.Log("Please load a save before using this command.", LogLevel.Info);
+                return;
+            }
+
+            StardewValley.Utility.ForEachLocation(loc =>
+            {
+                bool result = true;
+                result &= AutoOrganizeLogic.CleanupAutoOrganizeModDataByLocation(loc);
+
+                // This shouldn't be necessary as we already do this before saving, but just in case...
+                result &= QuickStackChestAnimation.CleanupChestAnimationModDataByLocation(loc);
+
+                return result;
+            });
         }
     }
 }

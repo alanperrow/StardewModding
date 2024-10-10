@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using ConvenientInventory.Compatibility;
+using ConvenientInventory.QuickStack;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
@@ -13,54 +15,52 @@ using StardewValley.Objects;
 
 namespace ConvenientInventory
 {
-    internal static class CachedTextures
-    {
-        public static Texture2D Mill { get; } = ModEntry.Instance.Helper.GameContent.Load<Texture2D>(@"Buildings\Mill");
-
-        public static Texture2D JunimoHut { get; } = ModEntry.Instance.Helper.GameContent.Load<Texture2D>(@"Buildings\Junimo Hut");
-
-        public static Texture2D FarmHouse { get; } = ModEntry.Instance.Helper.GameContent.Load<Texture2D>(@"Maps\farmhouse_tiles");
-    }
-
     public static class ConvenientInventory
     {
-        public static Texture2D QuickStackButtonIcon { private get; set; }
+        private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
-        private static IReadOnlyList<ITypedChest> NearbyTypedChests { get; set; }
-
-        private static ClickableTextureComponent QuickStackButton { get; set; }
+        private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
+        private static ClickableTextureComponent QuickStackButton
+        {
+            get => quickStackButton.Value;
+            set => quickStackButton.Value = value;
+        }
 
         private static readonly PerScreen<InventoryPage> playerInventoryPage = new();
         private static InventoryPage PlayerInventoryPage
         {
-            get { return playerInventoryPage.Value; }
-            set { playerInventoryPage.Value = value; }
+            get => playerInventoryPage.Value;
+            set => playerInventoryPage.Value = value;
         }
 
-        private static bool IsDrawToolTip { get; set; } = false;
+        private static readonly PerScreen<bool> shouldDrawQuickStackToolTip = new();
+        private static bool ShouldDrawQuickStackToolTip
+        {
+            get => shouldDrawQuickStackToolTip.Value;
+            set => shouldDrawQuickStackToolTip.Value = value;
+        }
 
         private const int quickStackButtonID = 918021;  // Unique indentifier
 
-        private static readonly List<ItemGrabMenu.TransferredItemSprite> transferredItemSprites = new();
-
-        public static Texture2D FavoriteItemsCursorTexture { private get; set; }
-
-        public static Texture2D FavoriteItemsHighlightTexture { private get; set; }
-
-        public static Texture2D FavoriteItemsBorderTexture { private get; set; }
+        private static readonly PerScreen<List<ItemGrabMenu.TransferredItemSprite>> transferredItemSprites = new(() => new List<ItemGrabMenu.TransferredItemSprite>());
+        private static List<ItemGrabMenu.TransferredItemSprite> TransferredItemSprites
+        {
+            get => transferredItemSprites.Value;
+            set => transferredItemSprites.Value = value;
+        }
 
         private static readonly PerScreen<bool> isFavoriteItemsHotkeyDown = new();
         public static bool IsFavoriteItemsHotkeyDown
         {
-            get { return isFavoriteItemsHotkeyDown.Value; }
-            set { isFavoriteItemsHotkeyDown.Value = value; }
+            get => isFavoriteItemsHotkeyDown.Value;
+            set => isFavoriteItemsHotkeyDown.Value = value;
         }
 
         private static readonly PerScreen<int> favoriteItemsHotkeyDownCounter = new();
         private static int FavoriteItemsHotkeyDownCounter
         {
-            get { return favoriteItemsHotkeyDownCounter.Value; }
-            set { favoriteItemsHotkeyDownCounter.Value = value; }
+            get => favoriteItemsHotkeyDownCounter.Value;
+            set => favoriteItemsHotkeyDownCounter.Value = value;
         }
 
         private static readonly string favoriteItemSlotsModDataKey = $"{ModEntry.Instance.ModManifest.UniqueID}/favoriteItemSlots";
@@ -82,28 +82,28 @@ namespace ConvenientInventory
 
                 return favoriteItemSlots.Value;
             }
-            set { favoriteItemSlots.Value = value; }
+            set => favoriteItemSlots.Value = value;
         }
 
         private static readonly PerScreen<bool> favoriteItemsIsItemSelected = new();
         public static bool FavoriteItemsIsItemSelected
         {
-            get { return favoriteItemsIsItemSelected.Value; }
-            set { favoriteItemsIsItemSelected.Value = value; }
+            get => favoriteItemsIsItemSelected.Value;
+            set => favoriteItemsIsItemSelected.Value = value;
         }
 
         private static readonly PerScreen<Item> favoriteItemsSelectedItem = new();
         public static Item FavoriteItemsSelectedItem
         {
-            get { return favoriteItemsSelectedItem.Value; }
-            set { favoriteItemsSelectedItem.Value = value; }
+            get => favoriteItemsSelectedItem.Value;
+            set => favoriteItemsSelectedItem.Value = value;
         }
 
         private static readonly PerScreen<int> favoriteItemsLastSelectedSlot = new();
         public static int FavoriteItemsLastSelectedSlot
         {
-            get { return favoriteItemsLastSelectedSlot.Value; }
-            set { favoriteItemsLastSelectedSlot.Value = value; }
+            get => favoriteItemsLastSelectedSlot.Value;
+            set => favoriteItemsLastSelectedSlot.Value = value;
         }
 
         public static bool[] LoadFavoriteItemSlots()
@@ -116,7 +116,7 @@ namespace ConvenientInventory
                 ?? new bool[Game1.player.MaxItems];
 
             dataStr ??= new string('0', FavoriteItemSlots.Length);
-            ModEntry.Instance.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", StardewModdingAPI.LogLevel.Trace);
+            ModEntry.Instance.Monitor.Log($"Favorite item slots loaded for {Game1.player.Name}: '{dataStr}'.", LogLevel.Trace);
             return FavoriteItemSlots;
         }
 
@@ -131,7 +131,7 @@ namespace ConvenientInventory
 
             Game1.player.modData[favoriteItemSlotsModDataKey] = saveStr;
 
-            ModEntry.Instance.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", StardewModdingAPI.LogLevel.Trace);
+            ModEntry.Instance.Monitor.Log($"Favorite item slots saved to {Game1.player.Name}.modData: '{saveStr}'.", LogLevel.Trace);
             return saveStr;
         }
 
@@ -145,15 +145,15 @@ namespace ConvenientInventory
                     new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
                     string.Empty,
                     ModEntry.Instance.Helper.Translation.Get("QuickStackButton.hoverText"),
-                    QuickStackButtonIcon,
+                    CachedTextures.QuickStackButtonIcon,
                     Rectangle.Empty,
                     4f,
                     false)
                 {
                     myID = quickStackButtonID,
-                    downNeighborID = 105,  // trash can
-                    upNeighborID = 106,  // organize button
-                    leftNeighborID = 11  // top-right inventory slot
+                    downNeighborID = InventoryPage.region_trashCan,
+                    upNeighborID = InventoryPage.region_organizeButton,
+                    leftNeighborID = 11, // top-right inventory slot
                 };
 
                 inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
@@ -165,7 +165,7 @@ namespace ConvenientInventory
                 if (InventoryPage.ShouldShowJunimoNoteIcon())
                 {
                     inventoryPage.inventory.dropItemInvisibleButton.leftNeighborID = inventoryPage.junimoNoteIcon.myID;
-                    inventoryPage.junimoNoteIcon.leftNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
+                    inventoryPage.junimoNoteIcon.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
                 }
                 else
                 {
@@ -226,7 +226,9 @@ namespace ConvenientInventory
             return true;
         }
 
-        // Toggles the favorited status of a selected item slot. Returns whether an item was toggled.
+        /// <summary>
+        /// Toggles the favorited status of a selected item slot. Returns whether an item was toggled.
+        /// </summary>
         private static bool ToggleFavoriteItemSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY, bool? favoriteOverride = null)
         {
             if (inventoryMenu is null)
@@ -241,7 +243,7 @@ namespace ConvenientInventory
             {
                 ModEntry.Instance.Monitor
                     .Log($"{(FavoriteItemSlots[clickPos] ? "Un-" : string.Empty)}Favorited item slot {clickPos}: {inventoryMenu.actualInventory[clickPos]?.Name}",
-                    StardewModdingAPI.LogLevel.Trace);
+                    LogLevel.Trace);
 
                 Game1.playSound("smallSelect");
 
@@ -255,7 +257,9 @@ namespace ConvenientInventory
             return false;
         }
 
-        // Tracks and "moves" favorite item slots when selecting/de-selecting items in an inventory menu.
+        /// <summary>
+        /// Tracks and "moves" favorite item slots when selecting/de-selecting items in an inventory menu.
+        /// </summary>
         private static bool TrackSelectedFavoriteItemSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY, bool isRightClick = false)
         {
             if (!ModEntry.Config.IsEnableFavoriteItems || IsFavoriteItemsHotkeyDown || inventoryMenu is null)
@@ -319,44 +323,25 @@ namespace ConvenientInventory
                         }
                         else if (isRightClick && clickedItem is Tool clickedTool)
                         {
+                            // We've right clicked a favorited slot with a tool in it
                             Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
-
-                            // Right-click attachments into a favorited tool
-                            if (cursorSlotItem != null)
+                            if (cursorSlotItem is StardewValley.Object cursorSlotObject)
                             {
-                                if (clickedTool.canThisBeAttached((StardewValley.Object)cursorSlotItem))
-                                {
-                                    // We are allowed to attach this item to our tool
-                                    var atts = clickedTool.attachments.Where(x => x != null && x.canStackWith(cursorSlotItem));
-                                    if (atts.Any())
-                                    {
-                                        // We found an existing attachment to try to stack with our item
-                                        if (atts.Any(x => !IsOverMaxStackSize(x, cursorSlotItem)))
-                                        {
-                                            // We fully stacked our item and are no longer holding anything
-                                            ResetFavoriteItemSlotsTracking();
-                                        }
-                                    }
-                                    else if (clickedTool.attachments.Any(x => x == null))
-                                    {
-                                        // We did not find any existing attachments to stack with our item, so this item itself will be attached
-                                        ResetFavoriteItemSlotsTracking();
-                                    }
-                                    else if (!clickedTool.attachments.Any(x => cursorSlotItem.CompareTo(x) == 0))
-                                    {
-                                        // We did not find any existing attachments to stack with our item, and there are no empty attachment slots,
-                                        // so this item itself will be swapped with one of the existing attachments
-                                        ResetFavoriteItemSlotsTracking();
-                                    }
-                                }
+                                // Right-click attachments into a favorited tool
+                                TryAttachIntoFavoritedTool(cursorSlotObject, clickedTool);
                             }
                         }
                         else if (isRightClick && clickedItem.Stack == 1 && inventoryMenu.highlightMethod(clickedItem))
                         {
-                            // Right click, taking the last item
+                            // We've right clicked a single item.
                             if (!IsCurrentActiveMenuNoHeldItems())
                             {
-                                StartTrackingFavoriteItemSlot(clickPos, clickedItem);
+                                Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
+                                if (cursorSlotItem == null || (cursorSlotItem.canStackWith(clickedItem) && cursorSlotItem.getRemainingStackSpace() != 0))
+                                {
+                                    // We will now be holding the right clicked item, so track it.
+                                    StartTrackingFavoriteItemSlot(clickPos, clickedItem);
+                                }
                             }
                             else
                             {
@@ -379,35 +364,10 @@ namespace ConvenientInventory
                     {
                         // We've right clicked an unfavorited slot with a tool in it
                         Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
-
-                        // Right-click favorited attachments into an unfavorited tool
-                        if (cursorSlotItem != null)
+                        if (cursorSlotItem is StardewValley.Object cursorSlotObject)
                         {
-                            if (clickedTool.canThisBeAttached((StardewValley.Object)cursorSlotItem))
-                            {
-                                // We are allowed to attach this item to our tool
-                                var atts = clickedTool.attachments.Where(x => x != null && x.canStackWith(cursorSlotItem));
-                                if (atts.Any())
-                                {
-                                    // We found an existing attachment to try to stack with our item
-                                    if (atts.Any(x => !IsOverMaxStackSize(x, cursorSlotItem)))
-                                    {
-                                        // We fully stacked our item and are no longer holding anything
-                                        ResetFavoriteItemSlotsTracking();
-                                    }
-                                }
-                                else if (clickedTool.attachments.Any(x => x == null))
-                                {
-                                    // We did not find any existing attachments to stack with our item, so this item itself will be attached
-                                    ResetFavoriteItemSlotsTracking();
-                                }
-                                else if (!clickedTool.attachments.Any(x => cursorSlotItem.CompareTo(x) == 0))
-                                {
-                                    // We did not find any existing attachments to stack with our item, and there are no empty attachment slots,
-                                    // so this item itself will be swapped with one of the existing attachments
-                                    ResetFavoriteItemSlotsTracking();
-                                }
-                            }
+                            // Right-click attachments into a favorited tool
+                            TryAttachIntoFavoritedTool(cursorSlotObject, clickedTool);
                         }
                     }
                 }
@@ -486,9 +446,59 @@ namespace ConvenientInventory
             return true;
         }
 
-        // Handles logic for determining whether we are equipping a selected favorited item. If so, resets favorite tracking.
+        /// <summary>
+        /// Tries to attach <paramref name="cursorSlotObject"/> into <paramref name="clickedTool"/>.
+        /// </summary>
+        private static void TryAttachIntoFavoritedTool(StardewValley.Object cursorSlotObject, Tool clickedTool)
+        {
+            if (!clickedTool.canThisBeAttached(cursorSlotObject))
+            {
+                return;
+            }
+            
+            // We are allowed to attach this item to our tool
+            var atts = clickedTool.attachments.Where(x => x != null && x.canStackWith(cursorSlotObject));
+            if (atts.Any())
+            {
+                // We found an existing attachment to try to stack with our item
+                if (atts.Any(x => !IsOverMaxStackSize(x, cursorSlotObject)))
+                {
+                    // We fully stacked our item and are no longer holding anything
+                    ResetFavoriteItemSlotsTracking();
+                }
+            }
+            else if (clickedTool.attachments.Any(x => x == null))
+            {
+                // We did not find any existing attachments to stack with our item, so this item itself will be attached
+                ResetFavoriteItemSlotsTracking();
+            }
+            else if (!clickedTool.attachments.Any(x => cursorSlotObject.CompareTo(x) == 0))
+            {
+                // We did not find any existing attachments to stack with our item, and there are no empty attachment slots,
+                // so this item itself will be swapped with one of the existing attachments
+                ResetFavoriteItemSlotsTracking();
+            }
+        }
+
+        /// <summary>
+        /// Handles logic for determining whether we are equipping a selected favorited item. If so, resets favorite tracking.
+        /// </summary>
         private static void OnEquipmentSlotClickedWithFavoriteItem(ClickableComponent equipmentSlot, Item cursorSlotItem)
         {
+            if (ApiHelper.IsWearMoreRingsInstalled)
+            {
+                // Wear More Rings mod changes ring equipment slot names; starts with "Ring 0", then "Ring 1", "Ring 2", etc.
+                if (equipmentSlot.name.StartsWith("Ring "))
+                {
+                    if (cursorSlotItem is Ring)
+                    {
+                        ResetFavoriteItemSlotsTracking();
+                    }
+
+                    return;
+                }
+            }
+
             switch (equipmentSlot.name)
             {
                 case "Left Ring":   // Inventory Page
@@ -528,22 +538,34 @@ namespace ConvenientInventory
             }
         }
 
-        // Determines whether two items being stacked will result in a leftover item stack (combined stacks > max stack size).
+        /// <summary>
+        /// Determines whether two items being stacked will result in a leftover item stack (combined stacks > max stack size).
+        /// </summary>
         private static bool IsOverMaxStackSize(Item item, Item canStackWith)
         {
             return item.Stack + canStackWith.Stack > item.maximumStackSize();
         }
 
-        // Gets the current active menu's "held item", if applicable. If not, gets the player's "cursor slot item" by default.
+        /// <summary>
+        /// Gets the current active menu's "held item", if applicable. If not, gets the player's "cursor slot item" by default.
+        /// </summary>
         private static Item GetHeldItemOrCursorSlotItem()
         {
             Item item = (Game1.activeClickableMenu as ForgeMenu)?.heldItem  // Forge menu cursor slot item
                 ?? Game1.player.CursorSlotItem;                             // Arbritrary menu cursor slot item
 
+            // Manually check for crafting page - idk why behavior is different from inventory page vs crafting page, but it is.
+            if (item == null && Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is CraftingPage craftingPage)
+            {
+                item = craftingPage.heldItem;
+            }
+
             return item;
         }
 
-        // Checks for menus which don't allow selecting and holding items, i.e. chests, shipping bins, shops, etc.
+        /// <summary>
+        /// Checks for menus which don't allow selecting and holding items, i.e. chests, shipping bins, shops, etc.
+        /// </summary>
         private static bool IsCurrentActiveMenuNoHeldItems()
         {
             bool result = Game1.activeClickableMenu is ItemGrabMenu
@@ -552,7 +574,9 @@ namespace ConvenientInventory
             return result;
         }
 
-        // Starts tracking a favorite item slot.
+        /// <summary>
+        /// Starts tracking a favorite item slot.
+        /// </summary>
         public static void StartTrackingFavoriteItemSlot(int clickPos, Item clickedItem)
         {
             FavoriteItemsLastSelectedSlot = clickPos;
@@ -561,7 +585,9 @@ namespace ConvenientInventory
             FavoriteItemSlots[clickPos] = false;
         }
 
-        // Resets the tracking state of favorite item slots.
+        /// <summary>
+        /// Resets the tracking state of favorite item slots.
+        /// </summary>
         public static void ResetFavoriteItemSlotsTracking()
         {
             FavoriteItemsLastSelectedSlot = -1;
@@ -569,7 +595,9 @@ namespace ConvenientInventory
             FavoriteItemsSelectedItem = null;
         }
 
-        // Handles shift-click logic for favorited item slots in player's inventory page.
+        /// <summary>
+        /// Handles shift-click logic for favorited item slots in player's inventory page.
+        /// </summary>
         private static bool HandleFavoriteItemSlotShiftClickedInInventoryPage(int clickPos, Item item)
         {
             bool isItemEquippable = (item is Ring && (Game1.player.leftRing.Value == null || Game1.player.rightRing.Value == null))
@@ -657,10 +685,18 @@ namespace ConvenientInventory
                 return;
             }
 
+            if (!Context.IsPlayerFree)
+            {
+                // Suppress quick stack hotkey if the player is not free to act in the world.
+                return;
+            }
+
             QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange);
         }
 
-        // Player shifted toolbar row, so shift all favorited item slots by a row
+        /// <summary>
+        /// Player shifted toolbar row, so shift all favorited item slots by a row
+        /// </summary>
         public static void ShiftToolbar(bool right)
         {
             RotateArray(FavoriteItemSlots, 12, right);
@@ -706,7 +742,7 @@ namespace ConvenientInventory
             if (ModEntry.Config.IsEnableQuickStack)
             {
                 QuickStackButton.tryHover(x, y);
-                IsDrawToolTip = QuickStackButton.containsPoint(x, y);
+                ShouldDrawQuickStackToolTip = QuickStackButton.containsPoint(x, y);
             }
         }
 
@@ -729,7 +765,9 @@ namespace ConvenientInventory
             return result;
         }
 
-        // Checks if we are about to remove the final item in a favorited item slot, and if so, unfavorites it.
+        /// <summary>
+        /// Checks if we are about to remove the final item in a favorited item slot, and if so, unfavorites it.
+        /// </summary>
         public static void PreFarmerReduceActiveItemByOne(Farmer who)
         {
             if (who.CurrentItem?.Stack == 1)
@@ -743,7 +781,9 @@ namespace ConvenientInventory
             }
         }
 
-        // Unfavorites any empty favorite item slots.
+        /// <summary>
+        /// Unfavorites any empty favorite item slots.
+        /// </summary>
         public static void UnfavoriteEmptyItemSlots()
         {
             for (int i = 0; i < Game1.player.Items.Count; i++)
@@ -759,8 +799,10 @@ namespace ConvenientInventory
             }
         }
 
-        // Called when an inventory's Organize button is clicked.
-        // Extracts an inventory's favorited items (replacing with null), to be re-inserted after organization is completed.
+        /// <summary>
+        /// Called when an inventory's Organize button is clicked.
+        /// Extracts an inventory's favorited items (replacing with null), to be re-inserted after organization is completed.
+        /// </summary>
         public static Item[] ExtractFavoriteItemsFromList(IList<Item> items)
         {
             if (items is null)
@@ -782,8 +824,10 @@ namespace ConvenientInventory
             return extractedItems;
         }
 
-        // Called after an inventory's Organize button is clicked.
-        // Re-inserts an inventory's favorited items that were extracted before organization began.
+        /// <summary>
+        /// Called after an inventory's Organize button is clicked.
+        /// Re-inserts an inventory's favorited items that were extracted before organization began.
+        /// </summary>
         public static void ReinsertExtractedFavoriteItemsIntoList(Item[] extractedItems, IList<Item> items, bool isSorted = true)
         {
             if (extractedItems is null || items is null)
@@ -810,7 +854,7 @@ namespace ConvenientInventory
                             ModEntry.Instance.Monitor
                                 .Log($"Found non-null item: '{items[items.Count - 1].Name}' (x {items[items.Count - 1].Stack}) out of bounds of inventory list (index={i}) " +
                                 "when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
-                                StardewModdingAPI.LogLevel.Warn);
+                                LogLevel.Warn);
                         }
 
                         // Remove the null "Item" we just pushed past the end of the list
@@ -829,7 +873,7 @@ namespace ConvenientInventory
                             ModEntry.Instance.Monitor
                                 .Log($"Found non-null item: '{items[i].Name}' (x {items[i].Stack}) in unexpected position (index={i}) " +
                                 "when re-inserting extracted favorite items. The item was manually dropped; this may have resulted in unexpected behavior.",
-                                StardewModdingAPI.LogLevel.Warn);
+                                LogLevel.Warn);
                         }
 
                         items[i] = extractedItems[i];
@@ -838,12 +882,14 @@ namespace ConvenientInventory
             }
         }
 
-        // Called after drawing everything else in arbitrary inventory menu.
-        // Draws favorite items cursor if keybind is being pressed.
+        /// <summary>
+        /// Called after drawing everything else in arbitrary inventory menu.
+        /// Draws favorite items cursor if keybind is being pressed.
+        /// </summary>
         public static void PostMenuDraw<T>(T menu, SpriteBatch spriteBatch) where T : IClickableMenu
         {
             // Draw quick stack button tooltip (in InventoryPage)
-            if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage && IsDrawToolTip)
+            if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage && ShouldDrawQuickStackToolTip)
             {
                 DrawQuickStackButtonToolTip(spriteBatch);
             }
@@ -875,7 +921,7 @@ namespace ConvenientInventory
 
         private static void DrawQuickStackButtonToolTip(SpriteBatch spriteBatch)
         {
-            NearbyTypedChests = QuickStackLogic.GetTypedChestsAroundFarmer(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
+            NearbyTypedChests = QuickStackLogic.GetTypedChestsWithinRange(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
 
             if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
             {
@@ -910,16 +956,18 @@ namespace ConvenientInventory
                     continue;
                 }
 
-                spriteBatch.Draw(FavoriteItemsHighlightTexture,
+                spriteBatch.Draw(CachedTextures.FavoriteItemsHighlight,
                     slotDrawPositions[i],
-                    new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
+                    CachedTextures.FavoriteItemsHighlight.Bounds,
                     Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
                 );
             }
         }
 
-        // Draws favorite item slots in toolbar, and draws current tool red outline and slot text on top of highlight (so we don't cover them up).
+        /// <summary>
+        /// Draws favorite item slots in toolbar, and draws current tool red outline and slot text on top of highlight (so we don't cover them up).
+        /// </summary>
         public static void DrawFavoriteItemSlotHighlightsInToolbar(SpriteBatch spriteBatch, int yPositionOnScreen, float transparency, string[] slotText)
         {
             for (int i = 0; i < 12; i++)
@@ -931,9 +979,9 @@ namespace ConvenientInventory
 
                 Vector2 toDraw = new(Game1.uiViewport.Width / 2 - 384 + i * 64, yPositionOnScreen - 96 + 8);
 
-                spriteBatch.Draw(FavoriteItemsHighlightTexture,
+                spriteBatch.Draw(CachedTextures.FavoriteItemsHighlight,
                     toDraw,
-                    new Rectangle(0, 0, FavoriteItemsHighlightTexture.Width, FavoriteItemsHighlightTexture.Height),
+                    CachedTextures.FavoriteItemsHighlight.Bounds,
                     Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
                 );
@@ -954,9 +1002,9 @@ namespace ConvenientInventory
         {
             float scale = (float)(3d + 0.15d * Math.Cos(FavoriteItemsHotkeyDownCounter / 15d));
 
-            spriteBatch.Draw(FavoriteItemsCursorTexture,
+            spriteBatch.Draw(CachedTextures.FavoriteItemsCursor,
                new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
-               new Rectangle(0, 0, FavoriteItemsCursorTexture.Width, FavoriteItemsCursorTexture.Height),
+               CachedTextures.FavoriteItemsCursor.Bounds,
                Color.White,
                0f, Vector2.Zero, scale, SpriteEffects.None, 1f
            );
@@ -968,9 +1016,9 @@ namespace ConvenientInventory
 
             if (ModEntry.Config.IsEnableFavoriteItems && index != -1 && FavoriteItemSlots[index])
             {
-                spriteBatch.Draw(FavoriteItemsBorderTexture,
+                spriteBatch.Draw(CachedTextures.FavoriteItemsBorder,
                     new Vector2(x, y),
-                    new Rectangle(0, 0, FavoriteItemsBorderTexture.Width, FavoriteItemsBorderTexture.Height),
+                    CachedTextures.FavoriteItemsBorder.Bounds,
                     Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
                 );
@@ -1006,7 +1054,7 @@ namespace ConvenientInventory
             if (ModEntry.Config.IsEnableQuickStack)
             {
                 // Draw transferred item sprites
-                foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in transferredItemSprites)
+                foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in TransferredItemSprites)
                 {
                     transferredItemSprite.Draw(spriteBatch);
                 }
@@ -1015,7 +1063,7 @@ namespace ConvenientInventory
             }
         }
 
-        private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<ITypedChest> chests)
+        private static int GetExtraNumPosUsedByBuildingChests(IReadOnlyList<TypedChest> chests)
         {
             int extraNumPos = 0;
 
@@ -1034,7 +1082,7 @@ namespace ConvenientInventory
             return extraNumPos;
         }
 
-        private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<ITypedChest> typedChests)
+        private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<TypedChest> typedChests)
         {
             Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
 
@@ -1044,8 +1092,10 @@ namespace ConvenientInventory
             }
         }
 
-        // Refactored from IClickableMenu drawHoverText()
-        // Finds the origin position of where a tooltip will be drawn.
+        /// <summary>
+        /// Refactored from IClickableMenu drawHoverText().
+        /// Finds the origin position of where a tooltip will be drawn.
+        /// </summary>
         private static Point GetToolTipDrawPosition(string text)
         {
             int width = (int)Game1.smallFont.MeasureString(text).X + 32;
@@ -1072,22 +1122,27 @@ namespace ConvenientInventory
             return new Point(x, y);
         }
 
-        // Updates transferredItemSprite animation
+        /// <summary>
+        /// Updates item sprite animations.
+        /// </summary>
         public static void Update(GameTime time)
         {
-            for (int i = 0; i < transferredItemSprites.Count; i++)
+            for (int i = 0; i < TransferredItemSprites.Count; i++)
             {
-                if (transferredItemSprites[i].Update(time))
+                if (TransferredItemSprites[i].Update(time))
                 {
-                    transferredItemSprites.RemoveAt(i);
+                    TransferredItemSprites.RemoveAt(i);
                     i--;
                 }
             }
         }
 
+        /// <summary>
+        /// Add transferred item sprite upon performing quick stack in the inventory page.
+        /// </summary>
         public static void AddTransferredItemSprite(ItemGrabMenu.TransferredItemSprite itemSprite)
         {
-            transferredItemSprites.Add(itemSprite);
+            TransferredItemSprites.Add(itemSprite);
         }
     }
 }

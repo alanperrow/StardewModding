@@ -4,11 +4,15 @@
     {
         Normal,
         Stone,
-        Fridge,
+        BigNormal,
+        BigStone,
         MiniFridge,
+        Fridge,
+        IslandFridge,
         Mill,
         JunimoHut,
         Special,
-        Package
+        Package,
+        Dresser
     }
 }

@@ -1,22 +1,33 @@
-﻿using GenericModConfigMenu;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 
 namespace ConvenientInventory.Compatibility
 {
-    public class ModInitializer
+    public static class ApiHelper
     {
-        private readonly IManifest modManifest;
-        private readonly IModHelper helper;
+        public static bool IsWearMoreRingsInstalled { get; set; }
 
-        public ModInitializer(IManifest modManifest, IModHelper helper)
+        public static IChestsAnywhereApi ChestsAnywhereApi { get; private set; }
+
+        public static void Initialize(IChestsAnywhereApi api)
         {
-            this.modManifest = modManifest;
-            this.helper = helper;
+            ChestsAnywhereApi = api;
         }
 
-        public void Initialize(IGenericModConfigMenuApi api, ModConfig config)
+        public static void Initialize(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IModHelper helper, IMonitor monitor)
         {
+            // == Config Validation ==
+            bool isChestsAnywhereInstalled = ChestsAnywhereApi != null;
+            if (!isChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStackRange) == ConfigHelper.QuickStackRange_GlobalInt)
+            {
+                // QuickStackRange: "Global" option is only supported if the Chests Anywhere mod is installed.
+                // If Chests Anywhere API is not found and config value is loaded as "Global", log a warning message to SMAPI and overwrite the config value to "Location".
+                monitor.Log(helper.Translation.Get("ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning"), LogLevel.Warn);
+                config.QuickStackRange = ConfigHelper.FormatQuickStackRange(ConfigHelper.QuickStackRange_LocationInt);
+                helper.WriteConfig(config);
+            }
+
+            // == Register GMCM ==
             api.Register(
                 mod: modManifest,
                 reset: () =>
@@ -42,13 +53,14 @@ namespace ConvenientInventory.Compatibility
 
             api.AddNumberOption(
                 mod: modManifest,
-                getValue: () => config.QuickStackRange,
-                setValue: value => config.QuickStackRange = value,
+                getValue: () => ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStackRange),
+                setValue: value => config.QuickStackRange = ConfigHelper.FormatQuickStackRange(value),
                 name: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackRange.Desc"),
-                min: 0,
-                max: 10,
-                interval: 1
+                min: 1,
+                max: isChestsAnywhereInstalled ? ConfigHelper.QuickStackRange_GlobalInt : ConfigHelper.QuickStackRange_LocationInt,
+                interval: 1,
+                formatValue: ConfigHelper.FormatQuickStackRange
             );
 
             api.AddBoolOption(
@@ -59,7 +71,7 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackHotkey.Desc")
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.QuickStackKeyboardHotkey,
                 setValue: value => config.QuickStackKeyboardHotkey = value,
@@ -67,7 +79,7 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackKeyboardHotkey.Desc")
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.QuickStackControllerHotkey,
                 setValue: value => config.QuickStackControllerHotkey = value,
@@ -85,6 +97,14 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
+                getValue: () => config.IsQuickStackIntoDressers,
+                setValue: value => config.IsQuickStackIntoDressers = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoDressers.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoDressers.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
                 getValue: () => config.IsQuickStackOverflowItems,
                 setValue: value => config.IsQuickStackOverflowItems = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name"),
@@ -96,8 +116,7 @@ namespace ConvenientInventory.Compatibility
                 getValue: () => config.IsQuickStackIgnoreItemQuality,
                 setValue: value => config.IsQuickStackIgnoreItemQuality = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Name"),
-                tooltip: () => $"(Requires \"{helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name")}\" to be enabled.) " +
-                    helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc")
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc")
             );
 
             api.AddBoolOption(
@@ -106,6 +125,43 @@ namespace ConvenientInventory.Compatibility
                 setValue: value => config.IsQuickStackTooltipDrawNearbyChests = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsEnableQuickStackAnimation,
+                setValue: value =>
+                {
+                    // In GMCM, we tie together IsEnableQuickStackAnimation with IsEnableQuickStackChestAnimation.
+                    // Most users should only care about whether the entire animation is enabled or disabled.
+                    // Keeping these as separate config values, however, allows users to manually edit the config file to set either value independently, if necessary.
+                    config.IsEnableQuickStackAnimation = value;
+                    config.IsEnableQuickStackChestAnimation = value;
+                },
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackAnimation.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableQuickStackAnimation.Desc")
+            );
+
+            api.AddNumberOption(
+                mod: modManifest,
+                getValue: () => config.QuickStackAnimationItemSpeed,
+                setValue: value => config.QuickStackAnimationItemSpeed = value,
+                name: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationItemSpeed.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationItemSpeed.Desc"),
+                min: 0.5f,
+                max: 3f,
+                interval: 0.1f
+            );
+
+            api.AddNumberOption(
+                mod: modManifest,
+                getValue: () => config.QuickStackAnimationStackSpeed,
+                setValue: value => config.QuickStackAnimationStackSpeed = value,
+                name: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationStackSpeed.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.QuickStackAnimationStackSpeed.Desc"),
+                min: 0.5f,
+                max: 3f,
+                interval: 0.1f
             );
 
             api.AddSectionTitle(
@@ -137,14 +193,14 @@ namespace ConvenientInventory.Compatibility
                 setValue: value =>
                 {
                     config.FavoriteItemsHighlightTextureChoice = int.Parse(value[..1]);
-                    ConvenientInventory.FavoriteItemsHighlightTexture = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
+                    CachedTextures.FavoriteItemsHighlight = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
                 },
                 name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc"),
                 allowedValues: highlightStyleDescriptions
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.FavoriteItemsKeyboardHotkey,
                 setValue: value => config.FavoriteItemsKeyboardHotkey = value,
@@ -152,12 +208,62 @@ namespace ConvenientInventory.Compatibility
                 tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc")
             );
 
-            api.AddKeybind(
+            api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.FavoriteItemsControllerHotkey,
                 setValue: value => config.FavoriteItemsControllerHotkey = value,
                 name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsControllerHotkey.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsControllerHotkey.Desc")
+            );
+
+            api.AddSectionTitle(
+                mod: modManifest,
+                text: () => helper.Translation.Get("ModConfigMenu.Label.TakeAllButOne")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsEnableTakeAllButOne,
+                setValue: value => config.IsEnableTakeAllButOne = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableTakeAllButOne.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableTakeAllButOne.Desc")
+            );
+
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.TakeAllButOneKeyboardHotkey,
+                setValue: value => config.TakeAllButOneKeyboardHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneKeyboardHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc")
+            );
+
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.TakeAllButOneControllerHotkey,
+                setValue: value => config.TakeAllButOneControllerHotkey = value,
+                name: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneControllerHotkey.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.TakeAllButOneControllerHotkey.Desc")
+            );
+
+            api.AddSectionTitle(
+                mod: modManifest,
+                text: () => helper.Translation.Get("ModConfigMenu.Label.AutoOrganizeChest")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsEnableAutoOrganizeChest,
+                setValue: value => config.IsEnableAutoOrganizeChest = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsEnableAutoOrganizeChest.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsEnableAutoOrganizeChest.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsShowAutoOrganizeButtonInstructions,
+                setValue: value => config.IsShowAutoOrganizeButtonInstructions = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc")
             );
 
             api.AddSectionTitle(
