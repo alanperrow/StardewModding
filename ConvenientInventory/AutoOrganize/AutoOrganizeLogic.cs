@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Inventories;
 using StardewValley.Menus;
 using StardewValley.Network;
@@ -34,6 +35,17 @@ namespace ConvenientInventory.AutoOrganize
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Gets the chest from the provided <paramref name="itemGrabMenuContext"/>, if any.
+        /// </summary>
+        /// <param name="itemGrabMenuContext">The <see cref="ItemGrabMenu.context"/> object.</param>
+        /// <returns>The chest, or null if chest could not be obtained from context.</returns>
+        public static Chest GetChestFromItemGrabMenuContext(object itemGrabMenuContext)
+        {
+            return itemGrabMenuContext as Chest
+              ?? (itemGrabMenuContext as JunimoHut)?.GetOutputChest();
         }
 
         /// <summary>
