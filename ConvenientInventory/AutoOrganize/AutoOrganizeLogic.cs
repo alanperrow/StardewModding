@@ -4,6 +4,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Inventories;
 using StardewValley.Menus;
+using StardewValley.Network;
 using StardewValley.Objects;
 
 namespace ConvenientInventory.AutoOrganize
@@ -45,68 +46,25 @@ namespace ConvenientInventory.AutoOrganize
                 return;
             }
 
-            StardewValley.Network.NetMutex chestMutex = chest.GetMutex();
+            NetMutex chestMutex = chest.GetMutex();
             bool chestMutexWasAlreadyLocked = chestMutex.IsLocked() && chestMutex.IsLockHeld();
 
-
-
-            // DEBUG //////////////////////////////////////////////////////////////////////
-            ModEntry.Instance.Monitor.Log($"TryOrganizeChest about to request lock...", LogLevel.Info);
-            ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLocked() = {chestMutex.IsLocked()}", LogLevel.Info);
-            ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLockHeld() = {chestMutex.IsLockHeld()}", LogLevel.Info);
-            ////////////////////////////////////////////////////////////////////////
-
-
-
+            // Perform organize with a mutex lock, for item safety.
             chestMutex.RequestLock(
                 acquired: () =>
                 {
-
-
-                    // DEBUG //////////////////////////////////////////////////////////////////////
-                    ModEntry.Instance.Monitor.Log($"TryOrganizeChest lock acquired.", LogLevel.Info);
-                    ////////////////////////////////////////////////////////////////////////
-
-
-
                     IInventory chestInventory = chest.GetItemsForPlayer();
                     ItemGrabMenu.organizeItemsInList(chestInventory);
-
-
-
-                    // DEBUG //////////////////////////////////////////////////////////////////////
-                    ModEntry.Instance.Monitor.Log($"TryOrganizeChest after requesting lock...", LogLevel.Info);
-                    ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLocked() = {chestMutex.IsLocked()}", LogLevel.Info);
-                    ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLockHeld() = {chestMutex.IsLockHeld()}", LogLevel.Info);
-                    ////////////////////////////////////////////////////////////////////////
-
-
 
                     if (!chestMutexWasAlreadyLocked && chestMutex.IsLocked() && chestMutex.IsLockHeld())
                     {
                         // Chest mutex was not locked before this method was invoked, so release the lock we acquired.
                         chestMutex.ReleaseLock();
-
-
-
-                        ModEntry.Instance.Monitor.Log($"TryOrganizeChest lock released.", LogLevel.Info);
-
-
                     }
-
-
-                    // DEBUG //////////////////////////////////////////////////////////////////////
-                    else
-                    {
-                        ModEntry.Instance.Monitor.Log($"TryOrganizeChest lock was not released, since lock was previously being held.", LogLevel.Info);
-                    }
-                    ////////////////////////////////////////////////////////////////////////
-
-
                 },
                 failed: () =>
                 {
-                    // Debug log; this shouldn't happen.
+                    // Log for debugging purposes; this shouldn't happen.
                     string itemNames = string.Empty;
                     foreach (Item item in chest.GetItemsForPlayer())
                     {
@@ -115,7 +73,7 @@ namespace ConvenientInventory.AutoOrganize
 
                     ModEntry.Instance.Monitor.Log(
                         $"Failed to acquire chest mutex lock before auto organizing. Chest items: {itemNames}.",
-                        LogLevel.Info);
+                        LogLevel.Debug);
                 });
         }
 
