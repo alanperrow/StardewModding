@@ -2,8 +2,10 @@
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.Inventories;
 using StardewValley.Menus;
+using StardewValley.Network;
 using StardewValley.Objects;
 
 namespace ConvenientInventory.AutoOrganize
@@ -36,6 +38,17 @@ namespace ConvenientInventory.AutoOrganize
         }
 
         /// <summary>
+        /// Gets the chest from the provided <paramref name="itemGrabMenuContext"/>, if any.
+        /// </summary>
+        /// <param name="itemGrabMenuContext">The <see cref="ItemGrabMenu.context"/> object.</param>
+        /// <returns>The chest, or null if chest could not be obtained from context.</returns>
+        public static Chest GetChestFromItemGrabMenuContext(object itemGrabMenuContext)
+        {
+            return itemGrabMenuContext as Chest
+              ?? (itemGrabMenuContext as JunimoHut)?.GetOutputChest();
+        }
+
+        /// <summary>
         /// Determines if this chest's mod data contains auto organize data, and if so, organizes the chest's inventory.
         /// </summary>
         public static void TryOrganizeChest(Chest chest)
@@ -45,15 +58,25 @@ namespace ConvenientInventory.AutoOrganize
                 return;
             }
 
-            chest.GetMutex().RequestLock(
+            NetMutex chestMutex = chest.GetMutex();
+            bool chestMutexWasAlreadyLocked = chestMutex.IsLocked() && chestMutex.IsLockHeld();
+
+            // Perform organize with a mutex lock, for item safety.
+            chestMutex.RequestLock(
                 acquired: () =>
                 {
                     IInventory chestInventory = chest.GetItemsForPlayer();
                     ItemGrabMenu.organizeItemsInList(chestInventory);
+
+                    if (!chestMutexWasAlreadyLocked && chestMutex.IsLocked() && chestMutex.IsLockHeld())
+                    {
+                        // Chest mutex was not locked before this method was invoked, so release the lock we acquired.
+                        chestMutex.ReleaseLock();
+                    }
                 },
                 failed: () =>
                 {
-                    // Debug log; this shouldn't happen.
+                    // Log for debugging purposes; this shouldn't happen.
                     string itemNames = string.Empty;
                     foreach (Item item in chest.GetItemsForPlayer())
                     {

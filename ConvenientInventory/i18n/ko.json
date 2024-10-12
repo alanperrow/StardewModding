@@ -1,0 +1,98 @@
+﻿{
+  // Translated by asas84562
+
+  // UI
+  "QuickStackButton.hoverText": "근처 상자에 빠른 정리",
+
+  "AutoOrganizeButton.hoverText": "자동 정리 켜기",
+  "AutoOrganizeButton.hoverText.disable": "(비활성화하려면 오른쪽 클릭)",
+  "AutoOrganizeButton.hoverText.disable-gamepad": "(비활성화하려면 X)",
+
+  // ModConfigMenu
+  "ModConfigMenu.Label.QuickStackToNearbyChests": "근처 상자에 빠른 정리",
+
+  "ModConfigMenu.IsEnableQuickStack.Name": "퀵 스택 활성화?",
+  "ModConfigMenu.IsEnableQuickStack.Desc": "활성화하면 인벤토리 메뉴에 \"근처 상자에 빠른 정리\" 버튼이 추가됩니다. 이 버튼을 누르면 인벤토리의 아이템이 해당 아이템이 들어 있는 근처의 상자에 쌓입니다.",
+
+  "ModConfigMenu.QuickStackRange.Name": "범위",
+  "ModConfigMenu.QuickStackRange.Desc": "플레이어로부터 몇 타일 떨어진 곳에서 주변 상자를 검색할지입니다.\n\n\"위치\"로 설정하면 플레이어의 현재 위치에 있는 모든 상자가 고려됩니다.\n\n\"전역\"으로 설정하면 전 세계의 모든 상자가 고려됩니다.",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "퀵스택 범위 구성 값이 \"글로벌\"이었으나 \"위치\"로 재설정되었습니다. \"Global\"은 Chests Anywhere 모드가 설치된 경우에만 지원됩니다.",
+
+  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "단축키 활성화?",
+  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "활성화하면 아래에 지정된 빠른 스택 단축키 중 하나를 누르면 인벤토리 메뉴 외부에서도 아이템을 빠르게 쌓을 수 있습니다.",
+
+  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "키 바인드 (키보드)",
+  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "아이템을 빠르게 쌓으려면 이 키를 누르세요.",
+
+  "ModConfigMenu.QuickStackControllerHotkey.Name": "키 바인드 (컨트롤러)",
+  "ModConfigMenu.QuickStackControllerHotkey.Desc": "아이템을 빠르게 스택하려면 이 버튼을 누르세요.",
+
+  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "건물에 퀵 스택?",
+  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "활성화하면 인벤토리가 있는 인근 건물(예: 제분소 또는 주니모 오두막)을 퀵 스택할 때 고려합니다.",
+
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "드레서에 퀵 스택?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(\"퀵 스택 오버플로 항목?\"을 활성화해야 합니다.)\n활성화하면 빠른 스택을 할 때 근처의 드레서가 고려됩니다.",
+
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "퀵 스택 오버플로 항목?",
+  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "활성화하면 빠른 스택은 단일 스택이 아닌 해당 항목이 포함된 상자에 가능한 한 많은 항목을 배치합니다.",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "퀵 스택은 아이템 품질을 무시합니까?",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(\"퀵 스택 오버플로 항목?\" 활성화가 필요합니다.)\n활성화하면 빠른 스택은 동일한 아이템의 모든 품질을 포함하는 상자에 아이템을 배치합니다.",
+
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "툴팁에 주변 상자 표시?",
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "활성화하면 빠른 스택 버튼 위로 마우스를 가져가면 근처에 있는 모든 상자의 미리보기가 거리별로 정렬되어 표시됩니다.",
+
+  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "퀵 스택 애니메이션을 사용하시겠습니까?",
+  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "활성화하면 아이템이 빠르게 쌓일 때 애니메이션이 재생되어 각 아이템이 저장된 위치를 시각적으로 보여줍니다.",
+
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "애니메이션: 아이템 속도",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "퀵 스택 애니메이션의 경우:\n퀵 스택 아이템이 저장된 상자를 향해 이동하는 속도를 조정합니다.\n\n0.5배: 절반 속도\n1x: 정상 속도\n3x: 3배 속도",
+
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "애니메이션: 스택 속도",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "빠른 스택 애니메이션의 경우:\n아이템이 저장된 상자에 개별적으로 쌓이는 속도를 조정합니다.\n\n0.5배: 절반 속도\n1x: 정상 속도\n3x: 3배 속도",
+
+  "ModConfigMenu.Label.FavoriteItems": "즐겨찾는 항목",
+
+  "ModConfigMenu.IsEnableFavoriteItems.Name": "즐겨찾는 항목 활성화?",
+  "ModConfigMenu.IsEnableFavoriteItems.Desc": "활성화하면 인벤토리에 있는 아이템을 즐겨찾기에 추가할 수 있습니다. 즐겨찾기에 추가한 아이템은 상자에 쌓을 때 무시됩니다. 또한 휴지통에 버리거나 떨어뜨리는 것도 방지됩니다.",
+
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "하이라이트 스타일",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "인벤토리에서 즐겨 찾는 항목을 강조 표시하기 위해 선호하는 텍스처 스타일을 선택하십시오.",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0": "금색 파선",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1": "깨끗한 금색 파선",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2": "두꺼운 금색 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3": "텍스처 골드 삽입 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "금색 삽입 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "어두운 파선",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "두꺼운 어두운 테두리",
+
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "키 바인드 (키보드)",
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "항목을 선택할 때 이 키를 눌러 즐겨 찾기에 추가하십시오.",
+
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "키 바인드 (컨트롤러)",
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "항목을 선택할 때 이 버튼을 길게 눌러 즐겨찾기에 추가하세요.",
+
+  "ModConfigMenu.Label.TakeAllButOne": "하나만 빼고 모두 가져가기",
+
+  "ModConfigMenu.IsEnableTakeAllButOne.Name": "하나만 빼고 모두 가져가기 활성화?",
+  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "활성화하면 아래 키 바인딩을 누른 상태에서 한 번에 하나의 아이템을 가져가는 대신 선택한 아이템 스택에서 하나를 제외한 모든 아이템을 즉시 가져옵니다.",
+
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "키 바인드 (키보드)",
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "아이템 스택에서 아이템을 가져올 때 이 키를 누르면 해당 아이템 중 하나를 제외한 모든 아이템을 즉시 가져옵니다.",
+
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "키 바인드 (컨트롤러)",
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "아이템 스택에서 아이템을 가져올 때 이 버튼을 누르면 해당 아이템 중 하나를 제외한 모든 아이템을 즉시 가져옵니다.",
+
+  "ModConfigMenu.Label.AutoOrganizeChest": "상자 자동 정리",
+
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "상자 자동 정리 버튼 활성화?",
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "활성화하면 상자 메뉴의 정리 버튼을 마우스 오른쪽 버튼으로 클릭하거나 게임패드에서 (X)를 눌러 해당 상자에 대한 자동 정리를 켜거나 끌 수 있습니다. 자동 정리가 켜진 상자는 새로운 아이템이 추가되더라도 모든 아이템이 정리된 상태를 유지합니다.",
+
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "호버 텍스트에 설명 표시?",
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "활성화하면 자동 정리 버튼의 호버 텍스트에 자동 정리를 끄는 방법에 대한 추가 설명이 포함됩니다.",
+
+  "ModConfigMenu.Label.Miscellaneous": "기타",
+
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "인벤토리 커서 측면 전이 활성화?",
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Desc": "활성화하면 인벤토리 메뉴의 양쪽 끝으로 커서를 이동하면 반대쪽으로 커서가 이동합니다."
+}

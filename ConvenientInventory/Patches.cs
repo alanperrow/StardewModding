@@ -848,16 +848,19 @@ namespace ConvenientInventory.Patches
             typeof(ItemExitBehavior),                   // heldItemExitBehavior
             typeof(bool)                                // allowExitWithHeldItem
         })]
-        public static void Constructor18_Postfix(ItemGrabMenu __instance, bool showOrganizeButton, int source, Item sourceItem)
+        public static void Constructor18_Postfix(ItemGrabMenu __instance, bool showOrganizeButton, int source, object context)
         {
             try
             {
                 if (ModEntry.Config.IsEnableAutoOrganizeChest
                     && showOrganizeButton
-                    && source == ItemGrabMenu.source_chest
-                    && sourceItem is Chest chest)
+                    && source == ItemGrabMenu.source_chest)
                 {
-                    AutoOrganizeLogic.TrySetupAutoOrganizeButton(__instance, chest);
+                    Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(context);
+                    if (chest != null)
+                    {
+                        AutoOrganizeLogic.TrySetupAutoOrganizeButton(__instance, chest);
+                    }
                 }
             }
             catch (Exception e)
@@ -879,10 +882,13 @@ namespace ConvenientInventory.Patches
             {
                 if (__instance.source == ItemGrabMenu.source_chest
                     && __instance.organizeButton != null
-                    && __instance.organizeButton.containsPoint(x, y)
-                    && __instance.sourceItem is Chest chest)
+                    && __instance.organizeButton.containsPoint(x, y))
                 {
-                    AutoOrganizeLogic.ToggleChestAutoOrganize(__instance, chest);
+                    Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
+                    if (chest != null)
+                    {
+                        AutoOrganizeLogic.ToggleChestAutoOrganize(__instance, chest);
+                    }
                 }
             }
             catch (Exception e)
@@ -906,10 +912,13 @@ namespace ConvenientInventory.Patches
             {
                 if (__instance is ItemGrabMenu itemGrabMenu
                     && itemGrabMenu.source == ItemGrabMenu.source_chest
-                    && itemGrabMenu.organizeButton != null
-                    && itemGrabMenu.sourceItem is Chest chest)
+                    && itemGrabMenu.organizeButton != null)
                 {
-                    AutoOrganizeLogic.TryUpdateAutoOrganizeButtonHoverTextByGamePadMode(itemGrabMenu.organizeButton, chest);
+                    Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(itemGrabMenu.context);
+                    if (chest != null)
+                    {
+                        AutoOrganizeLogic.TryUpdateAutoOrganizeButtonHoverTextByGamePadMode(itemGrabMenu.organizeButton, chest);
+                    }
                 }
             }
             catch (Exception e)
@@ -1171,10 +1180,13 @@ namespace ConvenientInventory.Patches
             {
                 if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu
                     && itemGrabMenu.source == ItemGrabMenu.source_chest
-                    && itemGrabMenu.organizeButton != null
-                    && itemGrabMenu.sourceItem is Chest chest)
+                    && itemGrabMenu.organizeButton != null)
                 {
-                    AutoOrganizeLogic.TryOrganizeChestInMenu(itemGrabMenu, chest);
+                    Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(itemGrabMenu.context);
+                    if (chest != null)
+                    {
+                        AutoOrganizeLogic.TryOrganizeChestInMenu(itemGrabMenu, chest);
+                    }
                 }
             }
             catch (Exception e)
