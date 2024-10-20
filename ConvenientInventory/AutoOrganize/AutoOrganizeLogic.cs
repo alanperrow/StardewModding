@@ -64,58 +64,26 @@ namespace ConvenientInventory.AutoOrganize
                 // NetMutex.RequestLock() seems to be invoking neither `acquired` nor `failed` Action when chest is outside of the current location.
                 // The request only seems to be evaluated upon entering that location, which will then invoke the appropriate Action.
                 // To avoid this, we perform Auto Organize without mutex lock in this case (unsafe; note that Chests Anywhere avoids mutex locks, presumably for the same reason).
-
-                // DEBUG //////////////////////////////////////////////////////////////////////
-                ModEntry.Instance.Monitor.Log($"TryOrganizeChest without mutex lock; chest.Location={chest.Location}.", LogLevel.Info);
-                ////////////////////////////////////////////////////////////////////////
-                ///
                 IInventory chestInventory = chest.GetItemsForPlayer();
                 ItemGrabMenu.organizeItemsInList(chestInventory);
             }
             else
             {
-                // TODO: Move mutex vars into else block
                 NetMutex chestMutex = chest.GetMutex();
                 bool chestMutexWasAlreadyLocked = chestMutex.IsLocked() && chestMutex.IsLockHeld();
-
-                // DEBUG //////////////////////////////////////////////////////////////////////
-                ModEntry.Instance.Monitor.Log($"TryOrganizeChest about to request lock...", LogLevel.Info);
-                ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLocked() = {chestMutex.IsLocked()}", LogLevel.Info);
-                ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLockHeld() = {chestMutex.IsLockHeld()}", LogLevel.Info);
-                ////////////////////////////////////////////////////////////////////////
 
                 // Perform organize with a mutex lock, for item safety.
                 chestMutex.RequestLock(
                     acquired: () =>
                     {
-                        // DEBUG //////////////////////////////////////////////////////////////////////
-                        ModEntry.Instance.Monitor.Log($"TryOrganizeChest lock acquired.", LogLevel.Info);
-                        ////////////////////////////////////////////////////////////////////////
-
                         IInventory chestInventory = chest.GetItemsForPlayer();
                         ItemGrabMenu.organizeItemsInList(chestInventory);
-
-                        // DEBUG //////////////////////////////////////////////////////////////////////
-                        ModEntry.Instance.Monitor.Log($"TryOrganizeChest after requesting lock...", LogLevel.Info);
-                        ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLocked() = {chestMutex.IsLocked()}", LogLevel.Info);
-                        ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLockHeld() = {chestMutex.IsLockHeld()}", LogLevel.Info);
-                        ////////////////////////////////////////////////////////////////////////
 
                         if (!chestMutexWasAlreadyLocked && chestMutex.IsLocked() && chestMutex.IsLockHeld())
                         {
                             // Chest mutex was not locked before this method was invoked, so release the lock we acquired.
                             chestMutex.ReleaseLock();
-
-                            // DEBUG //////////////////////////////////////////////////////////////////////
-                            ModEntry.Instance.Monitor.Log($"TryOrganizeChest lock released.", LogLevel.Info);
-                            ////////////////////////////////////////////////////////////////////////
                         }
-                        // DEBUG //////////////////////////////////////////////////////////////////////
-                        else
-                        {
-                            ModEntry.Instance.Monitor.Log($"TryOrganizeChest lock was not released, since lock was previously being held.", LogLevel.Info);
-                        }
-                        ////////////////////////////////////////////////////////////////////////
                     },
                     failed: () =>
                     {
@@ -128,16 +96,9 @@ namespace ConvenientInventory.AutoOrganize
 
                         ModEntry.Instance.Monitor.Log(
                             $"Failed to acquire chest mutex lock before auto organizing. Chest items: {itemNames}.",
-                            //LogLevel.Debug);
-                            LogLevel.Info);
+                            LogLevel.Debug);
                     });
             }
-
-            // DEBUG //////////////////////////////////////////////////////////////////////
-            ModEntry.Instance.Monitor.Log($"TryOrganizeChest method complete.", LogLevel.Info);
-            ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLocked() = {chestMutex.IsLocked()}", LogLevel.Info);
-            ModEntry.Instance.Monitor.Log($"\tchestMutex.IsLockHeld() = {chestMutex.IsLockHeld()}", LogLevel.Info);
-            ////////////////////////////////////////////////////////////////////////
         }
 
         /// <summary>
