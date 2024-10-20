@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
@@ -15,6 +17,8 @@ namespace ConvenientInventory.AutoOrganize
     /// </summary>
     public static class AutoOrganizeLogic
     {
+        private static readonly FieldInfo InventoryMenu_iconShakeTimer_FieldInfo = typeof(InventoryMenu).GetField("_iconShakeTimer", BindingFlags.NonPublic | BindingFlags.Instance);
+
         private static string AutoOrganizeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/AutoOrganize";
 
         /// <summary>
@@ -58,35 +62,40 @@ namespace ConvenientInventory.AutoOrganize
                 return;
             }
 
-            NetMutex chestMutex = chest.GetMutex();
-            bool chestMutexWasAlreadyLocked = chestMutex.IsLocked() && chestMutex.IsLockHeld();
+            OrganizeChest(chest);
+        }
 
-            // Perform organize with a mutex lock, for item safety.
-            chestMutex.RequestLock(
-                acquired: () =>
-                {
-                    IInventory chestInventory = chest.GetItemsForPlayer();
-                    ItemGrabMenu.organizeItemsInList(chestInventory);
+        /// <summary>
+        /// Determines if this chest's mod data contains auto organize data, and if so, organizes the chest's inventory
+        /// after <see cref="ItemGrabMenu.FillOutStacks"/> is called, to ensure new item stacks get auto organized.
+        /// Also updates the "shake item" indices to correspond with each item's new index after being organized.
+        /// </summary>
+        public static void TryOrganizeChestOnFillOutStacks(ItemGrabMenu chestMenu, Chest chest)
+        {
+            if (!chest.modData.ContainsKey(AutoOrganizeModDataKey))
+            {
+                return;
+            }
 
-                    if (!chestMutexWasAlreadyLocked && chestMutex.IsLocked() && chestMutex.IsLockHeld())
-                    {
-                        // Chest mutex was not locked before this method was invoked, so release the lock we acquired.
-                        chestMutex.ReleaseLock();
-                    }
-                },
-                failed: () =>
-                {
-                    // Log for debugging purposes; this shouldn't happen.
-                    string itemNames = string.Empty;
-                    foreach (Item item in chest.GetItemsForPlayer())
-                    {
-                        itemNames += $"'{item.Name}' x {item.Stack}, ";
-                    }
+            // Get the items that would have been shaken by FillOutStacks.
+            Dictionary<int, double> iconShakeTimer = (Dictionary<int, double>)InventoryMenu_iconShakeTimer_FieldInfo.GetValue(chestMenu.ItemsToGrabMenu);
+            IEnumerable<int> iconShakeIndices = iconShakeTimer.Keys;
+            List<Item> shakeItems = new();
+            foreach (int iconShakeIndex in iconShakeIndices)
+            {
+                shakeItems.Add(chestMenu.ItemsToGrabMenu.actualInventory[iconShakeIndex]);
+            }
 
-                    ModEntry.Instance.Monitor.Log(
-                        $"Failed to acquire chest mutex lock before auto organizing. Chest items: {itemNames}.",
-                        LogLevel.Debug);
-                });
+            iconShakeTimer.Clear();
+
+            // Organize the chest items.
+            OrganizeChest(chest);
+
+            // Shake items at their new index after being organized.
+            foreach (Item shakeItem in shakeItems)
+            {
+                chestMenu.ItemsToGrabMenu.ShakeItem(shakeItem);
+            }
         }
 
         /// <summary>
@@ -149,6 +158,55 @@ namespace ConvenientInventory.AutoOrganize
             if (chest.modData.ContainsKey(AutoOrganizeModDataKey))
             {
                 UpdateHoverTextByGamePadMode(organizeButton);
+            }
+        }
+
+        /// <summary>
+        /// Organizes the provided chest's inventory.
+        /// This method should only be called after verifying that this chest's mod data contains auto organize data.
+        /// </summary>
+        private static void OrganizeChest(Chest chest)
+        {
+            if (ConfigHelper.GetQuickStackRangeType(ModEntry.Config.QuickStackRange) == QuickStack.QuickStackRangeType.Global
+                && chest.Location != Game1.currentLocation)
+            {
+                // NetMutex.RequestLock() seems to be invoking neither `acquired` nor `failed` Action when chest is outside of the current location.
+                // The request only seems to be evaluated upon entering that location, which will then invoke the appropriate Action.
+                // To avoid this, we perform Auto Organize without mutex lock in this case (unsafe; note that Chests Anywhere avoids mutex locks, presumably for the same reason).
+                IInventory chestInventory = chest.GetItemsForPlayer();
+                ItemGrabMenu.organizeItemsInList(chestInventory);
+            }
+            else
+            {
+                NetMutex chestMutex = chest.GetMutex();
+                bool chestMutexWasAlreadyLocked = chestMutex.IsLocked() && chestMutex.IsLockHeld();
+
+                // Perform organize with a mutex lock, for item safety.
+                chestMutex.RequestLock(
+                    acquired: () =>
+                    {
+                        IInventory chestInventory = chest.GetItemsForPlayer();
+                        ItemGrabMenu.organizeItemsInList(chestInventory);
+
+                        if (!chestMutexWasAlreadyLocked && chestMutex.IsLocked() && chestMutex.IsLockHeld())
+                        {
+                            // Chest mutex was not locked before this method was invoked, so release the lock we acquired.
+                            chestMutex.ReleaseLock();
+                        }
+                    },
+                    failed: () =>
+                    {
+                        // Log for debugging purposes; this shouldn't happen.
+                        string itemNames = string.Empty;
+                        foreach (Item item in chest.GetItemsForPlayer())
+                        {
+                            itemNames += $"'{item.Name}' x {item.Stack}, ";
+                        }
+
+                        ModEntry.Instance.Monitor.Log(
+                            $"Failed to acquire chest mutex lock before auto organizing. Chest items: {itemNames}.",
+                            LogLevel.Debug);
+                    });
             }
         }
 
