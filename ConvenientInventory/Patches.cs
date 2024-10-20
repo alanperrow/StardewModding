@@ -971,6 +971,26 @@ namespace ConvenientInventory.Patches
 
             return true;
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Item.ConsumeStack))]
+        public static void ConsumeStack_Postfix()
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                // In case we reduced item stack to 0, refresh favorite item slots.
+                ConvenientInventory.UnfavoriteEmptyItemSlots();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ConsumeStack_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
     }
 
     [HarmonyPatch(typeof(Farmer))]
@@ -1254,6 +1274,26 @@ namespace ConvenientInventory.Patches
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(CanBeShipped_PostFix)}:\n{e}", LogLevel.Error);
             }
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(StardewValley.Object.performObjectDropInAction))]
+        public static void PerformObjectDropInAction_Postfix()
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                // In case we reduced item stack to 0, refresh favorite item slots.
+                ConvenientInventory.UnfavoriteEmptyItemSlots();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(PerformObjectDropInAction_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
     }
 
     [HarmonyPatch(typeof(GameLocation))]
@@ -1391,6 +1431,50 @@ namespace ConvenientInventory.Patches
             catch (Exception e)
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(TryToDepositThisItem_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(CraftingRecipe))]
+    public static class CraftingRecipePatches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(CraftingRecipe.consumeIngredients))]
+        public static void ConsumeIngredients_Postfix()
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                // In case we reduced any item stacks to 0, refresh favorite item slots.
+                ConvenientInventory.UnfavoriteEmptyItemSlots();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ConsumeIngredients_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(CraftingRecipe.ConsumeAdditionalIngredients))]
+        public static void ConsumeAdditionalIngredients_Postfix()
+        {
+            if (!ModEntry.Config.IsEnableFavoriteItems)
+            {
+                return;
+            }
+
+            try
+            {
+                // In case we reduced any item stacks to 0, refresh favorite item slots.
+                ConvenientInventory.UnfavoriteEmptyItemSlots();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ConsumeAdditionalIngredients_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
     }
