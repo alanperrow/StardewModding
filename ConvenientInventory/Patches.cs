@@ -790,14 +790,12 @@ namespace ConvenientInventory.Patches
         {
             __state = null;
 
-            if (!ModEntry.Config.IsEnableFavoriteItems)
-            {
-                return true;
-            }
-
             try
             {
-                __state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
+                if (ModEntry.Config.IsEnableFavoriteItems)
+                {
+                    __state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
+                }
             }
             catch (Exception e)
             {
@@ -811,14 +809,21 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
         public static void FillOutStacks_Postfix(ItemGrabMenu __instance, Item[] __state)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
-            {
-                return;
-            }
-
             try
             {
-                ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, __instance.inventory.actualInventory, false);
+                if (ModEntry.Config.IsEnableFavoriteItems)
+                {
+                    ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, __instance.inventory.actualInventory, false);
+                }
+
+                if (ModEntry.Config.IsEnableAutoOrganizeChest)
+                {
+                    Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
+                    if (chest != null)
+                    {
+                        AutoOrganizeLogic.TryOrganizeChestOnFillOutStacks(__instance, chest);
+                    }
+                }
             }
             catch (Exception e)
             {
