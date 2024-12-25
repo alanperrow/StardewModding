@@ -114,9 +114,26 @@ namespace SplitscreenImproved.Layout
             GameMenu gameMenu = Game1.activeClickableMenu as GameMenu;
             if (gameMenu != null)
             {
-                (gameMenu.GetCurrentPage() as OptionsPage)?.preWindowSizeChange();
-                gameMenu = (GameMenu)(Game1.activeClickableMenu = new GameMenu(gameMenu.currentTab));
-                (gameMenu.GetCurrentPage() as OptionsPage)?.postWindowSizeChange();
+                IClickableMenu currentPage = gameMenu.GetCurrentPage();
+                IClickableMenu currentPage2 = ((GameMenu)(Game1.activeClickableMenu = new GameMenu(gameMenu.currentTab))).GetCurrentPage();
+                if (!(currentPage2 is CollectionsPage collectionsPage))
+                {
+                    if (!(currentPage2 is OptionsPage optionsPage))
+                    {
+                        if (currentPage2 is SocialPage socialPage)
+                        {
+                            socialPage.postWindowSizeChange(currentPage);
+                        }
+                    }
+                    else
+                    {
+                        optionsPage.postWindowSizeChange(currentPage);
+                    }
+                }
+                else
+                {
+                    collectionsPage.postWindowSizeChange(currentPage);
+                }
             }
             Game1.PopUIMode();
         }
