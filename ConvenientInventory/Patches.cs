@@ -1393,6 +1393,12 @@ namespace ConvenientInventory.Patches
                 return;
             }
 
+            if (item == null)
+            {
+                // Avoids NRE if item is null for some reason.
+                return;
+            }
+
             try
             {
                 if (item.Stack == 0)
