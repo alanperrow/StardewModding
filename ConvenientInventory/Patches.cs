@@ -413,41 +413,23 @@ namespace ConvenientInventory.Patches
             for (int i = 0; i < instructionsList.Count; i++)
             {
                 // ==== First case: No item in cursor slot ====
-                // Find instruction for ternary conditional assignment `one.Stack = ...`
-                // IL_00f6 (instructionsList[?])
+                // Find instruction for `this.actualInventory[num] = item.ConsumeStack(one.Stack);`
+                // IL_013e (instructionsList[?])
                 if (!patch1Applied
                     && i > 0 && i < instructionsList.Count - 2
-                    && instructionsList[i - 1].opcode == OpCodes.Stloc_S // 5
-                    && instructionsList[i].opcode == OpCodes.Ldloc_S // 5
-                    && instructionsList[i + 1].opcode == OpCodes.Ldloc_2
-                    && instructionsList[i + 2].opcode == OpCodes.Callvirt) // StardewValley.Item::get_Stack()
+                    && instructionsList[i - 1].opcode == OpCodes.Conv_I4
+                    && instructionsList[i].opcode == OpCodes.Callvirt // StardewValley.Item::set_Stack(int32)
+                    && instructionsList[i + 1].opcode == OpCodes.Ldarg_0
+                    && instructionsList[i + 2].opcode == OpCodes.Ldfld) // StardewValley.Menus.InventoryMenu::actualInventory
                 {
-                    // Original source code sets stack size to either 1 or half the stack, depending on LeftShift key down.
-                    // Before doing so, we want to check if the "Take All But One" hotkey is down, and if so, set the stack size to all but one.
+                    // At this point in the original source code, we have just determined the stack size to consume, and we are about to consume it.
+                    // Before doing so, we want to check if the "Try Take All But One" hotkey is down, and if so, overwrite this stack size to consume all but one.
 
-                    // Find instruction for `this.actualInventory[num] = item.ConsumeStack(one.Stack);`
-                    // IL_013e (instructionsList[?])
-                    Label labelConsumeStack = ilg.DefineLabel();
-                    int j = i + 4;
-                    for (; j < instructionsList.Count - 1; j++)
-                    {
-                        if (instructionsList[j - 2].opcode == OpCodes.Call // System.Math::Ceiling(float64)
-                            && instructionsList[j - 1].opcode == OpCodes.Conv_I4
-                            && instructionsList[j].opcode == OpCodes.Callvirt // StardewValley.Item::set_Stack(int32)
-                            && instructionsList[j + 1].opcode == OpCodes.Ldarg_0)
-                        {
-                            break;
-                        }
-                    }
-
-                    // Inject "Try Take All But One" code.
+                    // Inject "Try Take All But One" code.                                                      // NOTE: At this point, stackSize int is already loaded onto eval stack
                     yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
                     yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` (slot number) int (local var @ index 1)
                     yield return new CodeInstruction(OpCodes.Ldloc_S, 5);                                       // load `newItem` (`one`) Item instance (local var @ short index 5)
-                    yield return new CodeInstruction(OpCodes.Call, tryTakeAllButOneItemMethod);                 // call helper method `TryTakeAllButOneItem(this, num, newItem)`
-                    yield return new CodeInstruction(OpCodes.Brtrue, labelConsumeStack);                        // break to "consume stack" instruction if call => true
-
-                    instructionsList[j].WithLabels(labelConsumeStack);
+                    yield return new CodeInstruction(OpCodes.Call, tryTakeAllButOneItemMethod);                 // call helper method `TryTakeAllButOneItem(stackSize, this, num, newItem)`
 
                     patch1Applied = true;
                 }
@@ -531,15 +513,14 @@ namespace ConvenientInventory.Patches
                 && inventoryMenu.actualInventory[slotNumber].Stack > 1;
         }
 
-        public static bool TryTakeAllButOneItem(InventoryMenu inventoryMenu, int slotNumber, Item newItem)
+        public static int TryTakeAllButOneItem(int stackSize, InventoryMenu inventoryMenu, int slotNumber, Item newItem)
         {
             if (IsTakeAllButOneHotkeyDown(inventoryMenu, slotNumber))
             {
-                newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
-                return true;
+                return newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
             }
 
-            return false;
+            return stackSize;
         }
 
         public static void TakeAllButOneItemWithAddTo(InventoryMenu inventoryMenu, int slotNumber, Item toAddTo)
