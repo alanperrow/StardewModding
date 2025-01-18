@@ -400,7 +400,6 @@ namespace ConvenientInventory.Patches
 
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(InventoryMenu.rightClick))]
-        [HarmonyDebug]
         public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
             MethodInfo isTakeAllButOneHotkeyDownMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsTakeAllButOneHotkeyDown));
