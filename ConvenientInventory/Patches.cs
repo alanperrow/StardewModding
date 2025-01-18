@@ -423,36 +423,12 @@ namespace ConvenientInventory.Patches
                 {
                     // At this point in the original source code, we have just determined the stack size to consume, and we are about to consume it.
                     // Before doing so, we want to check if the "Try Take All But One" hotkey is down, and if so, overwrite this stack size to consume all but one.
-                    Label labelTryTakeAllButOneItem = ilg.DefineLabel();
 
                     // Inject "Try Take All But One" code.
-                    yield return new CodeInstruction(OpCodes.Ldarg_0)                                           // load `this` InventoryMenu instance (arg0)
-                        .WithLabels(labelTryTakeAllButOneItem);
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
                     yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` (slot number) int (local var @ index 1)
                     yield return new CodeInstruction(OpCodes.Ldloc_S, 5);                                       // load `newItem` (`one`) Item instance (local var @ short index 5)
                     yield return new CodeInstruction(OpCodes.Call, tryTakeAllButOneItemMethod);                 // call helper method `TryTakeAllButOneItem(this, num, newItem)`
-
-                    // Now, find the previous jump instruction that would otherwise jump past our instructions.
-                    for (int j = i - 2; j > 0; j--)
-                    {
-                        // Find instruction for jump after ternary condition assigning `one.Stack = 1` upon checking `item.Stack <= 1 || !Game1.isOneOfTheseKeysDown(... Keys.LeftShift ...)`
-                        // IL_0125 (instructionsList[?])
-                        if (true
-                            && instructionsList[j - 1].opcode == OpCodes.Ldc_I4_1
-                            && instructionsList[j].opcode == OpCodes.Br_S // IL_013e
-                            && instructionsList[j + 1].opcode == OpCodes.Ldloc_2
-                            && instructionsList[j + 2].opcode == OpCodes.Callvirt) // StardewValley.Item::get_Stack()
-                        {
-                            // Original source code defines this jump to immediately consume the stack.
-                            // We want to instead jump to our `TryTakeAllButOneItem` method, so that it is called before consuming the stack.
-                            /*yield return new CodeInstruction(OpCodes.Br_S, labelTryTakeAllButOneItem);
-
-                            // We can now skip the original jump instruction in favor of our own.*/
-                            instructionsList[j].operand = labelTryTakeAllButOneItem;
-
-                            break;
-                        }
-                    }
 
                     patch1Applied = true;
                 }
