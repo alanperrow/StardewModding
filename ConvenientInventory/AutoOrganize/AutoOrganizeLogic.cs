@@ -167,8 +167,7 @@ namespace ConvenientInventory.AutoOrganize
         /// </summary>
         private static void OrganizeChest(Chest chest)
         {
-            if (ConfigHelper.GetQuickStackRangeType(ModEntry.Config.QuickStackRange) == QuickStack.QuickStackRangeType.Global
-                && chest.Location != Game1.currentLocation)
+            if (chest.Location != Game1.currentLocation)
             {
                 // NetMutex.RequestLock() seems to be invoking neither `acquired` nor `failed` Action when chest is outside of the current location.
                 // The request only seems to be evaluated upon entering that location, which will then invoke the appropriate Action.
