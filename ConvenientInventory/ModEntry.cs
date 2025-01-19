@@ -24,7 +24,8 @@ namespace ConvenientInventory
             Config = helper.ReadConfig<ModConfig>();
             Config.QuickStackRange = ConfigHelper.ValidateAndConstrainQuickStackRange(Config.QuickStackRange);
 
-            CachedTextures.LoadCachedTextures(helper, Config);
+            helper.Events.Content.AssetRequested += OnAssetRequested;
+            helper.Events.Content.AssetReady += OnAssetReady;
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
@@ -48,6 +49,12 @@ namespace ConvenientInventory
                 "\n\nUsage: convinv_cleanup_autoorganize",
                 ClearModDataForCurrentlyLoadedSave);
         }
+
+        /// <summary>Raised when an asset is being requested from the content pipeline.</summary>
+        private void OnAssetRequested(object sender, AssetRequestedEventArgs e) => CachedTextures.OnAssetRequested(e);
+
+        /// <summary>Raised after an asset is loaded by the content pipeline, after all mod edits specified via "AssetRequested" have been applied.</summary>
+        private void OnAssetReady(object sender, AssetReadyEventArgs e) => CachedTextures.OnAssetReady(e);
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).
         /// All mods are loaded and initialised at this point, so this is a good time to set up mod integrations.</summary>
@@ -79,6 +86,10 @@ namespace ConvenientInventory
             }
 
             ApiHelper.IsWearMoreRingsInstalled = Helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
+
+            // Load cached textures
+            CachedTextures.LoadGameAssets();
+            CachedTextures.LoadModAssets(Config);
         }
 
         /// <summary>Raised after the player loads a save slot and the world is initialized.</summary>

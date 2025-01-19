@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewValley;
 
 namespace ConvenientInventory.Compatibility
 {
@@ -193,7 +194,7 @@ namespace ConvenientInventory.Compatibility
                 setValue: value =>
                 {
                     config.FavoriteItemsHighlightTextureChoice = int.Parse(value[..1]);
-                    CachedTextures.FavoriteItemsHighlight = helper.ModContent.Load<Texture2D>($@"assets\favoriteHighlight_{value[0]}.png");
+                    CachedTextures.FavoriteItemsHighlight = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{value[0]}");
                 },
                 name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc"),
