@@ -42,9 +42,7 @@ namespace ConvenientInventory.QuickStack
                 }
                 else
                 {
-                    chestItems = chest.SpecialChestType == Chest.SpecialChestTypes.MiniShippingBin || chest.SpecialChestType == Chest.SpecialChestTypes.JunimoChest
-                        ? chest.GetItemsForPlayer(who.UniqueMultiplayerID)
-                        : chest.Items;
+                    chestItems = chest.GetItemsForPlayer(who.UniqueMultiplayerID);
                 }
 
                 List<Item> overflowItems = new();
