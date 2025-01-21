@@ -16,42 +16,6 @@ namespace SplitscreenImproved
     [HarmonyPatch(typeof(Game1))]
     public class Game1Patches
     {
-        /*
-        public static MethodInfo Window_ClientSizeChanged__SetWindowSize_InlinedMethod;
-
-        [HarmonyTranspiler]
-        [HarmonyPatch(nameof(Game1.Window_ClientSizeChanged))]
-        public static IEnumerable<CodeInstruction> Window_ClientSizeChanged_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
-        {
-            bool found = false;
-
-            // HACK: Find the inlined method at runtime by enumerating the instructions provided by the Harmony transpiler.
-            foreach (CodeInstruction instruction in instructions)
-            {
-                // Find instruction for loading delegate which invokes `SetWindowSize` method
-                // IL_00bc (instructionsList[?])
-                if (instruction.opcode == OpCodes.Ldftn)
-                {
-                    // Track the inlined delegate`SetWindowSize` method
-                    Window_ClientSizeChanged__SetWindowSize_InlinedMethod = (MethodInfo)instruction.operand;
-                    found = true;
-                }
-
-                yield return instruction;
-            }
-
-            if (!found)
-            {
-                ModEntry.Instance.Monitor.Log(
-                    $"{nameof(Game1Patches)}.{nameof(Window_ClientSizeChanged_Transpiler)} could not find target instruction(s) in " +
-                    $"{nameof(Game1.Window_ClientSizeChanged)}, so no changes were made.",
-                    LogLevel.Error);
-            }
-
-            yield break;
-        }
-        */
-
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(Game1.SetWindowSize))]
         public static IEnumerable<CodeInstruction> SetWindowSize_Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -108,33 +72,6 @@ namespace SplitscreenImproved
             SplitscreenLayout currentLayout = ModEntry.Config.LayoutFeature.GetSplitscreenLayoutByPreset(ModEntry.Config.LayoutFeature.PresetChoice);
             return currentLayout.GetScreenSplits(GameRunner.instance.gameInstances.Count)[Game1.game1.instanceIndex];
         }
-
-
-        /*
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(Game1.SetWindowSize))]
-        public static bool SetWindowSize_Prefix(Game1 __instance, int w, int h)
-        {
-            if (!ModEntry.Config.IsModEnabled
-                || !ModEntry.Config.LayoutFeature.IsFeatureEnabled)
-            {
-                return true;
-            }
-
-            try
-            {
-                // Replace base game method call.
-                LayoutManager.SetWindowSize(__instance, w, h);
-                return false;
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetWindowSize_Prefix)}:\n{e}", LogLevel.Error);
-            }
-
-            return true;
-        }
-        */
 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Game1.isMusicContextActiveButNotPlaying))]
