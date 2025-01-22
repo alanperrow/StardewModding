@@ -415,7 +415,7 @@ namespace ConvenientInventory.Patches
                 // Find instruction immediately after assigning `one.Stack`
                 // IL_0143 (instructionsList[?])
                 if (!patch1Applied
-                    && i > 0 && i < instructionsList.Count - 2
+                    && i > 1 && i < instructionsList.Count - 1
                     && instructionsList[i - 2].opcode == OpCodes.Conv_I4
                     && instructionsList[i - 1].opcode == OpCodes.Callvirt // StardewValley.Item::set_Stack(int32)
                     && instructionsList[i].opcode == OpCodes.Ldarg_0
