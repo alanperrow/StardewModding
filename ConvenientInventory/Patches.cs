@@ -412,23 +412,23 @@ namespace ConvenientInventory.Patches
             for (int i = 0; i < instructionsList.Count; i++)
             {
                 // ==== First case: No item in cursor slot ====
-                // Find instruction for `this.actualInventory[num] = item.ConsumeStack(one.Stack);`
-                // IL_013e (instructionsList[?])
+                // Find instruction immediately after assigning `one.Stack`
+                // IL_0143 (instructionsList[?])
                 if (!patch1Applied
                     && i > 0 && i < instructionsList.Count - 2
-                    && instructionsList[i - 1].opcode == OpCodes.Conv_I4
-                    && instructionsList[i].opcode == OpCodes.Callvirt // StardewValley.Item::set_Stack(int32)
-                    && instructionsList[i + 1].opcode == OpCodes.Ldarg_0
-                    && instructionsList[i + 2].opcode == OpCodes.Ldfld) // StardewValley.Menus.InventoryMenu::actualInventory
+                    && instructionsList[i - 2].opcode == OpCodes.Conv_I4
+                    && instructionsList[i - 1].opcode == OpCodes.Callvirt // StardewValley.Item::set_Stack(int32)
+                    && instructionsList[i].opcode == OpCodes.Ldarg_0
+                    && instructionsList[i + 1].opcode == OpCodes.Ldfld) // StardewValley.Menus.InventoryMenu::actualInventory
                 {
-                    // At this point in the original source code, we have just determined the stack size to consume, and we are about to consume it.
-                    // Before doing so, we want to check if the "Try Take All But One" hotkey is down, and if so, overwrite this stack size to consume all but one.
+                    // At this point in the original source code, we have just assigned the stack size for our new item stack.
+                    // We now want to check if the "Take All But One" hotkey is down, and if so, overwrite this stack size to take all but one.
 
-                    // Inject "Try Take All But One" code.                                                      // NOTE: At this point, stackSize int is already loaded onto eval stack
+                    // Inject "Try Take All But One" code.
                     yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
                     yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` (slot number) int (local var @ index 1)
                     yield return new CodeInstruction(OpCodes.Ldloc_S, 5);                                       // load `newItem` (`one`) Item instance (local var @ short index 5)
-                    yield return new CodeInstruction(OpCodes.Call, tryTakeAllButOneItemMethod);                 // call helper method `TryTakeAllButOneItem(stackSize, this, num, newItem)`
+                    yield return new CodeInstruction(OpCodes.Call, tryTakeAllButOneItemMethod);                 // call helper method `TryTakeAllButOneItem(this, num, newItem)`
 
                     patch1Applied = true;
                 }
@@ -507,19 +507,22 @@ namespace ConvenientInventory.Patches
 
         public static bool IsTakeAllButOneHotkeyDown(InventoryMenu inventoryMenu, int slotNumber)
         {
+            bool _debug_kbhotkey = ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown();
+            bool _debug_gphotkey = ModEntry.Config.TakeAllButOneControllerHotkey.IsDown();
+
             return ModEntry.Config.IsEnableTakeAllButOne
                 && (ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOneControllerHotkey.IsDown())
                 && inventoryMenu.actualInventory[slotNumber].Stack > 1;
         }
 
-        public static int TryTakeAllButOneItem(int stackSize, InventoryMenu inventoryMenu, int slotNumber, Item newItem)
+        public static void TryTakeAllButOneItem(InventoryMenu inventoryMenu, int slotNumber, Item newItem)
         {
-            if (IsTakeAllButOneHotkeyDown(inventoryMenu, slotNumber))
+            if (!IsTakeAllButOneHotkeyDown(inventoryMenu, slotNumber))
             {
-                return newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
+                return;
             }
 
-            return stackSize;
+            newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
         }
 
         public static void TakeAllButOneItemWithAddTo(InventoryMenu inventoryMenu, int slotNumber, Item toAddTo)
