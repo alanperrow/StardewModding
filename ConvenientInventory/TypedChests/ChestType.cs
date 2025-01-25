@@ -13,6 +13,7 @@
         JunimoHut,
         Special,
         Package,
-        Dresser
+        Dresser,
+        Dungeon
     }
 }

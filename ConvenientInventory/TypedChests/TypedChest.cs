@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
+using StardewValley.Locations;
 using StardewValley.Objects;
 
 namespace ConvenientInventory.TypedChests
@@ -37,6 +38,12 @@ namespace ConvenientInventory.TypedChests
             if (chest.SpecialChestType != Chest.SpecialChestTypes.None)
             {
                 return ChestType.Special;
+            }
+
+            if (chest.Location is VolcanoDungeon)
+            {
+                // Chests cannot be manually placed in a dungeon, so this must be a generated dungeon chest.
+                return ChestType.Dungeon;
             }
 
             return chest.ParentSheetIndex switch

@@ -297,9 +297,9 @@ namespace ConvenientInventory.QuickStack
                 }
 
                 ChestType chestType = TypedChest.DetermineChestType(chest);
-                if (chestType == ChestType.Package)
+                if (chestType == ChestType.Package || chestType == ChestType.Dungeon)
                 {
-                    // Do not consider new farmer packages as chests for quick stack
+                    // Do not consider new farmer packages or dungeon chests for quick stack
                     continue;
                 }
 
@@ -538,9 +538,9 @@ namespace ConvenientInventory.QuickStack
                         }
 
                         ChestType chestType = TypedChest.DetermineChestType(chest);
-                        if (chestType == ChestType.Package)
+                        if (chestType == ChestType.Package || chestType == ChestType.Dungeon)
                         {
-                            // Do not consider new farmer packages as chests for quick stack
+                            // Do not consider new farmer packages or dungeon chests for quick stack
                             continue;
                         }
 
