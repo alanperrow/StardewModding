@@ -878,6 +878,9 @@ namespace ConvenientInventory
 
                         items[i] = extractedItems[i];
                     }
+
+                    // Re-favorite this slot if it has been automatically unfavorited since we originally extracted favorite items.
+                    FavoriteItemSlots[i] = true;
                 }
             }
         }
