@@ -30,7 +30,14 @@ namespace ConvenientInventory.AutoOrganize
             {
                 foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
                 {
-                    chest.modData.Remove(AutoOrganizeModDataKey);
+                    bool removed = chest.modData.Remove(AutoOrganizeModDataKey);
+
+                    if (removed)
+                    {
+                        ModEntry.Instance.Monitor.Log(
+                            $"Removed auto organize mod data from chest ({chest.Name}) at location {gameLocation.Name} {chest.TileLocation}.",
+                            LogLevel.Trace);
+                    }
                 }
             }
             catch

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 
@@ -49,8 +50,16 @@ namespace ConvenientInventory.QuickStack
             {
                 foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
                 {
-                    chest.modData.Remove(StartTimeModDataKey);
-                    chest.modData.Remove(ItemAnimationTotalMsModDataKey);
+                    bool removed = false;
+                    removed |= chest.modData.Remove(StartTimeModDataKey);
+                    removed |= chest.modData.Remove(ItemAnimationTotalMsModDataKey);
+
+                    if (removed)
+                    {
+                        ModEntry.Instance.Monitor.Log(
+                            $"Removed chest animation mod data from chest ({chest.Name}) at location {gameLocation.Name} {chest.TileLocation}.",
+                            LogLevel.Trace);
+                    }
                 }
             }
             catch

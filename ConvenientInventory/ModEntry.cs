@@ -1,7 +1,6 @@
 ﻿using System;
 using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
-using ConvenientInventory.Patches;
 using ConvenientInventory.QuickStack;
 using HarmonyLib;
 using StardewModdingAPI;
