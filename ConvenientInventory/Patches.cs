@@ -16,7 +16,7 @@ using StardewValley.Objects;
 using ConvenientInventory.QuickStack;
 using ConvenientInventory.AutoOrganize;
 
-namespace ConvenientInventory.Patches
+namespace ConvenientInventory
 {
     public static class InventoryPageConstructorPatch
     {
@@ -221,7 +221,7 @@ namespace ConvenientInventory.Patches
                 // Find instruction after if(boldTitleText != null){ ... b.DrawString() x 3 ... } block
                 // IL_084e (instructionsList[?])
                 if (i > 0 && i < instructionsList.Count - 1
-                    && instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 6
+                    && instructionsList[i - 1].opcode == OpCodes.Stloc_S && instructionsList[i - 1].operand is LocalBuilder { LocalIndex: 6 }
                     && instructionsList[i].opcode == OpCodes.Ldarg_S && instructionsList[i].operand is byte b && b == 9
                     && instructionsList[i + 1].opcode == OpCodes.Brfalse)
                 {
@@ -248,7 +248,7 @@ namespace ConvenientInventory.Patches
             yield break;
         }
 
-        public static int GetYMinusBoldTitleTextHeight(int y, string boldTitleText) => (boldTitleText is null) ? y : (y - (int)Game1.dialogueFont.MeasureString(boldTitleText).Y);
+        public static int GetYMinusBoldTitleTextHeight(int y, string boldTitleText) => boldTitleText is null ? y : y - (int)Game1.dialogueFont.MeasureString(boldTitleText).Y;
     }
 
     [HarmonyPatch(typeof(ClickableTextureComponent))]
@@ -332,7 +332,7 @@ namespace ConvenientInventory.Patches
             MethodInfo isPlayerInventory = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.IsPlayerInventory));
             MethodInfo drawFavoriteItemSlotHighlights = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemSlotHighlights));
 
-            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsConfigEnableFavoriteItems));
+            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(InventoryMenuPatches), nameof(IsConfigEnableFavoriteItems));
 
             List<CodeInstruction> instructionsList = instructions.ToList();
 
@@ -344,7 +344,7 @@ namespace ConvenientInventory.Patches
                 // IL_02d7 (instructionsList[?])
                 if (i < instructionsList.Count - 2
                     && instructionsList[i].opcode == OpCodes.Ldc_I4_0
-                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 10
+                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && instructionsList[i + 1].operand is LocalBuilder { LocalIndex: 10 }
                     && instructionsList[i + 2].opcode == OpCodes.Br)
                 {
                     Label label = ilg.DefineLabel();
@@ -402,9 +402,9 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(InventoryMenu.rightClick))]
         public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo isTakeAllButOneHotkeyDownMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsTakeAllButOneHotkeyDown));
-            MethodInfo tryTakeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TryTakeAllButOneItem));
-            MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItemWithAddTo));
+            MethodInfo isTakeAllButOneHotkeyDownMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(IsTakeAllButOneHotkeyDown));
+            MethodInfo tryTakeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(TryTakeAllButOneItem));
+            MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(TakeAllButOneItemWithAddTo));
 
             List<CodeInstruction> instructionsList = instructions.ToList();
             bool patch1Applied = false, patch2Applied = false;
@@ -507,9 +507,6 @@ namespace ConvenientInventory.Patches
 
         public static bool IsTakeAllButOneHotkeyDown(InventoryMenu inventoryMenu, int slotNumber)
         {
-            bool _debug_kbhotkey = ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown();
-            bool _debug_gphotkey = ModEntry.Config.TakeAllButOneControllerHotkey.IsDown();
-
             return ModEntry.Config.IsEnableTakeAllButOne
                 && (ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOneControllerHotkey.IsDown())
                 && inventoryMenu.actualInventory[slotNumber].Stack > 1;
@@ -541,7 +538,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(new Type[] { typeof(SpriteBatch) })]
         public static IEnumerable<CodeInstruction> Draw_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(ToolbarPatches), nameof(ToolbarPatches.IsConfigEnableFavoriteItems));
+            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(ToolbarPatches), nameof(IsConfigEnableFavoriteItems));
             MethodInfo DrawFavoriteItemSlotHighlightsInToolbar = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemSlotHighlightsInToolbar));
 
             FieldInfo yPositionOnScreen = typeof(Toolbar).GetField("yPositionOnScreen", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
@@ -559,7 +556,7 @@ namespace ConvenientInventory.Patches
                 if (i > 0 && i < instructionsList.Count - 2
                     && instructionsList[i - 1].opcode == OpCodes.Blt
                     && instructionsList[i].opcode == OpCodes.Ldc_I4_0
-                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
+                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && instructionsList[i + 1].operand is LocalBuilder { LocalIndex: 8 }
                     && instructionsList[i + 2].opcode == OpCodes.Br)
                 {
                     Label label = ilg.DefineLabel();
@@ -602,7 +599,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Toolbar.receiveRightClick))]
         public static IEnumerable<CodeInstruction> ReceiveRightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo isItemSlotFavoritedMethod = AccessTools.DeclaredMethod(typeof(ToolbarPatches), nameof(ToolbarPatches.IsItemSlotFavorited));
+            MethodInfo isItemSlotFavoritedMethod = AccessTools.DeclaredMethod(typeof(ToolbarPatches), nameof(IsItemSlotFavorited));
 
             List<CodeInstruction> instructionsList = instructions.ToList();
             bool flag = false;
@@ -713,7 +710,7 @@ namespace ConvenientInventory.Patches
     {
         [HarmonyPrefix]
         [HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
-        public static bool OrganizeItemsInList_Prefix(ItemGrabMenu __instance, out Item[] __state, IList<Item> items)
+        public static bool OrganizeItemsInList_Prefix(out Item[] __state, IList<Item> items)
         {
             __state = null;
 
@@ -740,7 +737,7 @@ namespace ConvenientInventory.Patches
 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
-        public static void OrganizeItemsInList_Postfix(ItemGrabMenu __instance, Item[] __state, IList<Item> items)
+        public static void OrganizeItemsInList_Postfix(Item[] __state, IList<Item> items)
         {
             if (!ModEntry.Config.IsEnableFavoriteItems)
             {
