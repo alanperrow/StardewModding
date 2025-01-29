@@ -402,7 +402,6 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(InventoryMenu.rightClick))]
         public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo isTakeAllButOneHotkeyDownMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsTakeAllButOneHotkeyDown));
             MethodInfo tryTakeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TryTakeAllButOneItem));
             MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItemWithAddTo));
 
@@ -443,10 +442,6 @@ namespace ConvenientInventory.Patches
                     && instructionsList[i + 1].opcode == OpCodes.Ldc_I4_1
                     && instructionsList[i + 2].opcode == OpCodes.Newarr) // StardewValley.InputButton
                 {
-                    // Original source code checks for LeftShift in an if-statement. We want to prefix this with our own if-check for "Take All But One" feature.
-                    // By tracking the original instruction label, we can convert the original if-statement into an else condition of our own if-statement.
-                    Label labelIf = ilg.DefineLabel();
-
                     // Find instruction for `if (playSound)`
                     // IL_0238 (instructionsList[?])
                     Label labelEndElse = ilg.DefineLabel();
@@ -461,19 +456,13 @@ namespace ConvenientInventory.Patches
                             // Inject "Take All But One" code.
                             yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
                             yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                            yield return new CodeInstruction(OpCodes.Call, isTakeAllButOneHotkeyDownMethod)             // call helper method `IsTakeAllButOneHotkeyDown(this, num)`
+                            yield return new CodeInstruction(OpCodes.Ldarg_3);                                          // load `toAddTo` Item instance (arg3)
+                            yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemWithAddToMethod)            // call helper method `TakeAllButOneItemWithAddTo(this, num, toAddTo)`
                             {
                                 labels = instructionsList[i].ExtractLabels()
                             };
-                            yield return new CodeInstruction(OpCodes.Brfalse, labelIf);                                 // break to original if-statement if call => false
+                            yield return new CodeInstruction(OpCodes.Brtrue, labelEndElse);                             // break to end of else block
 
-                            yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
-                            yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                            yield return new CodeInstruction(OpCodes.Ldarg_3);                                          // load `toAddTo` Item instance (arg3)
-                            yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemWithAddToMethod);           // call helper method `TakeAllButOneItemWithAddTo(this, num, toAddTo)`
-                            yield return new CodeInstruction(OpCodes.Br, labelEndElse);                                 // break to end of else block
-
-                            instructionsList[i].WithLabels(labelIf);
                             instructionsList[j].WithLabels(labelEndElse);
 
                             patch2Applied = true;
@@ -526,11 +515,17 @@ namespace ConvenientInventory.Patches
             newItem.Stack = inventoryMenu.actualInventory[slotNumber].Stack - 1;
         }
 
-        public static void TakeAllButOneItemWithAddTo(InventoryMenu inventoryMenu, int slotNumber, Item toAddTo)
+        public static bool TakeAllButOneItemWithAddTo(InventoryMenu inventoryMenu, int slotNumber, Item toAddTo)
         {
+            if (!IsTakeAllButOneHotkeyDown(inventoryMenu, slotNumber))
+            {
+                return false;
+            }
+
             int amountToTake = Math.Min(inventoryMenu.actualInventory[slotNumber].Stack - 1, toAddTo.getRemainingStackSpace());
             inventoryMenu.actualInventory[slotNumber].Stack -= amountToTake;
             toAddTo.Stack += amountToTake;
+            return true;
         }
     }
 
