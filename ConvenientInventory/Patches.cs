@@ -406,6 +406,9 @@ namespace ConvenientInventory.Patches
             MethodInfo tryTakeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TryTakeAllButOneItem));
             MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItemWithAddTo));
 
+            MemberInfo itemStackSetter = AccessTools.PropertySetter(typeof(Item), nameof(Item.Stack));
+            FieldInfo oldKBStateField = AccessTools.Field(typeof(Game1), nameof(Game1.oldKBState));
+
             List<CodeInstruction> instructionsList = instructions.ToList();
             bool patch1Applied = false, patch2Applied = false;
 
@@ -417,9 +420,7 @@ namespace ConvenientInventory.Patches
                 if (!patch1Applied
                     && i > 1 && i < instructionsList.Count - 1
                     && instructionsList[i - 2].opcode == OpCodes.Conv_I4
-                    && instructionsList[i - 1].opcode == OpCodes.Callvirt // StardewValley.Item::set_Stack(int32)
-                    && instructionsList[i].opcode == OpCodes.Ldarg_0
-                    && instructionsList[i + 1].opcode == OpCodes.Ldfld) // StardewValley.Menus.InventoryMenu::actualInventory
+                    && instructionsList[i - 1].opcode == OpCodes.Callvirt && instructionsList[i - 1].operand.Equals(itemStackSetter)) // StardewValley.Item::set_Stack(int32)
                 {
                     // At this point in the original source code, we have just assigned the stack size for our new item stack.
                     // We now want to check if the "Take All But One" hotkey is down, and if so, overwrite this stack size to take all but one.
@@ -438,8 +439,7 @@ namespace ConvenientInventory.Patches
                 // IL_019c (instructionsList[?])
                 if (patch1Applied && !patch2Applied
                     && i < instructionsList.Count - 2
-                    && instructionsList[i - 1].opcode == OpCodes.Bge
-                    && instructionsList[i].opcode == OpCodes.Ldsfld // valuetype StardewValley.Game1::oldKBState
+                    && instructionsList[i].opcode == OpCodes.Ldsfld && instructionsList[i].operand.Equals(oldKBStateField) // valuetype StardewValley.Game1::oldKBState
                     && instructionsList[i + 1].opcode == OpCodes.Ldc_I4_1
                     && instructionsList[i + 2].opcode == OpCodes.Newarr) // StardewValley.InputButton
                 {
@@ -458,29 +458,30 @@ namespace ConvenientInventory.Patches
                             && instructionsList[j].opcode == OpCodes.Ldarg_S
                             && instructionsList[j + 1].opcode == OpCodes.Brfalse_S)
                         {
+                            // Inject "Take All But One" code.
+                            yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
+                            yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
+                            yield return new CodeInstruction(OpCodes.Call, isTakeAllButOneHotkeyDownMethod)             // call helper method `IsTakeAllButOneHotkeyDown(this, num)`
+                            {
+                                labels = instructionsList[i].ExtractLabels()
+                            };
+                            yield return new CodeInstruction(OpCodes.Brfalse, labelIf);                                 // break to original if-statement if call => false
+
+                            yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
+                            yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
+                            yield return new CodeInstruction(OpCodes.Ldarg_3);                                          // load `toAddTo` Item instance (arg3)
+                            yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemWithAddToMethod);           // call helper method `TakeAllButOneItemWithAddTo(this, num, toAddTo)`
+                            yield return new CodeInstruction(OpCodes.Br, labelEndElse);                                 // break to end of else block
+
+                            instructionsList[i].WithLabels(labelIf);
+                            instructionsList[j].WithLabels(labelEndElse);
+
+                            patch2Applied = true;
+
                             break;
                         }
                     }
 
-                    // Inject "Take All But One" code.
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                    yield return new CodeInstruction(OpCodes.Call, isTakeAllButOneHotkeyDownMethod)             // call helper method `IsTakeAllButOneHotkeyDown(this, num)`
-                    {
-                        labels = instructionsList[i].ExtractLabels()
-                    };
-                    yield return new CodeInstruction(OpCodes.Brfalse, labelIf);                                 // break to original if-statement if call => false
-
-                    yield return new CodeInstruction(OpCodes.Ldarg_0);                                          // load `this` InventoryMenu instance (arg0)
-                    yield return new CodeInstruction(OpCodes.Ldloc_1);                                          // load `num` int (local var @ index 1)
-                    yield return new CodeInstruction(OpCodes.Ldarg_3);                                          // load `toAddTo` Item instance (arg3)
-                    yield return new CodeInstruction(OpCodes.Call, takeAllButOneItemWithAddToMethod);           // call helper method `TakeAllButOneItemWithAddTo(this, num, toAddTo)`
-                    yield return new CodeInstruction(OpCodes.Br, labelEndElse);                                 // break to end of else block
-
-                    instructionsList[i].WithLabels(labelIf);
-                    instructionsList[j].WithLabels(labelEndElse);
-
-                    patch2Applied = true;
                 }
 
                 yield return instructionsList[i];
