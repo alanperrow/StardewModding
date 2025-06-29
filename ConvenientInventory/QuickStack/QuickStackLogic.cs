@@ -31,6 +31,11 @@ namespace ConvenientInventory.QuickStack
                 quickStackAnimation = new(who);
             }
 
+            if (!ModEntry.Config.IsQuickStackIntoHoppers)
+            {
+                chests = chests.Where(chest => chest.ChestType != ChestType.Hopper).ToList();
+            }
+
             foreach (TypedChest typedChest in chests)
             {
                 Chest chest = typedChest.Chest;

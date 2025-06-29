@@ -14,6 +14,7 @@
         Special,
         Package,
         Dresser,
-        Dungeon
+        Dungeon,
+        Hopper
     }
 }

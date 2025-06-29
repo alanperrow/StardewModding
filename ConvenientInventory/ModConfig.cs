@@ -14,6 +14,8 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIntoDressers { get; set; } = true;
 
+        public bool IsQuickStackIntoHoppers { get; set; } = true;
+
         public bool IsQuickStackOverflowItems { get; set; } = true;
 
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;

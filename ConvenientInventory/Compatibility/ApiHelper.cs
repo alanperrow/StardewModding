@@ -106,6 +106,14 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
+                getValue: () => config.IsQuickStackIntoHoppers,
+                setValue: value => config.IsQuickStackIntoHoppers = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoHoppers.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoHoppers.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
                 getValue: () => config.IsQuickStackOverflowItems,
                 setValue: value => config.IsQuickStackOverflowItems = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name"),

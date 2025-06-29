@@ -31,6 +31,9 @@
   "ModConfigMenu.IsQuickStackIntoDressers.Name": "Quick stack into dressers?",
   "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, nearby dressers will be considered when quick stacking.",
 
+  "ModConfigMenu.IsQuickStackIntoHoppers.Name": "Quick stack into hoppers?",
+  "ModConfigMenu.IsQuickStackIntoHoppers.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, nearby Hoppers will be considered when quick stacking.",
+
   "ModConfigMenu.IsQuickStackOverflowItems.Name": "Quick stack overflow items?",
   "ModConfigMenu.IsQuickStackOverflowItems.Desc": "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
 

@@ -35,6 +35,11 @@ namespace ConvenientInventory.TypedChests
                 return chest.QualifiedItemId == "(BC)BigStoneChest" ? ChestType.BigStone : ChestType.BigNormal;
             }
 
+            if (chest.SpecialChestType == Chest.SpecialChestTypes.AutoLoader)
+            {
+                return ChestType.Hopper;
+            }
+
             if (chest.SpecialChestType != Chest.SpecialChestTypes.None)
             {
                 return ChestType.Special;
