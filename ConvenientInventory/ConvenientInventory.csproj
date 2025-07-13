@@ -10,6 +10,8 @@
   <ItemGroup>
     <None Remove="assets\autoOrganize.png" />
     <None Remove="assets\autoOrganizeIcon.png" />
+    <None Remove="assets\chestQuickStackDisabledIcon.png" />
+    <None Remove="assets\chestQuickStackEnabledIcon.png" />
     <None Remove="assets\quickStackIcon.png" />
   </ItemGroup>
   <ItemGroup>
@@ -17,6 +19,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\autoOrganizeIcon.png" />
+    <Content Include="assets\chestQuickStackDisabledIcon.png" />
+    <Content Include="assets\chestQuickStackEnabledIcon.png" />
     <Content Include="assets\favoriteBorder.png" />
     <Content Include="assets\favoriteCursor.png" />
     <Content Include="assets\favoriteHighlight_0.png" />
