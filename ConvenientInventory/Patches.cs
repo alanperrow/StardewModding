@@ -1273,12 +1273,12 @@ namespace ConvenientInventory
     [HarmonyPatch(typeof(GameLocation))]
     public static class GameLocationPatches
     {
-        private static Item lastToolbarSlotItem;
-
         [HarmonyPrefix]
         [HarmonyPatch("removeQueuedFurniture")]
-        public static bool RemoveQueuedFurniture_Prefix()
+        public static bool RemoveQueuedFurniture_Prefix(out Item __state)
         {
+            __state = null;
+
             if (!ModEntry.Config.IsEnableFavoriteItems)
             {
                 return true;
@@ -1294,7 +1294,7 @@ namespace ConvenientInventory
 
                 // Track the last slot of the inventory toolbar to handle base game behavior where, if all toolbar slots have an item,
                 // the removed furniture will be placed into the last toolbar slot and add the previous item into the inventory.
-                lastToolbarSlotItem = Game1.player.Items[11];
+                __state = Game1.player.Items[11];
             }
             catch (Exception e)
             {
@@ -1306,17 +1306,19 @@ namespace ConvenientInventory
 
         [HarmonyPostfix]
         [HarmonyPatch("removeQueuedFurniture")]
-        public static void RemoveQueuedFurniture_Postfix()
+        public static void RemoveQueuedFurniture_Postfix(Item __state)
         {
             if (!ModEntry.Config.IsEnableFavoriteItems)
             {
                 return;
             }
 
-            if (lastToolbarSlotItem == null)
+            if (__state == null)
             {
                 return;
             }
+
+            Item lastToolbarSlotItem = __state;
 
             try
             {
@@ -1347,10 +1349,6 @@ namespace ConvenientInventory
             catch (Exception e)
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(RemoveQueuedFurniture_Postfix)}:\n{e}", LogLevel.Error);
-            }
-            finally
-            {
-                lastToolbarSlotItem = null;
             }
         }
     }
