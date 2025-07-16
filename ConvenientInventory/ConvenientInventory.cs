@@ -612,9 +612,9 @@ namespace ConvenientInventory
                 return true;
             }
 
-            if (clickPos >= 12)
+            if (clickPos >= NumberOfToolbarItems)
             {
-                for (int k = 0; k < 12; k++)
+                for (int k = 0; k < NumberOfToolbarItems; k++)
                 {
                     if (Game1.player.Items[k] == null || Game1.player.Items[k].canStackWith(item))
                     {
@@ -624,9 +624,9 @@ namespace ConvenientInventory
                     }
                 }
             }
-            else if (clickPos < 12)
+            else
             {
-                for (int j = 12; j < Game1.player.Items.Count; j++)
+                for (int j = NumberOfToolbarItems; j < Game1.player.Items.Count; j++)
                 {
                     if (Game1.player.Items[j] == null || Game1.player.Items[j].canStackWith(item))
                     {
@@ -699,7 +699,7 @@ namespace ConvenientInventory
         /// </summary>
         public static void ShiftToolbar(bool right)
         {
-            RotateArray(FavoriteItemSlots, 12, right);
+            RotateArray(FavoriteItemSlots, NumberOfToolbarItems, right);
         }
 
         private static void RotateArray(bool[] arr, int count, bool right)
@@ -973,7 +973,7 @@ namespace ConvenientInventory
         /// </summary>
         public static void DrawFavoriteItemSlotHighlightsInToolbar(SpriteBatch spriteBatch, int yPositionOnScreen, float transparency, string[] slotText)
         {
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < NumberOfToolbarItems; i++)
             {
                 if (!FavoriteItemSlots[i])
                 {
@@ -1147,5 +1147,7 @@ namespace ConvenientInventory
         {
             TransferredItemSprites.Add(itemSprite);
         }
+
+        private static int NumberOfToolbarItems => Math.Min(12, Game1.player.MaxItems);
     }
 }
