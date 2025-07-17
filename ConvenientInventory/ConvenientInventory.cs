@@ -17,6 +17,8 @@ namespace ConvenientInventory
 {
     public static class ConvenientInventory
     {
+        private const int NumSlotsPerInventoryRow = 12;
+
         private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
         private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
@@ -612,9 +614,9 @@ namespace ConvenientInventory
                 return true;
             }
 
-            if (clickPos >= NumberOfToolbarItems)
+            if (clickPos >= NumSlotsPerInventoryRow)
             {
-                for (int k = 0; k < NumberOfToolbarItems; k++)
+                for (int k = 0; k < NumSlotsPerInventoryRow; k++)
                 {
                     if (Game1.player.Items[k] == null || Game1.player.Items[k].canStackWith(item))
                     {
@@ -626,7 +628,7 @@ namespace ConvenientInventory
             }
             else
             {
-                for (int j = NumberOfToolbarItems; j < Game1.player.Items.Count; j++)
+                for (int j = NumSlotsPerInventoryRow; j < Game1.player.Items.Count; j++)
                 {
                     if (Game1.player.Items[j] == null || Game1.player.Items[j].canStackWith(item))
                     {
@@ -699,7 +701,7 @@ namespace ConvenientInventory
         /// </summary>
         public static void ShiftToolbar(bool right)
         {
-            RotateArray(FavoriteItemSlots, NumberOfToolbarItems, right);
+            RotateArray(FavoriteItemSlots, NumSlotsPerInventoryRow, right);
         }
 
         private static void RotateArray(bool[] arr, int count, bool right)
@@ -973,7 +975,8 @@ namespace ConvenientInventory
         /// </summary>
         public static void DrawFavoriteItemSlotHighlightsInToolbar(SpriteBatch spriteBatch, int yPositionOnScreen, float transparency, string[] slotText)
         {
-            for (int i = 0; i < NumberOfToolbarItems; i++)
+            var numberToolbarItems = Math.Min(12, Game1.player.MaxItems);
+            for (var i = 0; i < numberToolbarItems; i++)
             {
                 if (!FavoriteItemSlots[i])
                 {
@@ -1147,7 +1150,5 @@ namespace ConvenientInventory
         {
             TransferredItemSprites.Add(itemSprite);
         }
-
-        private static int NumberOfToolbarItems => Math.Min(12, Game1.player.MaxItems);
     }
 }
