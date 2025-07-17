@@ -21,6 +21,7 @@ namespace ConvenientInventory
 
         private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
 
+        private const int quickStackButtonID = 918021;  // Unique indentifier
         private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
         private static ClickableTextureComponent QuickStackButton
         {
@@ -41,8 +42,6 @@ namespace ConvenientInventory
             get => shouldDrawQuickStackToolTip.Value;
             set => shouldDrawQuickStackToolTip.Value = value;
         }
-
-        private const int quickStackButtonID = 918021;  // Unique indentifier
 
         private static readonly PerScreen<List<ItemGrabMenu.TransferredItemSprite>> transferredItemSprites = new(() => new List<ItemGrabMenu.TransferredItemSprite>());
         private static List<ItemGrabMenu.TransferredItemSprite> TransferredItemSprites
@@ -975,8 +974,10 @@ namespace ConvenientInventory
         /// </summary>
         public static void DrawFavoriteItemSlotHighlightsInToolbar(SpriteBatch spriteBatch, int yPositionOnScreen, float transparency, string[] slotText)
         {
-            var numberToolbarItems = Math.Min(12, Game1.player.MaxItems);
-            for (var i = 0; i < numberToolbarItems; i++)
+            // Account for inventory sizes smaller than 12.
+            int numToolbarSlots = Math.Min(12, Game1.player.MaxItems);
+
+            for (int i = 0; i < numToolbarSlots; i++)
             {
                 if (!FavoriteItemSlots[i])
                 {
