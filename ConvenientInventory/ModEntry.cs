@@ -185,6 +185,15 @@ namespace ConvenientInventory
                 // Remove the last item of the list
                 items.RemoveAt(index);
             }
+
+            Monitor.Log($"Finished resizing inventory.", LogLevel.Info);
+
+            if (items.Count != who.MaxItems)
+            {
+                Monitor.Log($"Inventory size is still incorrect after attempting to resize it (Inventory size: {items.Count}, Max items: {who.MaxItems})." +
+                    " This should never happen; check your SMAPI log for any other errors that may be causing this.",
+                    LogLevel.Warn);
+            }
         }
 
         /// <summary>
