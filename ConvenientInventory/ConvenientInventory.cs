@@ -12,6 +12,8 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
+using StardewValley.Objects.Trinkets;
+using StardewValley.Tools;
 
 namespace ConvenientInventory
 {
@@ -288,7 +290,7 @@ namespace ConvenientInventory
                                 HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
                             }
                             else if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuCP && gameMenuCP.pages[gameMenuCP.currentTab] is CraftingPage
-                                && (clickedItem is Hat or Clothing or Boots or Ring or StardewValley.Tools.MeleeWeapon))
+                                && (clickedItem is Hat or Clothing or Boots or Ring or MeleeWeapon))
                             {
                                 // Game logic for shift-clicking in player's crafting page. Idk why it works this way, but this handles it.
                                 HandleFavoriteItemSlotShiftClickedInCraftingPage(clickPos, clickedItem);
@@ -498,6 +500,8 @@ namespace ConvenientInventory
 
                     return;
                 }
+
+                // TODO: Trinkets - does this need Wear More Rings check, like for rings?
             }
 
             switch (equipmentSlot.name)
@@ -518,7 +522,7 @@ namespace ConvenientInventory
                     }
                     break;
                 case "Hat":
-                    if (cursorSlotItem is Hat or StardewValley.Tools.Pan)
+                    if (cursorSlotItem is Hat or Pan)
                     {
                         ResetFavoriteItemSlotsTracking();
                     }
@@ -532,6 +536,12 @@ namespace ConvenientInventory
                 case "Pants":
                     if (cursorSlotItem is Clothing maybePants && maybePants.clothesType.Value == Clothing.ClothesType.PANTS
                         || cursorSlotItem is StardewValley.Object && cursorSlotItem.ParentSheetIndex == 71) // trimmed purple shorts
+                    {
+                        ResetFavoriteItemSlotsTracking();
+                    }
+                    break;
+                case "Trinket":
+                    if (cursorSlotItem is Trinket)
                     {
                         ResetFavoriteItemSlotsTracking();
                     }
@@ -605,7 +615,8 @@ namespace ConvenientInventory
                 || (item is Hat && Game1.player.hat.Value == null)
                 || (item is Boots && Game1.player.boots.Value == null)
                 || (item is Clothing && (((item as Clothing).clothesType.Value == Clothing.ClothesType.SHIRT && Game1.player.shirtItem.Value == null)
-                                       || (item as Clothing).clothesType.Value == Clothing.ClothesType.PANTS && Game1.player.pantsItem.Value == null));
+                                       || (item as Clothing).clothesType.Value == Clothing.ClothesType.PANTS && Game1.player.pantsItem.Value == null))
+                || (item is Trinket && Game1.player.stats.Get("trinketSlots") != 0 && Game1.player.trinketItems.Any(x => x == null));
 
             if (isItemEquippable)
             {
