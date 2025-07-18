@@ -20,10 +20,8 @@ namespace ConvenientInventory
     public static class ConvenientInventory
     {
         private const int NumSlotsPerInventoryRow = 12;
-
-        private static IReadOnlyList<TypedChest> NearbyTypedChests { get; set; }
-
         private const int quickStackButtonID = 918021;  // Unique indentifier
+
         private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
         private static ClickableTextureComponent QuickStackButton
         {
@@ -936,22 +934,22 @@ namespace ConvenientInventory
 
         private static void DrawQuickStackButtonToolTip(SpriteBatch spriteBatch)
         {
-            NearbyTypedChests = QuickStackLogic.GetTypedChestsWithinRange(Game1.player, ModEntry.Config.QuickStackRange, true).AsReadOnly();
+            List<TypedChest> nearbyTypedChests = QuickStackLogic.GetTypedChestsWithinRange(Game1.player, ModEntry.Config.QuickStackRange, true);
 
             if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
             {
                 int numPos = ModEntry.Config.IsQuickStackIntoBuildingsWithInventories
-                    ? NearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(NearbyTypedChests)
-                    : NearbyTypedChests.Count;
+                    ? nearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(nearbyTypedChests)
+                    : nearbyTypedChests.Count;
 
                 var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
                 IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null);
 
-                DrawTypedChestsInToolTip(spriteBatch, NearbyTypedChests);
+                DrawTypedChestsInToolTip(spriteBatch, nearbyTypedChests);
             }
             else
             {
-                IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({NearbyTypedChests.Count})", string.Empty, null);
+                IClickableMenu.drawToolTip(spriteBatch, QuickStackButton.hoverText + $" ({nearbyTypedChests.Count})", string.Empty, null);
             }
         }
 
