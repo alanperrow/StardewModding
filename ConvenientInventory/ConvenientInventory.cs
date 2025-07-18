@@ -288,7 +288,7 @@ namespace ConvenientInventory
                                 HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
                             }
                             else if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuCP && gameMenuCP.pages[gameMenuCP.currentTab] is CraftingPage
-                                && (clickedItem is Hat or Clothing or Boots or Ring or MeleeWeapon))
+                                && (clickedItem is Hat or Clothing or Boots or Tool or Ring or Trinket))
                             {
                                 // Game logic for shift-clicking in player's crafting page. Idk why it works this way, but this handles it.
                                 HandleFavoriteItemSlotShiftClickedInCraftingPage(clickPos, clickedItem);
