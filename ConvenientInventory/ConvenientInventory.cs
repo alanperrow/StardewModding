@@ -20,7 +20,7 @@ namespace ConvenientInventory
     public static class ConvenientInventory
     {
         private const int NumSlotsPerInventoryRow = 12;
-        private const int quickStackButtonID = 918021;  // Unique indentifier
+        private const int QuickStackButtonID = 918021;  // Unique indentifier
 
         private static readonly PerScreen<ClickableTextureComponent> quickStackButton = new();
         private static ClickableTextureComponent QuickStackButton
@@ -151,14 +151,14 @@ namespace ConvenientInventory
                     4f,
                     false)
                 {
-                    myID = quickStackButtonID,
+                    myID = QuickStackButtonID,
                     downNeighborID = InventoryPage.region_trashCan,
                     upNeighborID = InventoryPage.region_organizeButton,
                     leftNeighborID = 11, // top-right inventory slot
                 };
 
-                inventoryPage.organizeButton.downNeighborID = quickStackButtonID;
-                inventoryPage.trashCan.upNeighborID = quickStackButtonID;
+                inventoryPage.organizeButton.downNeighborID = QuickStackButtonID;
+                inventoryPage.trashCan.upNeighborID = QuickStackButtonID;
             }
 
             if (ModEntry.Config.IsEnableInventoryPageSideWarp)
