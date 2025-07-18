@@ -187,6 +187,7 @@ namespace ConvenientInventory.Compatibility
                 $"4: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4")}",
                 $"5: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5")}",
                 $"6: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6")}",
+                $"7: {helper.Translation.Get("ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7")}",
             };
             api.AddTextOption(
                 mod: modManifest,

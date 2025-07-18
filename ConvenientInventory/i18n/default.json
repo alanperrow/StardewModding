@@ -63,6 +63,7 @@
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "Gold inset border",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "Dark dashed",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "Thick dark border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "Gold decorative border",
 
   "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Keybind (keyboard)",
   "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "Hold this key when selecting an item to favorite it.",
