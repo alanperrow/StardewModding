@@ -20,8 +20,7 @@ namespace ConvenientInventory
         public override void Entry(IModHelper helper)
         {
             Instance = this;
-            Config = helper.ReadConfig<ModConfig>();
-            Config.QuickStackRange = ConfigHelper.ValidateAndConstrainQuickStackRange(Config.QuickStackRange);
+            Config = LoadConfig(helper);
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetReady += OnAssetReady;
@@ -47,6 +46,32 @@ namespace ConvenientInventory
                 "\n(This command is intended for players who want to remove any Convenient Inventory mod data from their save file for a complete uninstallation.)" +
                 "\n\nUsage: convinv_cleanup_autoorganize",
                 ClearModDataForCurrentlyLoadedSave);
+        }
+
+        /// <summary>Loads the mod configuration from the config file, migrating old config if necessary.</summary>
+        private ModConfig LoadConfig(IModHelper helper)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            OldModConfig oldConfig = helper.Data.ReadJsonFile<OldModConfig>("config.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            // TODO: Will this ^ always read the file successfully even if the model type doesn't match every property?
+            //       Probably, because this is how the config file is auto-updated when new config properties are added...
+            //       Will have to think of a more foolproof solution.
+
+            ModConfig config;
+            if (oldConfig != null)
+            {
+                config = oldConfig.Migrate();
+                helper.WriteConfig(config);
+            }
+            else
+            {
+                config = helper.ReadConfig<ModConfig>();
+            }
+
+            config.QuickStack.Range = ConfigHelper.ValidateAndConstrainQuickStackRange(config.QuickStack.Range);
+            return config;
         }
 
         /// <summary>Raised when an asset is being requested from the content pipeline.</summary>
