@@ -1,15 +1,18 @@
-﻿using StardewModdingAPI.Utilities;
+﻿using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
 {
     // TODO: Investigate if this class can be made static, to avoid needing to write 'ModEntry.Config' everywhere.
     public class ModConfig
     {
+        private readonly IModHelper _helper;
         private SerializableModConfig serialConfig;
 
         /// <summary>Creates a new instance of <see cref="ModConfig"/>, wrapping an instance of <see cref="SerializableModConfig"/>.</summary>
-        public ModConfig(SerializableModConfig serializableModConfig)
+        public ModConfig(SerializableModConfig serializableModConfig, IModHelper helper)
         {
+            _helper = helper;
             serialConfig = serializableModConfig;
 
             QuickStack = new QuickStackConfig(this);
@@ -34,11 +37,11 @@ namespace ConvenientInventory
         /// <inheritdoc cref="MiscellaneousConfig"/>
         public MiscellaneousConfig Miscellaneous { get; }
 
-        /// <summary>Updates the internal serializable config with the provided <paramref name="serializableModConfig"/>.</summary>
-        public void UpdateSerializableConfig(SerializableModConfig serializableModConfig)
-        {
-            serialConfig = serializableModConfig;
-        }
+        /// <summary>Replaces the internal serializable config with a new default instance.</summary>
+        public void Reset() => serialConfig = new SerializableModConfig();
+
+        /// <summary>Saves the internal serializable config to the mod's configuration file.</summary>
+        public void Save() => _helper.WriteConfig(serialConfig);
 
         /// <summary>Config settings for the Quick Stack feature.</summary>
         public class QuickStackConfig

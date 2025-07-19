@@ -9,7 +9,7 @@
   // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "Quick Stack To Nearby Chests",
 
-  "ModConfigMenu.IsEnableQuickStack.Name": "Enable Quick stack?",
+  "ModConfigMenu.IsEnableQuickStack.Name": "Enable Quick Stack?",
   "ModConfigMenu.IsEnableQuickStack.Desc": "If enabled, adds a \"Quick Stack To Nearby Chests\" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.",
 
   "ModConfigMenu.QuickStackRange.Name": "Range",
@@ -25,17 +25,26 @@
   "ModConfigMenu.QuickStackControllerHotkey.Name": "Keybind (controller)",
   "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
 
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "Quick stack into buildings?",
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will be considered when quick stacking.",
+  "ModConfigMenu.IsQuickStackIntoMills.Name": "Into Mills?",
+  "ModConfigMenu.IsQuickStackIntoMills.Desc": "If enabled, nearby mills will be considered when quick stacking.",
 
-  "ModConfigMenu.IsQuickStackIntoDressers.Name": "Quick stack into dressers?",
-  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, nearby dressers will be considered when quick stacking.",
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Name": "Into Junimo Huts?",
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Desc": "If enabled, nearby Junimo Huts will be considered when quick stacking.",
 
-  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Quick stack overflow items?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "Into Dressers?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, nearby dressers will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoHoppers.Name": "Into Hoppers?",
+  "ModConfigMenu.IsQuickStackIntoHoppers.Desc": "If enabled, nearby hoppers will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "Into Mini-Shipping Bins?",
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "If enabled, nearby Mini-Shipping Bins will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Overflow items?",
   "ModConfigMenu.IsQuickStackOverflowItems.Desc": "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
 
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Quick stack ignore item quality?",
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain ANY quality of that same item.",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Ignore item quality?",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain ANY quality of that same item.",
 
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Show nearby chests in tooltip?",
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.",
