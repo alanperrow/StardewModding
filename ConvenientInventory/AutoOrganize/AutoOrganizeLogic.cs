@@ -233,13 +233,13 @@ namespace ConvenientInventory.AutoOrganize
 
         private static void UpdateHoverTextByGamePadMode(ClickableTextureComponent organizeButton)
         {
-            organizeButton.hoverText = ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText");
-            if (ModEntry.Config.IsShowAutoOrganizeButtonInstructions)
+            organizeButton.hoverText = I18n.AutoOrganizeButton_HoverText();
+            if (ModEntry.Config.AutoOrganizeChest.ShowInstructionsInTooltip)
             {
                 organizeButton.hoverText += '\n';
                 organizeButton.hoverText += Game1.options.gamepadControls
-                    ? ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText.disable-gamepad")
-                    : ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText.disable");
+                    ? I18n.AutoOrganizeButton_HoverText_DisableGamepad()
+                    : I18n.AutoOrganizeButton_HoverText_Disable();
             }
         }
 
