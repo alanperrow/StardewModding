@@ -5,7 +5,7 @@ namespace ConvenientInventory
 {
     public class ModConfig
     {
-        bool IsModEnabled { get; set; } = true;
+        // bool IsModEnabled { get; set; } = true;
 
         public QuickStackConfig QuickStack { get; set; } = new();
 
@@ -37,13 +37,13 @@ namespace ConvenientInventory
 
             public bool DrawChestsInButtonTooltip { get; set; } = true;
 
-            public bool IsHotkeyEnabled { get; set; } = false;
+            public bool IsHotkeyEnabled { get; set; } = true;
 
             public KeybindList KeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
 
             public KeybindList ControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
 
-            public bool IsItemQualityIgnored { get; set; } = false;
+            public bool IgnoreItemQuality { get; set; } = false;
 
             public bool IsAnimationEnabled { get; set; } = true;
 

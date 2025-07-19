@@ -78,7 +78,7 @@ namespace ConvenientInventory
                 IsHotkeyEnabled = IsEnableQuickStackHotkey,
                 KeyboardHotkey = QuickStackKeyboardHotkey,
                 ControllerHotkey = QuickStackControllerHotkey,
-                IsItemQualityIgnored = IsQuickStackIgnoreItemQuality,
+                IgnoreItemQuality = IsQuickStackIgnoreItemQuality,
                 IsAnimationEnabled = IsEnableQuickStackAnimation,
                 IsChestAnimationEnabled = IsEnableQuickStackChestAnimation,
                 AnimationItemSpeedFactor = QuickStackAnimationItemSpeed,
