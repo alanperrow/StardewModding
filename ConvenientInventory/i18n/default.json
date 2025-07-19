@@ -61,7 +61,7 @@
   "ModConfigMenu.Label.FavoriteItems": "Favorite Items",
 
   "ModConfigMenu.IsEnableFavoriteItems.Name": "Enable favorite items?",
-  "ModConfigMenu.IsEnableFavoriteItems.Desc": "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests. They will also be prevented from being trashed or dropped.",
+  "ModConfigMenu.IsEnableFavoriteItems.Desc": "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests. They will also be prevented from being trashed, dropped, and shipped.",
 
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "Highlight style",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "Choose your preferred texture style for highlighting favorited items in your inventory.",
