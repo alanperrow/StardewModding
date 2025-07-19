@@ -7,6 +7,11 @@ namespace ConvenientInventory
     [Obsolete("Only exists to migrate users from old config format. Use 'ModConfig' instead.")]
     public class OldModConfig
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        bool LoadedFromExistingConfigFile { get; set; } = true;
+
         // ===== Quick Stack To Nearby Chests =====
         public bool IsEnableQuickStack { get; set; } = true;
 
@@ -66,6 +71,7 @@ namespace ConvenientInventory
         /// </summary>
         public ModConfig Migrate() => new()
         {
+            IsMigrated = true,
             QuickStack = new ModConfig.QuickStackConfig()
             {
                 IsEnabled = IsEnableQuickStack,

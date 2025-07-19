@@ -7,6 +7,23 @@ namespace ConvenientInventory
     {
         // bool IsModEnabled { get; set; } = true;
 
+        public bool IsMigrated { get; set; } = false;
+        /*
+         * Investigate migrating from the old config format to the new one.
+         * 
+         * IDEA: Try to ReadJsonFile as ModConfig. If this `IsMigrated` value is false,
+         * that means either (1) the user removed this line from the config, or (2) we just read an OldModConfig file as a ModConfig file.
+         * 
+         * (1) In this case 
+         *  ... ???
+         *  Need to avoid accidentally deleting user's config settings if we are incorrect about which config type to read with ReadJsonFile.
+         * 
+         * (2) In this case we must perform a migration:
+         *  load the config file as OldModConfig,
+         *  migrate it to ModConfig (setting IsMigrated=true), then
+         *  overwrite the config file.
+         */
+
         public QuickStackConfig QuickStack { get; set; } = new();
 
         public FavoriteItemsConfig FavoriteItems { get; set; } = new();
@@ -23,6 +40,16 @@ namespace ConvenientInventory
 
             public string Range { get; set; } = ConfigHelper.QuickStackRange_Default;
 
+            public bool IsHotkeyEnabled { get; set; } = true;
+
+            public KeybindList KeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
+
+            public KeybindList ControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
+
+            public bool OverflowItems { get; set; } = true;
+
+            public bool IgnoreItemQuality { get; set; } = false;
+
             public bool IntoMills { get; set; } = true;
 
             public bool IntoJunimoHuts { get; set; } = true;
@@ -33,17 +60,7 @@ namespace ConvenientInventory
 
             public bool IntoMiniShippingBins { get; set; } = false;
 
-            public bool OverflowItems { get; set; } = true;
-
             public bool DrawChestsInButtonTooltip { get; set; } = true;
-
-            public bool IsHotkeyEnabled { get; set; } = true;
-
-            public KeybindList KeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
-
-            public KeybindList ControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
-
-            public bool IgnoreItemQuality { get; set; } = false;
 
             public bool IsAnimationEnabled { get; set; } = true;
 

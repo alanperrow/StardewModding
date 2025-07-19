@@ -34,7 +34,7 @@ namespace ConvenientInventory.Compatibility
                 reset: () =>
                 {
                     config = new OldModConfig();
-                    ModEntry.Config = config;
+                    ModEntry.Config.QuickStack. = config;
                 },
                 save: () => helper.WriteConfig(config)
             );
@@ -90,22 +90,6 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
-                getValue: () => config.IsQuickStackIntoBuildingsWithInventories,
-                setValue: value => config.IsQuickStackIntoBuildingsWithInventories = value,
-                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name"),
-                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc")
-            );
-
-            api.AddBoolOption(
-                mod: modManifest,
-                getValue: () => config.IsQuickStackIntoDressers,
-                setValue: value => config.IsQuickStackIntoDressers = value,
-                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoDressers.Name"),
-                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoDressers.Desc")
-            );
-
-            api.AddBoolOption(
-                mod: modManifest,
                 getValue: () => config.IsQuickStackOverflowItems,
                 setValue: value => config.IsQuickStackOverflowItems = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackOverflowItems.Name"),
@@ -118,6 +102,22 @@ namespace ConvenientInventory.Compatibility
                 setValue: value => config.IsQuickStackIgnoreItemQuality = value,
                 name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsQuickStackIntoBuildingsWithInventories,
+                setValue: value => config.IsQuickStackIntoBuildingsWithInventories = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc")
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.IsQuickStackIntoDressers,
+                setValue: value => config.IsQuickStackIntoDressers = value,
+                name: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoDressers.Name"),
+                tooltip: () => helper.Translation.Get("ModConfigMenu.IsQuickStackIntoDressers.Desc")
             );
 
             api.AddBoolOption(
@@ -202,6 +202,9 @@ namespace ConvenientInventory.Compatibility
                 allowedValues: highlightStyleDescriptions
             );
 
+            // TODO: Visualize the highlight texture choice.
+            //       Probably doesn't need to update live, but see SplitscreenImproved for reference if it does.
+
             api.AddKeybindList(
                 mod: modManifest,
                 getValue: () => config.FavoriteItemsKeyboardHotkey,
@@ -209,6 +212,9 @@ namespace ConvenientInventory.Compatibility
                 name: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Name"),
                 tooltip: () => helper.Translation.Get("ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc")
             );
+
+            // Compare this snippet from ConvenientInventory/ApiHelper.cs:
+            //       string textureChoice = e.Name.BaseName.Split("favoriteHighlight_")[1];
 
             api.AddKeybindList(
                 mod: modManifest,
