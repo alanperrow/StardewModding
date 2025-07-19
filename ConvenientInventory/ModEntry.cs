@@ -21,6 +21,7 @@ namespace ConvenientInventory
         {
             Instance = this;
             Config = ModConfig.Load(helper);
+            I18n.Init(helper.Translation);
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetReady += OnAssetReady;
