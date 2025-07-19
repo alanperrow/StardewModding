@@ -37,7 +37,7 @@ namespace ConvenientInventory
             FarmHouse = Game1.content.Load<Texture2D>(@"Maps\farmhouse_tiles");
         }
 
-        public static void LoadModAssets(OldModConfig config)
+        public static void LoadModAssets(SerializableModConfig config)
         {
             QuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "quickStackIcon");
             FavoriteItemsCursor = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteCursor");

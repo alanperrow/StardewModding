@@ -15,7 +15,7 @@ namespace ConvenientInventory.Compatibility
             ChestsAnywhereApi = api;
         }
 
-        public static void Initialize(IGenericModConfigMenuApi api, OldModConfig config, IManifest modManifest, IModHelper helper, IMonitor monitor)
+        public static void Initialize(IGenericModConfigMenuApi api, SerializableModConfig config, IManifest modManifest, IModHelper helper, IMonitor monitor)
         {
             // == Config Validation ==
             bool isChestsAnywhereInstalled = ChestsAnywhereApi != null;
@@ -33,7 +33,7 @@ namespace ConvenientInventory.Compatibility
                 mod: modManifest,
                 reset: () =>
                 {
-                    config = new OldModConfig();
+                    config = new SerializableModConfig();
                     ModEntry.Config.QuickStack. = config;
                 },
                 save: () => helper.WriteConfig(config)

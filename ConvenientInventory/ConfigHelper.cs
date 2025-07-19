@@ -15,7 +15,7 @@ namespace ConvenientInventory
         private const string QuickStackRange_Global = "Global";
 
         /// <summary>
-        /// Parses a config value for <see cref="OldModConfig.QuickStackRange"/> and returns this value as an <see langword="int"/>
+        /// Parses a config value for <see cref="SerializableModConfig.QuickStackRange"/> and returns this value as an <see langword="int"/>
         /// constrained to the set of expected values.
         /// </summary>
         /// <param name="value">The config value to parse.</param>
@@ -47,7 +47,7 @@ namespace ConvenientInventory
         }
 
         /// <summary>
-        /// Accepts an underlying int value for <see cref="OldModConfig.QuickStackRange"/> and returns a corresponding string description of the value.
+        /// Accepts an underlying int value for <see cref="SerializableModConfig.QuickStackRange"/> and returns a corresponding string description of the value.
         /// </summary>
         /// <param name="value">The underlying int value to format.</param>
         /// <returns>The corresponding string description.</returns>
@@ -69,7 +69,7 @@ namespace ConvenientInventory
         }
 
         /// <summary>
-        /// Parses a provided config value for <see cref="OldModConfig.QuickStackRange"/>, validates and constrains it, and returns the corresponding
+        /// Parses a provided config value for <see cref="SerializableModConfig.QuickStackRange"/>, validates and constrains it, and returns the corresponding
         /// string of the constrained value.
         /// </summary>
         /// <param name="value">The config value to validate and constrain.</param>
@@ -77,7 +77,7 @@ namespace ConvenientInventory
         public static string ValidateAndConstrainQuickStackRange(string value) => FormatQuickStackRange(ParseQuickStackRangeFromConfig(value));
 
         /// <summary>
-        /// Parses a config value for <see cref="OldModConfig.QuickStackRange"/> and returns the <see cref="QuickStackRangeType"/> associated with the value.
+        /// Parses a config value for <see cref="SerializableModConfig.QuickStackRange"/> and returns the <see cref="QuickStackRangeType"/> associated with the value.
         /// </summary>
         /// <param name="value">The config value to parse.</param>
         /// <returns>The <see cref="QuickStackRangeType"/> associated with the parsed value.</returns>
@@ -96,8 +96,8 @@ namespace ConvenientInventory
         }
 
         /// <summary>
-        /// Parses a config value for <see cref="OldModConfig.QuickStackRange"/> as an <see langword="int"/> which represents the quick stack tile range.
-        /// Throws an exception if <see cref="OldModConfig.QuickStackRange"/> is not of type <see cref="QuickStackRangeType.Tile"/>.
+        /// Parses a config value for <see cref="SerializableModConfig.QuickStackRange"/> as an <see langword="int"/> which represents the quick stack tile range.
+        /// Throws an exception if <see cref="SerializableModConfig.QuickStackRange"/> is not of type <see cref="QuickStackRangeType.Tile"/>.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>

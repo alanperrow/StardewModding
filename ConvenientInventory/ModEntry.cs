@@ -52,7 +52,7 @@ namespace ConvenientInventory
         private ModConfig LoadConfig(IModHelper helper)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
-            OldModConfig oldConfig = helper.Data.ReadJsonFile<OldModConfig>("config.json");
+            SerializableModConfig oldConfig = helper.Data.ReadJsonFile<SerializableModConfig>("config.json");
 #pragma warning restore CS0618 // Type or member is obsolete
 
             // TODO: Will this ^ always read the file successfully even if the model type doesn't match every property?

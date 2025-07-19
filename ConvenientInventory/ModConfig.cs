@@ -1,106 +1,259 @@
-﻿using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
+﻿using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
 {
+    // TODO: Investigate if this class can be made static, to avoid needing to write 'ModEntry.Config' everywhere.
     public class ModConfig
     {
-        // bool IsModEnabled { get; set; } = true;
+        private SerializableModConfig serialConfig;
 
-        public bool IsMigrated { get; set; } = false;
-        /*
-         * Investigate migrating from the old config format to the new one.
-         * 
-         * IDEA: Try to ReadJsonFile as ModConfig. If this `IsMigrated` value is false,
-         * that means either (1) the user removed this line from the config, or (2) we just read an OldModConfig file as a ModConfig file.
-         * 
-         * (1) In this case 
-         *  ... ???
-         *  Need to avoid accidentally deleting user's config settings if we are incorrect about which config type to read with ReadJsonFile.
-         * 
-         * (2) In this case we must perform a migration:
-         *  load the config file as OldModConfig,
-         *  migrate it to ModConfig (setting IsMigrated=true), then
-         *  overwrite the config file.
-         */
+        /// <summary>Creates a new instance of <see cref="ModConfig"/>, wrapping an instance of <see cref="SerializableModConfig"/>.</summary>
+        public ModConfig(SerializableModConfig serializableModConfig)
+        {
+            serialConfig = serializableModConfig;
 
-        public QuickStackConfig QuickStack { get; set; } = new();
+            QuickStack = new QuickStackConfig(this);
+            FavoriteItems = new FavoriteItemsConfig(this);
+            TakeAllButOne = new TakeAllButOneConfig(this);
+            AutoOrganizeChest = new AutoOrganizeChestConfig(this);
+            Miscellaneous = new MiscellaneousConfig(this);
+        }
 
-        public FavoriteItemsConfig FavoriteItems { get; set; } = new();
+        /// <inheritdoc cref="QuickStackConfig"/>
+        public QuickStackConfig QuickStack { get; }
 
-        public TakeAllButOneConfig TakeAllButOne { get; set; } = new();
+        /// <inheritdoc cref="FavoriteItemsConfig"/>
+        public FavoriteItemsConfig FavoriteItems { get; }
 
-        public AutoOrganizeChestConfig AutoOrganizeChest { get; set; } = new();
+        /// <inheritdoc cref="TakeAllButOneConfig"/>
+        public TakeAllButOneConfig TakeAllButOne { get; }
 
-        public MiscellaneousConfig Miscellaneous { get; set; } = new();
+        /// <inheritdoc cref="AutoOrganizeChestConfig"/>
+        public AutoOrganizeChestConfig AutoOrganizeChest { get; }
 
+        /// <inheritdoc cref="MiscellaneousConfig"/>
+        public MiscellaneousConfig Miscellaneous { get; }
+
+        /// <summary>Updates the internal serializable config with the provided <paramref name="serializableModConfig"/>.</summary>
+        public void UpdateSerializableConfig(SerializableModConfig serializableModConfig)
+        {
+            serialConfig = serializableModConfig;
+        }
+
+        /// <summary>Config settings for the Quick Stack feature.</summary>
         public class QuickStackConfig
         {
-            public bool IsEnabled { get; set; } = true;
+            private readonly ModConfig _config;
 
-            public string Range { get; set; } = ConfigHelper.QuickStackRange_Default;
+            public QuickStackConfig(ModConfig modConfig)
+            {
+                _config = modConfig;
+            }
 
-            public bool IsHotkeyEnabled { get; set; } = true;
+            public bool IsEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStack;
+                set => _config.serialConfig.IsEnableQuickStack = value;
+            }
 
-            public KeybindList KeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
+            public string Range
+            {
+                get => _config.serialConfig.QuickStackRange;
+                set => _config.serialConfig.QuickStackRange = value;
+            }
 
-            public KeybindList ControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
+            public bool IsHotkeyEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackHotkey;
+                set => _config.serialConfig.IsEnableQuickStackHotkey = value;
+            }
 
-            public bool OverflowItems { get; set; } = true;
+            public KeybindList KeyboardHotkey
+            {
+                get => _config.serialConfig.QuickStackKeyboardHotkey;
+                set => _config.serialConfig.QuickStackKeyboardHotkey = value;
+            }
 
-            public bool IgnoreItemQuality { get; set; } = false;
+            public KeybindList ControllerHotkey
+            {
+                get => _config.serialConfig.QuickStackControllerHotkey;
+                set => _config.serialConfig.QuickStackControllerHotkey = value;
+            }
 
-            public bool IntoMills { get; set; } = true;
+            public bool OverflowItems
+            {
+                get => _config.serialConfig.IsQuickStackOverflowItems;
+                set => _config.serialConfig.IsQuickStackOverflowItems = value;
+            }
 
-            public bool IntoJunimoHuts { get; set; } = true;
+            public bool IgnoreItemQuality
+            {
+                get => _config.serialConfig.IsQuickStackIgnoreItemQuality;
+                set => _config.serialConfig.IsQuickStackIgnoreItemQuality = value;
+            }
 
-            public bool IntoDressers { get; set; } = true;
+            public bool IntoMills
+            {
+                get => _config.serialConfig.IsQuickStackIntoMills;
+                set => _config.serialConfig.IsQuickStackIntoMills = value;
+            }
 
-            public bool IntoHoppers { get; set; } = true;
+            public bool IntoJunimoHuts
+            {
+                get => _config.serialConfig.IsQuickStackIntoJunimoHuts;
+                set => _config.serialConfig.IsQuickStackIntoJunimoHuts = value;
+            }
 
-            public bool IntoMiniShippingBins { get; set; } = false;
+            public bool IntoDressers
+            {
+                get => _config.serialConfig.IsQuickStackIntoDressers;
+                set => _config.serialConfig.IsQuickStackIntoDressers = value;
+            }
+            public bool IntoHoppers
+            {
+                get => _config.serialConfig.IsQuickStackIntoHoppers;
+                set => _config.serialConfig.IsQuickStackIntoHoppers = value;
+            }
 
-            public bool DrawChestsInButtonTooltip { get; set; } = true;
+            public bool IntoMiniShippingBins
+            {
+                get => _config.serialConfig.IsQuickStackIntoMiniShippingBins;
+                set => _config.serialConfig.IsQuickStackIntoMiniShippingBins = value;
+            }
 
-            public bool IsAnimationEnabled { get; set; } = true;
+            public bool DrawChestsInButtonTooltip
+            {
+                get => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests;
+                set => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests = value;
+            }
 
-            public bool IsChestAnimationEnabled { get; set; } = true;
+            public bool IsAnimationEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackAnimation;
+                set => _config.serialConfig.IsEnableQuickStackAnimation = value;
+            }
 
-            public float AnimationItemSpeedFactor { get; set; } = 1.0f;
+            public bool IsChestAnimationEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackChestAnimation;
+                set => _config.serialConfig.IsEnableQuickStackChestAnimation = value;
+            }
 
-            public float AnimationStackSpeedFactor { get; set; } = 1.0f;
+            public float AnimationItemSpeedFactor
+            {
+                get => _config.serialConfig.QuickStackAnimationItemSpeed;
+                set => _config.serialConfig.QuickStackAnimationItemSpeed = value;
+            }
+
+            public float AnimationStackSpeedFactor
+            {
+                get => _config.serialConfig.QuickStackAnimationStackSpeed;
+                set => _config.serialConfig.QuickStackAnimationStackSpeed = value;
+            }
         }
 
+        /// <summary>Config settings for the Favorite Items feature.</summary>
         public class FavoriteItemsConfig
         {
-            public bool IsEnabled { get; set; } = true;
+            private readonly ModConfig _config;
 
-            public int HighlightTextureChoice { get; set; } = 2;
+            public FavoriteItemsConfig(ModConfig modConfig)
+            {
+                this._config = modConfig;
+            }
 
-            public KeybindList KeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftAlt });
+            public bool IsEnabled
+            {
+                get => _config.serialConfig.IsEnableFavoriteItems;
+                set => _config.serialConfig.IsEnableFavoriteItems = value;
+            }
 
-            public KeybindList ControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftShoulder });
+            public int HighlightTextureChoice
+            {
+                get => _config.serialConfig.FavoriteItemsHighlightTextureChoice;
+                set => _config.serialConfig.FavoriteItemsHighlightTextureChoice = value;
+            }
+
+            public KeybindList KeyboardHotkey
+            {
+                get => _config.serialConfig.FavoriteItemsKeyboardHotkey;
+                set => _config.serialConfig.FavoriteItemsKeyboardHotkey = value;
+            }
+
+            public KeybindList ControllerHotkey
+            {
+                get => _config.serialConfig.FavoriteItemsControllerHotkey;
+                set => _config.serialConfig.FavoriteItemsControllerHotkey = value;
+            }
         }
 
+        /// <summary>Config settings for the Take All But One feature.</summary>
         public class TakeAllButOneConfig
         {
-            public bool IsEnabled { get; set; } = true;
+            private readonly ModConfig _config;
 
-            public KeybindList KeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftControl, SButton.LeftShift });
+            public TakeAllButOneConfig(ModConfig modConfig)
+            {
+                this._config = modConfig;
+            }
 
-            public KeybindList ControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftTrigger });
+            public bool IsEnabled
+            {
+                get => _config.serialConfig.IsEnableTakeAllButOne;
+                set => _config.serialConfig.IsEnableTakeAllButOne = value;
+            }
+
+            public KeybindList KeyboardHotkey
+            {
+                get => _config.serialConfig.TakeAllButOneKeyboardHotkey;
+                set => _config.serialConfig.TakeAllButOneKeyboardHotkey = value;
+            }
+
+            public KeybindList ControllerHotkey
+            {
+                get => _config.serialConfig.TakeAllButOneControllerHotkey;
+                set => _config.serialConfig.TakeAllButOneControllerHotkey = value;
+            }
         }
 
+        /// <summary>Config settings for the Auto Organize Chest feature.</summary>
         public class AutoOrganizeChestConfig
         {
-            public bool IsEnabled { get; set; } = true;
+            private readonly ModConfig _config;
 
-            public bool ShowInstructionsInTooltip { get; set; } = true;
+            public AutoOrganizeChestConfig(ModConfig modConfig)
+            {
+                this._config = modConfig;
+            }
+
+            public bool IsEnabled
+            {
+                get => _config.serialConfig.IsEnableAutoOrganizeChest;
+                set => _config.serialConfig.IsEnableAutoOrganizeChest = value;
+            }
+
+            public bool ShowInstructionsInTooltip
+            {
+                get => _config.serialConfig.IsShowAutoOrganizeButtonInstructions;
+                set => _config.serialConfig.IsShowAutoOrganizeButtonInstructions = value;
+            }
         }
 
+        /// <summary>Config settings for miscellaneous features.</summary>
         public class MiscellaneousConfig
         {
-            public bool IsInventoryPageSideWarpEnabled { get; set; } = true;
+            private readonly ModConfig _config;
+
+            public MiscellaneousConfig(ModConfig modConfig)
+            {
+                this._config = modConfig;
+            }
+
+            public bool IsInventoryPageSideWarpEnabled
+            {
+                get => _config.serialConfig.IsEnableInventoryPageSideWarp;
+                set => _config.serialConfig.IsEnableInventoryPageSideWarp = value;
+            }
         }
     }
 }
