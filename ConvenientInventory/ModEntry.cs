@@ -20,7 +20,7 @@ namespace ConvenientInventory
         public override void Entry(IModHelper helper)
         {
             Instance = this;
-            Config = LoadConfig(helper);
+            Config = ModConfig.Load(helper);
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetReady += OnAssetReady;
@@ -46,17 +46,6 @@ namespace ConvenientInventory
                 "\n(This command is intended for players who want to remove any Convenient Inventory mod data from their save file for a complete uninstallation.)" +
                 "\n\nUsage: convinv_cleanup_autoorganize",
                 ClearModDataForCurrentlyLoadedSave);
-        }
-
-        /// <summary>Loads the mod configuration from the config file.</summary>
-        private ModConfig LoadConfig(IModHelper helper)
-        {
-            var serializableModConfig = helper.ReadConfig<SerializableModConfig>();
-
-            ModConfig config = new(serializableModConfig, helper);
-            config.QuickStack.Range = ConfigHelper.ValidateAndConstrainQuickStackRange(config.QuickStack.Range);
-
-            return config;
         }
 
         /// <summary>Raised when an asset is being requested from the content pipeline.</summary>

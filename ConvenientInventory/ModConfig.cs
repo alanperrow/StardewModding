@@ -37,6 +37,17 @@ namespace ConvenientInventory
         /// <inheritdoc cref="MiscellaneousConfig"/>
         public MiscellaneousConfig Miscellaneous { get; }
 
+        /// <summary>Creates a new instance of <see cref="ModConfig"/> loaded from the mod's configuration file.</summary>
+        public static ModConfig Load(IModHelper helper)
+        {
+            var serializableModConfig = helper.ReadConfig<SerializableModConfig>();
+
+            ModConfig config = new(serializableModConfig, helper);
+            config.QuickStack.Range = ConfigHelper.ValidateAndConstrainQuickStackRange(config.QuickStack.Range);
+
+            return config;
+        }
+
         /// <summary>Replaces the internal serializable config with a new default instance.</summary>
         public void Reset() => serialConfig = new SerializableModConfig();
 
