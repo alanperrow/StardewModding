@@ -81,7 +81,7 @@ namespace ConvenientInventory
             var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (apiGMCM != null)
             {
-                ApiHelper.Initialize(apiGMCM, Config, ModManifest, Helper, Monitor);
+                ApiHelper.Initialize(apiGMCM, Config, ModManifest, Monitor);
             }
 
             ApiHelper.IsWearMoreRingsInstalled = Helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
@@ -94,7 +94,7 @@ namespace ConvenientInventory
         /// <summary>Raised after the player loads a save slot and the world is initialized.</summary>
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
-            if (Config.IsEnableFavoriteItems)
+            if (Config.FavoriteItems.IsEnabled)
             {
                 ConvenientInventory.LoadFavoriteItemSlots();
             }
@@ -103,7 +103,7 @@ namespace ConvenientInventory
         /// <summary>Raised before the game begins writing data to the save file (except the initial save creation).</summary>
         private void OnSaving(object sender, SavingEventArgs e)
         {
-            if (Config.IsEnableFavoriteItems)
+            if (Config.FavoriteItems.IsEnabled)
             {
                 ConvenientInventory.SaveFavoriteItemSlots();
             }
@@ -115,10 +115,10 @@ namespace ConvenientInventory
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             // Handle quick stack hotkey being pressed.
-            if (Config.IsEnableQuickStackHotkey
+            if (Config.QuickStack.IsHotkeyEnabled
                 && Context.IsWorldReady
                 && StardewValley.Game1.CurrentEvent is null
-                && (Config.QuickStackKeyboardHotkey.JustPressed() || Config.QuickStackControllerHotkey.JustPressed()))
+                && (Config.QuickStack.KeyboardHotkey.JustPressed() || Config.QuickStack.ControllerHotkey.JustPressed()))
             {
                 ConvenientInventory.OnQuickStackHotkeyPressed();
             }
@@ -128,9 +128,9 @@ namespace ConvenientInventory
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
             // Handle favorite items hotkey being toggled.
-            if (Config.IsEnableFavoriteItems)
+            if (Config.FavoriteItems.IsEnabled)
             {
-                bool isHotkeyDown = Config.FavoriteItemsKeyboardHotkey.IsDown() || Config.FavoriteItemsControllerHotkey.IsDown();
+                bool isHotkeyDown = Config.FavoriteItems.KeyboardHotkey.IsDown() || Config.FavoriteItems.ControllerHotkey.IsDown();
                 if (!ConvenientInventory.IsFavoriteItemsHotkeyDown && Context.IsWorldReady && isHotkeyDown)
                 {
                     ConvenientInventory.IsFavoriteItemsHotkeyDown = true;

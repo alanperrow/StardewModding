@@ -37,11 +37,11 @@ namespace ConvenientInventory
             FarmHouse = Game1.content.Load<Texture2D>(@"Maps\farmhouse_tiles");
         }
 
-        public static void LoadModAssets(SerializableModConfig config)
+        public static void LoadModAssets(ModConfig config)
         {
             QuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "quickStackIcon");
             FavoriteItemsCursor = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteCursor");
-            FavoriteItemsHighlight = Game1.content.Load<Texture2D>(ModAssetPrefix + $"favoriteHighlight_{config.FavoriteItemsHighlightTextureChoice}");
+            FavoriteItemsHighlight = Game1.content.Load<Texture2D>(ModAssetPrefix + $"favoriteHighlight_{config.FavoriteItems.HighlightTextureChoice}");
             FavoriteItemsBorder = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteBorder");
             AutoOrganizeButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "autoOrganizeIcon");
         }

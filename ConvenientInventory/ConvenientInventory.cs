@@ -140,7 +140,7 @@ namespace ConvenientInventory
         {
             PlayerInventoryPage = inventoryPage;
 
-            if (ModEntry.Config.IsEnableQuickStack)
+            if (ModEntry.Config.QuickStack.IsEnabled)
             {
                 QuickStackButton = new ClickableTextureComponent("",
                     new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
@@ -161,7 +161,7 @@ namespace ConvenientInventory
                 inventoryPage.trashCan.upNeighborID = QuickStackButtonID;
             }
 
-            if (ModEntry.Config.IsEnableInventoryPageSideWarp)
+            if (ModEntry.Config.Miscellaneous.IsInventoryPageSideWarpEnabled)
             {
                 if (InventoryPage.ShouldShowJunimoNoteIcon())
                 {
@@ -175,7 +175,7 @@ namespace ConvenientInventory
 
                 inventoryPage.organizeButton.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
 
-                if (ModEntry.Config.IsEnableQuickStack)
+                if (ModEntry.Config.QuickStack.IsEnabled)
                 {
                     QuickStackButton.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
                 }
@@ -184,7 +184,7 @@ namespace ConvenientInventory
 
         public static bool PreReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
         {
-            if (ModEntry.Config.IsEnableFavoriteItems)
+            if (ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 InventoryMenu inventory = (menu as InventoryPage)?.inventory    // Player menu - inventory tab
                     ?? (menu as CraftingPage)?.inventory                        // Player menu - crafting tab
@@ -209,7 +209,7 @@ namespace ConvenientInventory
 
         public static bool PreReceiveRightClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
         {
-            if (ModEntry.Config.IsEnableFavoriteItems)
+            if (ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 if (IsFavoriteItemsHotkeyDown)
                 {
@@ -263,7 +263,7 @@ namespace ConvenientInventory
         /// </summary>
         private static bool TrackSelectedFavoriteItemSlotAtClickPosition(InventoryMenu inventoryMenu, int clickX, int clickY, bool isRightClick = false)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems || IsFavoriteItemsHotkeyDown || inventoryMenu is null)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled || IsFavoriteItemsHotkeyDown || inventoryMenu is null)
             {
                 return false;
             }
@@ -681,9 +681,9 @@ namespace ConvenientInventory
         public static void PostReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
         {
             // Quick stack button clicked (in InventoryPage)
-            if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage inventoryPage && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
+            if (ModEntry.Config.QuickStack.IsEnabled && menu is InventoryPage inventoryPage && QuickStackButton != null && QuickStackButton.containsPoint(x, y))
             {
-                QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
+                QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStack.Range, inventoryPage);
             }
         }
 
@@ -691,7 +691,7 @@ namespace ConvenientInventory
         {
             if (Game1.activeClickableMenu is GameMenu gameMenu && gameMenu.pages[gameMenu.currentTab] is InventoryPage inventoryPage)
             {
-                QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange, inventoryPage);
+                QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStack.Range, inventoryPage);
                 return;
             }
 
@@ -701,7 +701,7 @@ namespace ConvenientInventory
                 return;
             }
 
-            QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStackRange);
+            QuickStackLogic.StackToNearbyChests(ModEntry.Config.QuickStack.Range);
         }
 
         /// <summary>
@@ -749,7 +749,7 @@ namespace ConvenientInventory
 
         public static void PerformHoverActionInInventoryPage(int x, int y)
         {
-            if (ModEntry.Config.IsEnableQuickStack)
+            if (ModEntry.Config.QuickStack.IsEnabled)
             {
                 QuickStackButton.tryHover(x, y);
                 ShouldDrawQuickStackToolTip = QuickStackButton.containsPoint(x, y);
@@ -758,7 +758,7 @@ namespace ConvenientInventory
 
         public static void PopulateClickableComponentsListInInventoryPage(InventoryPage inventoryPage)
         {
-            if (ModEntry.Config.IsEnableQuickStack)
+            if (ModEntry.Config.QuickStack.IsEnabled)
             {
                 inventoryPage.allClickableComponents.Add(QuickStackButton);
             }
@@ -902,12 +902,12 @@ namespace ConvenientInventory
         public static void PostMenuDraw<T>(T menu, SpriteBatch spriteBatch) where T : IClickableMenu
         {
             // Draw quick stack button tooltip (in InventoryPage)
-            if (ModEntry.Config.IsEnableQuickStack && menu is InventoryPage && ShouldDrawQuickStackToolTip)
+            if (ModEntry.Config.QuickStack.IsEnabled && menu is InventoryPage && ShouldDrawQuickStackToolTip)
             {
                 DrawQuickStackButtonToolTip(spriteBatch);
             }
 
-            if (ModEntry.Config.IsEnableFavoriteItems)
+            if (ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 // Get inventory if menu has one
                 InventoryMenu inventory = (menu as InventoryMenu)   // Inventory item slots container
@@ -934,13 +934,11 @@ namespace ConvenientInventory
 
         private static void DrawQuickStackButtonToolTip(SpriteBatch spriteBatch)
         {
-            List<TypedChest> nearbyTypedChests = QuickStackLogic.GetTypedChestsWithinRange(Game1.player, ModEntry.Config.QuickStackRange, true);
+            List<TypedChest> nearbyTypedChests = QuickStackLogic.GetTypedChestsWithinRange(Game1.player, ModEntry.Config.QuickStack.Range, true);
 
-            if (ModEntry.Config.IsQuickStackTooltipDrawNearbyChests)
+            if (ModEntry.Config.QuickStack.DrawChestsInButtonTooltip)
             {
-                int numPos = ModEntry.Config.IsQuickStackIntoBuildingsWithInventories
-                    ? nearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(nearbyTypedChests)
-                    : nearbyTypedChests.Count;
+                int numPos = nearbyTypedChests.Count + GetExtraNumPosUsedByBuildingChests(nearbyTypedChests);
 
                 var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
                 IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null);
@@ -1030,7 +1028,7 @@ namespace ConvenientInventory
         {
             int index = GetPlayerInventoryIndexOfItem(item);
 
-            if (ModEntry.Config.IsEnableFavoriteItems && index != -1 && FavoriteItemSlots[index])
+            if (ModEntry.Config.FavoriteItems.IsEnabled && index != -1 && FavoriteItemSlots[index])
             {
                 spriteBatch.Draw(CachedTextures.FavoriteItemsBorder,
                     new Vector2(x, y),
@@ -1067,7 +1065,7 @@ namespace ConvenientInventory
                 return;
             }
 
-            if (ModEntry.Config.IsEnableQuickStack)
+            if (ModEntry.Config.QuickStack.IsEnabled)
             {
                 // Draw transferred item sprites
                 foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in TransferredItemSprites)

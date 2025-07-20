@@ -377,7 +377,7 @@ namespace ConvenientInventory
             yield break;
         }
 
-        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.IsEnableFavoriteItems;
+        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.FavoriteItems.IsEnabled;
 
 
         [HarmonyPostfix]
@@ -507,8 +507,8 @@ namespace ConvenientInventory
 
         public static bool IsTakeAllButOneHotkeyDown(InventoryMenu inventoryMenu, int slotNumber)
         {
-            return ModEntry.Config.IsEnableTakeAllButOne
-                && (ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOneControllerHotkey.IsDown())
+            return ModEntry.Config.TakeAllButOne.IsEnabled
+                && (ModEntry.Config.TakeAllButOne.KeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOne.ControllerHotkey.IsDown())
                 && inventoryMenu.actualInventory[slotNumber].Stack > 1;
         }
 
@@ -593,7 +593,7 @@ namespace ConvenientInventory
             yield break;
         }
 
-        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.IsEnableFavoriteItems;
+        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.FavoriteItems.IsEnabled;
 
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(Toolbar.receiveRightClick))]
@@ -646,7 +646,7 @@ namespace ConvenientInventory
 
         public static bool IsItemSlotFavorited(int slotNumber)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return false;
             }
@@ -714,7 +714,7 @@ namespace ConvenientInventory
         {
             __state = null;
 
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -739,7 +739,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
         public static void OrganizeItemsInList_Postfix(Item[] __state, IList<Item> items)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -766,7 +766,7 @@ namespace ConvenientInventory
 
             try
             {
-                if (ModEntry.Config.IsEnableFavoriteItems)
+                if (ModEntry.Config.FavoriteItems.IsEnabled)
                 {
                     __state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
                 }
@@ -785,12 +785,12 @@ namespace ConvenientInventory
         {
             try
             {
-                if (ModEntry.Config.IsEnableFavoriteItems)
+                if (ModEntry.Config.FavoriteItems.IsEnabled)
                 {
                     ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, __instance.inventory.actualInventory, false);
                 }
 
-                if (ModEntry.Config.IsEnableAutoOrganizeChest)
+                if (ModEntry.Config.AutoOrganizeChest.IsEnabled)
                 {
                     Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
                     if (chest != null)
@@ -831,7 +831,7 @@ namespace ConvenientInventory
         {
             try
             {
-                if (ModEntry.Config.IsEnableAutoOrganizeChest
+                if (ModEntry.Config.AutoOrganizeChest.IsEnabled
                     && showOrganizeButton
                     && source == ItemGrabMenu.source_chest)
                 {
@@ -852,7 +852,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
         public static void ReceiveRightClick_Postfix(ItemGrabMenu __instance, int x, int y)
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
                 return;
             }
@@ -882,7 +882,7 @@ namespace ConvenientInventory
         [HarmonyPatch(typeof(IClickableMenu), nameof(IClickableMenu.setUpForGamePadMode))]
         public static void SetUpForGamePadMode_Postfix(IClickableMenu __instance)
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
                 return;
             }
@@ -914,7 +914,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Item.canBeTrashed))]
         public static bool CanBeTrashed_Prefix(Item __instance, ref bool __result)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems || !ConvenientInventory.FavoriteItemsIsItemSelected)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled || !ConvenientInventory.FavoriteItemsIsItemSelected)
             {
                 return true;
             }
@@ -950,7 +950,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Item.ConsumeStack))]
         public static void ConsumeStack_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -974,7 +974,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Farmer.shiftToolbar))]
         public static void ShiftToolbar_Postfix(Farmer __instance, bool right)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1006,7 +1006,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Farmer.reduceActiveItemByOne))]
         public static bool ReduceActiveItemByOne_Prefix(Farmer __instance)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1031,7 +1031,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(ForgeMenu.receiveKeyPress))]
         public static bool ReceiveKeyPress_Prefix(Keys key)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems || !ConvenientInventory.FavoriteItemsIsItemSelected)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled || !ConvenientInventory.FavoriteItemsIsItemSelected)
             {
                 return true;
             }
@@ -1056,7 +1056,7 @@ namespace ConvenientInventory
         [HarmonyPatch("_leftIngredientSpotClicked")]
         public static bool LeftIngredientSpotClicked_Prefix(ForgeMenu __instance)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1080,7 +1080,7 @@ namespace ConvenientInventory
         [HarmonyPatch("_rightIngredientSpotClicked")]
         public static bool RightIngredientSpotClicked_Prefix(ForgeMenu __instance)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1104,7 +1104,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(ForgeMenu.CraftItem))]
         public static void CraftItem_Postfix(bool forReal = false)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems || !forReal)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled || !forReal)
             {
                 return;
             }
@@ -1128,7 +1128,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Inventory.ReduceId))]
         public static void ReduceId_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1170,7 +1170,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Chest.grabItemFromInventory))]
         public static void GrabItemFromInventory_Postfix()
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
                 return;
             }
@@ -1198,7 +1198,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Chest.addItem))]
         public static void AddItem_Postfix(Chest __instance)
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
                 return;
             }
@@ -1228,7 +1228,7 @@ namespace ConvenientInventory
             }
 
 
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1253,7 +1253,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(StardewValley.Object.performObjectDropInAction))]
         public static void PerformObjectDropInAction_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1279,7 +1279,7 @@ namespace ConvenientInventory
         {
             __state = null;
 
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1308,7 +1308,7 @@ namespace ConvenientInventory
         [HarmonyPatch("removeQueuedFurniture")]
         public static void RemoveQueuedFurniture_Postfix(Item __state)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1360,7 +1360,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(JunimoNoteMenu.HandlePartialDonation))]
         public static void HandlePartialDonation_Postfix(Item item)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1393,7 +1393,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(Bundle.tryToDepositThisItem))]
         public static void TryToDepositThisItem_Postfix(Item __result)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1420,7 +1420,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(CraftingRecipe.consumeIngredients))]
         public static void ConsumeIngredients_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1440,7 +1440,7 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(CraftingRecipe.ConsumeAdditionalIngredients))]
         public static void ConsumeAdditionalIngredients_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }

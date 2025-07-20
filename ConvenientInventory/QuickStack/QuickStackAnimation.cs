@@ -82,8 +82,8 @@ namespace ConvenientInventory.QuickStack
             float baseLayerDepth = (float)((chestTileLocation.Y + 1) * 64) / 10000f + chestTileLocation.X / 50000f; // Refactored from Object.draw()
             float addlayerDepth = 1E-06f * NumAnimatedItems; // Avoids z-fighting by drawing each sprite on a separate layer depth.
 
-            int hoverTimePerItem = (int)(150 / ModEntry.Config.QuickStackAnimationStackSpeed);
-            int fadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationStackSpeed);
+            int hoverTimePerItem = (int)(150 / ModEntry.Config.QuickStack.AnimationStackSpeedFactor);
+            int fadeTime = (int)(500 / ModEntry.Config.QuickStack.AnimationStackSpeedFactor);
 
             ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
 
@@ -92,7 +92,7 @@ namespace ConvenientInventory.QuickStack
             if (isChestInCurrentLocation)
             {
                 // "Item toss" animation is used if the chest is in the current GameLocation.
-                float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStackAnimationItemSpeed;
+                float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStack.AnimationItemSpeedFactor;
 
                 float extraHeight = 192 - Math.Min(0, motionVec.Y);
                 float gravity = 2 * extraHeight / tossTime;
@@ -115,16 +115,16 @@ namespace ConvenientInventory.QuickStack
             else
             {
                 // "Upward item fade" animation is used if the chest is in a separate GameLocation.
-                int upwardFadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationItemSpeed);
+                int upwardFadeTime = (int)(500 / ModEntry.Config.QuickStack.AnimationItemSpeedFactor);
                 itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, 0f, Color.White)
                 {
                     scale = 4f,
                     layerDepth = 1f - addlayerDepth,
-                    alphaFade = 0.04f * ModEntry.Config.QuickStackAnimationItemSpeed,
+                    alphaFade = 0.04f * ModEntry.Config.QuickStack.AnimationItemSpeedFactor,
                     interval = upwardFadeTime,
-                    motion = new Vector2(0.6f, -4.5f) * ModEntry.Config.QuickStackAnimationItemSpeed,
-                    acceleration = new Vector2(0f, 0.08f) * ModEntry.Config.QuickStackAnimationItemSpeed,
-                    scaleChange = -0.07f * ModEntry.Config.QuickStackAnimationItemSpeed,
+                    motion = new Vector2(0.6f, -4.5f) * ModEntry.Config.QuickStack.AnimationItemSpeedFactor,
+                    acceleration = new Vector2(0f, 0.08f) * ModEntry.Config.QuickStack.AnimationItemSpeedFactor,
+                    scaleChange = -0.07f * ModEntry.Config.QuickStack.AnimationItemSpeedFactor,
                 };
             }
             
@@ -140,11 +140,11 @@ namespace ConvenientInventory.QuickStack
                 delayBeforeAnimationStart = itemHoverSprite.delayBeforeAnimationStart + (int)itemHoverSprite.interval,
                 scale = 4f,
                 layerDepth = baseLayerDepth + addlayerDepth,
-                alphaFade = 0.04f * ModEntry.Config.QuickStackAnimationStackSpeed,
+                alphaFade = 0.04f * ModEntry.Config.QuickStack.AnimationStackSpeedFactor,
                 interval = fadeTime,
-                motion = new Vector2(0.6f, 4.5f) * ModEntry.Config.QuickStackAnimationStackSpeed,
-                acceleration = new Vector2(0f, -0.08f) * ModEntry.Config.QuickStackAnimationStackSpeed,
-                scaleChange = -0.07f * ModEntry.Config.QuickStackAnimationStackSpeed,
+                motion = new Vector2(0.6f, 4.5f) * ModEntry.Config.QuickStack.AnimationStackSpeedFactor,
+                acceleration = new Vector2(0f, -0.08f) * ModEntry.Config.QuickStack.AnimationStackSpeedFactor,
+                scaleChange = -0.07f * ModEntry.Config.QuickStack.AnimationStackSpeedFactor,
             };
 
             // Animate sprites separately by game location.

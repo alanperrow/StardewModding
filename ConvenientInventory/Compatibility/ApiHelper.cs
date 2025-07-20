@@ -16,7 +16,7 @@ namespace ConvenientInventory.Compatibility
             ChestsAnywhereApi = api;
         }
 
-        public static void Initialize(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IModHelper helper, IMonitor monitor)
+        public static void Initialize(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
             // == Config Validation ==
             bool isChestsAnywhereInstalled = ChestsAnywhereApi != null;

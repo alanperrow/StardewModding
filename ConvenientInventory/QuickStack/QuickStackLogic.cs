@@ -26,7 +26,7 @@ namespace ConvenientInventory.QuickStack
             Inventory playerInventory = who.Items;
 
             QuickStackAnimation quickStackAnimation = null;
-            if (ModEntry.Config.IsEnableQuickStackAnimation)
+            if (ModEntry.Config.QuickStack.IsAnimationEnabled)
             {
                 quickStackAnimation = new(who);
             }
@@ -62,7 +62,7 @@ namespace ConvenientInventory.QuickStack
                             continue;
                         }
 
-                        if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+                        if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
                         {
                             // Skip favorited items
                             continue;
@@ -70,7 +70,7 @@ namespace ConvenientInventory.QuickStack
 
                         if (dresserFakeChest != null)
                         {
-                            if (ModEntry.Config.IsQuickStackOverflowItems && playerItem.QualifiedItemId == chestItem.QualifiedItemId)
+                            if (ModEntry.Config.QuickStack.OverflowItems && playerItem.QualifiedItemId == chestItem.QualifiedItemId)
                             {
                                 // We found an existing occurence of this item in this Dresser, so add it to overflowItems.
                                 overflowItems.Add(playerItem.getOne());
@@ -81,8 +81,8 @@ namespace ConvenientInventory.QuickStack
                         }
                         else if (!playerItem.canStackWith(chestItem))
                         {
-                            if (ModEntry.Config.IsQuickStackOverflowItems
-                                && ModEntry.Config.IsQuickStackIgnoreItemQuality
+                            if (ModEntry.Config.QuickStack.OverflowItems
+                                && ModEntry.Config.QuickStack.IgnoreItemQuality
                                 && CanStackWithIgnoreQuality(playerItem, chestItem))
                             {
                                 overflowItems.Add(playerItem.getOne());
@@ -116,7 +116,7 @@ namespace ConvenientInventory.QuickStack
 
                         if (chestItem.Stack == chestItem.maximumStackSize())
                         {
-                            if (ModEntry.Config.IsQuickStackOverflowItems)
+                            if (ModEntry.Config.QuickStack.OverflowItems)
                             {
                                 overflowItems.Add(chestItem.getOne());
                             }
@@ -128,7 +128,7 @@ namespace ConvenientInventory.QuickStack
                 }
 
                 // Add overflow stacks to chest when applicable
-                if (ModEntry.Config.IsQuickStackOverflowItems && chestItems.Count < chest.GetActualCapacity())
+                if (ModEntry.Config.QuickStack.OverflowItems && chestItems.Count < chest.GetActualCapacity())
                 {
                     foreach (Item overflowItem in overflowItems)
                     {
@@ -144,7 +144,7 @@ namespace ConvenientInventory.QuickStack
                                 continue;
                             }
 
-                            if (ModEntry.Config.IsEnableFavoriteItems && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+                            if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
                             {
                                 // Skip favorited items
                                 continue;
@@ -365,7 +365,7 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Buildings
-            if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
+            if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories) // TODO: Update to check for Junimo huts and mills separately
             {
                 foreach (Building building in gameLocation.buildings)
                 {
@@ -422,7 +422,7 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Dressers
-            if (ModEntry.Config.IsQuickStackIntoDressers)
+            if (ModEntry.Config.QuickStack.IntoDressers)
             {
                 foreach (StorageFurniture dresser in gameLocation.furniture.Where(x => x is StorageFurniture and not FishTankFurniture).Cast<StorageFurniture>())
                 {
@@ -630,7 +630,7 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Buildings
-            if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories)
+            if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories) // TODO: Update to check for Junimo huts and mills separately
             {
                 foreach (Building building in gameLocation.buildings)
                 {
@@ -713,7 +713,7 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Dressers
-            if (ModEntry.Config.IsQuickStackIntoDressers)
+            if (ModEntry.Config.QuickStack.IntoDressers)
             {
                 foreach (StorageFurniture dresser in gameLocation.furniture.Where(x => x is StorageFurniture and not FishTankFurniture).Cast<StorageFurniture>())
                 {

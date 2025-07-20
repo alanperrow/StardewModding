@@ -101,9 +101,9 @@ namespace ConvenientInventory.QuickStack
         /// <returns>The data, if any. Otherwise, null.</returns>
         private static ChestAnimationData GetChestAnimationData(Chest chest)
         {
-            if (!ModEntry.Config.IsEnableQuickStack
-                || !ModEntry.Config.IsEnableQuickStackAnimation
-                || !ModEntry.Config.IsEnableQuickStackChestAnimation)
+            if (!ModEntry.Config.QuickStack.IsEnabled
+                || !ModEntry.Config.QuickStack.IsAnimationEnabled
+                || !ModEntry.Config.QuickStack.IsChestAnimationEnabled)
             {
                 return null;
             }
