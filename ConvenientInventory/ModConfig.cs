@@ -3,7 +3,6 @@ using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
 {
-    // TODO: Investigate if this class can be made static, to avoid needing to write 'ModEntry.Config' everywhere.
     public class ModConfig
     {
         private readonly IModHelper _helper;
