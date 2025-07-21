@@ -35,7 +35,7 @@ namespace ConvenientInventory.AutoOrganize
                     if (removed)
                     {
                         ModEntry.Instance.Monitor.Log(
-                            $"Removed auto organize mod data from chest ({chest.Name}) at location {gameLocation.Name} {chest.TileLocation}.",
+                            $"Removed auto organize mod data from chest ('{chest.Name}') at location {gameLocation.Name} {chest.TileLocation}.",
                             LogLevel.Trace);
                     }
                 }

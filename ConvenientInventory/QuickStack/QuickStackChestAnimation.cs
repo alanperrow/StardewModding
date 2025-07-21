@@ -57,7 +57,7 @@ namespace ConvenientInventory.QuickStack
                     if (removed)
                     {
                         ModEntry.Instance.Monitor.Log(
-                            $"Removed chest animation mod data from chest ({chest.Name}) at location {gameLocation.Name} {chest.TileLocation}.",
+                            $"Removed chest animation mod data from chest ('{chest.Name}') at location {gameLocation.Name} {chest.TileLocation}.",
                             LogLevel.Trace);
                     }
                 }

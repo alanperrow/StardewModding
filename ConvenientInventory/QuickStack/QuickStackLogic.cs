@@ -31,6 +31,8 @@ namespace ConvenientInventory.QuickStack
                 quickStackAnimation = new(who);
             }
 
+            QuickStackSummary quickStackSummary = new();
+
             foreach (TypedChest typedChest in chests)
             {
                 Chest chest = typedChest.Chest;
@@ -112,6 +114,7 @@ namespace ConvenientInventory.QuickStack
                             }
 
                             quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                            quickStackSummary.AddToSummary(typedChest, playerItem, beforeStack);
                         }
 
                         if (chestItem.Stack == chestItem.maximumStackSize())
@@ -180,6 +183,7 @@ namespace ConvenientInventory.QuickStack
                                 }
 
                                 quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                                quickStackSummary.AddToSummary(typedChest, playerItem, beforeStack);
                             }
 
                             if (leftoverItem is null)
@@ -197,6 +201,11 @@ namespace ConvenientInventory.QuickStack
 
             quickStackAnimation?.Complete();
             Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
+
+            if (movedAtLeastOneTotal)
+            {
+                ModEntry.Instance.Monitor.Log(quickStackSummary.GetSummaryMessage(), LogLevel.Trace);
+            }
 
             return movedAtLeastOneTotal;
         }

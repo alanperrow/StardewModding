@@ -177,7 +177,7 @@ namespace ConvenientInventory
                     StardewValley.Game1.createItemDebris(items[index], who.getStandingPosition(), who.FacingDirection)
                         .DroppedByPlayerID.Value = who.UniqueMultiplayerID;
 
-                    Monitor.Log($"Found non-null item: '{items[index].Name}' (x {items[index].Stack}) at index: {index} when resizing inventory."
+                    Monitor.Log($"Found non-null item: '{items[index].Name}' (x {items[index].Stack}) at index={index} when resizing inventory."
                         + " The item was manually dropped; this may have resulted in unexpected behavior.",
                         LogLevel.Warn);
                 }
