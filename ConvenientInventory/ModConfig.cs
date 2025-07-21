@@ -3,6 +3,7 @@ using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
 {
+    /// <summary>Represents the mod configuration. Acts as a wrapper around <see cref="SerializableModConfig"/>.</summary>
     public class ModConfig
     {
         private readonly IModHelper _helper;
@@ -117,11 +118,14 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIntoJunimoHuts = value;
             }
 
+            public bool IntoBuildingsWithInventories => IntoMills || IntoJunimoHuts;
+
             public bool IntoDressers
             {
                 get => _config.serialConfig.IsQuickStackIntoDressers;
                 set => _config.serialConfig.IsQuickStackIntoDressers = value;
             }
+
             public bool IntoHoppers
             {
                 get => _config.serialConfig.IsQuickStackIntoHoppers;
@@ -172,7 +176,7 @@ namespace ConvenientInventory
 
             public FavoriteItemsConfig(ModConfig modConfig)
             {
-                this._config = modConfig;
+                _config = modConfig;
             }
 
             public bool IsEnabled
@@ -207,7 +211,7 @@ namespace ConvenientInventory
 
             public TakeAllButOneConfig(ModConfig modConfig)
             {
-                this._config = modConfig;
+                _config = modConfig;
             }
 
             public bool IsEnabled
@@ -236,7 +240,7 @@ namespace ConvenientInventory
 
             public AutoOrganizeChestConfig(ModConfig modConfig)
             {
-                this._config = modConfig;
+                _config = modConfig;
             }
 
             public bool IsEnabled
@@ -259,7 +263,7 @@ namespace ConvenientInventory
 
             public MiscellaneousConfig(ModConfig modConfig)
             {
-                this._config = modConfig;
+                _config = modConfig;
             }
 
             public bool IsInventoryPageSideWarpEnabled

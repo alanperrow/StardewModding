@@ -303,6 +303,10 @@ namespace ConvenientInventory.QuickStack
                     continue;
                 }
 
+                // TODO: Check for hoppers
+
+                // TODO: Check for mini shipping bins
+
                 if (orderByDistance)
                 {
                     Vector2 chestTileCenterPosition = GetTileCenterPosition((int)chest.TileLocation.X, (int)chest.TileLocation.Y);
@@ -365,11 +369,11 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Buildings
-            if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories) // TODO: Update to check for Junimo huts and mills separately
+            if (ModEntry.Config.QuickStack.IntoBuildingsWithInventories)
             {
                 foreach (Building building in gameLocation.buildings)
                 {
-                    if (building is JunimoHut junimoHut)
+                    if (ModEntry.Config.QuickStack.IntoJunimoHuts && building is JunimoHut junimoHut)
                     {
                         if (junimoHut.GetOutputChest().GetMutex().IsLocked())
                         {
@@ -394,7 +398,7 @@ namespace ConvenientInventory.QuickStack
                         }
 
                     }
-                    else if (building.buildingType.Value == "Mill")
+                    else if (ModEntry.Config.QuickStack.IntoMills && building.buildingType.Value == "Mill")
                     {
                         if (building.isUnderConstruction() || building.GetBuildingChest("Input").GetMutex().IsLocked())
                         {
@@ -630,7 +634,7 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Buildings
-            if (ModEntry.Config.IsQuickStackIntoBuildingsWithInventories) // TODO: Update to check for Junimo huts and mills separately
+            if (ModEntry.Config.QuickStack.IntoBuildingsWithInventories)
             {
                 foreach (Building building in gameLocation.buildings)
                 {
@@ -640,7 +644,7 @@ namespace ConvenientInventory.QuickStack
                         Vector2 buildingTileCenterPosition = GetTileCenterPosition(building.tileX.Value, building.tileY.Value);
                         if (IsPositionWithinRange(originPosition.Value, buildingTileCenterPosition, range))
                         {
-                            if (building is JunimoHut junimoHut)
+                            if (ModEntry.Config.QuickStack.IntoJunimoHuts && building is JunimoHut junimoHut)
                             {
                                 if (junimoHut.GetOutputChest().GetMutex().IsLocked())
                                 {
@@ -656,7 +660,7 @@ namespace ConvenientInventory.QuickStack
                                 Chest hutChest = junimoHut.GetOutputChest();
                                 AddChestToList(hutChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.JunimoHut,  hutVisualTileLoc);
                             }
-                            else if (building.buildingType.Value == "Mill")
+                            else if (ModEntry.Config.QuickStack.IntoMills && building.buildingType.Value == "Mill")
                             {
                                 if (building.isUnderConstruction() || building.GetBuildingChest("Input").GetMutex().IsLocked())
                                 {
@@ -679,7 +683,7 @@ namespace ConvenientInventory.QuickStack
                         // We have a specified tile origin point
                         if (IsTileWithinRange(originTile.Value, building.tileX.Value, building.tileY.Value, range))
                         {
-                            if (building is JunimoHut junimoHut)
+                            if (ModEntry.Config.QuickStack.IntoJunimoHuts && building is JunimoHut junimoHut)
                             {
                                 if (junimoHut.GetOutputChest().GetMutex().IsLocked())
                                 {
@@ -693,7 +697,7 @@ namespace ConvenientInventory.QuickStack
                                 Chest hutChest = junimoHut.GetOutputChest();
                                 AddChestToList(hutChest, chestList, withDist, gameLocation, chestType: ChestType.JunimoHut, visualTileLoc: hutVisualTileLoc);
                             }
-                            else if (building.buildingType.Value == "Mill")
+                            else if (ModEntry.Config.QuickStack.IntoMills && building.buildingType.Value == "Mill")
                             {
                                 if (building.isUnderConstruction() || building.GetBuildingChest("Input").GetMutex().IsLocked())
                                 {

@@ -46,6 +46,10 @@ namespace ConvenientInventory.TypedChests
                 return ChestType.Dungeon;
             }
 
+            // TODO: Check for hoppers
+             
+            // TODO: Check for mini shipping bins
+
             return chest.ParentSheetIndex switch
             {
                 232 => ChestType.Stone,

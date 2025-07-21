@@ -3,6 +3,11 @@ using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
 {
+    /// <summary>Represents the mod configuration to be serialized to and deserialized from the mod's config file.</summary>
+    /// <remarks>
+    /// This class has been superseded by <see cref="ModConfig"/> but is still used as the config serialization type
+    /// for compatibility with existing config files.
+    /// </remarks>
     public class SerializableModConfig
     {
         // bool IsModEnabled { get; set; } = true;
