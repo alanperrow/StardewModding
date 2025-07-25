@@ -19,6 +19,10 @@ namespace ConvenientInventory.TypedChests
         public override Item addItem(Item item)
         {
             Dresser.onDresserItemDeposited(item);
+
+            // Manually set Stack to 0 so we can calculate the correct number of items moved (should always be 1, since dresser items are unstackable).
+            item.Stack = 0;
+
             return null;
         }
 

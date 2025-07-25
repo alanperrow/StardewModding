@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 using ConvenientInventory.TypedChests;
 using StardewValley;
 using System.Collections.Generic;
@@ -17,7 +16,6 @@ namespace ConvenientInventory.QuickStack
             if (!_movedItemsByTypedChest.ContainsKey(quickStackedChest))
             {
                 _movedItemsByTypedChest[quickStackedChest] = new List<MovedItem>();
-                return;
             }
 
             _movedItemsByTypedChest[quickStackedChest].Add(new MovedItem(quickStackedItem, beforeStack));
@@ -44,8 +42,13 @@ namespace ConvenientInventory.QuickStack
             int chestIndex = 0;
             foreach ((TypedChest quickStackedChest, List<MovedItem> movedItems) in _movedItemsByTypedChest)
             {
-                sb.Append($"\t{++chestIndex}.) Chest '{quickStackedChest.Chest.Name}' at location " +
-                    $"{quickStackedChest.ChestGameLocation} {quickStackedChest.Chest.TileLocation} received items: ");
+                sb.Append($"\t{++chestIndex}.) Chest '{quickStackedChest.Chest.Name}' of type '{quickStackedChest.ChestType}' ");
+                sb.Append($"at location {quickStackedChest.ChestGameLocation.Name} {quickStackedChest.Chest.TileLocation} ");
+                if (quickStackedChest.VisualTileLocation.HasValue)
+                {
+                    sb.Append($"(Visual {quickStackedChest.VisualTileLocation.Value})");
+                }
+                sb.Append("received items: ");
 
                 sb.Append('[');
                 for (int i = 0; i < movedItems.Count; i++)
@@ -58,7 +61,11 @@ namespace ConvenientInventory.QuickStack
                     }
                 }
                 sb.Append(']');
-                sb.AppendLine();
+
+                if (chestIndex < _movedItemsByTypedChest.Count)
+                {
+                    sb.AppendLine();
+                }
             }
 
             return sb.ToString();
@@ -67,7 +74,9 @@ namespace ConvenientInventory.QuickStack
         private record MovedItem
         {
             public Item Item { get; }
+
             public int AmountMoved { get; }
+
             public MovedItem(Item item, int beforeStack)
             {
                 Item = item;
