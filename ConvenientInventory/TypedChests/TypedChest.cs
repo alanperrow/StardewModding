@@ -28,16 +28,28 @@ namespace ConvenientInventory.TypedChests
 
         public Vector2? VisualTileLocation { get; }
 
+        /// <summary>
+        /// Given a vanilla <see cref="StardewValley.Objects.Chest"/>, determine its <see cref="TypedChests.ChestType"/> enum for use by this mod.
+        /// </summary>
         public static ChestType DetermineChestType(Chest chest)
         {
-            if (chest.SpecialChestType == Chest.SpecialChestTypes.BigChest)
+            switch (chest.SpecialChestType)
             {
-                return chest.QualifiedItemId == "(BC)BigStoneChest" ? ChestType.BigStone : ChestType.BigNormal;
-            }
+                case Chest.SpecialChestTypes.None:
+                    break;
 
-            if (chest.SpecialChestType != Chest.SpecialChestTypes.None)
-            {
-                return ChestType.Special;
+                case Chest.SpecialChestTypes.BigChest:
+                    return chest.QualifiedItemId == "(BC)BigStoneChest" ? ChestType.BigStone : ChestType.BigNormal;
+
+                case Chest.SpecialChestTypes.AutoLoader:
+                    return ChestType.Hopper;
+
+                case Chest.SpecialChestTypes.MiniShippingBin:
+                    return ChestType.MiniShippingBin;
+
+                default:
+                    // If the chest has a special type other than None, but not any of the special types above, simply treat it as Special.
+                    return ChestType.Special;
             }
 
             if (chest.Location is VolcanoDungeon)
@@ -45,10 +57,6 @@ namespace ConvenientInventory.TypedChests
                 // Chests cannot be manually placed in a dungeon, so this must be a generated dungeon chest.
                 return ChestType.Dungeon;
             }
-
-            // TODO: Check for hoppers
-             
-            // TODO: Check for mini shipping bins
 
             return chest.ParentSheetIndex switch
             {

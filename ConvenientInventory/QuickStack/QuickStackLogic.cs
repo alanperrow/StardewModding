@@ -299,22 +299,10 @@ namespace ConvenientInventory.QuickStack
 
             foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
             {
-                // Make sure chest is not in-use by another player (easy fix to avoid concurrency issues and possibly item deletion/duplication)
-                if (chest.GetMutex().IsLocked())
+                if (!ShouldQuickStackInto(chest, out ChestType chestType))
                 {
                     continue;
                 }
-
-                ChestType chestType = TypedChest.DetermineChestType(chest);
-                if (chestType == ChestType.Package || chestType == ChestType.Dungeon)
-                {
-                    // Do not consider new farmer packages or dungeon chests for quick stack
-                    continue;
-                }
-
-                // TODO: Check for hoppers
-
-                // TODO: Check for mini shipping bins
 
                 if (orderByDistance)
                 {
@@ -544,16 +532,8 @@ namespace ConvenientInventory.QuickStack
 
                     if (gameLocation.objects.TryGetValue(tileLocation, out StardewValley.Object obj) && obj is Chest chest)
                     {
-                        // Make sure chest is not in-use by another player (easy fix to avoid concurrency issues and possibly item deletion/duplication)
-                        if (chest.GetMutex().IsLocked())
+                        if (!ShouldQuickStackInto(chest, out ChestType chestType))
                         {
-                            continue;
-                        }
-
-                        ChestType chestType = TypedChest.DetermineChestType(chest);
-                        if (chestType == ChestType.Package || chestType == ChestType.Dungeon)
-                        {
-                            // Do not consider new farmer packages or dungeon chests for quick stack
                             continue;
                         }
 
@@ -768,6 +748,38 @@ namespace ConvenientInventory.QuickStack
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Determines if the provided chest can be quick stacked into, based on its mutex state and chest type.
+        /// </summary>
+        private static bool ShouldQuickStackInto(Chest chest, out ChestType chestType)
+        {
+            chestType = TypedChest.DetermineChestType(chest);
+
+            if (chest.GetMutex().IsLocked())
+            {
+                // Prevent quick stack if chest is in-use by a player (easy fix to avoid concurrency issues and possibly item deletion/duplication)
+                return false;
+            }
+
+            if (chestType is ChestType.Package or ChestType.Dungeon)
+            {
+                // Do not consider new farmer packages or dungeon chests for quick stack
+                return false;
+            }
+
+            if (!ModEntry.Config.QuickStack.IntoHoppers && chestType == ChestType.Hopper)
+            {
+                return false;
+            }
+
+            if (!ModEntry.Config.QuickStack.IntoMiniShippingBins && chestType == ChestType.MiniShippingBin)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private static void AddChestToList(

@@ -46,7 +46,7 @@ namespace ConvenientInventory.QuickStack
                 sb.Append($"at location {quickStackedChest.ChestGameLocation.Name} {quickStackedChest.Chest.TileLocation} ");
                 if (quickStackedChest.VisualTileLocation.HasValue)
                 {
-                    sb.Append($"(Visual {quickStackedChest.VisualTileLocation.Value})");
+                    sb.Append($"(Visual {quickStackedChest.VisualTileLocation.Value}) ");
                 }
                 sb.Append("received items: ");
 
