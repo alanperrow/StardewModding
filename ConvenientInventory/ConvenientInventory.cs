@@ -242,10 +242,6 @@ namespace ConvenientInventory
             // Only allow favoriting if selected slot contains an item. Always allow unfavoriting.
             if (clickPos != -1 && inventoryMenu.actualInventory.Count > clickPos && (FavoriteItemSlots[clickPos] || inventoryMenu.actualInventory[clickPos] != null))
             {
-                ModEntry.Instance.Monitor
-                    .Log($"{(FavoriteItemSlots[clickPos] ? "Un-" : string.Empty)}Favorited item slot {clickPos}: {inventoryMenu.actualInventory[clickPos]?.Name}",
-                    LogLevel.Trace);
-
                 Game1.playSound("smallSelect");
 
                 FavoriteItemSlots[clickPos] = (favoriteOverride is null)
