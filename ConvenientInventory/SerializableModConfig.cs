@@ -27,8 +27,6 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
 
-        //public bool IsQuickStackIntoBuildingsWithInventories { get; set; } = true;
-
         public bool IsQuickStackIntoMills { get; set; } = true;
 
         public bool IsQuickStackIntoJunimoHuts { get; set; } = true;
@@ -37,7 +35,7 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIntoHoppers { get; set; } = true;
 
-        public bool IsQuickStackIntoMiniShippingBins { get; set; } = true;
+        public bool IsQuickStackIntoMiniShippingBins { get; set; } = false;
 
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;
 
