@@ -37,6 +37,10 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIntoMiniShippingBins { get; set; } = false;
 
+        public bool IsEnableQuickStackToggleChest { get; set; } = false;
+
+        public bool IsEnableQuickStackPrioritizeChest { get; set; } = false;
+
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;
 
         public bool IsEnableQuickStackAnimation { get; set; } = true;

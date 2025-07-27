@@ -144,6 +144,22 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
+                getValue: () => config.QuickStack.IsToggleChestEnabled,
+                setValue: value => config.QuickStack.IsToggleChestEnabled = value,
+                name: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Name,
+                tooltip: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsPrioritizeChestEnabled,
+                setValue: value => config.QuickStack.IsPrioritizeChestEnabled = value,
+                name: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Name,
+                tooltip: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
                 getValue: () => config.QuickStack.DrawChestsInButtonTooltip,
                 setValue: value => config.QuickStack.DrawChestsInButtonTooltip = value,
                 name: I18n.ModConfigMenu_IsQuickStackTooltipDrawNearbyChests_Name,

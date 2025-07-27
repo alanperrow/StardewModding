@@ -138,6 +138,18 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIntoMiniShippingBins = value;
             }
 
+            public bool IsToggleChestEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackToggleChest;
+                set => _config.serialConfig.IsEnableQuickStackToggleChest = value;
+            }
+
+            public bool IsPrioritizeChestEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackPrioritizeChest;
+                set => _config.serialConfig.IsEnableQuickStackPrioritizeChest = value;
+            }
+
             public bool DrawChestsInButtonTooltip
             {
                 get => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests;
