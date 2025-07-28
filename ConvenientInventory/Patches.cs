@@ -20,11 +20,11 @@ namespace ConvenientInventory
 {
     public static class InventoryPageConstructorPatch
     {
-        public static void Postfix(InventoryPage __instance, int x, int y, int width, int height)
+        public static void Postfix(InventoryPage __instance, int width, int height)
         {
             try
             {
-                ConvenientInventory.InventoryPageConstructor(__instance, x, y, width, height);
+                ConvenientInventory.InventoryPageConstructor(__instance, width, height);
             }
             catch (Exception e)
             {

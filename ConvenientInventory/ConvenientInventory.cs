@@ -136,7 +136,7 @@ namespace ConvenientInventory
             return saveStr;
         }
 
-        public static void InventoryPageConstructor(InventoryPage inventoryPage, int x, int y, int width, int height)
+        public static void InventoryPageConstructor(InventoryPage inventoryPage, int width, int height)
         {
             PlayerInventoryPage = inventoryPage;
 
