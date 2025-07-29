@@ -1,10 +1,11 @@
-﻿using System;
-using ConvenientInventory.AutoOrganize;
+﻿using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.QuickStack;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley.Menus;
+using System;
 
 namespace ConvenientInventory
 {
@@ -26,8 +27,9 @@ namespace ConvenientInventory
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetReady += OnAssetReady;
 
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.Display.MenuChanged += OnMenuChanged;
 
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.Saving += OnSaving;
 
@@ -54,6 +56,20 @@ namespace ConvenientInventory
 
         /// <summary>Raised after an asset is loaded by the content pipeline, after all mod edits specified via "AssetRequested" have been applied.</summary>
         private void OnAssetReady(object sender, AssetReadyEventArgs e) => CachedTextures.OnAssetReady(e);
+
+        /// <summary>Raised after a game menu is opened, closed, or replaced.</summary>
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            if (e.OldMenu is ItemGrabMenu)
+            {
+                ToggleChestQuickStackLogic.OnClosedItemGrabMenu();
+            }
+
+            if (e.NewMenu is ItemGrabMenu itemGrabMenu)
+            {
+                ToggleChestQuickStackLogic.OnOpenedItemGrabMenu(itemGrabMenu);
+            }
+        }
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).
         /// All mods are loaded and initialised at this point, so this is a good time to set up mod integrations.</summary>

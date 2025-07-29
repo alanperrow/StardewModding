@@ -6,6 +6,12 @@
   "AutoOrganizeButton.hoverText.disable": "(Right click to disable)",
   "AutoOrganizeButton.hoverText.disable-gamepad": "(X to disable)",
 
+  "ToggleChestQuickStackButton.hoverText.enabled": "Quick Stack Enabled",
+  "ToggleChestQuickStackButton.hoverText.disabled": "Quick Stack Disabled",
+  "ToggleChestQuickStackButton.hoverText.priority1": "+1 Priority",
+  "ToggleChestQuickStackButton.hoverText.priority2": "+2 Priority",
+  "ToggleChestQuickStackButton.hoverText.priority3": "+3 Priority",
+
   // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "Quick Stack To Nearby Chests",
 
