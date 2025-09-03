@@ -53,11 +53,11 @@ namespace ConvenientInventory
             FavoriteItemsHighlight = Game1.content.Load<Texture2D>(ModAssetPrefix + $"favoriteHighlight_{config.FavoriteItems.HighlightTextureChoice}");
             FavoriteItemsBorder = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteBorder");
             AutoOrganizeButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "autoOrganizeIcon");
-            ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabled");
-            ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabled");
-            ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1");
-            ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2");
-            ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3");
+            ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabledIcon");
+            ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabledIcon");
+            ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1Icon");
+            ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2Icon");
+            ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
         }
 
         /// <summary>
@@ -86,25 +86,25 @@ namespace ConvenientInventory
             {
                 e.LoadFromModFile<Texture2D>(@"assets\autoOrganizeIcon.png", AssetLoadPriority.Medium);
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackDisabled"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackDisabledIcon"))
             {
-                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackDisabled.png", AssetLoadPriority.Medium);
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackDisabledIcon.png", AssetLoadPriority.Medium);
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackEnabled"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackEnabledIcon"))
             {
-                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackEnabled.png", AssetLoadPriority.Medium);
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackEnabledIcon.png", AssetLoadPriority.Medium);
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority1"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority1Icon"))
             {
-                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority1.png", AssetLoadPriority.Medium);
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority1Icon.png", AssetLoadPriority.Medium);
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority2"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority2Icon"))
             {
-                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority2.png", AssetLoadPriority.Medium);
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority2Icon.png", AssetLoadPriority.Medium);
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority3"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority3Icon"))
             {
-                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority3.png", AssetLoadPriority.Medium);
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority3Icon.png", AssetLoadPriority.Medium);
             }
         }
 
@@ -134,25 +134,25 @@ namespace ConvenientInventory
             {
                 AutoOrganizeButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "autoOrganizeIcon");
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackDisabled"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackDisabledIcon"))
             {
-                ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabled");
+                ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabledIcon");
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackEnabled"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackEnabledIcon"))
             {
-                ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabled");
+                ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabledIcon");
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority1"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority1Icon"))
             {
-                ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1");
+                ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1Icon");
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority2"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority2Icon"))
             {
-                ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2");
+                ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2Icon");
             }
-            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority3"))
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority3Icon"))
             {
-                ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3");
+                ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
             }
         }
     }
