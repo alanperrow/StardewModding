@@ -494,8 +494,6 @@ namespace ConvenientInventory
 
                     return;
                 }
-
-                // TODO: Trinkets - does this need Wear More Rings check, like for rings?
             }
 
             switch (equipmentSlot.name)
