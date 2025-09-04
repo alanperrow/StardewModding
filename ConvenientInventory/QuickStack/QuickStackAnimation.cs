@@ -14,7 +14,7 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public class QuickStackAnimation
     {
-        private readonly Random random = new();
+        private static readonly Random random = new();
 
         /// <summary>
         /// Creates a new instance of <see cref="QuickStackAnimation"/> with reference to the provided farmer.
