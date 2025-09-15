@@ -253,6 +253,37 @@ namespace ConvenientInventory.QuickStack
         }
 
         /// <summary>
+        /// Determines if the provided chest can be quick stacked into, based on its chest type and mutex state (optional).
+        /// If <paramref name="chest"/> is <see langword="null"/>, returns <see langword="false"/>.
+        /// </summary>
+        public static bool ShouldQuickStackInto(Chest chest, out ChestType chestType, bool checkMutex = true)
+        {
+            if (chest is null || (checkMutex && chest.GetMutex().IsLocked()))
+            {
+                // Prevent quick stack if chest is in-use by a player (easy fix to avoid concurrency issues and possibly item deletion/duplication)
+                chestType = default;
+                return false;
+            }
+
+            chestType = TypedChest.DetermineChestType(chest);
+            if (chestType is ChestType.Package or ChestType.Dungeon)
+            {
+                // Do not consider new farmer packages or dungeon chests for quick stack
+                return false;
+            }
+            else if (!ModEntry.Config.QuickStack.IntoHoppers && chestType == ChestType.Hopper)
+            {
+                return false;
+            }
+            else if (!ModEntry.Config.QuickStack.IntoMiniShippingBins && chestType == ChestType.MiniShippingBin)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Returns all chests from all locations in the world.
         /// Priority is given to chests in <paramref name="gameLocation"/>, which are ordered by the point-distance from their tile-center to origin.
         /// Next priority is given to any interior locations of <paramref name="gameLocation"/>.
@@ -739,37 +770,6 @@ namespace ConvenientInventory.QuickStack
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Determines if the provided chest can be quick stacked into, based on its mutex state and chest type.
-        /// If <paramref name="chest"/> is <see langword="null"/>, returns <see langword="false"/>.
-        /// </summary>
-        private static bool ShouldQuickStackInto(Chest chest, out ChestType chestType)
-        {
-            if (chest is null || chest.GetMutex().IsLocked())
-            {
-                // Prevent quick stack if chest is in-use by a player (easy fix to avoid concurrency issues and possibly item deletion/duplication)
-                chestType = default;
-                return false;
-            }
-
-            chestType = TypedChest.DetermineChestType(chest);
-            if (chestType is ChestType.Package or ChestType.Dungeon)
-            {
-                // Do not consider new farmer packages or dungeon chests for quick stack
-                return false;
-            }
-            else if (!ModEntry.Config.QuickStack.IntoHoppers && chestType == ChestType.Hopper)
-            {
-                return false;
-            }
-            else if (!ModEntry.Config.QuickStack.IntoMiniShippingBins && chestType == ChestType.MiniShippingBin)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         private static void AddChestToList(

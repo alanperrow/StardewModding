@@ -22,7 +22,7 @@ namespace ConvenientInventory.AutoOrganize
         private static string AutoOrganizeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/AutoOrganize";
 
         /// <summary>
-        /// Iterates through all chests in each game location and removes any auto organize mod data.
+        /// Iterates through all chests in the provided game location and removes any auto organize mod data.
         /// </summary>
         public static bool CleanupAutoOrganizeModDataByLocation(GameLocation gameLocation)
         {
@@ -31,7 +31,6 @@ namespace ConvenientInventory.AutoOrganize
                 foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
                 {
                     bool removed = chest.modData.Remove(AutoOrganizeModDataKey);
-
                     if (removed)
                     {
                         ModEntry.Instance.Monitor.Log(

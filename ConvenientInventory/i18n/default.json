@@ -6,11 +6,11 @@
   "AutoOrganizeButton.hoverText.disable": "(Right click to disable)",
   "AutoOrganizeButton.hoverText.disable-gamepad": "(X to disable)",
 
-  "ToggleChestQuickStackButton.hoverText.enabled": "Quick Stack Enabled",
-  "ToggleChestQuickStackButton.hoverText.disabled": "Quick Stack Disabled",
-  "ToggleChestQuickStackButton.hoverText.priority1": "+1 Priority",
-  "ToggleChestQuickStackButton.hoverText.priority2": "+2 Priority",
-  "ToggleChestQuickStackButton.hoverText.priority3": "+3 Priority",
+  "QuickStackToggleChestButton.hoverText.enabled": "Quick Stack Enabled",
+  "QuickStackToggleChestButton.hoverText.disabled": "Quick Stack Disabled",
+  "QuickStackToggleChestButton.hoverText.priority1": "+1 Priority",
+  "QuickStackToggleChestButton.hoverText.priority2": "+2 Priority",
+  "QuickStackToggleChestButton.hoverText.priority3": "+3 Priority",
 
   // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "Quick Stack To Nearby Chests",
@@ -53,7 +53,7 @@
   "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "If enabled, nearby Mini-Shipping Bins will be considered when quick stacking.",
 
   "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "Toggle quick stack per-chest?",
-  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "If enabled, adds a Toggle Quick Stack button to the chest menu to determine whether that specific chest will be considered when quick stacking.",
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "If enabled, adds a Toggle Quick Stack button to chest menus to determine whether that specific chest will be considered when quick stacking.",
 
   "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "Prioritize quick stack per-chest?",
   "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button can also assign a priority level for that specific chest.\nChests with a higher priority level will be considered first when quick stacking.",

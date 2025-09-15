@@ -262,6 +262,7 @@ namespace ConvenientInventory
             try
             {
                 ConvenientInventory.PostClickableTextureComponentDraw(__instance, b);
+                QuickStackToggleChestLogic.OnDrawComponent(__instance, b);
             }
             catch (Exception e)
             {
@@ -903,6 +904,48 @@ namespace ConvenientInventory
             catch (Exception e)
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetUpForGamePadMode_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ItemGrabMenu.performHoverAction))]
+        public static void PerformHoverAction_Postfix(int x, int y)
+        {
+            try
+            {
+                QuickStackToggleChestLogic.OnPerformHoverActionInItemGrabMenu(x, y);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(PerformHoverAction_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ItemGrabMenu.receiveLeftClick))]
+        public static void ReceiveLeftClick_Postfix(int x, int y)
+        {
+            try
+            {
+                QuickStackToggleChestLogic.OnReceiveLeftClickInItemGrabMenu(x, y);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ItemGrabMenu.SetupBorderNeighbors))]
+        public static void SetupBorderNeighbors_Postfix()
+        {
+            try
+            {
+                QuickStackToggleChestLogic.OnSetupBorderNeighborsInItemGrabMenu();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetupBorderNeighbors_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
     }

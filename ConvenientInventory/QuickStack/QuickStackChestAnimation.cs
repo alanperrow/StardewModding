@@ -42,7 +42,7 @@ namespace ConvenientInventory.QuickStack
         }
 
         /// <summary>
-        /// Iterates through all chests in each game location and removes any quick stack chest animation mod data.
+        /// Iterates through all chests in the provided game location and removes any quick stack chest animation mod data.
         /// </summary>
         public static bool CleanupChestAnimationModDataByLocation(GameLocation gameLocation)
         {

@@ -41,7 +41,7 @@ namespace ConvenientInventory
 
         public bool IsEnableQuickStackPrioritizeChest { get; set; } = false;
 
-        // TODO: Add separate config option for showing button in chest menu.
+        // TODO: (?) Add separate config option for showing button in chest menu.
         //       Maybe some users will want to disable quick stack for one or two chests, then hide the button and never mess with it again.
 
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;

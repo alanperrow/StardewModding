@@ -62,12 +62,12 @@ namespace ConvenientInventory
         {
             if (e.OldMenu is ItemGrabMenu)
             {
-                ChestQuickStackToggleLogic.OnClosedItemGrabMenu();
+                QuickStackToggleChestLogic.OnClosedItemGrabMenu();
             }
 
             if (e.NewMenu is ItemGrabMenu itemGrabMenu)
             {
-                ChestQuickStackToggleLogic.OnOpenedItemGrabMenu(itemGrabMenu);
+                QuickStackToggleChestLogic.OnOpenedItemGrabMenu(itemGrabMenu);
             }
         }
 
