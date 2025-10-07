@@ -1053,21 +1053,19 @@ namespace ConvenientInventory
 
         public static void PostClickableTextureComponentDraw(ClickableTextureComponent textureComponent, SpriteBatch spriteBatch)
         {
-            // Check if we have just drawn the trash can for this inventory page, which happens before in-game tooltip is drawn.
-            if (PlayerInventoryPage?.trashCan != textureComponent)
-            {
-                return;
-            }
-
             if (ModEntry.Config.QuickStack.IsEnabled)
             {
-                // Draw transferred item sprites
-                foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in TransferredItemSprites)
+                // Check if we have just drawn the trash can for this inventory page, which happens before in-game tooltip is drawn.
+                if (PlayerInventoryPage?.trashCan == textureComponent)
                 {
-                    transferredItemSprite.Draw(spriteBatch);
-                }
+                    // Draw transferred item sprites
+                    foreach (ItemGrabMenu.TransferredItemSprite transferredItemSprite in TransferredItemSprites)
+                    {
+                        transferredItemSprite.Draw(spriteBatch);
+                    }
 
-                QuickStackButton?.draw(spriteBatch);
+                    QuickStackButton?.draw(spriteBatch);
+                }
             }
         }
 

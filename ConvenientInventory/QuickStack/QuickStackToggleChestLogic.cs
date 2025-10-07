@@ -60,8 +60,27 @@ namespace ConvenientInventory.QuickStack
             return true;
         }
 
+        //public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
+        //{
+        //    //// DEBUG: Prefer constructor approach for now
+        //    //if (!ModEntry.Config.QuickStack.IsToggleChestEnabled
+        //    //    || !ShouldQuickStackIntoMenuContext(itemGrabMenu)
+        //    //    || itemGrabMenu.fillStacksButton == null)
+        //    //{
+        //    //    return;
+        //    //}
+
+        //    //QuickStackToggleChestButton = CreateButton(itemGrabMenu);
+        //    //ActiveItemGrabMenu = itemGrabMenu;
+
+        //    ////ActiveItemGrabMenu.allClickableComponents.Add(QuickStackToggleChestButton);
+        //}
+
         public static void OnOpenedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
+            //// DEBUG: Prefer constructor approach for now
+            //return;
+
             if (!ModEntry.Config.QuickStack.IsToggleChestEnabled
                 || !ShouldQuickStackIntoMenuContext(itemGrabMenu)
                 || itemGrabMenu.fillStacksButton == null)
@@ -79,6 +98,17 @@ namespace ConvenientInventory.QuickStack
             ActiveItemGrabMenu = null;
         }
 
+        public static void OnWindowResized()
+        {
+            if (QuickStackToggleChestButton == null || ActiveItemGrabMenu == null)
+            {
+                return;
+            }
+
+            // Reposition our button now that the window size has changed.
+            QuickStackToggleChestButton.bounds = GetButtonBounds(ActiveItemGrabMenu);
+        }
+
         public static void OnSetupBorderNeighborsInItemGrabMenu()
         {
             if (QuickStackToggleChestButton == null || ActiveItemGrabMenu == null)
@@ -86,7 +116,18 @@ namespace ConvenientInventory.QuickStack
                 return;
             }
 
-            // All ItemGrabMenu button neighbors get re-setup when color picker is toggled, so we need to re-setup our button neighbors too. 
+            // All ItemGrabMenu button neighbors get re-setup when color picker is toggled, so we need to re-setup our button neighbors too.
+            SetButtonNeighborIds(QuickStackToggleChestButton, ActiveItemGrabMenu);
+        }
+
+        public static void OnPopulateClickableComponentsListInItemGrabMenu()
+        {
+            if (QuickStackToggleChestButton == null || ActiveItemGrabMenu == null)
+            {
+                return;
+            }
+
+            // Add our button to the new clickable components list (and set up its neighbors).
             SetButtonNeighborIds(QuickStackToggleChestButton, ActiveItemGrabMenu);
         }
 
@@ -140,11 +181,7 @@ namespace ConvenientInventory.QuickStack
 
         private static ClickableTextureComponent CreateButton(ItemGrabMenu itemGrabMenu)
         {
-            const int buttonSize = 64;
-            Rectangle buttonBounds = new(
-                itemGrabMenu.fillStacksButton.bounds.Left + buttonSize + 16, // Place to the right of Fill Stacks button
-                itemGrabMenu.fillStacksButton.bounds.Top,
-                buttonSize, buttonSize);
+            Rectangle buttonBounds = GetButtonBounds(itemGrabMenu);
             (string buttonHoverText, Texture2D buttonTexture) = GetDynamicButtonData(itemGrabMenu);
 
             ClickableTextureComponent button = new(
@@ -161,6 +198,18 @@ namespace ConvenientInventory.QuickStack
 
             SetButtonNeighborIds(button, itemGrabMenu);
             return button;
+        }
+
+        private static Rectangle GetButtonBounds(ItemGrabMenu itemGrabMenu)
+        {
+            // Place to the right of Fill Stacks button.
+            const int buttonSize = 64;
+            Rectangle buttonBounds = new(
+                itemGrabMenu.fillStacksButton.bounds.Left + buttonSize + 16,
+                itemGrabMenu.fillStacksButton.bounds.Top,
+                buttonSize, buttonSize);
+
+            return buttonBounds;
         }
 
         private static (string, Texture2D) GetDynamicButtonData(ItemGrabMenu itemGrabMenu)
@@ -216,12 +265,15 @@ namespace ConvenientInventory.QuickStack
                 : (itemGrabMenu.specialButton != null ? ItemGrabMenu.region_specialButton : ClickableComponent.ID_ignore);
             button.downNeighborID = ItemGrabMenu.region_organizeButton;
 
-            // TODO: Setting fillStacksButton.rightNeighborId is not having any effect... why?
-            //       The rightNeighborId is remaining set to our custom ID, but the cursor does not move to our button. Am I missing something?
-
             // Define our button as the right neighbor of the Fill Stacks button.
             button.leftNeighborID = ItemGrabMenu.region_fillStacksButton;
             itemGrabMenu.fillStacksButton.rightNeighborID = QuickStackToggleChestButtonID;
+
+            // Add our button to the menu.
+            if (!itemGrabMenu.allClickableComponents.Contains(button))
+            {
+                itemGrabMenu.allClickableComponents.Add(button);
+            }
         }
 
         private static IHaveModData GetMenuContextAsIHaveModData(ItemGrabMenu itemGrabMenu) => itemGrabMenu?.context as IHaveModData;

@@ -28,6 +28,7 @@ namespace ConvenientInventory
             helper.Events.Content.AssetReady += OnAssetReady;
 
             helper.Events.Display.MenuChanged += OnMenuChanged;
+            helper.Events.Display.WindowResized += OnWindowResized;
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
@@ -69,6 +70,12 @@ namespace ConvenientInventory
             {
                 QuickStackToggleChestLogic.OnOpenedItemGrabMenu(itemGrabMenu);
             }
+        }
+
+        /// <summary>Raised after the game window is resized.</summary>
+        private void OnWindowResized(object sender, WindowResizedEventArgs e)
+        {
+            QuickStackToggleChestLogic.OnWindowResized();
         }
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).

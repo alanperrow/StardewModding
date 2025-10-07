@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq;
 using System.Text;
+using ConvenientInventory.AutoOrganize;
+using ConvenientInventory.QuickStack;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Menus;
 using StardewValley.Inventories;
+using StardewValley.Menus;
 using StardewValley.Objects;
-using ConvenientInventory.QuickStack;
-using ConvenientInventory.AutoOrganize;
 
 namespace ConvenientInventory
 {
@@ -165,6 +165,23 @@ namespace ConvenientInventory
     public static class IClickableMenuPatches
     {
         [HarmonyPostfix]
+        [HarmonyPatch(nameof(IClickableMenu.exitThisMenu))]
+        public static void ExitThisMenu_Postfix(IClickableMenu __instance)
+        {
+            try
+            {
+                if (__instance is ItemGrabMenu)
+                {
+                    QuickStackToggleChestLogic.OnExitedItemGrabMenu(__instance);
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ExitThisMenu_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch(nameof(IClickableMenu.populateClickableComponentList))]
         public static void PopulateClickableComponentsList_Postfix(IClickableMenu __instance)
         {
@@ -173,6 +190,10 @@ namespace ConvenientInventory
                 if (__instance is InventoryPage inventoryPage)
                 {
                     ConvenientInventory.PopulateClickableComponentsListInInventoryPage(inventoryPage);
+                }
+                else if (__instance is ItemGrabMenu)
+                {
+                    QuickStackToggleChestLogic.OnPopulateClickableComponentsListInItemGrabMenu();
                 }
             }
             catch (Exception e)
@@ -948,6 +969,29 @@ namespace ConvenientInventory
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetupBorderNeighbors_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(MethodType.Constructor, new Type[]
+        {
+            typeof(IList<Item>), typeof(bool), typeof(bool), typeof(InventoryMenu.highlightThisItem), typeof(ItemGrabMenu.behaviorOnItemSelect),
+            typeof(string), typeof(ItemGrabMenu.behaviorOnItemSelect), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool),
+            typeof(int), typeof(Item), typeof(int), typeof(object), typeof(ItemExitBehavior), typeof(bool)
+        })]
+        public static void Constructor18_Postfix(ItemGrabMenu __instance)
+        {
+            try
+            {
+                QuickStackToggleChestLogic.OnConstructedItemGrabMenu(__instance);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Constructor18_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(MethodType.Constructor, new Type[] { typeof(IList<Item>), typeof(object) })]
+        public static void Constructor2_Postfix(ItemGrabMenu __instance) => Constructor18_Postfix(__instance);
     }
 
     [HarmonyPatch(typeof(Item))]
