@@ -60,6 +60,29 @@ namespace ConvenientInventory.QuickStack
             return true;
         }
 
+        /// <summary>
+        /// Gets the current <see cref="QuickStackToggleChestState"/> value from the provided chest's mod data.
+        /// </summary>
+        /// <param name="menuContextChest"></param>
+        /// <returns>The obtained <see cref="QuickStackToggleChestState"/> value, or the default enum value if not found.</returns>
+        public static QuickStackToggleChestState GetQuickStackToggleChestStateFromModData(IHaveModData chest)
+        {
+            if (chest == null || !chest.modData.ContainsKey(QuickStackToggleChestModDataKey))
+            {
+                // Return default state.
+                return QuickStackToggleChestState.Enabled;
+            }
+
+            string modDataValue = chest.modData[QuickStackToggleChestModDataKey];
+            if (!Enum.TryParse(modDataValue, out QuickStackToggleChestState parsedState))
+            {
+                // Return default state.
+                return QuickStackToggleChestState.Enabled;
+            }
+
+            return parsedState;
+        }
+
         public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
             if (!ModEntry.Config.QuickStack.IsToggleChestEnabled
@@ -149,11 +172,27 @@ namespace ConvenientInventory.QuickStack
                 return;
             }
 
-            IHaveModData modDataMenuContext = GetMenuContextAsIHaveModData(ActiveItemGrabMenu);
-            QuickStackToggleChestState updatedState = UpdateQuickStackToggleChestStateInModData(modDataMenuContext);
+            IHaveModData menuContextChest = GetMenuContextChest(ActiveItemGrabMenu);
+            QuickStackToggleChestState updatedState = UpdateQuickStackToggleChestStateInModData(menuContextChest);
 
-            QuickStackToggleChestButton.hoverText = GetHoverText(modDataMenuContext, updatedState);
-            QuickStackToggleChestButton.texture = GetButtonTexture(modDataMenuContext, updatedState);
+            QuickStackToggleChestButton.hoverText = GetHoverText(menuContextChest, updatedState);
+            QuickStackToggleChestButton.texture = GetButtonTexture(menuContextChest, updatedState);
+
+            Game1.playSound("drumkit6");
+        }
+
+        public static void OnReceiveRightClickInItemGrabMenu(int x, int y)
+        {
+            if (QuickStackToggleChestButton == null || ActiveItemGrabMenu == null || !QuickStackToggleChestButton.containsPoint(x, y))
+            {
+                return;
+            }
+
+            IHaveModData menuContextChest = GetMenuContextChest(ActiveItemGrabMenu);
+            QuickStackToggleChestState updatedState = UpdateQuickStackToggleChestStateInModData(menuContextChest, false);
+
+            QuickStackToggleChestButton.hoverText = GetHoverText(menuContextChest, updatedState);
+            QuickStackToggleChestButton.texture = GetButtonTexture(menuContextChest, updatedState);
 
             Game1.playSound("drumkit6");
         }
@@ -200,14 +239,14 @@ namespace ConvenientInventory.QuickStack
 
         private static (string, Texture2D) GetDynamicButtonData(ItemGrabMenu itemGrabMenu)
         {
-            IHaveModData modDataMenuContext = GetMenuContextAsIHaveModData(itemGrabMenu);
-            QuickStackToggleChestState state = GetQuickStackToggleChestStateFromModData(modDataMenuContext);
-            return (GetHoverText(modDataMenuContext, state), GetButtonTexture(modDataMenuContext, state));
+            IHaveModData menuContextChest = GetMenuContextChest(itemGrabMenu);
+            QuickStackToggleChestState state = GetQuickStackToggleChestStateFromModData(menuContextChest);
+            return (GetHoverText(menuContextChest, state), GetButtonTexture(menuContextChest, state));
         }
 
-        private static string GetHoverText(IHaveModData modDataMenuContext, QuickStackToggleChestState state)
+        private static string GetHoverText(IHaveModData menuContextChest, QuickStackToggleChestState state)
         {
-            if (modDataMenuContext == null)
+            if (menuContextChest == null)
             {
                 // Edge case: This menu's context does not support mod data. This shouldn't happen, but return default text just to be safe.
                 return I18n.QuickStackToggleChestButton_HoverText_Enabled();
@@ -224,11 +263,11 @@ namespace ConvenientInventory.QuickStack
             };
         }
 
-        private static Texture2D GetButtonTexture(IHaveModData modDataMenuContext = null, QuickStackToggleChestState? state = null)
+        private static Texture2D GetButtonTexture(IHaveModData menuContextChest = null, QuickStackToggleChestState? state = null)
         {
-            if (modDataMenuContext == null)
+            if (menuContextChest == null)
             {
-                // Edge case: This menu's context does not support mod data. This shouldn't happen, but return default texture just to be safe.
+                // Edge case: This menu's context chest does not support mod data. This shouldn't happen, but return default texture just to be safe.
                 return CachedTextures.ChestQuickStackEnabledButtonIcon;
             }
 
@@ -262,64 +301,55 @@ namespace ConvenientInventory.QuickStack
             }
         }
 
-        private static IHaveModData GetMenuContextAsIHaveModData(ItemGrabMenu itemGrabMenu) => itemGrabMenu?.context as IHaveModData;
-
-        /// <summary>
-        /// Gets the current <see cref="QuickStackToggleChestState"/> value from the provided menu context's mod data.
-        /// </summary>
-        /// <param name="modDataMenuContext"></param>
-        /// <returns>The obtained <see cref="QuickStackToggleChestState"/> value, or the default enum value if not found.</returns>
-        private static QuickStackToggleChestState GetQuickStackToggleChestStateFromModData(IHaveModData modDataMenuContext)
+        private static IHaveModData GetMenuContextChest(ItemGrabMenu itemGrabMenu) => itemGrabMenu?.context switch
         {
-            if (modDataMenuContext == null || !modDataMenuContext.modData.ContainsKey(QuickStackToggleChestModDataKey))
-            {
-                // Return default state.
-                return QuickStackToggleChestState.Enabled;
-            }
-
-            string modDataValue = modDataMenuContext.modData[QuickStackToggleChestModDataKey];
-            if (!Enum.TryParse(modDataValue, out QuickStackToggleChestState parsedState))
-            {
-                // Return default state.
-                return QuickStackToggleChestState.Enabled;
-            }
-
-            return parsedState;
-        }
+            Chest contextChest => contextChest,
+            JunimoHut junimoHut => junimoHut.GetOutputChest(),
+            _ => null,
+        };
 
         /// <summary>
         /// Updates the current <see cref="QuickStackToggleChestState"/> value from the provided menu context's mod data to the next value in sequence.
         /// </summary>
-        /// <param name="modDataMenuContext"></param>
+        /// <param name="menuContextChest">The chest whose modData will be updated.</param>
+        /// <param name="increment">Whether to increment (true) or decrement (false) the toggle chest state.</param>
         /// <returns>The new <see cref="QuickStackToggleChestState"/> value.</returns>
-        private static QuickStackToggleChestState UpdateQuickStackToggleChestStateInModData(IHaveModData modDataMenuContext)
+        private static QuickStackToggleChestState UpdateQuickStackToggleChestStateInModData(IHaveModData menuContextChest, bool increment = true)
         {
-            if (modDataMenuContext == null)
+            if (menuContextChest == null)
             {
                 // Edge case: This menu's context does not support mod data. This shouldn't happen, but return default state just to be safe.
                 return QuickStackToggleChestState.Enabled;
             }
 
-            if (!modDataMenuContext.modData.ContainsKey(QuickStackToggleChestModDataKey))
+            if (!menuContextChest.modData.ContainsKey(QuickStackToggleChestModDataKey))
             {
-                // Assign next state in sequence after default.
-                QuickStackToggleChestState next = GetNextStateInSequence(QuickStackToggleChestState.Enabled);
-                modDataMenuContext.modData[QuickStackToggleChestModDataKey] = next.ToModDataString();
-                return next;
-            }
+                // Assign next state in sequence, starting from default.
+                QuickStackToggleChestState newState = increment
+                    ? GetNextStateInSequence(QuickStackToggleChestState.Enabled)
+                    : GetPrevStateInSequence(QuickStackToggleChestState.Enabled);
 
-            string modDataValue = modDataMenuContext.modData[QuickStackToggleChestModDataKey];
-            if (!Enum.TryParse(modDataValue, out QuickStackToggleChestState parsedState))
+                menuContextChest.modData[QuickStackToggleChestModDataKey] = newState.ToModDataString();
+                return newState;
+            }
+            else
             {
-                // Clear invalid state in modData and return default state.
-                modDataMenuContext.modData.Remove(QuickStackToggleChestModDataKey);
-                return QuickStackToggleChestState.Enabled;
-            }
+                string modDataValue = menuContextChest.modData[QuickStackToggleChestModDataKey];
+                if (!Enum.TryParse(modDataValue, out QuickStackToggleChestState parsedState))
+                {
+                    // Clear invalid state in modData and return default state.
+                    menuContextChest.modData.Remove(QuickStackToggleChestModDataKey);
+                    return QuickStackToggleChestState.Enabled;
+                }
 
-            // Assign next state in sequence after current state.
-            QuickStackToggleChestState nextState = GetNextStateInSequence(parsedState);
-            modDataMenuContext.modData[QuickStackToggleChestModDataKey] = nextState.ToModDataString();
-            return nextState;
+                // Assign next state in sequence after current state.
+                QuickStackToggleChestState newState = increment
+                    ? GetNextStateInSequence(parsedState)
+                    : GetPrevStateInSequence(parsedState);
+
+                menuContextChest.modData[QuickStackToggleChestModDataKey] = newState.ToModDataString();
+                return newState;
+            }
         }
 
         private static QuickStackToggleChestState GetNextStateInSequence(QuickStackToggleChestState current)
@@ -342,6 +372,29 @@ namespace ConvenientInventory.QuickStack
                 QuickStackToggleChestState.Disabled => QuickStackToggleChestState.Enabled,
                 QuickStackToggleChestState.Enabled => QuickStackToggleChestState.Disabled,
                 _ => QuickStackToggleChestState.Enabled,
+            };
+        }
+
+        private static QuickStackToggleChestState GetPrevStateInSequence(QuickStackToggleChestState current)
+        {
+            if (ModEntry.Config.QuickStack.IsPrioritizeChestEnabled)
+            {
+                return current switch
+                {
+                    QuickStackToggleChestState.Disabled => QuickStackToggleChestState.Priority3,
+                    QuickStackToggleChestState.Enabled => QuickStackToggleChestState.Disabled,
+                    QuickStackToggleChestState.Priority1 => QuickStackToggleChestState.Enabled,
+                    QuickStackToggleChestState.Priority2 => QuickStackToggleChestState.Priority1,
+                    QuickStackToggleChestState.Priority3 => QuickStackToggleChestState.Priority2,
+                    _ => QuickStackToggleChestState.Disabled,
+                };
+            }
+
+            return current switch
+            {
+                QuickStackToggleChestState.Disabled => QuickStackToggleChestState.Enabled,
+                QuickStackToggleChestState.Enabled => QuickStackToggleChestState.Disabled,
+                _ => QuickStackToggleChestState.Disabled,
             };
         }
 

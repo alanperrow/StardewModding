@@ -874,21 +874,21 @@ namespace ConvenientInventory
         [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
         public static void ReceiveRightClick_Postfix(ItemGrabMenu __instance, int x, int y)
         {
-            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
-            {
-                return;
-            }
-
             try
             {
-                if (__instance.source == ItemGrabMenu.source_chest
-                    && __instance.organizeButton != null
-                    && __instance.organizeButton.containsPoint(x, y))
+                QuickStackToggleChestLogic.OnReceiveRightClickInItemGrabMenu(x, y);
+
+                if (ModEntry.Config.AutoOrganizeChest.IsEnabled)
                 {
-                    Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
-                    if (chest != null)
+                    if (__instance.source == ItemGrabMenu.source_chest
+                        && __instance.organizeButton != null
+                        && __instance.organizeButton.containsPoint(x, y))
                     {
-                        AutoOrganizeLogic.ToggleChestAutoOrganize(__instance, chest);
+                        Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
+                        if (chest != null)
+                        {
+                            AutoOrganizeLogic.ToggleChestAutoOrganize(__instance, chest);
+                        }
                     }
                 }
             }
