@@ -69,15 +69,17 @@ namespace ConvenientInventory
         /// <param name="e">The event data.</param>
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            Monitor.Log("Applying Harmony patches...", LogLevel.Trace);
             var harmony = new Harmony(ModManifest.UniqueID);
 
             // Manually patch InventoryPage constructor, otherwise Harmony cannot find method.
             harmony.Patch(
-                original: AccessTools.Constructor(typeof(StardewValley.Menus.InventoryPage), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int) }),
+                original: AccessTools.Constructor(typeof(InventoryPage), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int) }),
                 postfix: new HarmonyMethod(typeof(InventoryPageConstructorPatch), nameof(InventoryPageConstructorPatch.Postfix))
             );
 
             harmony.PatchAll();
+            Monitor.Log("Finished applying Harmony patches.", LogLevel.Trace);
 
             // Initialize mod API integrations
             var apiCA = Helper.ModRegistry.GetApi<IChestsAnywhereApi>("Pathoschild.ChestsAnywhere");
