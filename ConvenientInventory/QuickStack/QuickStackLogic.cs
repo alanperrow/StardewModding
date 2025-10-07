@@ -215,9 +215,10 @@ namespace ConvenientInventory.QuickStack
 
         public static List<TypedChest> GetTypedChestsWithinRange(Farmer who, string rangeStr, bool sorted = false)
         {
+            List<TypedChest> typedChestsWithinRange = new();
             if (who is null)
             {
-                return new List<TypedChest>();
+                return typedChestsWithinRange;
             }
 
             QuickStackRangeType rangeType = ConfigHelper.GetQuickStackRangeType(rangeStr);
@@ -227,7 +228,7 @@ namespace ConvenientInventory.QuickStack
                 Vector2 farmerPosition = who.getStandingPosition();
                 GameLocation gameLocation = who.currentLocation;
 
-                return GetGlobalTypedChests(farmerPosition, gameLocation);
+                typedChestsWithinRange = GetGlobalTypedChests(farmerPosition, gameLocation);
             }
             else if (rangeType == QuickStackRangeType.Location)
             {
@@ -235,7 +236,7 @@ namespace ConvenientInventory.QuickStack
                 Vector2 farmerPosition = who.getStandingPosition();
                 GameLocation gameLocation = who.currentLocation;
 
-                return GetLocationTypedChests(farmerPosition, gameLocation, orderByDistance: true);
+                typedChestsWithinRange = GetLocationTypedChests(farmerPosition, gameLocation, orderByDistance: true);
             }
             else
             {
@@ -246,10 +247,32 @@ namespace ConvenientInventory.QuickStack
                 Point farmerTileLocation = who.TilePoint;
                 GameLocation gameLocation = who.currentLocation;
 
-                return sorted
+                typedChestsWithinRange = sorted
                     ? GetNearbyTypedChestsWithDistance(farmerPosition, tileRange, gameLocation).OrderBy(x => x.Distance).Select(x => x.TypedChest).ToList()
                     : GetNearbyTypedChests(farmerTileLocation, tileRange, gameLocation);
             }
+
+            if (ModEntry.Config.QuickStack.IsToggleChestEnabled)
+            {
+                // Exclude any chests that have toggled off quick stack.
+                List<(TypedChest TypedChest, QuickStackToggleChestState ToggleState)> filteredChestsWithToggleState = new();
+                foreach (TypedChest typedChest in typedChestsWithinRange)
+                {
+                    QuickStackToggleChestState state = QuickStackToggleChestLogic.GetQuickStackToggleChestStateFromModData(typedChest.Chest);
+                    if (state != QuickStackToggleChestState.Disabled)
+                    {
+                        filteredChestsWithToggleState.Add((typedChest, state));
+                    }
+                }
+
+                // Order the filtered chests by quick stack priority.
+                // If chests are already sorted by distance, this will maintain that sorting order but will prioritize chests with higher priority levels.
+                typedChestsWithinRange = ModEntry.Config.QuickStack.IsPrioritizeChestEnabled
+                    ? filteredChestsWithToggleState.OrderByDescending(x => x.ToggleState).Select(x => x.TypedChest).ToList()
+                    : filteredChestsWithToggleState.Select(x => x.TypedChest).ToList();
+            }
+
+            return typedChestsWithinRange;
         }
 
         /// <summary>
@@ -408,12 +431,12 @@ namespace ConvenientInventory.QuickStack
                 {
                     if (ModEntry.Config.QuickStack.IntoJunimoHuts && building is JunimoHut junimoHut)
                     {
-                        if (junimoHut.GetOutputChest().GetMutex().IsLocked())
+                        Chest hutChest = junimoHut.GetOutputChest();
+                        if (!ShouldQuickStackInto(hutChest, out _))
                         {
                             continue;
                         }
 
-                        Chest hutChest = junimoHut.GetOutputChest();
                         Vector2 hutVisualTileLoc = new(
                             junimoHut.tileX.Value + junimoHut.tilesWide.Value / 2,
                             junimoHut.tileY.Value + junimoHut.tilesHigh.Value - 1);
@@ -657,7 +680,8 @@ namespace ConvenientInventory.QuickStack
                         {
                             if (ModEntry.Config.QuickStack.IntoJunimoHuts && building is JunimoHut junimoHut)
                             {
-                                if (junimoHut.GetOutputChest().GetMutex().IsLocked())
+                                Chest hutChest = junimoHut.GetOutputChest();
+                                if (!ShouldQuickStackInto(hutChest, out _))
                                 {
                                     continue;
                                 }
@@ -668,7 +692,6 @@ namespace ConvenientInventory.QuickStack
 
                                 tx = (int)buildingTileCenterPosition.X;
                                 ty = (int)buildingTileCenterPosition.Y;
-                                Chest hutChest = junimoHut.GetOutputChest();
                                 AddChestToList(hutChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.JunimoHut,  hutVisualTileLoc);
                             }
                             else if (ModEntry.Config.QuickStack.IntoMills && building.buildingType.Value == "Mill")
@@ -696,7 +719,8 @@ namespace ConvenientInventory.QuickStack
                         {
                             if (ModEntry.Config.QuickStack.IntoJunimoHuts && building is JunimoHut junimoHut)
                             {
-                                if (junimoHut.GetOutputChest().GetMutex().IsLocked())
+                                Chest hutChest = junimoHut.GetOutputChest();
+                                if (!ShouldQuickStackInto(hutChest, out _))
                                 {
                                     continue;
                                 }
@@ -705,7 +729,6 @@ namespace ConvenientInventory.QuickStack
                                     junimoHut.tileX.Value + junimoHut.tilesWide.Value / 2,
                                     junimoHut.tileY.Value + junimoHut.tilesHigh.Value - 1);
 
-                                Chest hutChest = junimoHut.GetOutputChest();
                                 AddChestToList(hutChest, chestList, withDist, gameLocation, chestType: ChestType.JunimoHut, visualTileLoc: hutVisualTileLoc);
                             }
                             else if (ModEntry.Config.QuickStack.IntoMills && building.buildingType.Value == "Mill")
