@@ -10,8 +10,6 @@ namespace ConvenientInventory
     /// </remarks>
     public class SerializableModConfig
     {
-        // bool IsModEnabled { get; set; } = true;
-
         // ===== Quick Stack To Nearby Chests =====
         public bool IsEnableQuickStack { get; set; } = true;
 
@@ -41,8 +39,7 @@ namespace ConvenientInventory
 
         public bool IsEnableQuickStackPrioritizeChest { get; set; } = false;
 
-        // TODO: (?) Add separate config option for showing button in chest menu.
-        //       Maybe some users will want to disable quick stack for one or two chests, then hide the button and never mess with it again.
+        public bool IsQuickStackToggleChestButtonHidden { get; set; } = false;
 
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;
 

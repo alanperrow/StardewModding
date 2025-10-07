@@ -150,6 +150,12 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsEnableQuickStackPrioritizeChest = value;
             }
 
+            public bool IsToggleChestButtonHidden
+            {
+                get => _config.serialConfig.IsQuickStackToggleChestButtonHidden;
+                set => _config.serialConfig.IsQuickStackToggleChestButtonHidden = value;
+            }
+
             public bool DrawChestsInButtonTooltip
             {
                 get => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests;

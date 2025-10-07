@@ -143,22 +143,6 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
-                getValue: () => config.QuickStack.IsToggleChestEnabled,
-                setValue: value => config.QuickStack.IsToggleChestEnabled = value,
-                name: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Name,
-                tooltip: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Desc
-            );
-
-            api.AddBoolOption(
-                mod: modManifest,
-                getValue: () => config.QuickStack.IsPrioritizeChestEnabled,
-                setValue: value => config.QuickStack.IsPrioritizeChestEnabled = value,
-                name: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Name,
-                tooltip: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Desc
-            );
-
-            api.AddBoolOption(
-                mod: modManifest,
                 getValue: () => config.QuickStack.DrawChestsInButtonTooltip,
                 setValue: value => config.QuickStack.DrawChestsInButtonTooltip = value,
                 name: I18n.ModConfigMenu_IsQuickStackTooltipDrawNearbyChests_Name,
@@ -200,6 +184,30 @@ namespace ConvenientInventory.Compatibility
                 min: 0.5f,
                 max: 3f,
                 interval: 0.1f
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsToggleChestEnabled,
+                setValue: value => config.QuickStack.IsToggleChestEnabled = value,
+                name: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Name,
+                tooltip: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsPrioritizeChestEnabled,
+                setValue: value => config.QuickStack.IsPrioritizeChestEnabled = value,
+                name: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Name,
+                tooltip: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsToggleChestButtonHidden,
+                setValue: value => config.QuickStack.IsToggleChestButtonHidden = value,
+                name: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Desc
             );
 
             // ===== Favorite Items =====

@@ -58,6 +58,9 @@
   "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "Prioritize quick stack per-chest?",
   "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button can also assign a priority level for that specific chest.\nChests with a higher priority level will be considered first when quick stacking.",
 
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "Hide Toggle Quick Stack button?",
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button will be hidden from chest menus.\nEven when hidden, a chest's toggle/prioritize quick stack setting will still be used.",
+
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Show nearby chests in tooltip?",
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "If enabled, hovering over the quick stack button will show a preview of all nearby chests considered for quick stack, ordered by distance.",
 
