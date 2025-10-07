@@ -60,27 +60,8 @@ namespace ConvenientInventory.QuickStack
             return true;
         }
 
-        //public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
-        //{
-        //    //// DEBUG: Prefer constructor approach for now
-        //    //if (!ModEntry.Config.QuickStack.IsToggleChestEnabled
-        //    //    || !ShouldQuickStackIntoMenuContext(itemGrabMenu)
-        //    //    || itemGrabMenu.fillStacksButton == null)
-        //    //{
-        //    //    return;
-        //    //}
-
-        //    //QuickStackToggleChestButton = CreateButton(itemGrabMenu);
-        //    //ActiveItemGrabMenu = itemGrabMenu;
-
-        //    ////ActiveItemGrabMenu.allClickableComponents.Add(QuickStackToggleChestButton);
-        //}
-
-        public static void OnOpenedItemGrabMenu(ItemGrabMenu itemGrabMenu)
+        public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
-            //// DEBUG: Prefer constructor approach for now
-            //return;
-
             if (!ModEntry.Config.QuickStack.IsToggleChestEnabled
                 || !ShouldQuickStackIntoMenuContext(itemGrabMenu)
                 || itemGrabMenu.fillStacksButton == null)
@@ -92,8 +73,13 @@ namespace ConvenientInventory.QuickStack
             ActiveItemGrabMenu = itemGrabMenu;
         }
 
-        public static void OnClosedItemGrabMenu()
+        public static void OnExitedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
+            if (ActiveItemGrabMenu != itemGrabMenu)
+            {
+                return;
+            }
+
             QuickStackToggleChestButton = null;
             ActiveItemGrabMenu = null;
         }

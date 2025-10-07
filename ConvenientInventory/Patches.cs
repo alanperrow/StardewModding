@@ -170,9 +170,9 @@ namespace ConvenientInventory
         {
             try
             {
-                if (__instance is ItemGrabMenu)
+                if (__instance is ItemGrabMenu itemGrabMenu)
                 {
-                    QuickStackToggleChestLogic.OnExitedItemGrabMenu(__instance);
+                    QuickStackToggleChestLogic.OnExitedItemGrabMenu(itemGrabMenu);
                 }
             }
             catch (Exception e)

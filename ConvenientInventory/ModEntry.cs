@@ -27,7 +27,6 @@ namespace ConvenientInventory
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetReady += OnAssetReady;
 
-            helper.Events.Display.MenuChanged += OnMenuChanged;
             helper.Events.Display.WindowResized += OnWindowResized;
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -57,20 +56,6 @@ namespace ConvenientInventory
 
         /// <summary>Raised after an asset is loaded by the content pipeline, after all mod edits specified via "AssetRequested" have been applied.</summary>
         private void OnAssetReady(object sender, AssetReadyEventArgs e) => CachedTextures.OnAssetReady(e);
-
-        /// <summary>Raised after a game menu is opened, closed, or replaced.</summary>
-        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
-        {
-            if (e.OldMenu is ItemGrabMenu)
-            {
-                QuickStackToggleChestLogic.OnClosedItemGrabMenu();
-            }
-
-            if (e.NewMenu is ItemGrabMenu itemGrabMenu)
-            {
-                QuickStackToggleChestLogic.OnOpenedItemGrabMenu(itemGrabMenu);
-            }
-        }
 
         /// <summary>Raised after the game window is resized.</summary>
         private void OnWindowResized(object sender, WindowResizedEventArgs e)
