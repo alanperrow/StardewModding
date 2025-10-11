@@ -965,8 +965,7 @@ namespace ConvenientInventory
                     slotDrawPositions[i],
                     CachedTextures.FavoriteItemsHighlight.Bounds,
                     Color.White,
-                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
-                );
+                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
             }
         }
 
@@ -991,10 +990,13 @@ namespace ConvenientInventory
                     toDraw,
                     CachedTextures.FavoriteItemsHighlight.Bounds,
                     Color.White,
-                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
-                );
+                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
 
-                spriteBatch.DrawString(Game1.tinyFont, slotText[i], toDraw + new Vector2(4f, -8f), Color.DimGray * transparency);
+                // Skip drawing slot text when in gamepad mode.
+                if (!Game1.options.gamepadControls)
+                {
+                    spriteBatch.DrawString(Game1.tinyFont, slotText[i], toDraw + new Vector2(4f, -8f), Color.DimGray * transparency);
+                }
 
                 if (Game1.player.CurrentToolIndex == i)
                 {
