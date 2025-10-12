@@ -151,6 +151,14 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
+                getValue: () => config.QuickStack.SuppressSoundWhenNoNearbyChests,
+                setValue: value => config.QuickStack.SuppressSoundWhenNoNearbyChests = value,
+                name: I18n.ModConfigMenu_IsSuppressSoundWhenNoNearbyChests_Name,
+                tooltip: I18n.ModConfigMenu_IsSuppressSoundWhenNoNearbyChests_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
                 getValue: () => config.QuickStack.IsToggleChestEnabled,
                 setValue: value => config.QuickStack.IsToggleChestEnabled = value,
                 name: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Name,
