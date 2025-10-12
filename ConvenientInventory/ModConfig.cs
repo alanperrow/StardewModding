@@ -162,6 +162,12 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests = value;
             }
 
+            public bool SuppressSoundWhenNoNearbyChests
+            {
+                get => _config.serialConfig.IsSuppressSoundWhenNoNearbyChests;
+                set => _config.serialConfig.IsSuppressSoundWhenNoNearbyChests = value;
+            }
+
             public bool IsAnimationEnabled
             {
                 get => _config.serialConfig.IsEnableQuickStackAnimation;

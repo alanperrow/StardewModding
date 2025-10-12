@@ -43,6 +43,8 @@ namespace ConvenientInventory
 
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;
 
+        public bool IsSuppressSoundWhenNoNearbyChests { get; set; } = false;
+
         public bool IsEnableQuickStackAnimation { get; set; } = true;
 
         public bool IsEnableQuickStackChestAnimation { get; set; } = true;

@@ -203,7 +203,12 @@ namespace ConvenientInventory.QuickStack
             }
 
             quickStackAnimation?.Complete();
-            Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
+
+            bool shouldPlaySound = !ModEntry.Config.QuickStack.SuppressSoundWhenNoNearbyChests || chests.Any();
+            if (shouldPlaySound)
+            {
+                Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
+            }
 
             if (movedAtLeastOneTotal)
             {
