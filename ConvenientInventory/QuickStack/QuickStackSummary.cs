@@ -11,14 +11,14 @@ namespace ConvenientInventory.QuickStack
         private readonly Dictionary<TypedChest, List<MovedItem>> _movedItemsByTypedChest = new();
 
         /// <summary>Adds an item to the summary of items moved by Quick Stack, grouped by chest.</summary>
-        public void AddToSummary(TypedChest quickStackedChest, Item quickStackedItem, int beforeStack)
+        public void AddToSummary(TypedChest quickStackedChest, string itemName, int resultingStack, int beforeStack)
         {
             if (!_movedItemsByTypedChest.ContainsKey(quickStackedChest))
             {
                 _movedItemsByTypedChest[quickStackedChest] = new List<MovedItem>();
             }
 
-            _movedItemsByTypedChest[quickStackedChest].Add(new MovedItem(quickStackedItem, beforeStack));
+            _movedItemsByTypedChest[quickStackedChest].Add(new MovedItem(itemName, resultingStack, beforeStack));
         }
 
         /// <summary>Gets a summary message of the items moved by Quick Stack, grouped by chest.</summary>
@@ -54,7 +54,7 @@ namespace ConvenientInventory.QuickStack
                 for (int i = 0; i < movedItems.Count; i++)
                 {
                     MovedItem movedItem = movedItems[i];
-                    sb.Append($"'{movedItem.Item.Name}' x {movedItem.AmountMoved}");
+                    sb.Append($"'{movedItem.ItemName}' x {movedItem.AmountMoved}");
                     if (i < movedItems.Count - 1)
                     {
                         sb.Append(", ");
@@ -73,14 +73,14 @@ namespace ConvenientInventory.QuickStack
 
         private record MovedItem
         {
-            public Item Item { get; }
+            public string ItemName { get; }
 
             public int AmountMoved { get; }
 
-            public MovedItem(Item item, int beforeStack)
+            public MovedItem(string itemName, int resultingStack, int beforeStack)
             {
-                Item = item;
-                AmountMoved = beforeStack - item.Stack;
+                ItemName = itemName;
+                AmountMoved = beforeStack - resultingStack;
             }
         }
     }

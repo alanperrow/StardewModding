@@ -114,7 +114,7 @@ namespace ConvenientInventory.QuickStack
                             }
 
                             quickStackAnimation?.AddToAnimation(typedChest, playerItem);
-                            quickStackSummary.AddToSummary(typedChest, playerItem, beforeStack);
+                            quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
                         }
 
                         if (chestItem.Stack == chestItem.maximumStackSize())
@@ -183,10 +183,7 @@ namespace ConvenientInventory.QuickStack
                                 }
 
                                 quickStackAnimation?.AddToAnimation(typedChest, playerItem);
-
-                                // Add one to beforeStack if item was added to a dresser, since item stack doesn't decrease in this case.
-                                beforeStack += dresserFakeChest != null ? 1 : 0;
-                                quickStackSummary.AddToSummary(typedChest, playerItem, beforeStack);
+                                quickStackSummary.AddToSummary(typedChest, playerItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
                             }
 
                             if (leftoverItem is null)
