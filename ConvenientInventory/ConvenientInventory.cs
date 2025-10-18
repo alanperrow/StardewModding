@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
@@ -136,14 +137,21 @@ namespace ConvenientInventory
             return saveStr;
         }
 
-        public static void InventoryPageConstructor(InventoryPage inventoryPage, int width, int height)
+        public static void OnConstructedInventoryPage(InventoryPage inventoryPage)
         {
             PlayerInventoryPage = inventoryPage;
 
             if (ModEntry.Config.QuickStack.IsEnabled)
             {
+                // Place underneath the Organize button.
+                const int buttonSize = 64;
+                Rectangle bounds = new(
+                    inventoryPage.organizeButton.bounds.Left,
+                    inventoryPage.organizeButton.bounds.Top + buttonSize + 16,
+                    buttonSize, buttonSize);
+
                 QuickStackButton = new ClickableTextureComponent("",
-                    new Rectangle(inventoryPage.xPositionOnScreen + width, inventoryPage.yPositionOnScreen + height / 3 - 64 + 8 + 80, 64, 64),
+                    bounds,
                     string.Empty,
                     I18n.QuickStackButton_HoverText(),
                     CachedTextures.QuickStackButtonIcon,
@@ -178,6 +186,30 @@ namespace ConvenientInventory
                 if (ModEntry.Config.QuickStack.IsEnabled)
                 {
                     QuickStackButton.rightNeighborID = inventoryPage.inventory.dropItemInvisibleButton.myID;
+                }
+            }
+        }
+
+        public static void OnMenuChanged(MenuChangedEventArgs e)
+        {
+            if (ApiHelper.IsCustomBackpackFrameworkInstalled)
+            {
+                if (e.OldMenu is GameMenu gameMenuLeaving && e.NewMenu is InventoryPage
+                    && e.NewMenu.GetType() == ApiHelper.CustomBackpackFullInventoryPageType
+                    && gameMenuLeaving.GetCurrentPage() is InventoryPage)
+                {
+                    // We have opened Custom Backpack Framework's FullInventoryPage from InventoryPage.
+                    // Temporarily remove the quick stack button as it is behaving strangely with the custom menu.
+                    PlayerInventoryPage = null;
+                    QuickStackButton = null;
+                }
+                else if (e.OldMenu is InventoryPage && e.NewMenu is GameMenu gameMenuReturning
+                    && e.OldMenu.GetType() == ApiHelper.CustomBackpackFullInventoryPageType
+                    && gameMenuReturning.GetCurrentPage() is InventoryPage inventoryPage)
+                {
+                    // We have switched back to InventoryPage from Custom Backpack Framework's FullInventoryPage.
+                    // Re-create the quick stack button.
+                    OnConstructedInventoryPage(inventoryPage);
                 }
             }
         }
@@ -743,7 +775,7 @@ namespace ConvenientInventory
 
         public static void PerformHoverActionInInventoryPage(int x, int y)
         {
-            if (ModEntry.Config.QuickStack.IsEnabled)
+            if (ModEntry.Config.QuickStack.IsEnabled && QuickStackButton != null)
             {
                 QuickStackButton.tryHover(x, y);
                 ShouldDrawQuickStackToolTip = QuickStackButton.containsPoint(x, y);
@@ -752,7 +784,7 @@ namespace ConvenientInventory
 
         public static void PopulateClickableComponentsListInInventoryPage(InventoryPage inventoryPage)
         {
-            if (ModEntry.Config.QuickStack.IsEnabled)
+            if (ModEntry.Config.QuickStack.IsEnabled && QuickStackButton != null)
             {
                 inventoryPage.allClickableComponents.Add(QuickStackButton);
             }
@@ -896,7 +928,7 @@ namespace ConvenientInventory
         public static void PostMenuDraw<T>(T menu, SpriteBatch spriteBatch) where T : IClickableMenu
         {
             // Draw quick stack button tooltip (in InventoryPage)
-            if (ModEntry.Config.QuickStack.IsEnabled && menu is InventoryPage && ShouldDrawQuickStackToolTip)
+            if (ModEntry.Config.QuickStack.IsEnabled && menu is InventoryPage && ShouldDrawQuickStackToolTip && QuickStackButton != null)
             {
                 DrawQuickStackButtonToolTip(spriteBatch);
             }
@@ -937,7 +969,11 @@ namespace ConvenientInventory
                 var text = QuickStackButton.hoverText + new string('\n', 2 * ((numPos + 7) / 8));  // Draw two newlines for each row of chests
                 IClickableMenu.drawToolTip(spriteBatch, text, string.Empty, null);
 
-                DrawTypedChestsInToolTip(spriteBatch, nearbyTypedChests);
+                Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
+                for (int i = 0, pos = 0; i < nearbyTypedChests.Count; i++, pos++)
+                {
+                    pos += nearbyTypedChests[i]?.DrawInToolTip(spriteBatch, toolTipPosition, pos) ?? 0;
+                }
             }
             else
             {
@@ -1096,16 +1132,6 @@ namespace ConvenientInventory
             }
 
             return extraNumPos;
-        }
-
-        private static void DrawTypedChestsInToolTip(SpriteBatch spriteBatch, IReadOnlyList<TypedChest> typedChests)
-        {
-            Point toolTipPosition = GetToolTipDrawPosition(QuickStackButton.hoverText);
-
-            for (int i = 0, pos = 0; i < typedChests.Count; i++, pos++)
-            {
-                pos += typedChests[i]?.DrawInToolTip(spriteBatch, toolTipPosition, pos) ?? 0;
-            }
         }
 
         /// <summary>

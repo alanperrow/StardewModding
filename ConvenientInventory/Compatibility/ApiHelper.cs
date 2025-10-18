@@ -1,10 +1,9 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using System.Reflection;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
-using StardewValley.Menus;
-using System;
-using System.Reflection;
 
 namespace ConvenientInventory.Compatibility
 {
@@ -23,6 +22,8 @@ namespace ConvenientInventory.Compatibility
         /// Each increment represents one scrolled row; 0 indicates no scroll (default).
         /// </summary>
         public static int CustomBackpackScrollAmount => ((PerScreen<int>)customBackpackScrollAmountField.GetValue(null)).Value;
+
+        public static Type CustomBackpackFullInventoryPageType { get; private set; }
 
         public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
@@ -371,7 +372,14 @@ namespace ConvenientInventory.Compatibility
                     IMod cbfMod = modCBF.GetType().GetProperty("Mod").GetValue(modCBF) as IMod;
                     Type cbfModType = cbfMod.GetType();
 
-                    // We cache the field info itself to account for the case where a new instance is assigned.
+                    // Cache the `FullInventoryPage` type for future comparisons.
+                    CustomBackpackFullInventoryPageType = cbfModType.Assembly.GetType("CustomBackpack.FullInventoryPage");
+                    if (CustomBackpackFullInventoryPageType == null)
+                    {
+                        throw new TargetException("Unable to find type 'CustomBackpack.FullInventoryPage' in mod assembly.");
+                    }
+
+                    // Cache the `scrolled` field info itself to account for the case where a new instance is assigned.
                     customBackpackScrollAmountField = cbfModType.GetField("scrolled", BindingFlags.Static | BindingFlags.Public);
                     var test = (PerScreen<int>)customBackpackScrollAmountField.GetValue(null); // Verify we can access this value as expected.
 

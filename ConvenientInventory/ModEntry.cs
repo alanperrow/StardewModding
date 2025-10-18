@@ -28,6 +28,7 @@ namespace ConvenientInventory
             helper.Events.Content.AssetReady += OnAssetReady;
 
             helper.Events.Display.WindowResized += OnWindowResized;
+            helper.Events.Display.MenuChanged += OnMenuChanged;
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
@@ -58,10 +59,10 @@ namespace ConvenientInventory
         private void OnAssetReady(object sender, AssetReadyEventArgs e) => CachedTextures.OnAssetReady(e);
 
         /// <summary>Raised after the game window is resized.</summary>
-        private void OnWindowResized(object sender, WindowResizedEventArgs e)
-        {
-            QuickStackToggleChestLogic.OnWindowResized();
-        }
+        private void OnWindowResized(object sender, WindowResizedEventArgs e) => QuickStackToggleChestLogic.OnWindowResized();
+
+        /// <summary>Raised after a game menu is opened, closed, or replaced.</summary>
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e) => ConvenientInventory.OnMenuChanged(e);
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).
         /// All mods are loaded and initialised at this point, so this is a good time to set up mod integrations.</summary>
