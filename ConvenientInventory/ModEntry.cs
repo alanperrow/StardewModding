@@ -89,7 +89,7 @@ namespace ConvenientInventory
             }
 
             // Initialize all other mod integrations.
-            ApiHelper.InitializeMods(Helper);
+            ApiHelper.InitializeMods(Helper, Monitor);
 
             // Load cached textures.
             CachedTextures.LoadGameAssets();

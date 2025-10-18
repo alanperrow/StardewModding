@@ -952,17 +952,16 @@ namespace ConvenientInventory
                 return;
             }
 
-            List<Vector2> slotDrawPositions = inventoryMenu.GetSlotDrawPositions();
-
             bool[] favoriteItemSlots = FavoriteItemSlots;
             if (ApiHelper.IsCustomBackpackFrameworkInstalled)
             {
-                // Offset favorite item slots by the current backpack scroll amount.
-                int scrollAmount = ApiHelper.CustomBackpackFrameworkScrollAmount;
+                // Offset favorite item slots by the custom backpack scroll amount.
+                int startingRow = ApiHelper.CustomBackpackScrollAmount;
                 int columns = inventoryMenu.capacity / inventoryMenu.rows;
-                favoriteItemSlots = FavoriteItemSlots.Skip(scrollAmount * columns).Take(inventoryMenu.capacity).ToArray();
+                favoriteItemSlots = FavoriteItemSlots.Skip(startingRow * columns).Take(inventoryMenu.capacity).ToArray();
             }
 
+            List<Vector2> slotDrawPositions = inventoryMenu.GetSlotDrawPositions();
             for (int i = 0; i < slotDrawPositions.Count && i < favoriteItemSlots.Length; i++)
             {
                 if (!favoriteItemSlots[i])

@@ -10,13 +10,19 @@ namespace ConvenientInventory.Compatibility
 {
     public static class ApiHelper
     {
-        private static FieldInfo cbfScrollAmountFieldInfo;
+        private static FieldInfo customBackpackScrollAmountField;
 
         public static bool IsChestsAnywhereInstalled { get; private set; }
 
         public static bool IsCustomBackpackFrameworkInstalled { get; private set; }
 
         public static bool IsWearMoreRingsInstalled { get; private set; }
+
+        /// <summary>
+        /// Gets the per-screen inventory scroll amount from the Custom Backpack Framework mod.
+        /// Each increment represents one scrolled row; 0 indicates no scroll (default).
+        /// </summary>
+        public static int CustomBackpackScrollAmount => ((PerScreen<int>)customBackpackScrollAmountField.GetValue(null)).Value;
 
         public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
@@ -347,7 +353,7 @@ namespace ConvenientInventory.Compatibility
         /// <summary>
         /// Initializes mod integrations for cases not using a mod API.
         /// </summary>
-        public static void InitializeMods(IModHelper helper)
+        public static void InitializeMods(IModHelper helper, IMonitor monitor)
         {
             // Wear More Rings
             IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
@@ -356,33 +362,26 @@ namespace ConvenientInventory.Compatibility
             IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
 
             // Custom Backpack Framework
-            // The PerScreen<int> field `scrolled` needs to be accessed via reflection as it is not exposed via API.
             IModInfo modCBF = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework");
             if (modCBF != null)
             {
-                IMod cbfMod = modCBF.GetType().GetProperty("Mod").GetValue(modCBF) as IMod;
-                Type cbfModType = cbfMod.GetType();
-                FieldInfo cbfScrolledFieldInfo = cbfModType.GetField("scrolled", BindingFlags.Static | BindingFlags.Public);
-                cbfScrollAmountFieldInfo = cbfScrolledFieldInfo;
-                 
-                IsCustomBackpackFrameworkInstalled = true;
-                // TODO: This works -- now make it safe
+                // The PerScreen<int> field `scrolled` needs to be accessed via reflection as it is not exposed via API.
+                try
+                {
+                    IMod cbfMod = modCBF.GetType().GetProperty("Mod").GetValue(modCBF) as IMod;
+                    Type cbfModType = cbfMod.GetType();
 
-                return;
+                    // We cache the field info itself to account for the case where a new instance is assigned.
+                    customBackpackScrollAmountField = cbfModType.GetField("scrolled", BindingFlags.Static | BindingFlags.Public);
+                    var test = (PerScreen<int>)customBackpackScrollAmountField.GetValue(null); // Verify we can access this value as expected.
+
+                    IsCustomBackpackFrameworkInstalled = true;
+                }
+                catch (Exception ex)
+                {
+                    monitor.Log($"Could not initialize compatibility with Custom Backpack Framework:\n{ex}", LogLevel.Warn);
+                }
             }
         }
-
-        /// <summary>
-        /// Gets the scroll amount from the Custom Backpack Framework mod. This value is per-screen.
-        /// Each increment represents one scrolled row; 0 indicates no scroll (default).
-        /// </summary>
-        public static int CustomBackpackFrameworkScrollAmount => (cbfScrollAmountFieldInfo.GetValue(null) as PerScreen<int>)?.Value ?? 0;
-    }
-
-    public interface ICustomBackpackApi
-    {
-        public bool SetPlayerSlots(int slots, bool force);
-        public bool ChangeScroll(InventoryMenu menu, int delta);
-        //public int GetScroll();
     }
 }
