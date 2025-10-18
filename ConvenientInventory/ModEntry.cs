@@ -81,22 +81,17 @@ namespace ConvenientInventory
             harmony.PatchAll();
             Monitor.Log("Finished applying Harmony patches.", LogLevel.Trace);
 
-            // Initialize mod API integrations
-            var apiCA = Helper.ModRegistry.GetApi<IChestsAnywhereApi>("Pathoschild.ChestsAnywhere");
-            if (apiCA != null)
-            {
-                ApiHelper.Initialize(apiCA);
-            }
-
+            // Initialize mod API integrations.
             var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (apiGMCM != null)
             {
-                ApiHelper.Initialize(apiGMCM, Config, ModManifest, Monitor);
+                ApiHelper.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
             }
 
-            ApiHelper.IsWearMoreRingsInstalled = Helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
+            // Initialize all other mod integrations.
+            ApiHelper.InitializeMods(Helper);
 
-            // Load cached textures
+            // Load cached textures.
             CachedTextures.LoadGameAssets();
             CachedTextures.LoadModAssets(Config);
         }

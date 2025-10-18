@@ -1,25 +1,27 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Menus;
+using System;
+using System.Reflection;
 
 namespace ConvenientInventory.Compatibility
 {
     public static class ApiHelper
     {
-        public static bool IsWearMoreRingsInstalled { get; set; }
+        private static FieldInfo cbfScrollAmountFieldInfo;
 
-        public static IChestsAnywhereApi ChestsAnywhereApi { get; private set; }
+        public static bool IsChestsAnywhereInstalled { get; private set; }
 
-        public static void Initialize(IChestsAnywhereApi api)
-        {
-            ChestsAnywhereApi = api;
-        }
+        public static bool IsCustomBackpackFrameworkInstalled { get; private set; }
 
-        public static void Initialize(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
+        public static bool IsWearMoreRingsInstalled { get; private set; }
+
+        public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
             // == Config Validation ==
-            bool isChestsAnywhereInstalled = ChestsAnywhereApi != null;
-            if (!isChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
+            if (!IsChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
             {
                 // QuickStackRange: "Global" option is only supported if the Chests Anywhere mod is installed.
                 // If Chests Anywhere API is not found and config value is loaded as "Global", log a warning message to SMAPI and overwrite the config value to "Location".
@@ -56,7 +58,7 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_QuickStackRange_Name,
                 tooltip: I18n.ModConfigMenu_QuickStackRange_Desc,
                 min: 1,
-                max: isChestsAnywhereInstalled ? ConfigHelper.QuickStackRange_GlobalInt : ConfigHelper.QuickStackRange_LocationInt,
+                max: IsChestsAnywhereInstalled ? ConfigHelper.QuickStackRange_GlobalInt : ConfigHelper.QuickStackRange_LocationInt,
                 interval: 1,
                 formatValue: ConfigHelper.FormatQuickStackRange
             );
@@ -341,5 +343,46 @@ namespace ConvenientInventory.Compatibility
                 tooltip: I18n.ModConfigMenu_IsEnableInventoryPageSideWarp_Desc
             );
         }
+
+        /// <summary>
+        /// Initializes mod integrations for cases not using a mod API.
+        /// </summary>
+        public static void InitializeMods(IModHelper helper)
+        {
+            // Wear More Rings
+            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
+
+            // Chests Anywhere
+            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
+
+            // Custom Backpack Framework
+            // The PerScreen<int> field `scrolled` needs to be accessed via reflection as it is not exposed via API.
+            IModInfo modCBF = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework");
+            if (modCBF != null)
+            {
+                IMod cbfMod = modCBF.GetType().GetProperty("Mod").GetValue(modCBF) as IMod;
+                Type cbfModType = cbfMod.GetType();
+                FieldInfo cbfScrolledFieldInfo = cbfModType.GetField("scrolled", BindingFlags.Static | BindingFlags.Public);
+                cbfScrollAmountFieldInfo = cbfScrolledFieldInfo;
+                 
+                IsCustomBackpackFrameworkInstalled = true;
+                // TODO: This works -- now make it safe
+
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Gets the scroll amount from the Custom Backpack Framework mod. This value is per-screen.
+        /// Each increment represents one scrolled row; 0 indicates no scroll (default).
+        /// </summary>
+        public static int CustomBackpackFrameworkScrollAmount => (cbfScrollAmountFieldInfo.GetValue(null) as PerScreen<int>)?.Value ?? 0;
+    }
+
+    public interface ICustomBackpackApi
+    {
+        public bool SetPlayerSlots(int slots, bool force);
+        public bool ChangeScroll(InventoryMenu menu, int delta);
+        //public int GetScroll();
     }
 }

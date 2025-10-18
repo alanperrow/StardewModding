@@ -954,9 +954,18 @@ namespace ConvenientInventory
 
             List<Vector2> slotDrawPositions = inventoryMenu.GetSlotDrawPositions();
 
-            for (int i = 0; i < slotDrawPositions.Count && i < FavoriteItemSlots.Length; i++)
+            bool[] favoriteItemSlots = FavoriteItemSlots;
+            if (ApiHelper.IsCustomBackpackFrameworkInstalled)
             {
-                if (!FavoriteItemSlots[i])
+                // Offset favorite item slots by the current backpack scroll amount.
+                int scrollAmount = ApiHelper.CustomBackpackFrameworkScrollAmount;
+                int columns = inventoryMenu.capacity / inventoryMenu.rows;
+                favoriteItemSlots = FavoriteItemSlots.Skip(scrollAmount * columns).Take(inventoryMenu.capacity).ToArray();
+            }
+
+            for (int i = 0; i < slotDrawPositions.Count && i < favoriteItemSlots.Length; i++)
+            {
+                if (!favoriteItemSlots[i])
                 {
                     continue;
                 }
