@@ -86,11 +86,17 @@ namespace ConvenientInventory
             var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
             if (apiGMCM != null)
             {
-                ApiHelper.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
+                ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
+            }
+
+            var apiCBF = Helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
+            if (apiCBF != null)
+            {
+                ModIntegrations.InitializeApi(apiCBF, Helper, Monitor);
             }
 
             // Initialize all other mod integrations.
-            ApiHelper.InitializeMods(Helper, Monitor);
+            ModIntegrations.InitializeMods(Helper);
 
             // Load cached textures.
             CachedTextures.LoadGameAssets();

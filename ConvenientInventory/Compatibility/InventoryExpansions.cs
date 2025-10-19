@@ -3,6 +3,9 @@ using System;
 
 namespace ConvenientInventory.Compatibility
 {
+    /// <summary>
+    /// Supports compatibility with mods that change the player's inventory size.
+    /// </summary>
     public static class InventoryExpansions
     {
         /// <summary> Checks if the player's max number of items differs from the length of favoriteItemSlots. </summary>

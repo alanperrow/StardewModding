@@ -1,30 +1,32 @@
-﻿using System;
-using System.Reflection;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Menus;
+using System;
+using System.Reflection;
 
 namespace ConvenientInventory.Compatibility
 {
-    public static class ApiHelper
+    /// <summary>
+    /// Supports integration/compatibility with other mods and provides access to their API methods.
+    /// </summary>
+    public static class ModIntegrations
     {
-        private static FieldInfo customBackpackScrollAmountField;
+        private static ICustomBackpackApi customBackpackApi;
+        private static Type customBackpackFullInventoryPageType;
 
         public static bool IsChestsAnywhereInstalled { get; private set; }
 
-        public static bool IsCustomBackpackFrameworkInstalled { get; private set; }
+        public static bool IsCustomBackpackFrameworkInstalled => customBackpackApi != null;
 
         public static bool IsWearMoreRingsInstalled { get; private set; }
 
+        public static int CustomBackpackScrollAmount => IsCustomBackpackFrameworkInstalled ? customBackpackApi.GetScroll() : 0;
+
+
         /// <summary>
-        /// Gets the per-screen inventory scroll amount from the Custom Backpack Framework mod.
-        /// Each increment represents one scrolled row; 0 indicates no scroll (default).
+        /// Initializes our mod config through the Generic Mod Config Menu API.
         /// </summary>
-        public static int CustomBackpackScrollAmount => ((PerScreen<int>)customBackpackScrollAmountField.GetValue(null)).Value;
-
-        public static Type CustomBackpackFullInventoryPageType { get; private set; }
-
         public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
             // == Config Validation ==
@@ -352,44 +354,43 @@ namespace ConvenientInventory.Compatibility
         }
 
         /// <summary>
-        /// Initializes mod integrations for cases not using a mod API.
+        /// Initializes mod integrations with the Custom Backpack Framework mod and API.
         /// </summary>
-        public static void InitializeMods(IModHelper helper, IMonitor monitor)
+        public static void InitializeApi(ICustomBackpackApi api, IModHelper helper, IMonitor monitor)
         {
-            // Wear More Rings
-            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
-
-            // Chests Anywhere
-            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
-
-            // Custom Backpack Framework
-            IModInfo modCBF = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework");
-            if (modCBF != null)
+            try
             {
-                // The PerScreen<int> field `scrolled` needs to be accessed via reflection as it is not exposed via API.
-                try
+                // Cache the `FullInventoryPage` type to be used for comparisons.
+                IModInfo cbfModInfo = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework");
+                IMod cbfMod = cbfModInfo?.GetType().GetProperty("Mod").GetValue(cbfModInfo) as IMod;
+                Type cbfModType = cbfMod?.GetType();
+                customBackpackFullInventoryPageType = cbfModType?.Assembly.GetType("CustomBackpack.FullInventoryPage");
+                if (customBackpackFullInventoryPageType == null)
                 {
-                    IMod cbfMod = modCBF.GetType().GetProperty("Mod").GetValue(modCBF) as IMod;
-                    Type cbfModType = cbfMod.GetType();
-
-                    // Cache the `FullInventoryPage` type for future comparisons.
-                    CustomBackpackFullInventoryPageType = cbfModType.Assembly.GetType("CustomBackpack.FullInventoryPage");
-                    if (CustomBackpackFullInventoryPageType == null)
-                    {
-                        throw new TargetException("Unable to find type 'CustomBackpack.FullInventoryPage' in mod assembly.");
-                    }
-
-                    // Cache the `scrolled` field info itself to account for the case where a new instance is assigned.
-                    customBackpackScrollAmountField = cbfModType.GetField("scrolled", BindingFlags.Static | BindingFlags.Public);
-                    var test = (PerScreen<int>)customBackpackScrollAmountField.GetValue(null); // Verify we can access this value as expected.
-
-                    IsCustomBackpackFrameworkInstalled = true;
+                    throw new TargetException("Unable to find type 'CustomBackpack.FullInventoryPage' in mod assembly.");
                 }
-                catch (Exception ex)
-                {
-                    monitor.Log($"Could not initialize compatibility with Custom Backpack Framework:\n{ex}", LogLevel.Warn);
-                }
+
+                // Initialization successful.
+                customBackpackApi = api;
+            }
+            catch (Exception ex)
+            {
+                monitor.Log($"Could not initialize mod integrations with Custom Backpack Framework:\n{ex}", LogLevel.Warn);
             }
         }
+
+        /// <summary>
+        /// Initializes mod integrations for cases not using a mod API.
+        /// </summary>
+        public static void InitializeMods(IModHelper helper)
+        {
+            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
+            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
+        }
+
+        /// <summary>
+        /// Determines whether the given menu is an instance of Custom Backpack Framework's full inventory page.
+        /// </summary>
+        public static bool IsCustomBackpackFullInventoryPage(IClickableMenu menu) => menu?.GetType() == customBackpackFullInventoryPageType;
     }
 }

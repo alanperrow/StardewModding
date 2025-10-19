@@ -192,20 +192,19 @@ namespace ConvenientInventory
 
         public static void OnMenuChanged(MenuChangedEventArgs e)
         {
-            if (ApiHelper.IsCustomBackpackFrameworkInstalled)
+            if (ModIntegrations.IsCustomBackpackFrameworkInstalled)
             {
-                if (e.OldMenu is GameMenu gameMenuLeaving && e.NewMenu is InventoryPage
-                    && e.NewMenu.GetType() == ApiHelper.CustomBackpackFullInventoryPageType
-                    && gameMenuLeaving.GetCurrentPage() is InventoryPage)
+                if (e.OldMenu is GameMenu && e.NewMenu is InventoryPage
+                    && ModIntegrations.IsCustomBackpackFullInventoryPage(e.NewMenu))
                 {
                     // We have opened Custom Backpack Framework's FullInventoryPage from InventoryPage.
                     // Temporarily remove the quick stack button as it is behaving strangely with the custom menu.
                     PlayerInventoryPage = null;
                     QuickStackButton = null;
                 }
-                else if (e.OldMenu is InventoryPage && e.NewMenu is GameMenu gameMenuReturning
-                    && e.OldMenu.GetType() == ApiHelper.CustomBackpackFullInventoryPageType
-                    && gameMenuReturning.GetCurrentPage() is InventoryPage inventoryPage)
+                else if (e.OldMenu is InventoryPage && e.NewMenu is GameMenu gameMenu
+                    && ModIntegrations.IsCustomBackpackFullInventoryPage(e.OldMenu)
+                    && gameMenu.GetCurrentPage() is InventoryPage inventoryPage)
                 {
                     // We have switched back to InventoryPage from Custom Backpack Framework's FullInventoryPage.
                     // Re-create the quick stack button.
@@ -514,7 +513,7 @@ namespace ConvenientInventory
         /// </summary>
         private static void OnEquipmentSlotClickedWithFavoriteItem(ClickableComponent equipmentSlot, Item cursorSlotItem)
         {
-            if (ApiHelper.IsWearMoreRingsInstalled)
+            if (ModIntegrations.IsWearMoreRingsInstalled)
             {
                 // Wear More Rings mod changes ring equipment slot names; starts with "Ring 0", then "Ring 1", "Ring 2", etc.
                 if (equipmentSlot.name.StartsWith("Ring "))
@@ -989,10 +988,10 @@ namespace ConvenientInventory
             }
 
             bool[] favoriteItemSlots = FavoriteItemSlots;
-            if (ApiHelper.IsCustomBackpackFrameworkInstalled)
+            if (ModIntegrations.IsCustomBackpackFrameworkInstalled)
             {
                 // Offset favorite item slots by the custom backpack scroll amount.
-                int startingRow = ApiHelper.CustomBackpackScrollAmount;
+                int startingRow = ModIntegrations.CustomBackpackScrollAmount;
                 int columns = inventoryMenu.capacity / inventoryMenu.rows;
                 favoriteItemSlots = FavoriteItemSlots.Skip(startingRow * columns).Take(inventoryMenu.capacity).ToArray();
             }
