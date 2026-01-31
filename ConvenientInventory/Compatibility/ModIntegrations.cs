@@ -360,14 +360,23 @@ namespace ConvenientInventory.Compatibility
         {
             try
             {
+                IModInfo cbfModInfo = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework")
+                    ?? throw new InvalidOperationException("Custom Backpack Framework mod not found in mod registry.");
+
+                // Ensure mod version is recent enough where API interface includes `GetScroll()` method.
+                if (!cbfModInfo.Manifest.Version.IsNewerThan("1.1.0"))//TODO: is this true when equal? Or will I have to check for newer than 1.0.1 (previous version before 1.1.0)?
+                {
+                    throw new InvalidOperationException($"Custom Backpack Framework mod version {cbfModInfo.Manifest.Version} is outdated. " +
+                        "Please update to version 1.1.0 or later to enable compatibility with Convenient Inventory.");
+                }
+
                 // Cache the `FullInventoryPage` type to be used for comparisons.
-                IModInfo cbfModInfo = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework");
-                IMod cbfMod = cbfModInfo?.GetType().GetProperty("Mod").GetValue(cbfModInfo) as IMod;
+                IMod cbfMod = cbfModInfo.GetType().GetProperty("Mod").GetValue(cbfModInfo) as IMod;
                 Type cbfModType = cbfMod?.GetType();
                 customBackpackFullInventoryPageType = cbfModType?.Assembly.GetType("CustomBackpack.FullInventoryPage");
                 if (customBackpackFullInventoryPageType == null)
                 {
-                    throw new TargetException("Unable to find type 'CustomBackpack.FullInventoryPage' in mod assembly.");
+                    throw new InvalidOperationException("Unable to find type 'CustomBackpack.FullInventoryPage' in mod assembly.");
                 }
 
                 // Initialization successful.
