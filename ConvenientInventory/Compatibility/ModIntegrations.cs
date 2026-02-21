@@ -3,7 +3,6 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 using System;
-using System.Reflection;
 
 namespace ConvenientInventory.Compatibility
 {
@@ -364,7 +363,7 @@ namespace ConvenientInventory.Compatibility
                     ?? throw new InvalidOperationException("Custom Backpack Framework mod not found in mod registry.");
 
                 // Ensure mod version is recent enough where API interface includes `GetScroll()` method.
-                if (!cbfModInfo.Manifest.Version.IsNewerThan("1.1.0"))//TODO: is this true when equal? Or will I have to check for newer than 1.0.1 (previous version before 1.1.0)?
+                if (cbfModInfo.Manifest.Version.IsOlderThan("1.1.0"))
                 {
                     throw new InvalidOperationException($"Custom Backpack Framework mod version {cbfModInfo.Manifest.Version} is outdated. " +
                         "Please update to version 1.1.0 or later to enable compatibility with Convenient Inventory.");
@@ -384,7 +383,7 @@ namespace ConvenientInventory.Compatibility
             }
             catch (Exception ex)
             {
-                monitor.Log($"Could not initialize mod integrations with Custom Backpack Framework:\n{ex}", LogLevel.Warn);
+                monitor.Log($"Could not initialize mod integrations with Custom Backpack Framework:\n{ex.Message}", LogLevel.Warn);
             }
         }
 
