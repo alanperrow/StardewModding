@@ -720,6 +720,12 @@ namespace ConvenientInventory
                 return;
             }
 
+            if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu && itemGrabMenu.fillStacksButton != null)
+            {
+                QuickStackLogic.StackInItemGrabMenu(itemGrabMenu);
+                return;
+            }
+
             if (!Context.IsPlayerFree)
             {
                 // Suppress quick stack hotkey if the player is not free to act in the world.

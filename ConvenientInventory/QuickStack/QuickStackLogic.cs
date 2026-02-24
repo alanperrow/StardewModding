@@ -16,6 +16,165 @@ namespace ConvenientInventory.QuickStack
 {
     public static class QuickStackLogic
     {
+        public static bool StackInItemGrabMenu(ItemGrabMenu itemGrabMenu)
+        {
+            Chest chest = itemGrabMenu.context switch
+            {
+                Chest c => c,
+                JunimoHut jh => jh.GetOutputChest(),
+                _ => null,
+            };
+
+            if (chest is null)
+            {
+                ModEntry.Instance.Monitor.Log(
+                    $"Cannot quick stack into ItemGrabMenu context of type {itemGrabMenu.context?.GetType().Name ?? "null"}.",
+                    LogLevel.Debug);
+                return false;
+            }
+
+            TypedChest typedChest = new(
+                chest, itemGrabMenu.context is JunimoHut ? ChestType.JunimoHut : TypedChest.DetermineChestType(chest), chest.Location, null);
+
+            bool movedAtLeastOneTotal = false;
+            Farmer who = Game1.player;
+            Inventory playerInventory = who.Items;
+
+            QuickStackSummary quickStackSummary = new();
+            List<Item> overflowItems = new();
+
+            // Fill chest stacks with player inventory items
+            foreach (Item chestItem in chest.Items)
+            {
+                if (chestItem is null)
+                {
+                    continue;
+                }
+
+                foreach (Item playerItem in playerInventory)
+                {
+                    if (playerItem is null)
+                    {
+                        continue;
+                    }
+
+                    if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+                    {
+                        // Skip favorited items
+                        continue;
+                    }
+
+                    if (!playerItem.canStackWith(chestItem))
+                    {
+                        if (ModEntry.Config.QuickStack.OverflowItems
+                            && ModEntry.Config.QuickStack.IgnoreItemQuality
+                            && CanStackWithIgnoreQuality(playerItem, chestItem))
+                        {
+                            overflowItems.Add(playerItem.getOne());
+                        }
+
+                        continue;
+                    }
+
+                    int beforeStack = playerItem.Stack;
+                    playerItem.Stack = chestItem.addToStack(playerItem);
+                    bool movedAtLeastOne = beforeStack != playerItem.Stack;
+
+                    movedAtLeastOneTotal |= movedAtLeastOne;
+
+                    if (movedAtLeastOne)
+                    {
+                        ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[playerInventory.IndexOf(playerItem)];
+                        ConvenientInventory.AddTransferredItemSprite(
+                            new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
+
+                        if (playerItem.Stack == 0)
+                        {
+                            who.removeItemFromInventory(playerItem);
+                        }
+
+                        quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
+                    }
+
+                    if (chestItem.Stack == chestItem.maximumStackSize())
+                    {
+                        if (ModEntry.Config.QuickStack.OverflowItems)
+                        {
+                            overflowItems.Add(chestItem.getOne());
+                        }
+
+                        itemGrabMenu.inventory.ShakeItem(playerItem);
+                        break;
+                    }
+                }
+            }
+
+            // Add overflow stacks to chest when applicable
+            if (ModEntry.Config.QuickStack.OverflowItems && chest.Items.Count < chest.GetActualCapacity())
+            {
+                foreach (Item overflowItem in overflowItems)
+                {
+                    if (overflowItem is null)
+                    {
+                        continue;
+                    }
+
+                    foreach (Item playerItem in playerInventory)
+                    {
+                        if (playerItem is null)
+                        {
+                            continue;
+                        }
+
+                        if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+                        {
+                            // Skip favorited items
+                            continue;
+                        }
+
+                        if (!playerItem.canStackWith(overflowItem))
+                        {
+                            // Skip overflow item if it doesn't stack with player item.
+                            continue;
+                        }
+
+                        int beforeStack = playerItem.Stack;
+                        Item leftoverItem = chest.addItem(playerItem);
+                        bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
+
+                        movedAtLeastOneTotal |= movedAtLeastOne;
+
+                        if (movedAtLeastOne)
+                        {
+                            ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[playerInventory.IndexOf(playerItem)];
+                            ConvenientInventory.AddTransferredItemSprite(
+                                new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
+
+                            quickStackSummary.AddToSummary(typedChest, playerItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
+                        }
+
+                        if (leftoverItem is null)
+                        {
+                            who.removeItemFromInventory(playerItem);
+                        }
+                        else
+                        {
+                            itemGrabMenu.inventory.ShakeItem(playerItem);
+                        }
+                    }
+                }
+            }
+
+            Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
+
+            if (movedAtLeastOneTotal)
+            {
+                ModEntry.Instance.Monitor.Log(quickStackSummary.GetSummaryMessage(), LogLevel.Trace);
+            }
+
+            return movedAtLeastOneTotal;
+        }
+
         public static bool StackToNearbyChests(string rangeStr, InventoryPage inventoryPage = null)
         {
             bool movedAtLeastOneTotal = false;
