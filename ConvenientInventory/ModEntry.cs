@@ -37,6 +37,8 @@ namespace ConvenientInventory
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.Input.ButtonsChanged += OnButtonsChanged;
 
+            helper.Events.World.ChestInventoryChanged += OnChestInventoryChanged;
+
             helper.ConsoleCommands.Add("player_fixinventory",
                 "Resizes the player's inventory to its correct maximum size, dropping any extra items contained in inventory." +
                 "\n(Some mods directly modify the player's inventory size, causing compatibility issues and/or leaving extra null items when uninstalled; " +
@@ -62,7 +64,11 @@ namespace ConvenientInventory
         private void OnWindowResized(object sender, WindowResizedEventArgs e) => QuickStackToggleChestLogic.OnWindowResized();
 
         /// <summary>Raised after a game menu is opened, closed, or replaced.</summary>
-        private void OnMenuChanged(object sender, MenuChangedEventArgs e) => ConvenientInventory.OnMenuChanged(e);
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e)
+        {
+            ConvenientInventory.OnMenuChanged(e);
+            QuickStackInMenuLogic.OnMenuChanged(e);
+        }
 
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).
         /// All mods are loaded and initialised at this point, so this is a good time to set up mod integrations.</summary>
@@ -153,6 +159,9 @@ namespace ConvenientInventory
                 }
             }
         }
+
+        /// <summary>Raised after items are added or removed from a chest.</summary>
+        private void OnChestInventoryChanged(object sender, ChestInventoryChangedEventArgs e) => QuickStackInMenuLogic.OnChestInventoryChanged(e);
 
         /// <summary>
         /// Resizes player's inventory to player.MaxItems, dropping any extra items contained in inventory.

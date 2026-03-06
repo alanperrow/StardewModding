@@ -1281,48 +1281,10 @@ namespace ConvenientInventory
             }
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(Chest.addItem))]
-        public static bool AddItem_Prefix(Chest __instance, out bool __state)
-        {
-            __state = false;
-            try
-            {
-                if (QuickStackLogic.IsStackingIntoItemGrabMenu
-                    && __instance.GetItemsForPlayer() is Inventory chestInventory)
-                {
-                    // Temporarily subscribe to OnSlotChanged event to shake any newly added items from quick stacking into this chest.
-                    chestInventory.OnSlotChanged += OnSlotChangedWhileStackingIntoChestMenu;
-                    __state = true;
-                }
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(AddItem_Prefix)}:\n{e}", LogLevel.Error);
-            }
-
-            return true;
-        }
-
-        // If our quick stack added a new item into this chest, shake the newly added item.
-        private static void OnSlotChangedWhileStackingIntoChestMenu(Inventory inventory, int index, Item before, Item after)
-        {
-            if (before == null && after != null && Game1.activeClickableMenu is ItemGrabMenu chestItemGrabMenu)
-            {
-                chestItemGrabMenu.ItemsToGrabMenu.ShakeItem(after);
-            }
-        }
-
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Chest.addItem))]
         public static void AddItem_Postfix(Chest __instance, bool __state)
         {
-            if (__state)
-            {
-                // Unsubscribe from the OnSlotChanged event which we temporarily subscribed to in the Prefix method.
-                (__instance.GetItemsForPlayer() as Inventory).OnSlotChanged -= OnSlotChangedWhileStackingIntoChestMenu;
-            }
-
             if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
                 return;
