@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -16,7 +17,22 @@ namespace ConvenientInventory.QuickStack
 {
     public static class QuickStackLogic
     {
+        public static bool IsStackingIntoItemGrabMenu { get; private set; }
+
         public static bool StackInItemGrabMenu(ItemGrabMenu itemGrabMenu)
+        {
+            try
+            {
+                IsStackingIntoItemGrabMenu = true;
+                return StackInItemGrabMenuCore(itemGrabMenu);
+            }
+            finally
+            {
+                IsStackingIntoItemGrabMenu = false;
+            }
+        }
+
+        private static bool StackInItemGrabMenuCore(ItemGrabMenu itemGrabMenu)
         {
             Chest chest = itemGrabMenu.context switch
             {
@@ -27,14 +43,29 @@ namespace ConvenientInventory.QuickStack
 
             if (chest is null)
             {
+                Game1.playSound("cancel");
                 ModEntry.Instance.Monitor.Log(
-                    $"Cannot quick stack into ItemGrabMenu context of type {itemGrabMenu.context?.GetType().Name ?? "null"}.",
+                    $"Cannot quick stack into ItemGrabMenu context of type '{itemGrabMenu.context?.GetType().Name ?? "null"}'.",
                     LogLevel.Debug);
                 return false;
             }
 
+            if (!ShouldQuickStackInto(chest, out ChestType chestType, false))
+            {
+                Game1.playSound("cancel");
+                return false;
+            }
+            
+            //TODO: Add config option to allow manual quick stack into chest to bypass a "disabled" quick stack toggle state, true by default.
+            if (QuickStackToggleChestLogic.GetQuickStackToggleChestStateFromModData(chest) == QuickStackToggleChestState.Disabled)
+            {
+                //TODO: Shake Toggle Quick Stack button, if visible.
+                Game1.playSound("cancel");
+                return false;
+            }
+
             TypedChest typedChest = new(
-                chest, itemGrabMenu.context is JunimoHut ? ChestType.JunimoHut : TypedChest.DetermineChestType(chest), chest.Location, null);
+                chest, itemGrabMenu.context is JunimoHut ? ChestType.JunimoHut : chestType, chest.Location, null);
 
             bool movedAtLeastOneTotal = false;
             Farmer who = Game1.player;
@@ -44,7 +75,7 @@ namespace ConvenientInventory.QuickStack
             List<Item> overflowItems = new();
 
             // Fill chest stacks with player inventory items
-            foreach (Item chestItem in chest.Items)
+            foreach (Item chestItem in chest.GetItemsForPlayer(who.UniqueMultiplayerID))
             {
                 if (chestItem is null)
                 {
@@ -84,8 +115,10 @@ namespace ConvenientInventory.QuickStack
 
                     if (movedAtLeastOne)
                     {
+                        itemGrabMenu.ItemsToGrabMenu.ShakeItem(chestItem);
+
                         ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[playerInventory.IndexOf(playerItem)];
-                        ConvenientInventory.AddTransferredItemSprite(
+                        itemGrabMenu._transferredItemSprites.Add(
                             new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
 
                         if (playerItem.Stack == 0)
@@ -110,7 +143,8 @@ namespace ConvenientInventory.QuickStack
             }
 
             // Add overflow stacks to chest when applicable
-            if (ModEntry.Config.QuickStack.OverflowItems && chest.Items.Count < chest.GetActualCapacity())
+            IInventory chestItems = chest.GetItemsForPlayer(who.UniqueMultiplayerID);
+            if (ModEntry.Config.QuickStack.OverflowItems && chestItems.Count < chest.GetActualCapacity())
             {
                 foreach (Item overflowItem in overflowItems)
                 {
@@ -147,8 +181,8 @@ namespace ConvenientInventory.QuickStack
                         if (movedAtLeastOne)
                         {
                             ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[playerInventory.IndexOf(playerItem)];
-                            ConvenientInventory.AddTransferredItemSprite(
-                                new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
+                            itemGrabMenu._transferredItemSprites.Add(
+                                    new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
 
                             quickStackSummary.AddToSummary(typedChest, playerItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
                         }
@@ -169,6 +203,11 @@ namespace ConvenientInventory.QuickStack
 
             if (movedAtLeastOneTotal)
             {
+                if (ModEntry.Config.AutoOrganizeChest.IsEnabled)
+                {
+                    AutoOrganizeLogic.TryOrganizeChestOnFillOutStacks(itemGrabMenu, chest);
+                }
+
                 ModEntry.Instance.Monitor.Log(quickStackSummary.GetSummaryMessage(), LogLevel.Trace);
             }
 
