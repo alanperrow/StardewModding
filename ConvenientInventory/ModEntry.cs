@@ -48,7 +48,7 @@ namespace ConvenientInventory
                 "Clears all mod data set by Convenient Inventory for the currently loaded save; no other mod data is removed. " +
                 "Changes to the save file will take effect the next time the game is saved." +
                 "\n(This command is intended for players who want to remove any Convenient Inventory mod data from their save file for a complete uninstallation.)" +
-                "\n\nUsage: convinv_cleanup_autoorganize",
+                "\n\nUsage: convinv_clearmoddata",
                 ClearModDataForCurrentlyLoadedSave);
         }
 
