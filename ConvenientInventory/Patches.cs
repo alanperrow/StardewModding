@@ -1283,7 +1283,7 @@ namespace ConvenientInventory
 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Chest.addItem))]
-        public static void AddItem_Postfix(Chest __instance, bool __state)
+        public static void AddItem_Postfix(Chest __instance)
         {
             if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {

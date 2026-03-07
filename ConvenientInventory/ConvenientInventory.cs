@@ -728,7 +728,7 @@ namespace ConvenientInventory
                 // - Since we already have a quick stack toggle button, adding another buttons seems like it would be confusing.
                 // - Maybe we could implement a shift-click behavior on the existing fillStacksButton to perform a quick stack into that chest?
                 //    - If this is implemented, when holding shift, the button icon and tooltip should be updated to indicate that it will perform a quick stack instead of fill stacks.
-                QuickStackInMenuLogic.StackInItemGrabMenu(itemGrabMenu);
+                QuickStackInMenuLogic.StackToChestInMenu(itemGrabMenu);
                 return;
             }
 

@@ -2,7 +2,6 @@
 using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.TypedChests;
 using StardewModdingAPI;
-using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
@@ -17,71 +16,7 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public static class QuickStackInMenuLogic
     {
-        private static bool isQuickStackingInItemGrabMenu;
-        private static ItemGrabMenu itemGrabMenuToStackIn;
-
-        public static bool StackInItemGrabMenu(ItemGrabMenu itemGrabMenu)
-        {
-            try
-            {
-                isQuickStackingInItemGrabMenu = true;
-                return StackInItemGrabMenuCore(itemGrabMenu);
-            }
-            finally
-            {
-                isQuickStackingInItemGrabMenu = false;
-            }
-        }
-
-        public static void OnMenuChanged(MenuChangedEventArgs e)
-        {
-            if (itemGrabMenuToStackIn != null && e.OldMenu == itemGrabMenuToStackIn)
-            {
-                Chest chest = GetChestFromContext(itemGrabMenuToStackIn);
-                if (chest is null)
-                {
-                    return;
-                }
-
-                itemGrabMenuToStackIn = null;
-                (chest.GetItemsForPlayer() as Inventory).OnSlotChanged -= OnChestInventorySlotChanged;
-            }
-
-            if (e.NewMenu is ItemGrabMenu itemGrabMenu && itemGrabMenu.fillStacksButton != null)
-            {
-                Chest chest = GetChestFromContext(itemGrabMenu);
-                if (chest is null)
-                {
-                    return;
-                }
-
-                itemGrabMenuToStackIn = itemGrabMenu;
-                (chest.GetItemsForPlayer() as Inventory).OnSlotChanged += OnChestInventorySlotChanged;
-            }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Chest"/> from the given <see cref="ItemGrabMenu"/>'s <see cref="ItemGrabMenu.context"/>, if any.
-        /// </summary>
-        private static Chest GetChestFromContext(ItemGrabMenu itemGrabMenu) => itemGrabMenu.context switch
-        {
-            Chest c => c,
-            JunimoHut jh => jh.GetOutputChest(),
-            _ => null,
-        };
-
-        /// <summary>
-        /// Shakes any new items that are added while quick stacking into an ItemGrabMenu for a chest.
-        /// </summary>
-        private static void OnChestInventorySlotChanged(Inventory inventory, int index, Item before, Item after)
-        {
-            if (isQuickStackingInItemGrabMenu && itemGrabMenuToStackIn != null && before == null && after != null)
-            {
-                itemGrabMenuToStackIn.ItemsToGrabMenu.ShakeItem(after);
-            }
-        }
-
-        private static bool StackInItemGrabMenuCore(ItemGrabMenu itemGrabMenu)
+        public static bool StackToChestInMenu(ItemGrabMenu itemGrabMenu)
         {
             Chest chest = GetChestFromContext(itemGrabMenu);
             if (chest is null)
@@ -256,5 +191,15 @@ namespace ConvenientInventory.QuickStack
 
             return movedAtLeastOneTotal;
         }
+
+        /// <summary>
+        /// Gets the <see cref="Chest"/> from the given <see cref="ItemGrabMenu"/>'s <see cref="ItemGrabMenu.context"/>, if any.
+        /// </summary>
+        private static Chest GetChestFromContext(ItemGrabMenu itemGrabMenu) => itemGrabMenu.context switch
+        {
+            Chest c => c,
+            JunimoHut jh => jh.GetOutputChest(),
+            _ => null,
+        };
     }
 }
