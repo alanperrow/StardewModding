@@ -146,6 +146,9 @@ namespace ConvenientInventory.QuickStack
                         continue;
                     }
 
+                    //TODO: Optimization: Instead of using `playerItem.getOne()` and `chestItem.getOne()` above, couldn't we just track the actual playerItem in our inventory?
+                    //      This would avoid having to search through the player's inventory again to find the item we already know exists.
+                    //      Experiment with this, and if successful, apply the same change to `QuickStackLogic.StackToNearbyChests()` as well.
                     foreach (Item playerItem in playerInventory)
                     {
                         if (playerItem is null)
@@ -166,6 +169,10 @@ namespace ConvenientInventory.QuickStack
                         }
 
                         int beforeStack = playerItem.Stack;
+
+                        //TODO: This is where we should shake the newly added item, if any.
+                        //      Maybe we could add some new static fields and use them to introduce a new condition in Chest.addItem postfix method specifically for this case?
+                        //      Or we could temporarily subscribe to the OnSlotChanged event of the chest's inventory?
                         Item leftoverItem = chest.addItem(playerItem);
                         bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
 
