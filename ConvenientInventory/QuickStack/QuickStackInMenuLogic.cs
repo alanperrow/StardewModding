@@ -5,6 +5,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
+using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
 
@@ -43,22 +44,38 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
-            if (!QuickStackLogic.ShouldQuickStackInto(chest, out ChestType chestType, false))
+            GameLocation chestLocation = chest.Location;
+            ChestType chestType;
+            if (itemGrabMenu.context is JunimoHut)
             {
-                Game1.playSound("cancel");
-                return false;
+                chestType = ChestType.JunimoHut;
+            }
+            else
+            {
+                chestType = TypedChest.DetermineChestType(chest);
+                if (chestType is ChestType.Package or ChestType.Dungeon)
+                {
+                    // Do not consider new farmer packages or dungeon chests for quick stack.
+                    Game1.playSound("cancel");
+                    return false;
+                }
+                else if (chestType == ChestType.Normal)
+                {
+                    // Double check for fridge chest before accepting default Normal result.
+                    if (Game1.currentLocation is FarmHouse farmHouse && chest == farmHouse.GetFridge())
+                    {
+                        chestLocation ??= farmHouse;
+                        chestType = ChestType.Fridge;
+                    }
+                    else if (Game1.currentLocation is IslandFarmHouse islandFarmHouse && chest == islandFarmHouse.GetFridge())
+                    {
+                        chestLocation ??= islandFarmHouse;
+                        chestType = ChestType.IslandFridge;
+                    }
+                }
             }
 
-            //TODO: Add config option to allow manual quick stack into chest to bypass a "disabled" quick stack toggle state, true by default.
-            if (QuickStackToggleChestLogic.GetQuickStackToggleChestStateFromModData(chest) == QuickStackToggleChestState.Disabled)
-            {
-                //TODO: Shake Toggle Quick Stack button, if visible.
-                Game1.playSound("cancel");
-                return false;
-            }
-
-            TypedChest typedChest = new(
-                chest, itemGrabMenu.context is JunimoHut ? ChestType.JunimoHut : chestType, chest.Location, null);
+            TypedChest typedChest = new(chest, chestType, chestLocation ?? Game1.currentLocation, null);
 
             bool movedAtLeastOneTotal = false;
             Farmer who = Game1.player;
@@ -131,7 +148,7 @@ namespace ConvenientInventory.QuickStack
 
                         if (playerItem.Stack != 0)
                         {
-                        itemGrabMenu.inventory.ShakeItem(playerItem);
+                            itemGrabMenu.inventory.ShakeItem(playerItem);
                         }
 
                         break;
