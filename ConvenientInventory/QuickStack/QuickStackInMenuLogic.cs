@@ -129,7 +129,11 @@ namespace ConvenientInventory.QuickStack
                             overflowItems.Add(chestItem.getOne());
                         }
 
+                        if (playerItem.Stack != 0)
+                        {
                         itemGrabMenu.inventory.ShakeItem(playerItem);
+                        }
+
                         break;
                     }
                 }
@@ -169,11 +173,16 @@ namespace ConvenientInventory.QuickStack
                         }
 
                         int beforeStack = playerItem.Stack;
-
-                        //TODO: This is where we should shake the newly added item, if any.
-                        //      Maybe we could add some new static fields and use them to introduce a new condition in Chest.addItem postfix method specifically for this case?
-                        //      Or we could temporarily subscribe to the OnSlotChanged event of the chest's inventory?
-                        Item leftoverItem = chest.addItem(playerItem);
+                        Item leftoverItem = null;
+                        try
+                        {
+                            (chest.GetItemsForPlayer() as Inventory).OnSlotChanged += ChestSlotChanged;
+                            leftoverItem = chest.addItem(playerItem);
+                        }
+                        finally
+                        {
+                            (chest.GetItemsForPlayer() as Inventory).OnSlotChanged -= ChestSlotChanged;
+                        }
                         bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
 
                         movedAtLeastOneTotal |= movedAtLeastOne;
@@ -213,6 +222,15 @@ namespace ConvenientInventory.QuickStack
             }
 
             return movedAtLeastOneTotal;
+
+            // Local function to shake item if we add it to the chest.
+            void ChestSlotChanged(Inventory inventory, int index, Item before, Item after)
+            {
+                if (before == null && after != null)
+                {
+                    itemGrabMenu.ItemsToGrabMenu.ShakeItem(index);
+                }
+            }
         }
 
         /// <summary>

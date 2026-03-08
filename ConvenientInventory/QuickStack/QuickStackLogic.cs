@@ -124,7 +124,11 @@ namespace ConvenientInventory.QuickStack
                                 overflowItems.Add(chestItem.getOne());
                             }
 
-                            inventoryPage?.inventory.ShakeItem(playerItem);
+                            if (playerItem.Stack != 0)
+                            {
+                                inventoryPage?.inventory.ShakeItem(playerItem);
+                            }
+
                             break;
                         }
                     }
@@ -736,7 +740,7 @@ namespace ConvenientInventory.QuickStack
 
                                 tx = (int)buildingTileCenterPosition.X;
                                 ty = (int)buildingTileCenterPosition.Y;
-                                AddChestToList(hutChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.JunimoHut,  hutVisualTileLoc);
+                                AddChestToList(hutChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.JunimoHut, hutVisualTileLoc);
                             }
                             else if (ModEntry.Config.QuickStack.IntoMills && building.buildingType.Value == "Mill")
                             {
