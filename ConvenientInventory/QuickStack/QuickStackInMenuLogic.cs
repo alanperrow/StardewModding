@@ -16,7 +16,22 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public static class QuickStackInMenuLogic
     {
+        public static bool IsStackingToChestInMenu { get; private set; }
+
         public static bool StackToChestInMenu(ItemGrabMenu itemGrabMenu)
+        {
+            try
+            {
+                IsStackingToChestInMenu = true;
+                return StackToChestInMenuCore(itemGrabMenu);
+            }
+            finally
+            {
+                IsStackingToChestInMenu = false;
+            }
+        }
+
+        private static bool StackToChestInMenuCore(ItemGrabMenu itemGrabMenu)
         {
             Chest chest = GetChestFromContext(itemGrabMenu);
             if (chest is null)
@@ -183,6 +198,7 @@ namespace ConvenientInventory.QuickStack
             {
                 if (ModEntry.Config.AutoOrganizeChest.IsEnabled)
                 {
+                    // Manually trigger auto organize now that quick stack has completed and added at least one item.
                     AutoOrganizeLogic.TryOrganizeChestOnFillOutStacks(itemGrabMenu, chest);
                 }
 
