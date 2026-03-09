@@ -47,7 +47,7 @@ namespace ConvenientInventory.QuickStack
                     chestItems = chest.GetItemsForPlayer(who.UniqueMultiplayerID);
                 }
 
-                List<Item> overflowItems = new();
+                HashSet<Item> overflowItems = new();
 
                 // Fill chest stacks with player inventory items
                 foreach (Item chestItem in chestItems)
@@ -64,7 +64,8 @@ namespace ConvenientInventory.QuickStack
                             continue;
                         }
 
-                        if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
+                        int itemIndex = playerInventory.IndexOf(playerItem);
+                        if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[itemIndex])
                         {
                             // Skip favorited items
                             continue;
@@ -75,7 +76,7 @@ namespace ConvenientInventory.QuickStack
                             if (ModEntry.Config.QuickStack.OverflowItems && playerItem.QualifiedItemId == chestItem.QualifiedItemId)
                             {
                                 // We found an existing occurence of this item in this Dresser, so add it to overflowItems.
-                                overflowItems.Add(playerItem.getOne());
+                                overflowItems.Add(playerItem);
                             }
 
                             // In a Dresser, never attempt to add to existing stacks, as we only deal with single-stack items.
@@ -87,7 +88,7 @@ namespace ConvenientInventory.QuickStack
                                 && ModEntry.Config.QuickStack.IgnoreItemQuality
                                 && CanStackWithIgnoreQuality(playerItem, chestItem))
                             {
-                                overflowItems.Add(playerItem.getOne());
+                                overflowItems.Add(playerItem);
                             }
 
                             continue;
@@ -103,33 +104,29 @@ namespace ConvenientInventory.QuickStack
                         {
                             if (inventoryPage != null)
                             {
-                                ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[playerInventory.IndexOf(playerItem)];
+                                ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[itemIndex];
                                 ConvenientInventory.AddTransferredItemSprite(
                                     new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                             }
 
                             if (playerItem.Stack == 0)
                             {
+                                // Remove player item from inventory (and overflow list, if we are tracking it).
                                 who.removeItemFromInventory(playerItem);
+                                overflowItems.Remove(playerItem);
                             }
 
                             quickStackAnimation?.AddToAnimation(typedChest, playerItem);
                             quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
                         }
 
-                        if (chestItem.Stack == chestItem.maximumStackSize())
+                        if (chestItem.Stack == chestItem.maximumStackSize() && playerItem.Stack != 0)
                         {
+                            inventoryPage?.inventory.ShakeItem(playerItem);
                             if (ModEntry.Config.QuickStack.OverflowItems)
                             {
-                                overflowItems.Add(chestItem.getOne());
+                                overflowItems.Add(playerItem);
                             }
-
-                            if (playerItem.Stack != 0)
-                            {
-                                inventoryPage?.inventory.ShakeItem(playerItem);
-                            }
-
-                            break;
                         }
                     }
                 }
@@ -139,71 +136,48 @@ namespace ConvenientInventory.QuickStack
                 {
                     foreach (Item overflowItem in overflowItems)
                     {
-                        if (overflowItem is null)
+                        if (overflowItem is null || overflowItem.Stack == 0)
                         {
                             continue;
                         }
 
-                        foreach (Item playerItem in playerInventory)
+                        int itemIndex = playerInventory.IndexOf(overflowItem);
+                        if (itemIndex == -1 || (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[itemIndex]))
                         {
-                            if (playerItem is null)
+                            // Skip favorited items
+                            continue;
+                        }
+
+                        int beforeStack = overflowItem.Stack;
+                        Item leftoverItem = chest.addItem(overflowItem);
+                        bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
+
+                        movedAtLeastOneTotal |= movedAtLeastOne;
+
+                        if (movedAtLeastOne)
+                        {
+                            if (inventoryPage != null)
                             {
-                                continue;
+                                ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[itemIndex];
+                                ConvenientInventory.AddTransferredItemSprite(
+                                    new ItemGrabMenu.TransferredItemSprite(overflowItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                             }
 
-                            if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
-                            {
-                                // Skip favorited items
-                                continue;
-                            }
+                            quickStackAnimation?.AddToAnimation(typedChest, overflowItem);
+                            quickStackSummary.AddToSummary(typedChest, overflowItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
+                        }
 
-                            if (dresserFakeChest != null)
-                            {
-                                if (playerItem.QualifiedItemId != overflowItem.QualifiedItemId)
-                                {
-                                    // In a Dresser, skip overflow item if it doesn't match player item.
-                                    continue;
-                                }
-                            }
-                            else if (!playerItem.canStackWith(overflowItem))
-                            {
-                                // Skip overflow item if it doesn't stack with player item.
-                                continue;
-                            }
-
-                            int beforeStack = playerItem.Stack;
-                            Item leftoverItem = chest.addItem(playerItem);
-                            bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
-
-                            movedAtLeastOneTotal |= movedAtLeastOne;
-
-                            if (movedAtLeastOne)
-                            {
-                                if (inventoryPage != null)
-                                {
-                                    ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[playerInventory.IndexOf(playerItem)];
-                                    ConvenientInventory.AddTransferredItemSprite(
-                                        new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
-                                }
-
-                                quickStackAnimation?.AddToAnimation(typedChest, playerItem);
-                                quickStackSummary.AddToSummary(typedChest, playerItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
-                            }
-
-                            if (leftoverItem is null)
-                            {
-                                who.removeItemFromInventory(playerItem);
-                            }
-                            else
-                            {
-                                inventoryPage?.inventory.ShakeItem(playerItem);
-                            }
+                        if (leftoverItem is null)
+                        {
+                            who.removeItemFromInventory(overflowItem);
+                        }
+                        else
+                        {
+                            inventoryPage?.inventory.ShakeItem(overflowItem);
                         }
                     }
                 }
             }
-
-            quickStackAnimation?.Complete();
 
             bool shouldPlaySound = !ModEntry.Config.QuickStack.SuppressSoundWhenNoNearbyChests || chests.Any();
             if (shouldPlaySound)
@@ -211,6 +185,7 @@ namespace ConvenientInventory.QuickStack
                 Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
             }
 
+            quickStackAnimation?.Complete();
             if (movedAtLeastOneTotal)
             {
                 ModEntry.Instance.Monitor.Log(quickStackSummary.GetSummaryMessage(), LogLevel.Trace);
