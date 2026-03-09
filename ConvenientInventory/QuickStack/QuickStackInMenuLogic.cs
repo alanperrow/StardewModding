@@ -82,7 +82,7 @@ namespace ConvenientInventory.QuickStack
             Inventory playerInventory = who.Items;
 
             QuickStackSummary quickStackSummary = new();
-            List<Item> overflowItems = new();
+            HashSet<Item> overflowItems = new();
 
             // Fill chest stacks with player inventory items
             foreach (Item chestItem in chest.GetItemsForPlayer(who.UniqueMultiplayerID))
@@ -111,7 +111,7 @@ namespace ConvenientInventory.QuickStack
                             && ModEntry.Config.QuickStack.IgnoreItemQuality
                             && QuickStackLogic.CanStackWithIgnoreQuality(playerItem, chestItem))
                         {
-                            overflowItems.Add(playerItem.getOne());
+                            overflowItems.Add(playerItem);
                         }
 
                         continue;
@@ -134,24 +134,22 @@ namespace ConvenientInventory.QuickStack
                         if (playerItem.Stack == 0)
                         {
                             who.removeItemFromInventory(playerItem);
+
+                            // Remove player item from overflow list, if we are tracking it.
+                            overflowItems.Remove(playerItem);
                         }
 
                         quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
                     }
 
-                    if (chestItem.Stack == chestItem.maximumStackSize())
+                    if (chestItem.Stack == chestItem.maximumStackSize() && playerItem.Stack != 0)
                     {
+                        itemGrabMenu.inventory.ShakeItem(playerItem);
+
                         if (ModEntry.Config.QuickStack.OverflowItems)
                         {
-                            overflowItems.Add(chestItem.getOne());
+                            overflowItems.Add(playerItem);
                         }
-
-                        if (playerItem.Stack != 0)
-                        {
-                            itemGrabMenu.inventory.ShakeItem(playerItem);
-                        }
-
-                        break;
                     }
                 }
             }
@@ -160,67 +158,51 @@ namespace ConvenientInventory.QuickStack
             IInventory chestItems = chest.GetItemsForPlayer(who.UniqueMultiplayerID);
             if (ModEntry.Config.QuickStack.OverflowItems && chestItems.Count < chest.GetActualCapacity())
             {
-                foreach (Item overflowItem in overflowItems)
+                foreach (Item overflowPlayerItem in overflowItems)
                 {
-                    if (overflowItem is null)
+                    if (overflowPlayerItem is null || overflowPlayerItem.Stack == 0)
                     {
                         continue;
                     }
 
-                    //TODO: Optimization: Instead of using `playerItem.getOne()` and `chestItem.getOne()` above, couldn't we just track the actual playerItem in our inventory?
-                    //      This would avoid having to search through the player's inventory again to find the item we already know exists.
-                    //      Experiment with this, and if successful, apply the same change to `QuickStackLogic.StackToNearbyChests()` as well.
-                    foreach (Item playerItem in playerInventory)
+                    int itemIndex = playerInventory.IndexOf(overflowPlayerItem);
+                    if (itemIndex == -1 || (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[itemIndex]))
                     {
-                        if (playerItem is null)
-                        {
-                            continue;
-                        }
+                        // Skip favorited items
+                        continue;
+                    }
 
-                        if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[playerInventory.IndexOf(playerItem)])
-                        {
-                            // Skip favorited items
-                            continue;
-                        }
+                    int beforeStack = overflowPlayerItem.Stack;
+                    Item leftoverItem = null;
+                    try
+                    {
+                        (chest.GetItemsForPlayer() as Inventory).OnSlotChanged += ChestSlotChanged;
+                        leftoverItem = chest.addItem(overflowPlayerItem);
+                    }
+                    finally
+                    {
+                        (chest.GetItemsForPlayer() as Inventory).OnSlotChanged -= ChestSlotChanged;
+                    }
+                    bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
 
-                        if (!playerItem.canStackWith(overflowItem))
-                        {
-                            // Skip overflow item if it doesn't stack with player item.
-                            continue;
-                        }
+                    movedAtLeastOneTotal |= movedAtLeastOne;
 
-                        int beforeStack = playerItem.Stack;
-                        Item leftoverItem = null;
-                        try
-                        {
-                            (chest.GetItemsForPlayer() as Inventory).OnSlotChanged += ChestSlotChanged;
-                            leftoverItem = chest.addItem(playerItem);
-                        }
-                        finally
-                        {
-                            (chest.GetItemsForPlayer() as Inventory).OnSlotChanged -= ChestSlotChanged;
-                        }
-                        bool movedAtLeastOne = leftoverItem is null || beforeStack != leftoverItem.Stack;
+                    if (movedAtLeastOne)
+                    {
+                        ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[playerInventory.IndexOf(overflowPlayerItem)];
+                        itemGrabMenu._transferredItemSprites.Add(
+                                new ItemGrabMenu.TransferredItemSprite(overflowPlayerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
 
-                        movedAtLeastOneTotal |= movedAtLeastOne;
+                        quickStackSummary.AddToSummary(typedChest, overflowPlayerItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
+                    }
 
-                        if (movedAtLeastOne)
-                        {
-                            ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[playerInventory.IndexOf(playerItem)];
-                            itemGrabMenu._transferredItemSprites.Add(
-                                    new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
-
-                            quickStackSummary.AddToSummary(typedChest, playerItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
-                        }
-
-                        if (leftoverItem is null)
-                        {
-                            who.removeItemFromInventory(playerItem);
-                        }
-                        else
-                        {
-                            itemGrabMenu.inventory.ShakeItem(playerItem);
-                        }
+                    if (leftoverItem is null)
+                    {
+                        who.removeItemFromInventory(overflowPlayerItem);
+                    }
+                    else
+                    {
+                        itemGrabMenu.inventory.ShakeItem(overflowPlayerItem);
                     }
                 }
             }
