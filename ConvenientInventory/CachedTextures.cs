@@ -39,6 +39,8 @@ namespace ConvenientInventory
 
         public static Texture2D ChestQuickStackPriority3ButtonIcon { get; private set; }
 
+        public static Texture2D FillStacksQuickStackButtonIcon { get; private set; }
+
         public static void LoadGameAssets()
         {
             Mill = Game1.content.Load<Texture2D>(@"Buildings\Mill");
@@ -58,6 +60,7 @@ namespace ConvenientInventory
             ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1Icon");
             ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2Icon");
             ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
+            FillStacksQuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "fillStacksQuickStackIcon");
         }
 
         /// <summary>
@@ -106,6 +109,10 @@ namespace ConvenientInventory
             {
                 e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority3Icon.png", AssetLoadPriority.Medium);
             }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "fillStacksQuickStackIcon"))
+            {
+                e.LoadFromModFile<Texture2D>(@"assets\fillStacksQuickStackIcon.png", AssetLoadPriority.Medium);
+            }
         }
 
         /// <summary>
@@ -153,6 +160,10 @@ namespace ConvenientInventory
             else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority3Icon"))
             {
                 ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "fillStacksQuickStackIcon"))
+            {
+                FillStacksQuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "fillStacksQuickStackIcon");
             }
         }
     }

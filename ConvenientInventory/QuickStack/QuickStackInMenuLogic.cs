@@ -19,6 +19,22 @@ namespace ConvenientInventory.QuickStack
     {
         public static bool IsStackingToChestInMenu { get; private set; }
 
+        public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
+        {
+            //TODO: Make config value and check for it here.
+            if (itemGrabMenu.fillStacksButton == null)
+            {
+                return;
+            }
+
+            itemGrabMenu.fillStacksButton.hoverText = "Quick Stack"; //I18n.FillStacksQuickStackButton_HoverText;
+            itemGrabMenu.fillStacksButton.texture = CachedTextures.FillStacksQuickStackButtonIcon;
+            itemGrabMenu.fillStacksButton.sourceRect = CachedTextures.FillStacksQuickStackButtonIcon.Bounds;
+
+            //TODO: Patch `ItemGrabMenu.FillOutStacks` to call `StackToChestInMenu` instead of base game logic when this config is enabled.
+            //      Technically, we could just Postfix the base game logic, since the base game FillOutStacks shouldn't interfere with our logic.
+        }
+
         public static bool StackToChestInMenu(ItemGrabMenu itemGrabMenu)
         {
             try
@@ -44,7 +60,7 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
-            // Create TypedChest instance.
+            // Wrap this chest in a TypedChest.
             GameLocation chestLocation = chest.Location;
             ChestType chestType;
             if (itemGrabMenu.context is JunimoHut)

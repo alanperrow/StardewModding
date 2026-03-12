@@ -982,6 +982,7 @@ namespace ConvenientInventory
             try
             {
                 QuickStackToggleChestLogic.OnConstructedItemGrabMenu(__instance);
+                QuickStackInMenuLogic.OnConstructedItemGrabMenu(__instance);
             }
             catch (Exception e)
             {
