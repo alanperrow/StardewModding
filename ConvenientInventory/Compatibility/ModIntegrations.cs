@@ -51,6 +51,8 @@ namespace ConvenientInventory.Compatibility
                 text: I18n.ModConfigMenu_Label_QuickStackToNearbyChests
             );
 
+            //TODO: Use new GMCM version to include subheaders to break up large Quick Stack section.
+
             api.AddBoolOption(
                 mod: modManifest,
                 getValue: () => config.QuickStack.IsEnabled,
@@ -69,6 +71,22 @@ namespace ConvenientInventory.Compatibility
                 max: IsChestsAnywhereInstalled ? ConfigHelper.QuickStackRange_GlobalInt : ConfigHelper.QuickStackRange_LocationInt,
                 interval: 1,
                 formatValue: ConfigHelper.FormatQuickStackRange
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.OverflowItems,
+                setValue: value => config.QuickStack.OverflowItems = value,
+                name: I18n.ModConfigMenu_IsQuickStackOverflowItems_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackOverflowItems_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IgnoreItemQuality,
+                setValue: value => config.QuickStack.IgnoreItemQuality = value,
+                name: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Desc
             );
 
             api.AddBoolOption(
@@ -97,18 +115,50 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
-                getValue: () => config.QuickStack.OverflowItems,
-                setValue: value => config.QuickStack.OverflowItems = value,
-                name: I18n.ModConfigMenu_IsQuickStackOverflowItems_Name,
-                tooltip: I18n.ModConfigMenu_IsQuickStackOverflowItems_Desc
+                getValue: () => config.QuickStack.AllowHotkeyInChestMenu,
+                setValue: value => config.QuickStack.AllowHotkeyInChestMenu = value,
+                name: I18n.ModConfigMenu_IsQuickStackAllowHotkeyInChestMenu_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackAllowHotkeyInChestMenu_Desc
             );
 
             api.AddBoolOption(
                 mod: modManifest,
-                getValue: () => config.QuickStack.IgnoreItemQuality,
-                setValue: value => config.QuickStack.IgnoreItemQuality = value,
-                name: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Name,
-                tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Desc
+                getValue: () => config.QuickStack.WithFillStacksButton,
+                setValue: value => config.QuickStack.WithFillStacksButton = value,
+                name: I18n.ModConfigMenu_IsQuickStackWithFillStacksButton_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackWithFillStacksButton_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.VisuallyOverrideFillStacksButton,
+                setValue: value => config.QuickStack.VisuallyOverrideFillStacksButton = value,
+                name: I18n.ModConfigMenu_IsQuickStackVisuallyOverrideFillStacksButton_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackVisuallyOverrideFillStacksButton_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsToggleChestEnabled,
+                setValue: value => config.QuickStack.IsToggleChestEnabled = value,
+                name: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Name,
+                tooltip: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsPrioritizeChestEnabled,
+                setValue: value => config.QuickStack.IsPrioritizeChestEnabled = value,
+                name: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Name,
+                tooltip: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Desc
+            );
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsToggleChestButtonHidden,
+                setValue: value => config.QuickStack.IsToggleChestButtonHidden = value,
+                name: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Desc
             );
 
             api.AddBoolOption(
@@ -169,30 +219,6 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
-                getValue: () => config.QuickStack.IsToggleChestEnabled,
-                setValue: value => config.QuickStack.IsToggleChestEnabled = value,
-                name: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Name,
-                tooltip: I18n.ModConfigMenu_IsEnableQuickStackToggleChest_Desc
-            );
-
-            api.AddBoolOption(
-                mod: modManifest,
-                getValue: () => config.QuickStack.IsPrioritizeChestEnabled,
-                setValue: value => config.QuickStack.IsPrioritizeChestEnabled = value,
-                name: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Name,
-                tooltip: I18n.ModConfigMenu_IsEnableQuickStackPrioritizeChest_Desc
-            );
-
-            api.AddBoolOption(
-                mod: modManifest,
-                getValue: () => config.QuickStack.IsToggleChestButtonHidden,
-                setValue: value => config.QuickStack.IsToggleChestButtonHidden = value,
-                name: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Name,
-                tooltip: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Desc
-            );
-
-            api.AddBoolOption(
-                mod: modManifest,
                 getValue: () => config.QuickStack.IsAnimationEnabled,
                 setValue: value =>
                 {
@@ -244,7 +270,7 @@ namespace ConvenientInventory.Compatibility
 
             string[] highlightStyleDescriptions =
             {
-                $"0: {() => I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc0()}",
+                $"0: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc0()}",
                 $"1: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc1()}",
                 $"2: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc2()}",
                 $"3: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc3()}",

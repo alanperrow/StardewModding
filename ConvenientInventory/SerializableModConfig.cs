@@ -15,15 +15,27 @@ namespace ConvenientInventory
 
         public string QuickStackRange { get; set; } = ConfigHelper.QuickStackRange_Default;
 
+        public bool IsQuickStackOverflowItems { get; set; } = true;
+
+        public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
+
         public bool IsEnableQuickStackHotkey { get; set; } = false;
 
         public KeybindList QuickStackKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
 
         public KeybindList QuickStackControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
 
-        public bool IsQuickStackOverflowItems { get; set; } = true;
+        public bool IsQuickStackAllowHotkeyInChestMenu { get; set; } = true;
 
-        public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
+        public bool IsQuickStackWithFillStacksButton { get; set; } = false;
+
+        public bool IsQuickStackVisuallyOverrideFillStacksButton { get; set; } = false;
+
+        public bool IsEnableQuickStackToggleChest { get; set; } = false;
+
+        public bool IsEnableQuickStackPrioritizeChest { get; set; } = false;
+
+        public bool IsQuickStackToggleChestButtonHidden { get; set; } = false;
 
         public bool IsQuickStackIntoMills { get; set; } = true;
 
@@ -34,12 +46,6 @@ namespace ConvenientInventory
         public bool IsQuickStackIntoHoppers { get; set; } = true;
 
         public bool IsQuickStackIntoMiniShippingBins { get; set; } = false;
-
-        public bool IsEnableQuickStackToggleChest { get; set; } = false;
-
-        public bool IsEnableQuickStackPrioritizeChest { get; set; } = false;
-
-        public bool IsQuickStackToggleChestButtonHidden { get; set; } = false;
 
         public bool IsQuickStackTooltipDrawNearbyChests { get; set; } = true;
 

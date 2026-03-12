@@ -76,6 +76,18 @@ namespace ConvenientInventory
                 set => _config.serialConfig.QuickStackRange = value;
             }
 
+            public bool OverflowItems
+            {
+                get => _config.serialConfig.IsQuickStackOverflowItems;
+                set => _config.serialConfig.IsQuickStackOverflowItems = value;
+            }
+
+            public bool IgnoreItemQuality
+            {
+                get => _config.serialConfig.IsQuickStackIgnoreItemQuality;
+                set => _config.serialConfig.IsQuickStackIgnoreItemQuality = value;
+            }
+
             public bool IsHotkeyEnabled
             {
                 get => _config.serialConfig.IsEnableQuickStackHotkey;
@@ -94,16 +106,40 @@ namespace ConvenientInventory
                 set => _config.serialConfig.QuickStackControllerHotkey = value;
             }
 
-            public bool OverflowItems
+            public bool AllowHotkeyInChestMenu
             {
-                get => _config.serialConfig.IsQuickStackOverflowItems;
-                set => _config.serialConfig.IsQuickStackOverflowItems = value;
+                get => _config.serialConfig.IsQuickStackAllowHotkeyInChestMenu;
+                set => _config.serialConfig.IsQuickStackAllowHotkeyInChestMenu = value;
             }
 
-            public bool IgnoreItemQuality
+            public bool WithFillStacksButton
             {
-                get => _config.serialConfig.IsQuickStackIgnoreItemQuality;
-                set => _config.serialConfig.IsQuickStackIgnoreItemQuality = value;
+                get => _config.serialConfig.IsQuickStackWithFillStacksButton;
+                set => _config.serialConfig.IsQuickStackWithFillStacksButton = value;
+            }
+
+            public bool VisuallyOverrideFillStacksButton
+            {
+                get => _config.serialConfig.IsQuickStackVisuallyOverrideFillStacksButton;
+                set => _config.serialConfig.IsQuickStackVisuallyOverrideFillStacksButton = value;
+            }
+
+            public bool IsToggleChestEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackToggleChest;
+                set => _config.serialConfig.IsEnableQuickStackToggleChest = value;
+            }
+
+            public bool IsPrioritizeChestEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackPrioritizeChest;
+                set => _config.serialConfig.IsEnableQuickStackPrioritizeChest = value;
+            }
+
+            public bool IsToggleChestButtonHidden
+            {
+                get => _config.serialConfig.IsQuickStackToggleChestButtonHidden;
+                set => _config.serialConfig.IsQuickStackToggleChestButtonHidden = value;
             }
 
             public bool IntoMills
@@ -136,24 +172,6 @@ namespace ConvenientInventory
             {
                 get => _config.serialConfig.IsQuickStackIntoMiniShippingBins;
                 set => _config.serialConfig.IsQuickStackIntoMiniShippingBins = value;
-            }
-
-            public bool IsToggleChestEnabled
-            {
-                get => _config.serialConfig.IsEnableQuickStackToggleChest;
-                set => _config.serialConfig.IsEnableQuickStackToggleChest = value;
-            }
-
-            public bool IsPrioritizeChestEnabled
-            {
-                get => _config.serialConfig.IsEnableQuickStackPrioritizeChest;
-                set => _config.serialConfig.IsEnableQuickStackPrioritizeChest = value;
-            }
-
-            public bool IsToggleChestButtonHidden
-            {
-                get => _config.serialConfig.IsQuickStackToggleChestButtonHidden;
-                set => _config.serialConfig.IsQuickStackToggleChestButtonHidden = value;
             }
 
             public bool DrawChestsInButtonTooltip

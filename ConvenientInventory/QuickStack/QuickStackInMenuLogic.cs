@@ -21,13 +21,15 @@ namespace ConvenientInventory.QuickStack
 
         public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
-            //TODO: Make config value and check for it here.
-            if (itemGrabMenu.fillStacksButton == null)
+            if (!ModEntry.Config.QuickStack.IsEnabled
+                || !ModEntry.Config.QuickStack.WithFillStacksButton
+                || !ModEntry.Config.QuickStack.VisuallyOverrideFillStacksButton
+                || itemGrabMenu.fillStacksButton == null)
             {
                 return;
             }
 
-            itemGrabMenu.fillStacksButton.hoverText = "Quick Stack"; //I18n.FillStacksQuickStackButton_HoverText;
+            itemGrabMenu.fillStacksButton.hoverText = I18n.FillStacksQuickStackButton_HoverText();
             itemGrabMenu.fillStacksButton.texture = CachedTextures.FillStacksQuickStackButtonIcon;
             itemGrabMenu.fillStacksButton.sourceRect = CachedTextures.FillStacksQuickStackButtonIcon.Bounds;
 

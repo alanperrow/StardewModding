@@ -85,7 +85,8 @@ namespace ConvenientInventory.QuickStack
 
         public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
-            if (!ModEntry.Config.QuickStack.IsToggleChestEnabled
+            if (!ModEntry.Config.QuickStack.IsEnabled
+                || !ModEntry.Config.QuickStack.IsToggleChestEnabled
                 || ModEntry.Config.QuickStack.IsToggleChestButtonHidden
                 || !ShouldQuickStackIntoMenuContext(itemGrabMenu)
                 || itemGrabMenu.fillStacksButton == null)

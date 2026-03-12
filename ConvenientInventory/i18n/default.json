@@ -12,6 +12,8 @@
   "QuickStackToggleChestButton.hoverText.priority2": "+2 Priority",
   "QuickStackToggleChestButton.hoverText.priority3": "+3 Priority",
 
+  "FillStacksQuickStackButton.hoverText": "Quick Stack Items",
+
   // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "Quick Stack To Nearby Chests",
 
@@ -22,6 +24,12 @@
   "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.\n\nIf set to \"Location\", all chests in the player's current location will be considered.\n\nIf set to \"Global\", all chests in the world will be considered.",
   "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange config value was \"Global\" but has been reset to \"Location\". \"Global\" is only supported if the Chests Anywhere mod is installed.",
 
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Overflow items?",
+  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Ignore item quality?",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain ANY quality of that same item.",
+
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
   "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
 
@@ -31,11 +39,23 @@
   "ModConfigMenu.QuickStackControllerHotkey.Name": "Keybind (controller)",
   "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
 
-  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Overflow items?",
-  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Name": "Allow hotkey in chest menu?",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "(Requires \"Enable hotkey?\" to be enabled.)\nIf enabled, allows the Quick Stack hotkey to work within chest menus, in which case\nitems will be quick stacked into that specific chest.",
 
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Ignore item quality?",
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain ANY quality of that same item.",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "Quick Stack with Add To Stacks button?",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "If enabled, the \"Add To Existing Stacks\" button in chest menus will quick stack items into that specific chest when pressed.",
+
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "Show updated Add To Stacks button?",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "(Requires \"Quick Stack with Add To Stacks button?\" to be enabled.)\nIf enabled, the \"Add To Existing Stacks\" button in chest menus will be visually overridden as a \"Quick Stack Items\" button.",
+
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "Toggle quick stack per-chest?",
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "If enabled, adds a Toggle Quick Stack button to chest menus to determine whether that specific chest will be considered when quick stacking.",
+
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "Prioritize quick stack per-chest?",
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button can also assign a priority level for that specific chest.\nChests with a higher priority level will be considered first when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "Hide Toggle Quick Stack button?",
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button will be hidden from chest menus.\nEven when hidden, a chest's toggle/prioritize quick stack setting will still be used.",
 
   "ModConfigMenu.IsQuickStackIntoMills.Name": "Into Mills?",
   "ModConfigMenu.IsQuickStackIntoMills.Desc": "If enabled, nearby mills will be considered when quick stacking.",
@@ -51,15 +71,6 @@
 
   "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "Into Mini-Shipping Bins?",
   "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "If enabled, nearby Mini-Shipping Bins will be considered when quick stacking.",
-
-  "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "Toggle quick stack per-chest?",
-  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "If enabled, adds a Toggle Quick Stack button to chest menus to determine whether that specific chest will be considered when quick stacking.",
-
-  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "Prioritize quick stack per-chest?",
-  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button can also assign a priority level for that specific chest.\nChests with a higher priority level will be considered first when quick stacking.",
-
-  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "Hide Toggle Quick Stack button?",
-  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button will be hidden from chest menus.\nEven when hidden, a chest's toggle/prioritize quick stack setting will still be used.",
 
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Show nearby chests in tooltip?",
   "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "If enabled, hovering over the quick stack button will show a preview of all nearby chests considered for quick stack, ordered by distance.",
