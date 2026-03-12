@@ -6,8 +6,8 @@
   "AutoOrganizeButton.hoverText.disable": "(Right click to disable)",
   "AutoOrganizeButton.hoverText.disable-gamepad": "(X to disable)",
 
-  "QuickStackToggleChestButton.hoverText.enabled": "Quick Stack Enabled",
-  "QuickStackToggleChestButton.hoverText.disabled": "Quick Stack Disabled",
+  "QuickStackToggleChestButton.hoverText.enabled": "Nearby Quick Stack Enabled",
+  "QuickStackToggleChestButton.hoverText.disabled": "Nearby Quick Stack Disabled",
   "QuickStackToggleChestButton.hoverText.priority1": "+1 Priority",
   "QuickStackToggleChestButton.hoverText.priority2": "+2 Priority",
   "QuickStackToggleChestButton.hoverText.priority3": "+3 Priority",
