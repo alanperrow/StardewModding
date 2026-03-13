@@ -40,13 +40,13 @@
   "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
 
   "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Name": "Allow hotkey in chest menu?",
-  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "(Requires \"Enable hotkey?\" to be enabled.)\nIf enabled, allows the Quick Stack hotkey to work within chest menus, in which case\nitems will be quick stacked into that specific chest.",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "(Requires \"Enable hotkey?\" to be enabled.)\nIf enabled, allows the Quick Stack hotkey to work within chest menus,\nin which case items will be quick stacked into that specific chest.",
 
-  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "Quick Stack with Add To Stacks button?",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "Quick Stack with Add To Stacks?",
   "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "If enabled, the \"Add To Existing Stacks\" button in chest menus will quick stack items into that specific chest when pressed.",
 
-  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "Show updated Add To Stacks button?",
-  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "(Requires \"Quick Stack with Add To Stacks button?\" to be enabled.)\nIf enabled, the \"Add To Existing Stacks\" button in chest menus will be visually overridden as a \"Quick Stack Items\" button.",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "Visually override Add To Stacks?",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "(Requires \"Quick Stack with Add To Stacks?\" to be enabled.)\nIf enabled, the \"Add To Existing Stacks\" button in chest menus will be\nvisually overridden as a \"Quick Stack Items\" button.",
 
   "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "Toggle quick stack per-chest?",
   "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "If enabled, adds a Toggle Quick Stack button to chest menus to determine whether that specific chest will be considered when quick stacking.",

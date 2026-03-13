@@ -29,7 +29,7 @@ namespace ConvenientInventory
 
         public bool IsQuickStackWithFillStacksButton { get; set; } = false;
 
-        public bool IsQuickStackVisuallyOverrideFillStacksButton { get; set; } = false;
+        public bool IsQuickStackVisuallyOverrideFillStacksButton { get; set; } = true;
 
         public bool IsEnableQuickStackToggleChest { get; set; } = false;
 

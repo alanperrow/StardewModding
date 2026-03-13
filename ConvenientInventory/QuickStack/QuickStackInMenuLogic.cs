@@ -32,9 +32,6 @@ namespace ConvenientInventory.QuickStack
             itemGrabMenu.fillStacksButton.hoverText = I18n.FillStacksQuickStackButton_HoverText();
             itemGrabMenu.fillStacksButton.texture = CachedTextures.FillStacksQuickStackButtonIcon;
             itemGrabMenu.fillStacksButton.sourceRect = CachedTextures.FillStacksQuickStackButtonIcon.Bounds;
-
-            //TODO: Patch `ItemGrabMenu.FillOutStacks` to call `StackToChestInMenu` instead of base game logic when this config is enabled.
-            //      Technically, we could just Postfix the base game logic, since the base game FillOutStacks shouldn't interfere with our logic.
         }
 
         public static bool StackToChestInMenu(ItemGrabMenu itemGrabMenu)

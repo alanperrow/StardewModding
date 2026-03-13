@@ -993,6 +993,30 @@ namespace ConvenientInventory
         [HarmonyPostfix]
         [HarmonyPatch(MethodType.Constructor, new Type[] { typeof(IList<Item>), typeof(object) })]
         public static void Constructor2_Postfix(ItemGrabMenu __instance) => Constructor18_Postfix(__instance);
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
+        public static bool FillOutStacks_Prefix(ItemGrabMenu __instance)
+        {
+            if (!ModEntry.Config.QuickStack.IsEnabled || !ModEntry.Config.QuickStack.WithFillStacksButton)
+            {
+                return true;
+            }
+
+            try
+            {
+                QuickStackInMenuLogic.StackToChestInMenu(__instance);
+
+                // Instead of returning false here to skip the base game `FillOutStacks` call, we prefer to
+                // return true so as not to interfere if any other mods want to prefix this method as well.
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(FillOutStacks_Prefix)}:\n{e}", LogLevel.Error);
+            }
+
+            return true;
+        }
     }
 
     [HarmonyPatch(typeof(Item))]
