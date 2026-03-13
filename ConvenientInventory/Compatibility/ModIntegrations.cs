@@ -102,9 +102,9 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_QuickStackControllerHotkey_Name,
                 tooltip: I18n.ModConfigMenu_QuickStackControllerHotkey_Desc);
 
-            //api.AddSubHeader(
-            //    mod: modManifest,
-            //    text: I18n.ModConfigMenu_QuickStackAdditionalSettings_Label);
+            api.AddSubHeader(
+                mod: modManifest,
+                text: I18n.ModConfigMenu_SubHeader_InChestMenu);
 
             api.AddBoolOption(
                 mod: modManifest,
@@ -148,6 +148,10 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Desc);
 
+            api.AddSubHeader(
+                mod: modManifest,
+                text: I18n.ModConfigMenu_SubHeader_OtherInventories);
+
             api.AddBoolOption(
                 mod: modManifest,
                 getValue: () => config.QuickStack.IntoMills,
@@ -183,19 +187,9 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsQuickStackIntoMiniShippingBins_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackIntoMiniShippingBins_Desc);
 
-            api.AddBoolOption(
+            api.AddSubHeader(
                 mod: modManifest,
-                getValue: () => config.QuickStack.DrawChestsInButtonTooltip,
-                setValue: value => config.QuickStack.DrawChestsInButtonTooltip = value,
-                name: I18n.ModConfigMenu_IsQuickStackTooltipDrawNearbyChests_Name,
-                tooltip: I18n.ModConfigMenu_IsQuickStackTooltipDrawNearbyChests_Desc);
-
-            api.AddBoolOption(
-                mod: modManifest,
-                getValue: () => config.QuickStack.SuppressSoundWhenNoNearbyChests,
-                setValue: value => config.QuickStack.SuppressSoundWhenNoNearbyChests = value,
-                name: I18n.ModConfigMenu_IsSuppressSoundWhenNoNearbyChests_Name,
-                tooltip: I18n.ModConfigMenu_IsSuppressSoundWhenNoNearbyChests_Desc);
+                text: I18n.ModConfigMenu_SubHeader_Animation);
 
             api.AddBoolOption(
                 mod: modManifest,
@@ -230,6 +224,24 @@ namespace ConvenientInventory.Compatibility
                 min: 0.5f,
                 max: 3f,
                 interval: 0.1f);
+
+            api.AddSubHeader(
+                mod: modManifest,
+                text: I18n.ModConfigMenu_SubHeader_AdditionalSettings);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.DrawChestsInButtonTooltip,
+                setValue: value => config.QuickStack.DrawChestsInButtonTooltip = value,
+                name: I18n.ModConfigMenu_IsQuickStackTooltipDrawNearbyChests_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackTooltipDrawNearbyChests_Desc);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.SuppressSoundWhenNoNearbyChests,
+                setValue: value => config.QuickStack.SuppressSoundWhenNoNearbyChests = value,
+                name: I18n.ModConfigMenu_IsSuppressSoundWhenNoNearbyChests_Name,
+                tooltip: I18n.ModConfigMenu_IsSuppressSoundWhenNoNearbyChests_Desc);
 
             // ===== Favorite Items =====
             api.AddSectionTitle(

@@ -174,18 +174,6 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIntoMiniShippingBins = value;
             }
 
-            public bool DrawChestsInButtonTooltip
-            {
-                get => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests;
-                set => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests = value;
-            }
-
-            public bool SuppressSoundWhenNoNearbyChests
-            {
-                get => _config.serialConfig.IsSuppressSoundWhenNoNearbyChests;
-                set => _config.serialConfig.IsSuppressSoundWhenNoNearbyChests = value;
-            }
-
             public bool IsAnimationEnabled
             {
                 get => _config.serialConfig.IsEnableQuickStackAnimation;
@@ -208,6 +196,18 @@ namespace ConvenientInventory
             {
                 get => _config.serialConfig.QuickStackAnimationStackSpeed;
                 set => _config.serialConfig.QuickStackAnimationStackSpeed = value;
+            }
+
+            public bool DrawChestsInButtonTooltip
+            {
+                get => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests;
+                set => _config.serialConfig.IsQuickStackTooltipDrawNearbyChests = value;
+            }
+
+            public bool SuppressSoundWhenNoNearbyChests
+            {
+                get => _config.serialConfig.IsSuppressSoundWhenNoNearbyChests;
+                set => _config.serialConfig.IsSuppressSoundWhenNoNearbyChests = value;
             }
         }
 
