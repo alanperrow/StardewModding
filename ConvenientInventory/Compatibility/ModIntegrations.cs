@@ -14,6 +14,7 @@ namespace ConvenientInventory.Compatibility
     public static class ModIntegrations
     {
         private static readonly PerScreen<Texture2D> highlightStylePreviewTexture = new();
+        private static readonly PerScreen<Color> highlightStylePreviewColor = new(() => Color.White);
 
         private static ICustomBackpackApi customBackpackApi;
         private static Type customBackpackFullInventoryPageType;
@@ -278,7 +279,7 @@ namespace ConvenientInventory.Compatibility
             api.AddComplexOption(
                 mod: modManifest,
                 height: () => 58,
-                draw: (sb, pos) => sb.Draw(highlightStylePreviewTexture.Value, pos, null, Color.White, 0f, Vector2.Zero, 4, SpriteEffects.None, 0),
+                draw: (sb, pos) => sb.Draw(highlightStylePreviewTexture.Value, pos, null, highlightStylePreviewColor.Value, 0f, Vector2.Zero, 4, SpriteEffects.None, 0),
                 name: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Name,
                 tooltip: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Desc);
 
@@ -312,6 +313,72 @@ namespace ConvenientInventory.Compatibility
                 tooltip: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc,
                 allowedValues: highlightStyleDescriptions,
                 fieldId: highlightStyleFieldId);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => false,//config.FavoriteItems.IsUseCustomHighlightColor,
+                setValue: value => { },//config.FavoriteItems.IsUseCustomHighlightColor = value,
+                name: () => "Use Custom Highlight Color?",//I18n.ModConfigMenu_IsUseCustomHighlightColor_Name,
+                tooltip: () => "If enabled, the custom color will be applied to the highlight style.");//I18n.ModConfigMenu_IsUseCustomHighlightColor_Desc);
+
+            const string customHighlightColorRFieldId = "customHighlightColorR";
+            api.AddNumberOption(
+                mod: modManifest,
+                getValue: () =>
+                {
+                    return highlightStylePreviewColor.Value.R;
+                    //return config.FavoriteItems.CustomHighlightColor.R,
+                },
+                setValue: value =>
+                {
+                    //config.FavoriteItems.CustomHighlightColor.R = value,
+                },
+                name: () => "Custom Highlight Color: R",//I18n.ModConfigMenu_CustomHighlightColor_R_Name,
+                tooltip: () => "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nRed component of the custom highlight color.",//I18n.ModConfigMenu_CustomHighlightColor_R_Desc,
+                min: 0,
+                max: 255,
+                interval: 1,
+                fieldId: customHighlightColorRFieldId);
+
+            const string customHighlightColorGFieldId = "customHighlightColorG";
+            api.AddNumberOption(
+                mod: modManifest,
+                getValue: () =>
+                {
+                    return highlightStylePreviewColor.Value.G;
+                    //return config.FavoriteItems.CustomHighlightColor.G,
+                },
+                setValue: value =>
+                {
+                    highlightStylePreviewColor.Value = new Color(highlightStylePreviewColor.Value, 1f) { G = (byte)value };
+                    //config.FavoriteItems.CustomHighlightColor.G = value,
+                },
+                name: () => "Custom Highlight Color: G",//I18n.ModConfigMenu_CustomHighlightColor_G_Name,
+                tooltip: () => "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nGreen component of the custom highlight color.",//I18n.ModConfigMenu_CustomHighlightColor_G_Desc,
+                min: 0,
+                max: 255,
+                interval: 1,
+                fieldId: customHighlightColorGFieldId);
+
+            const string customHighlightColorBFieldId = "customHighlightColorB";
+            api.AddNumberOption(
+                mod: modManifest,
+                getValue: () =>
+                {
+                    return highlightStylePreviewColor.Value.B;
+                    //return config.FavoriteItems.CustomHighlightColor.B,
+                },
+                setValue: value =>
+                {
+                    highlightStylePreviewColor.Value = new Color(highlightStylePreviewColor.Value, 1f) { B = (byte)value };
+                    //config.FavoriteItems.CustomHighlightColor.B = value,
+                },
+                name: () => "Custom Highlight Color: B",//I18n.ModConfigMenu_CustomHighlightColor_B_Name,
+                tooltip: () => "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nBlue component of the custom highlight color.",//I18n.ModConfigMenu_CustomHighlightColor_B_Desc,
+                min: 0,
+                max: 255,
+                interval: 1,
+                fieldId: customHighlightColorBFieldId);
 
             // ===== Take All But One =====
             api.AddSectionTitle(
@@ -379,6 +446,21 @@ namespace ConvenientInventory.Compatibility
                     {
                         string newValueStr = (string)newValue;
                         highlightStylePreviewTexture.Value = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{newValueStr[0]}");
+                    }
+                    else if (fieldId == customHighlightColorRFieldId)
+                    {
+                        byte newValueByte = (byte)(int)newValue;
+                        highlightStylePreviewColor.Value = new Color(highlightStylePreviewColor.Value, 1f) { R = newValueByte };
+                    }
+                    else if (fieldId == customHighlightColorGFieldId)
+                    {
+                        byte newValueByte = (byte)(int)newValue;
+                        highlightStylePreviewColor.Value = new Color(highlightStylePreviewColor.Value, 1f) { G = newValueByte };
+                    }
+                    else if (fieldId == customHighlightColorBFieldId)
+                    {
+                        byte newValueByte = (byte)(int)newValue;
+                        highlightStylePreviewColor.Value = new Color(highlightStylePreviewColor.Value, 1f) { B = newValueByte };
                     }
                 });
         }
