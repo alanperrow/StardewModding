@@ -89,6 +89,8 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIgnoreItemQuality = value;
             }
 
+            public bool OverflowNonstackables { get; set; } = true;//TODO - full setup; should be false by default
+
             public bool IsHotkeyEnabled
             {
                 get => _config.serialConfig.IsEnableQuickStackHotkey;
