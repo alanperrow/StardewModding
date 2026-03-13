@@ -261,6 +261,20 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsEnableFavoriteItems_Name,
                 tooltip: I18n.ModConfigMenu_IsEnableFavoriteItems_Desc);
 
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.FavoriteItems.KeyboardHotkey,
+                setValue: value => config.FavoriteItems.KeyboardHotkey = value,
+                name: I18n.ModConfigMenu_FavoriteItemsKeyboardHotkey_Name,
+                tooltip: I18n.ModConfigMenu_FavoriteItemsKeyboardHotkey_Desc);
+
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.FavoriteItems.ControllerHotkey,
+                setValue: value => config.FavoriteItems.ControllerHotkey = value,
+                name: I18n.ModConfigMenu_FavoriteItemsControllerHotkey_Name,
+                tooltip: I18n.ModConfigMenu_FavoriteItemsControllerHotkey_Desc);
+
             api.AddComplexOption(
                 mod: modManifest,
                 height: () => 58,
@@ -298,20 +312,6 @@ namespace ConvenientInventory.Compatibility
                 tooltip: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc,
                 allowedValues: highlightStyleDescriptions,
                 fieldId: highlightStyleFieldId);
-
-            api.AddKeybindList(
-                mod: modManifest,
-                getValue: () => config.FavoriteItems.KeyboardHotkey,
-                setValue: value => config.FavoriteItems.KeyboardHotkey = value,
-                name: I18n.ModConfigMenu_FavoriteItemsKeyboardHotkey_Name,
-                tooltip: I18n.ModConfigMenu_FavoriteItemsKeyboardHotkey_Desc);
-
-            api.AddKeybindList(
-                mod: modManifest,
-                getValue: () => config.FavoriteItems.ControllerHotkey,
-                setValue: value => config.FavoriteItems.ControllerHotkey = value,
-                name: I18n.ModConfigMenu_FavoriteItemsControllerHotkey_Name,
-                tooltip: I18n.ModConfigMenu_FavoriteItemsControllerHotkey_Desc);
 
             // ===== Take All But One =====
             api.AddSectionTitle(
