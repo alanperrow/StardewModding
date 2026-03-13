@@ -17,5 +17,7 @@
         Dungeon,
         Hopper,
         MiniShippingBin,
+        Enricher,
+        JunimoChest,
     }
 }

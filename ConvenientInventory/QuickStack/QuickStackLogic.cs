@@ -283,6 +283,12 @@ namespace ConvenientInventory.QuickStack
             {
                 return false;
             }
+            else if (chestType == ChestType.Enricher)
+            {
+                // Do not consider enrichers for quick stack.
+                // May reconsider later, but honestly this just seems like it would be annoying.
+                return false;
+            }
 
             return true;
         }

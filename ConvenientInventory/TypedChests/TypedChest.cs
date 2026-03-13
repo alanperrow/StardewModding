@@ -47,6 +47,12 @@ namespace ConvenientInventory.TypedChests
                 case Chest.SpecialChestTypes.MiniShippingBin:
                     return ChestType.MiniShippingBin;
 
+                case Chest.SpecialChestTypes.Enricher:
+                    return ChestType.Enricher;
+
+                case Chest.SpecialChestTypes.JunimoChest:
+                    return ChestType.JunimoChest;
+
                 default:
                     // If the chest has a special type other than None, but not any of the special types above, simply treat it as Special.
                     return ChestType.Special;
