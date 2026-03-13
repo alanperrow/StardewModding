@@ -111,6 +111,9 @@
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "Thick dark border",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "Gold decorative border",
 
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "Preview:",
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "Preview the chosen highlight style.",
+
   "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Keybind (keyboard)",
   "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "Hold this key when selecting an item to favorite it.",
 

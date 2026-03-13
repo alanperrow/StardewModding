@@ -1,6 +1,8 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -11,6 +13,8 @@ namespace ConvenientInventory.Compatibility
     /// </summary>
     public static class ModIntegrations
     {
+        private static readonly PerScreen<Texture2D> highlightStylePreviewTexture = new();
+
         private static ICustomBackpackApi customBackpackApi;
         private static Type customBackpackFullInventoryPageType;
 
@@ -21,7 +25,6 @@ namespace ConvenientInventory.Compatibility
         public static bool IsWearMoreRingsInstalled { get; private set; }
 
         public static int CustomBackpackScrollAmount => IsCustomBackpackFrameworkInstalled ? customBackpackApi.GetScroll() : 0;
-
 
         /// <summary>
         /// Initializes our mod config through the Generic Mod Config Menu API.
@@ -258,6 +261,14 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsEnableFavoriteItems_Name,
                 tooltip: I18n.ModConfigMenu_IsEnableFavoriteItems_Desc);
 
+            api.AddComplexOption(
+                mod: modManifest,
+                height: () => 58,
+                draw: (sb, pos) => sb.Draw(highlightStylePreviewTexture.Value, pos, null, Color.White, 0f, Vector2.Zero, 4, SpriteEffects.None, 0),
+                name: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Name,
+                tooltip: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Desc);
+
+            const string highlightStyleFieldId = "highlightStyle";
             string[] highlightStyleDescriptions =
             {
                 $"0: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc0()}",
@@ -271,7 +282,13 @@ namespace ConvenientInventory.Compatibility
             };
             api.AddTextOption(
                 mod: modManifest,
-                getValue: () => highlightStyleDescriptions[config.FavoriteItems.HighlightTextureChoice],
+                getValue: () =>
+                {
+                    int choiceIndex = config.FavoriteItems.HighlightTextureChoice;
+                    highlightStylePreviewTexture.Value = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{choiceIndex}");
+
+                    return highlightStyleDescriptions[choiceIndex];
+                },
                 setValue: value =>
                 {
                     config.FavoriteItems.HighlightTextureChoice = int.Parse(value[..1]);
@@ -279,10 +296,8 @@ namespace ConvenientInventory.Compatibility
                 },
                 name: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Name,
                 tooltip: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc,
-                allowedValues: highlightStyleDescriptions);
-
-            // TODO: Visualize the highlight texture choice.
-            //       Probably doesn't need to update live, but see SplitscreenImproved for reference if it does.
+                allowedValues: highlightStyleDescriptions,
+                fieldId: highlightStyleFieldId);
 
             api.AddKeybindList(
                 mod: modManifest,
@@ -354,6 +369,18 @@ namespace ConvenientInventory.Compatibility
                 setValue: value => config.Miscellaneous.IsInventoryPageSideWarpEnabled = value,
                 name: I18n.ModConfigMenu_IsEnableInventoryPageSideWarp_Name,
                 tooltip: I18n.ModConfigMenu_IsEnableInventoryPageSideWarp_Desc);
+
+            // ===== Live Preview =====
+            api.OnFieldChanged(
+                mod: modManifest,
+                onChange: (fieldId, newValue) =>
+                {
+                    if (fieldId == highlightStyleFieldId)
+                    {
+                        string newValueStr = (string)newValue;
+                        highlightStylePreviewTexture.Value = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{newValueStr[0]}");
+                    }
+                });
         }
 
         /// <summary>
