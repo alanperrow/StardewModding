@@ -110,6 +110,8 @@
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "Dark dashed",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "Thick dark border",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "Gold decorative border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-8": "Custom thick border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-9": "Custom dashed border",
 
   "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "Preview:",
   "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "Preview the chosen highlight style.",

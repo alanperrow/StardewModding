@@ -294,6 +294,8 @@ namespace ConvenientInventory.Compatibility
                 $"5: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc5()}",
                 $"6: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc6()}",
                 $"7: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc7()}",
+                $"8: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc8()}",
+                $"9: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc9()}",
             };
             api.AddTextOption(
                 mod: modManifest,
