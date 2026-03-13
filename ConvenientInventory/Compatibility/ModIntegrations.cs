@@ -331,6 +331,7 @@ namespace ConvenientInventory.Compatibility
                 getValue: () =>
                 {
                     // Initial assignment for default preview value.
+                    useHighlightStylePreviewColor.Value = config.FavoriteItems.UseCustomHighlightColor;
                     highlightStylePreviewColor.Value = config.FavoriteItems.CustomHighlightColor;
 
                     return config.FavoriteItems.UseCustomHighlightColor;

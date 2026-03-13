@@ -1013,7 +1013,7 @@ namespace ConvenientInventory
                 spriteBatch.Draw(CachedTextures.FavoriteItemsHighlight,
                     slotDrawPositions[i],
                     CachedTextures.FavoriteItemsHighlight.Bounds,
-                    Color.White,
+                    ModEntry.Config.FavoriteItems.UseCustomHighlightColor ? ModEntry.Config.FavoriteItems.CustomHighlightColor : Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
             }
         }
@@ -1038,7 +1038,7 @@ namespace ConvenientInventory
                 spriteBatch.Draw(CachedTextures.FavoriteItemsHighlight,
                     toDraw,
                     CachedTextures.FavoriteItemsHighlight.Bounds,
-                    Color.White,
+                    ModEntry.Config.FavoriteItems.UseCustomHighlightColor ? ModEntry.Config.FavoriteItems.CustomHighlightColor : Color.White,
                     0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
 
                 // Skip drawing slot text when in gamepad mode.
