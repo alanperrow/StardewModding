@@ -98,22 +98,19 @@ namespace ConvenientInventory.TypedChests
                 new Vector2(x, y),
                 Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, !this.Chest.playerChoiceColor.Value.Equals(Color.Black) ? 168 : this.Chest.ParentSheetIndex, 16, 32),
                 this.Chest.playerChoiceColor.Value.Equals(Color.Black) ? this.Chest.Tint : this.Chest.playerChoiceColor.Value,
-                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
-            );
+                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
 
             spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
                 new Vector2(x, y + 42),
                 new Rectangle(0, 168 / 8 * 32 + 53, 16, 11),
                 Color.White,
-                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f
-            );
+                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f);
 
             spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
                 new Vector2(x, y),
                 Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, this.Chest.startingLidFrame.Value + 46, 16, 32),
                 Color.White,
-                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f
-            );
+                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f);
 
             return 0;
         }
@@ -152,22 +149,19 @@ namespace ConvenientInventory.TypedChests
             new Vector2(x, y),
                 Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, this.Chest.ParentSheetIndex, 16, 32),
                 this.Chest.playerChoiceColor.Value.Equals(Color.Black) ? this.Chest.Tint : this.Chest.playerChoiceColor.Value,
-                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
-            );
+                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
 
             spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
                 new Vector2(x, y + 42),
                 new Rectangle(0, this.Chest.ParentSheetIndex / 8 * 32 + 53, 16, 11),
                 Color.White,
-                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f
-            );
+                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 1E-05f);
 
             spriteBatch.Draw(Game1.bigCraftableSpriteSheet,
                 new Vector2(x, y),
                 Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, this.Chest.startingLidFrame.Value + 8, 16, 32),
                 Color.White,
-                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f
-            );
+                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f - 2E-05f);
 
             return 0;
         }
@@ -178,8 +172,7 @@ namespace ConvenientInventory.TypedChests
                 new Vector2(x, y + 8),
                 Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, this.Chest.ParentSheetIndex, 16, 32),
                 Color.White,
-                0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f
-            );
+                0f, Vector2.Zero, 1.75f, SpriteEffects.None, 1f);
 
             return 0;
         }
@@ -221,8 +214,7 @@ namespace ConvenientInventory.TypedChests
                 new Vector2(x + 8, y),
                 new Rectangle(0, 64, 64, 64),
                 Color.White,
-                0f, Vector2.Zero, 1f, SpriteEffects.None, 1f
-            );
+                0f, Vector2.Zero, 1f, SpriteEffects.None, 1f);
 
             newPosIndex++;
 
@@ -244,8 +236,7 @@ namespace ConvenientInventory.TypedChests
                 new Vector2(x + 9, y - 16),
                 new Rectangle(Utility.getSeasonNumber(Game1.currentSeason) * 48, 0, 48, 64),
                 Color.White,
-                0f, Vector2.Zero, 1.25f, SpriteEffects.None, 1f
-            );
+                0f, Vector2.Zero, 1.25f, SpriteEffects.None, 1f);
 
             newPosIndex++;
 
@@ -267,8 +258,7 @@ namespace ConvenientInventory.TypedChests
                 new Vector2(x - 8, y + 12),
                 dresserSourceRect,
                 Color.White,
-                0f, Vector2.Zero, 1.5f, SpriteEffects.None, 1f
-            );
+                0f, Vector2.Zero, 1.5f, SpriteEffects.None, 1f);
 
             return 0;
         }
@@ -279,8 +269,7 @@ namespace ConvenientInventory.TypedChests
                 new Vector2(x, y),
                 Game1.getSourceRectForStandardTileSheet(Game1.bigCraftableSpriteSheet, this.Chest.ParentSheetIndex, 16, 32),
                 Color.White,
-                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f
-            );
+                0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
 
             return 0;
         }

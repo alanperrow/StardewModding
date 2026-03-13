@@ -1071,8 +1071,7 @@ namespace ConvenientInventory
                new Vector2(Game1.getOldMouseX() - 32, Game1.getOldMouseY()),
                CachedTextures.FavoriteItemsCursor.Bounds,
                Color.White,
-               0f, Vector2.Zero, scale, SpriteEffects.None, 1f
-           );
+               0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
         }
 
         public static void DrawFavoriteItemsToolTipBorder(Item item, SpriteBatch spriteBatch, int x, int y)
@@ -1085,8 +1084,7 @@ namespace ConvenientInventory
                     new Vector2(x, y),
                     CachedTextures.FavoriteItemsBorder.Bounds,
                     Color.White,
-                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f
-                );
+                    0f, Vector2.Zero, 4f, SpriteEffects.None, 1f);
             }
         }
 

@@ -76,8 +76,7 @@ namespace ConvenientInventory
             // Manually patch InventoryPage constructor, otherwise Harmony cannot find method.
             harmony.Patch(
                 original: AccessTools.Constructor(typeof(InventoryPage), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int) }),
-                postfix: new HarmonyMethod(typeof(InventoryPageConstructorPatch), nameof(InventoryPageConstructorPatch.Postfix))
-            );
+                postfix: new HarmonyMethod(typeof(InventoryPageConstructorPatch), nameof(InventoryPageConstructorPatch.Postfix)));
 
             harmony.PatchAll();
             Monitor.Log("Finished applying Harmony patches.", LogLevel.Trace);
