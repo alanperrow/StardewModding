@@ -28,6 +28,9 @@ namespace ConvenientInventory.Compatibility
         /// </summary>
         public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
+            // == Check for new API version ==
+            IGenericModConfigMenuApi16 api16 = api as IGenericModConfigMenuApi16;
+
             // == Config Validation ==
             if (!IsChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
             {
@@ -102,7 +105,7 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_QuickStackControllerHotkey_Name,
                 tooltip: I18n.ModConfigMenu_QuickStackControllerHotkey_Desc);
 
-            api.AddSubHeader(
+            api16?.AddSubHeader(
                 mod: modManifest,
                 text: I18n.ModConfigMenu_SubHeader_InChestMenu);
 
@@ -148,7 +151,7 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackToggleChestButtonHidden_Desc);
 
-            api.AddSubHeader(
+            api16?.AddSubHeader(
                 mod: modManifest,
                 text: I18n.ModConfigMenu_SubHeader_OtherInventories);
 
@@ -187,7 +190,7 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsQuickStackIntoMiniShippingBins_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackIntoMiniShippingBins_Desc);
 
-            api.AddSubHeader(
+            api16?.AddSubHeader(
                 mod: modManifest,
                 text: I18n.ModConfigMenu_SubHeader_Animation);
 
@@ -225,7 +228,7 @@ namespace ConvenientInventory.Compatibility
                 max: 3f,
                 interval: 0.1f);
 
-            api.AddSubHeader(
+            api16?.AddSubHeader(
                 mod: modManifest,
                 text: I18n.ModConfigMenu_SubHeader_AdditionalSettings);
 

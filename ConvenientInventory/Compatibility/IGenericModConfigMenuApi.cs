@@ -34,12 +34,6 @@ namespace ConvenientInventory.Compatibility
         /// <param name="tooltip">The tooltip text shown when the cursor hovers on the title, or <c>null</c> to disable the tooltip.</param>
         void AddSectionTitle(IManifest mod, Func<string> text, Func<string> tooltip = null);
 
-        /// <summary>Add a subheader at the current position in the form.</summary>
-        /// <remarks>Larger than paragraph, smaller than title.</remarks>
-        /// <param name="mod">The mod's manifest.</param>
-        /// <param name="text">The title text shown in the form.</param>
-        void AddSubHeader(IManifest mod, Func<string> text);
-
         /// <summary>Add a paragraph of text at the current position in the form.</summary>
         /// <param name="mod">The mod's manifest.</param>
         /// <param name="text">The paragraph text to display.</param>
@@ -169,10 +163,6 @@ namespace ConvenientInventory.Compatibility
         /// <summary>Open the config UI for a specific mod.</summary>
         /// <param name="mod">The mod's manifest.</param>
         void OpenModMenu(IManifest mod);
-
-        /// <summary>Open the config UI for a specific mod, as a child menu if there is an existing menu.</summary>
-        /// <param name="mod">The mod's manifest.</param>
-        void OpenModMenuAsChildMenu(IManifest mod);
 
         /// <summary>Get the currently-displayed mod config menu, if any.</summary>
         /// <param name="mod">The manifest of the mod whose config menu is being shown, or <c>null</c> if not applicable.</param>

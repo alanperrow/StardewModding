@@ -1,11 +1,11 @@
-﻿using ConvenientInventory.AutoOrganize;
+﻿using System;
+using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.QuickStack;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley.Menus;
-using System;
 
 namespace ConvenientInventory
 {
@@ -82,10 +82,25 @@ namespace ConvenientInventory
             Monitor.Log("Finished applying Harmony patches.", LogLevel.Trace);
 
             // Initialize mod API integrations.
-            var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (apiGMCM != null)
+            var modGMCM = Helper.ModRegistry.Get("spacechase0.GenericModConfigMenu");
+            if (modGMCM != null)
             {
-                ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
+                if (modGMCM.Manifest.Version.IsOlderThan("1.16.0"))
+                {
+                    var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
+                    }
+                }
+                else
+                {
+                    var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi16>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
+                    }
+                }
             }
 
             var apiCBF = Helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
