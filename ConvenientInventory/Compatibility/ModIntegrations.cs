@@ -14,6 +14,7 @@ namespace ConvenientInventory.Compatibility
     public static class ModIntegrations
     {
         private static readonly PerScreen<Texture2D> highlightStylePreviewTexture = new();
+        private static readonly PerScreen<bool> useHighlightStylePreviewColor = new();
         private static readonly PerScreen<Color> highlightStylePreviewColor = new(() => Color.White);
 
         private static ICustomBackpackApi customBackpackApi;
@@ -32,9 +33,6 @@ namespace ConvenientInventory.Compatibility
         /// </summary>
         public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
-            // == Check for new API version ==
-            IGenericModConfigMenuApi16 api16 = api as IGenericModConfigMenuApi16;
-
             // == Config Validation ==
             if (!IsChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
             {
@@ -44,6 +42,8 @@ namespace ConvenientInventory.Compatibility
                 config.QuickStack.Range = ConfigHelper.FormatQuickStackRange(ConfigHelper.QuickStackRange_LocationInt);
                 config.Save();
             }
+
+            IGenericModConfigMenuApi16 api16 = api as IGenericModConfigMenuApi16;
 
             // == Register GMCM ==
             api.Register(
@@ -276,10 +276,18 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_FavoriteItemsControllerHotkey_Name,
                 tooltip: I18n.ModConfigMenu_FavoriteItemsControllerHotkey_Desc);
 
+            api16?.AddSubHeader(
+                mod: modManifest,
+                text: I18n.ModConfigMenu_SubHeader_Customize);
+
             api.AddComplexOption(
                 mod: modManifest,
                 height: () => 58,
-                draw: (sb, pos) => sb.Draw(highlightStylePreviewTexture.Value, pos, null, highlightStylePreviewColor.Value, 0f, Vector2.Zero, 4, SpriteEffects.None, 0),
+                draw: (sb, pos) =>
+                {
+                    Color color = useHighlightStylePreviewColor.Value ? highlightStylePreviewColor.Value : Color.White;
+                    sb.Draw(highlightStylePreviewTexture.Value, pos, null, color, 0f, Vector2.Zero, 4, SpriteEffects.None, 0);
+                },
                 name: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Name,
                 tooltip: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Desc);
 
@@ -301,6 +309,7 @@ namespace ConvenientInventory.Compatibility
                 mod: modManifest,
                 getValue: () =>
                 {
+                    // Initial assignment for default preview value.
                     int choiceIndex = config.FavoriteItems.HighlightTextureChoice;
                     highlightStylePreviewTexture.Value = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{choiceIndex}");
 
@@ -316,27 +325,28 @@ namespace ConvenientInventory.Compatibility
                 allowedValues: highlightStyleDescriptions,
                 fieldId: highlightStyleFieldId);
 
+            const string useCustomHighlightColorFieldId = "useCustomHighlightColor";
             api.AddBoolOption(
                 mod: modManifest,
-                getValue: () => false,//config.FavoriteItems.IsUseCustomHighlightColor,
-                setValue: value => { },//config.FavoriteItems.IsUseCustomHighlightColor = value,
-                name: () => "Use Custom Highlight Color?",//I18n.ModConfigMenu_IsUseCustomHighlightColor_Name,
-                tooltip: () => "If enabled, the custom color will be applied to the highlight style.");//I18n.ModConfigMenu_IsUseCustomHighlightColor_Desc);
+                getValue: () =>
+                {
+                    // Initial assignment for default preview value.
+                    highlightStylePreviewColor.Value = config.FavoriteItems.CustomHighlightColor;
+
+                    return config.FavoriteItems.UseCustomHighlightColor;
+                },
+                setValue: value => config.FavoriteItems.UseCustomHighlightColor = value,
+                name: I18n.ModConfigMenu_IsFavoriteItemsUseCustomHighlightColor_Name,
+                tooltip: I18n.ModConfigMenu_IsFavoriteItemsUseCustomHighlightColor_Desc,
+                fieldId: useCustomHighlightColorFieldId);
 
             const string customHighlightColorRFieldId = "customHighlightColorR";
             api.AddNumberOption(
                 mod: modManifest,
-                getValue: () =>
-                {
-                    return highlightStylePreviewColor.Value.R;
-                    //return config.FavoriteItems.CustomHighlightColor.R,
-                },
-                setValue: value =>
-                {
-                    //config.FavoriteItems.CustomHighlightColor.R = value,
-                },
-                name: () => "Custom Highlight Color: R",//I18n.ModConfigMenu_CustomHighlightColor_R_Name,
-                tooltip: () => "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nRed component of the custom highlight color.",//I18n.ModConfigMenu_CustomHighlightColor_R_Desc,
+                getValue: () => config.FavoriteItems.CustomHighlightColor.R,
+                setValue: value => config.FavoriteItems.CustomHighlightColor = new Color(config.FavoriteItems.CustomHighlightColor, 1f) { R = (byte)value },
+                name: I18n.ModConfigMenu_FavoriteItemsCustomHighlightColor_R_Name,
+                tooltip: I18n.ModConfigMenu_FavoriteItemsCustomHighlightColor_R_Desc,
                 min: 0,
                 max: 255,
                 interval: 1,
@@ -345,18 +355,10 @@ namespace ConvenientInventory.Compatibility
             const string customHighlightColorGFieldId = "customHighlightColorG";
             api.AddNumberOption(
                 mod: modManifest,
-                getValue: () =>
-                {
-                    return highlightStylePreviewColor.Value.G;
-                    //return config.FavoriteItems.CustomHighlightColor.G,
-                },
-                setValue: value =>
-                {
-                    highlightStylePreviewColor.Value = new Color(highlightStylePreviewColor.Value, 1f) { G = (byte)value };
-                    //config.FavoriteItems.CustomHighlightColor.G = value,
-                },
-                name: () => "Custom Highlight Color: G",//I18n.ModConfigMenu_CustomHighlightColor_G_Name,
-                tooltip: () => "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nGreen component of the custom highlight color.",//I18n.ModConfigMenu_CustomHighlightColor_G_Desc,
+                getValue: () => config.FavoriteItems.CustomHighlightColor.G,
+                setValue: value => config.FavoriteItems.CustomHighlightColor = new Color(config.FavoriteItems.CustomHighlightColor, 1f) { G = (byte)value },
+                name: I18n.ModConfigMenu_FavoriteItemsCustomHighlightColor_G_Name,
+                tooltip: I18n.ModConfigMenu_FavoriteItemsCustomHighlightColor_G_Desc,
                 min: 0,
                 max: 255,
                 interval: 1,
@@ -365,18 +367,10 @@ namespace ConvenientInventory.Compatibility
             const string customHighlightColorBFieldId = "customHighlightColorB";
             api.AddNumberOption(
                 mod: modManifest,
-                getValue: () =>
-                {
-                    return highlightStylePreviewColor.Value.B;
-                    //return config.FavoriteItems.CustomHighlightColor.B,
-                },
-                setValue: value =>
-                {
-                    highlightStylePreviewColor.Value = new Color(highlightStylePreviewColor.Value, 1f) { B = (byte)value };
-                    //config.FavoriteItems.CustomHighlightColor.B = value,
-                },
-                name: () => "Custom Highlight Color: B",//I18n.ModConfigMenu_CustomHighlightColor_B_Name,
-                tooltip: () => "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nBlue component of the custom highlight color.",//I18n.ModConfigMenu_CustomHighlightColor_B_Desc,
+                getValue: () => config.FavoriteItems.CustomHighlightColor.B,
+                setValue: value => config.FavoriteItems.CustomHighlightColor = new Color(config.FavoriteItems.CustomHighlightColor, 1f) { B = (byte)value },
+                name: I18n.ModConfigMenu_FavoriteItemsCustomHighlightColor_B_Name,
+                tooltip: I18n.ModConfigMenu_FavoriteItemsCustomHighlightColor_B_Desc,
                 min: 0,
                 max: 255,
                 interval: 1,
@@ -448,6 +442,11 @@ namespace ConvenientInventory.Compatibility
                     {
                         string newValueStr = (string)newValue;
                         highlightStylePreviewTexture.Value = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{newValueStr[0]}");
+                    }
+                    else if (fieldId == useCustomHighlightColorFieldId)
+                    {
+                        bool newValueBool = (bool)newValue;
+                        useHighlightStylePreviewColor.Value = newValueBool;
                     }
                     else if (fieldId == customHighlightColorRFieldId)
                     {

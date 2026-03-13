@@ -1,4 +1,5 @@
-﻿using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
@@ -62,11 +63,15 @@ namespace ConvenientInventory
         // ===== Favorite Items =====
         public bool IsEnableFavoriteItems { get; set; } = true;
 
-        public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;
-
         public KeybindList FavoriteItemsKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftAlt });
 
         public KeybindList FavoriteItemsControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftShoulder });
+
+        public int FavoriteItemsHighlightTextureChoice { get; set; } = 2;
+
+        public bool IsFavoriteItemsUseCustomHighlightColor { get; set; } = false;
+
+        public Color FavoriteItemsCustomHighlightColor { get; set; } = new Color(255, 255, 255);
 
         // ===== Take All But One =====
         public bool IsEnableTakeAllButOne { get; set; } = true;

@@ -100,6 +100,17 @@
   "ModConfigMenu.IsEnableFavoriteItems.Name": "Enable favorite items?",
   "ModConfigMenu.IsEnableFavoriteItems.Desc": "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests. They will also be prevented from being trashed, dropped, and shipped.",
 
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Keybind (keyboard)",
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "Hold this key when selecting an item to favorite it.",
+
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Keybind (controller)",
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Hold this button when selecting an item to favorite it.",
+
+  "ModConfigMenu.SubHeader.Customize": "Customize",
+
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "Preview:",
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "Preview the selected highlight style.",
+
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "Highlight style",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "Choose your preferred texture style for highlighting favorited items in your inventory.",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0": "Gold dashed",
@@ -113,14 +124,17 @@
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-8": "Custom thick border",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-9": "Custom dashed border",
 
-  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "Preview:",
-  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "Preview the chosen highlight style.",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Name": "Use Custom Highlight Color?",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Desc": "If enabled, applies a custom color to the highlight style.",
 
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Keybind (keyboard)",
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "Hold this key when selecting an item to favorite it.",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Name": "Custom Highlight Color: R",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Desc": "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nRed component of the custom highlight color.",
 
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Keybind (controller)",
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Hold this button when selecting an item to favorite it.",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Name": "Custom Highlight Color: G",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Desc": "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nGreen component of the custom highlight color.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Name": "Custom Highlight Color: B",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Desc": "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nBlue component of the custom highlight color.",
 
   "ModConfigMenu.Label.TakeAllButOne": "Take All But One",
 

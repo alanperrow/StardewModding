@@ -1,4 +1,5 @@
-﻿using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework;
+using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
 namespace ConvenientInventory
@@ -227,12 +228,6 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsEnableFavoriteItems = value;
             }
 
-            public int HighlightTextureChoice
-            {
-                get => _config.serialConfig.FavoriteItemsHighlightTextureChoice;
-                set => _config.serialConfig.FavoriteItemsHighlightTextureChoice = value;
-            }
-
             public KeybindList KeyboardHotkey
             {
                 get => _config.serialConfig.FavoriteItemsKeyboardHotkey;
@@ -243,6 +238,24 @@ namespace ConvenientInventory
             {
                 get => _config.serialConfig.FavoriteItemsControllerHotkey;
                 set => _config.serialConfig.FavoriteItemsControllerHotkey = value;
+            }
+
+            public int HighlightTextureChoice
+            {
+                get => _config.serialConfig.FavoriteItemsHighlightTextureChoice;
+                set => _config.serialConfig.FavoriteItemsHighlightTextureChoice = value;
+            }
+
+            public bool UseCustomHighlightColor
+            {
+                get => _config.serialConfig.IsFavoriteItemsUseCustomHighlightColor;
+                set => _config.serialConfig.IsFavoriteItemsUseCustomHighlightColor = value;
+            }
+
+            public Color CustomHighlightColor
+            {
+                get => _config.serialConfig.FavoriteItemsCustomHighlightColor;
+                set => _config.serialConfig.FavoriteItemsCustomHighlightColor = value;
             }
         }
 
