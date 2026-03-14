@@ -72,6 +72,24 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsEnableQuickStack = value;
             }
 
+            public bool IsHotkeyEnabled
+            {
+                get => _config.serialConfig.IsEnableQuickStackHotkey;
+                set => _config.serialConfig.IsEnableQuickStackHotkey = value;
+            }
+
+            public KeybindList KeyboardHotkey
+            {
+                get => _config.serialConfig.QuickStackKeyboardHotkey;
+                set => _config.serialConfig.QuickStackKeyboardHotkey = value;
+            }
+
+            public KeybindList ControllerHotkey
+            {
+                get => _config.serialConfig.QuickStackControllerHotkey;
+                set => _config.serialConfig.QuickStackControllerHotkey = value;
+            }
+
             public string Range
             {
                 get => _config.serialConfig.QuickStackRange;
@@ -100,24 +118,6 @@ namespace ConvenientInventory
             {
                 get => _config.serialConfig.QuickStackNonStackableTypesToOverflow;
                 set => _config.serialConfig.QuickStackNonStackableTypesToOverflow = value;
-            }
-
-            public bool IsHotkeyEnabled
-            {
-                get => _config.serialConfig.IsEnableQuickStackHotkey;
-                set => _config.serialConfig.IsEnableQuickStackHotkey = value;
-            }
-
-            public KeybindList KeyboardHotkey
-            {
-                get => _config.serialConfig.QuickStackKeyboardHotkey;
-                set => _config.serialConfig.QuickStackKeyboardHotkey = value;
-            }
-
-            public KeybindList ControllerHotkey
-            {
-                get => _config.serialConfig.QuickStackControllerHotkey;
-                set => _config.serialConfig.QuickStackControllerHotkey = value;
             }
 
             public bool AllowHotkeyInChestMenu

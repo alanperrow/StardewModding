@@ -66,6 +66,27 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsEnableQuickStack_Name,
                 tooltip: I18n.ModConfigMenu_IsEnableQuickStack_Desc);
 
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsHotkeyEnabled,
+                setValue: value => config.QuickStack.IsHotkeyEnabled = value,
+                name: I18n.ModConfigMenu_IsEnableQuickStackHotkey_Name,
+                tooltip: I18n.ModConfigMenu_IsEnableQuickStackHotkey_Desc);
+
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.QuickStack.KeyboardHotkey,
+                setValue: value => config.QuickStack.KeyboardHotkey = value,
+                name: I18n.ModConfigMenu_QuickStackKeyboardHotkey_Name,
+                tooltip: I18n.ModConfigMenu_QuickStackKeyboardHotkey_Desc);
+
+            api.AddKeybindList(
+                mod: modManifest,
+                getValue: () => config.QuickStack.ControllerHotkey,
+                setValue: value => config.QuickStack.ControllerHotkey = value,
+                name: I18n.ModConfigMenu_QuickStackControllerHotkey_Name,
+                tooltip: I18n.ModConfigMenu_QuickStackControllerHotkey_Desc);
+
             api.AddNumberOption(
                 mod: modManifest,
                 getValue: () => ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range),
@@ -110,27 +131,6 @@ namespace ConvenientInventory.Compatibility
                 allowedValues: nonStackableTypesDisplayNameByEnum.Values.ToArray(),
                 name: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Name,
                 tooltip: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Desc);
-
-            api.AddBoolOption(
-                mod: modManifest,
-                getValue: () => config.QuickStack.IsHotkeyEnabled,
-                setValue: value => config.QuickStack.IsHotkeyEnabled = value,
-                name: I18n.ModConfigMenu_IsEnableQuickStackHotkey_Name,
-                tooltip: I18n.ModConfigMenu_IsEnableQuickStackHotkey_Desc);
-
-            api.AddKeybindList(
-                mod: modManifest,
-                getValue: () => config.QuickStack.KeyboardHotkey,
-                setValue: value => config.QuickStack.KeyboardHotkey = value,
-                name: I18n.ModConfigMenu_QuickStackKeyboardHotkey_Name,
-                tooltip: I18n.ModConfigMenu_QuickStackKeyboardHotkey_Desc);
-
-            api.AddKeybindList(
-                mod: modManifest,
-                getValue: () => config.QuickStack.ControllerHotkey,
-                setValue: value => config.QuickStack.ControllerHotkey = value,
-                name: I18n.ModConfigMenu_QuickStackControllerHotkey_Name,
-                tooltip: I18n.ModConfigMenu_QuickStackControllerHotkey_Desc);
 
             api16?.AddSubHeader(
                 mod: modManifest,

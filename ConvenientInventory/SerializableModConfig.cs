@@ -15,6 +15,12 @@ namespace ConvenientInventory
         // ===== Quick Stack To Nearby Chests =====
         public bool IsEnableQuickStack { get; set; } = true;
 
+        public bool IsEnableQuickStackHotkey { get; set; } = false;
+
+        public KeybindList QuickStackKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
+
+        public KeybindList QuickStackControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
+
         public string QuickStackRange { get; set; } = ConfigHelper.QuickStackRange_Default;
 
         public bool IsQuickStackOverflowItems { get; set; } = true;
@@ -24,12 +30,6 @@ namespace ConvenientInventory
         public bool IsQuickStackIgnoreItemVariation { get; set; } = false;
 
         public NonStackableTypes QuickStackNonStackableTypesToOverflow { get; set; } = NonStackableTypes.None;
-
-        public bool IsEnableQuickStackHotkey { get; set; } = false;
-
-        public KeybindList QuickStackKeyboardHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.K });
-
-        public KeybindList QuickStackControllerHotkey { get; set; } = KeybindList.ForSingle(new[] { SButton.LeftStick });
 
         public bool IsQuickStackAllowHotkeyInChestMenu { get; set; } = true;
 

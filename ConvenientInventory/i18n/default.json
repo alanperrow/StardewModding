@@ -20,6 +20,15 @@
   "ModConfigMenu.IsEnableQuickStack.Name": "Enable Quick Stack?",
   "ModConfigMenu.IsEnableQuickStack.Desc": "If enabled, adds a \"Quick Stack To Nearby Chests\" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.",
 
+  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
+  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
+
+  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "Keybind (keyboard)",
+  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "Press this key to quick stack your items.",
+
+  "ModConfigMenu.QuickStackControllerHotkey.Name": "Keybind (controller)",
+  "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
+
   "ModConfigMenu.QuickStackRange.Name": "Range",
   "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.\n\nIf set to \"Location\", all chests in the player's current location will be considered.\n\nIf set to \"Global\", all chests in the world will be considered.",
   "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange config value was \"Global\" but has been reset to \"Location\". \"Global\" is only supported if the Chests Anywhere mod is installed.",
@@ -37,15 +46,6 @@
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptTools": "Except Tools",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeapons": "Except Tools and Weapons",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeaponsEquips": "Except Tools, Weapons, and Equips",
-
-  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
-  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
-
-  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "Keybind (keyboard)",
-  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "Press this key to quick stack your items.",
-
-  "ModConfigMenu.QuickStackControllerHotkey.Name": "Keybind (controller)",
-  "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
 
   "ModConfigMenu.SubHeader.InChestMenu": "In Chest Menu",
 
