@@ -92,7 +92,8 @@ namespace ConvenientInventory.Compatibility
                 getValue: () => ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range),
                 setValue: value => config.QuickStack.Range = ConfigHelper.FormatQuickStackRange(value),
                 name: I18n.ModConfigMenu_QuickStackRange_Name,
-                tooltip: I18n.ModConfigMenu_QuickStackRange_Desc,
+                tooltip: () => I18n.ModConfigMenu_QuickStackRange_Desc()
+                    + (IsChestsAnywhereInstalled ? I18n.ModConfigMenu_QuickStackRange_DescGlobal() : string.Empty),
                 min: 1,
                 max: IsChestsAnywhereInstalled ? ConfigHelper.QuickStackRange_GlobalInt : ConfigHelper.QuickStackRange_LocationInt,
                 interval: 1,
