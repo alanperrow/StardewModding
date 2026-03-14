@@ -32,6 +32,11 @@
 
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "Overflow non-stackables:",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "(Requires \"Overflow items?\" to be enabled.)\nChoose which non-stackable item types can be quick stacked as\noverflow items if a chest contains that same item.\n\nChoose \"None\" if non-stackable items should NOT be quick stacked.",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-None": "None",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-All": "All",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptTools": "Except Tools",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeapons": "Except Tools and Weapons",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeaponsEquips": "Except Tools, Weapons, and Equips",
 
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
   "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",

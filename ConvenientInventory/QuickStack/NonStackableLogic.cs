@@ -11,15 +11,6 @@ namespace ConvenientInventory.QuickStack
     public static class NonStackableLogic
     {
         /// <summary>
-        /// Gets the display name, if any, of the provided <see cref="NonStackableTypes"/> enum value.
-        /// </summary>
-        public static string GetDisplayName(NonStackableTypes value)
-        {
-            var member = typeof(NonStackableTypes).GetMember(value.ToString()).FirstOrDefault();
-            return member?.GetCustomAttribute<DisplayAttribute>()?.Name;
-        }
-
-        /// <summary>
         /// Determines whether the current config allows quick stacking of the provided non-stackable item.
         /// </summary>
         public static bool CanOverflowNonStackable(Item item) =>

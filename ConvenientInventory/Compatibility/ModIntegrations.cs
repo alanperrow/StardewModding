@@ -91,18 +91,23 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Desc);
 
-            Dictionary<string, NonStackableTypes> nonStackableTypesByDisplayName = Enum.GetValues<NonStackableTypes>()
-                .Select(x => (DisplayName: NonStackableLogic.GetDisplayName(x), Value: x))
-                .Where(t => t.DisplayName != null)
-                .ToDictionary(t => t.DisplayName, t => t.Value);
+            Dictionary<NonStackableTypes, string> nonStackableTypesDisplayNameByEnum = new()
+            {
+                { NonStackableTypes.None, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescNone() },
+                { NonStackableTypes.All, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescAll() },
+                { NonStackableTypes.ExceptTools, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescExceptTools() },
+                { NonStackableTypes.ExceptToolsWeapons, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescExceptToolsWeapons() },
+                { NonStackableTypes.ExceptToolsWeaponsEquips, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescExceptToolsWeaponsEquips() },
+            };
+            Dictionary<string, NonStackableTypes> nonStackableTypesEnumByDisplayName = nonStackableTypesDisplayNameByEnum.ToDictionary(kv => kv.Value, kv => kv.Key);
             api.AddTextOption(
                 mod: modManifest,
-                getValue: () => NonStackableLogic.GetDisplayName(config.QuickStack.NonStackableTypesToOverflow),
+                getValue: () => nonStackableTypesDisplayNameByEnum[config.QuickStack.NonStackableTypesToOverflow],
                 setValue: value =>
                 {
-                    config.QuickStack.NonStackableTypesToOverflow = nonStackableTypesByDisplayName[value];
+                    config.QuickStack.NonStackableTypesToOverflow = nonStackableTypesEnumByDisplayName[value];
                 },
-                allowedValues: nonStackableTypesByDisplayName.Keys.ToArray(),
+                allowedValues: nonStackableTypesDisplayNameByEnum.Values.ToArray(),
                 name: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Name,
                 tooltip: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Desc);
 
