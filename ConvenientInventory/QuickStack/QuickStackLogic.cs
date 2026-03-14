@@ -84,11 +84,7 @@ namespace ConvenientInventory.QuickStack
                         }
                         else if (!playerItem.canStackWith(chestItem))
                         {
-                            if (ModEntry.Config.QuickStack.OverflowItems
-                                && ((ModEntry.Config.QuickStack.IgnoreItemQuality && CanStackWithIgnoreQuality(playerItem, chestItem))
-                                    || (ModEntry.Config.QuickStack.NonStackableTypesToOverflow != NonStackableTypes.None
-                                        && NonStackableLogic.AreEquivalentNonStackables(playerItem, chestItem)
-                                        && NonStackableLogic.CanOverflowNonStackable(playerItem))))
+                            if (ShouldOverflowItem(playerItem, chestItem))
                             {
                                 overflowItems.Add(playerItem);
                             }
@@ -296,21 +292,44 @@ namespace ConvenientInventory.QuickStack
         }
 
         /// <summary>
-        /// Taken from <see cref="Item.canStackWith"/>, removing quality check.
+        /// Determines whether <paramref name="playerItem"/> should be considered an overflow item for <paramref name="chestItem"/>,
+        /// based on the item's properties and the current config.
+        /// <para>This method should only be called after verifying <see cref="Item.canStackWith"/> is <see langword="false"/>.</para>
         /// </summary>
-        public static bool CanStackWithIgnoreQuality(Item item, ISalable other)
+        public static bool ShouldOverflowItem(Item playerItem, Item chestItem)
         {
-            if (other is not Item otherItem || other.GetType() != item.GetType())
+            if (ModEntry.Config.QuickStack.OverflowItems)
+            {
+                if ((ModEntry.Config.QuickStack.IgnoreItemQuality || ModEntry.Config.QuickStack.IgnoreItemVariation)
+                    && ConfiguredCanStackWith(playerItem, chestItem))
+                {
+                    return true;
+                }
+                else if (ModEntry.Config.QuickStack.NonStackableTypesToOverflow != NonStackableTypes.None
+                    && NonStackableLogic.AreEquivalentNonStackables(playerItem, chestItem)
+                    && NonStackableLogic.CanOverflowNonStackable(playerItem))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Taken from <see cref="Item.canStackWith"/>, ignoring certain properties based on the current config.
+        /// </summary>
+        private static bool ConfiguredCanStackWith(Item item, Item other)
+        {
+            if (other.GetType() != item.GetType())
             {
                 return false;
             }
 
-            if (item is ColoredObject coloredObj)
+            if (!ModEntry.Config.QuickStack.IgnoreItemVariation
+                && item is ColoredObject coloredObj && other is ColoredObject otherColoredObj && !coloredObj.color.Value.Equals(otherColoredObj.color.Value))
             {
-                if (other is ColoredObject otherColoredObj && !coloredObj.color.Value.Equals(otherColoredObj.color.Value))
-                {
-                    return false;
-                }
+                return false;
             }
 
             if (item.maximumStackSize() <= 1 || other.maximumStackSize() <= 1)
@@ -318,20 +337,24 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
-            if (item is StardewValley.Object obj)
-            {
-                if (other is StardewValley.Object otherObj && otherObj.orderData.Value != obj.orderData.Value)
-                {
-                    return false;
-                }
-            }
-
-            if (item.QualifiedItemId != otherItem.QualifiedItemId)
+            if (item is StardewValley.Object obj && other is StardewValley.Object otherObj && otherObj.orderData.Value != obj.orderData.Value)
             {
                 return false;
             }
 
-            if (!item.Name.Equals(other.Name))
+            if (!ModEntry.Config.QuickStack.IgnoreItemQuality
+                && item.Quality != other.Quality)
+            {
+                return false;
+            }
+
+            if (item.QualifiedItemId != other.QualifiedItemId)
+            {
+                return false;
+            }
+
+            if (!ModEntry.Config.QuickStack.IgnoreItemVariation
+                && !item.Name.Equals(other.Name))
             {
                 return false;
             }

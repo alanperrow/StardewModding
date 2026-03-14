@@ -21,6 +21,8 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
 
+        public bool IsQuickStackIgnoreItemVariation { get; set; } = false;
+
         public NonStackableTypes QuickStackNonStackableTypesToOverflow { get; set; } = NonStackableTypes.None;
 
         public bool IsEnableQuickStackHotkey { get; set; } = false;

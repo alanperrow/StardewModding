@@ -140,11 +140,7 @@ namespace ConvenientInventory.QuickStack
 
                     if (!playerItem.canStackWith(chestItem))
                     {
-                        if (ModEntry.Config.QuickStack.OverflowItems
-                            && ((ModEntry.Config.QuickStack.IgnoreItemQuality && QuickStackLogic.CanStackWithIgnoreQuality(playerItem, chestItem))
-                                || (ModEntry.Config.QuickStack.NonStackableTypesToOverflow != NonStackableTypes.None
-                                    && NonStackableLogic.AreEquivalentNonStackables(playerItem, chestItem)
-                                    && NonStackableLogic.CanOverflowNonStackable(playerItem))))
+                        if (QuickStackLogic.ShouldOverflowItem(playerItem, chestItem))
                         {
                             overflowItems.Add(playerItem);
                         }

@@ -90,6 +90,12 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIgnoreItemQuality = value;
             }
 
+            public bool IgnoreItemVariation
+            {
+                get => _config.serialConfig.IsQuickStackIgnoreItemVariation;
+                set => _config.serialConfig.IsQuickStackIgnoreItemVariation = value;
+            }
+
             public NonStackableTypes NonStackableTypesToOverflow
             {
                 get => _config.serialConfig.QuickStackNonStackableTypesToOverflow;
