@@ -6,7 +6,7 @@ Development typically involves the usage of the [Harmony](https://github.com/par
 The mods can be loaded and run alongside the base game by using [SMAPI](https://smapi.io/).
 See the [player's guide to using mods](https://stardewvalleywiki.com/Modding:Player_Guide/Getting_Started) on the official wiki for detailed installation instructions.
 
-You can find a list of my published mods on [my NexusMods profile](https://next.nexusmods.com/profile/gaussfire/mods).
+You can find a list of my published mods on my [NexusMods profile](https://next.nexusmods.com/profile/gaussfire/mods).
 I prefer to play with mods that are intentionally balanced and/or focus on quality-of-life improvements, so that's what you'll find here.
 
 ## Future Mod Ideas
