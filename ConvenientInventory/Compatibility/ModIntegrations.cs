@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ConvenientInventory.QuickStack;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -87,6 +90,21 @@ namespace ConvenientInventory.Compatibility
                 setValue: value => config.QuickStack.IgnoreItemQuality = value,
                 name: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Desc);
+
+            Dictionary<string, NonStackableTypes> nonStackableTypesByDisplayName = Enum.GetValues<NonStackableTypes>()
+                .Select(x => (DisplayName: NonStackableLogic.GetDisplayName(x), Value: x))
+                .Where(t => t.DisplayName != null)
+                .ToDictionary(t => t.DisplayName, t => t.Value);
+            api.AddTextOption(
+                mod: modManifest,
+                getValue: () => NonStackableLogic.GetDisplayName(config.QuickStack.NonStackableTypesToOverflow),
+                setValue: value =>
+                {
+                    config.QuickStack.NonStackableTypesToOverflow = nonStackableTypesByDisplayName[value];
+                },
+                allowedValues: nonStackableTypesByDisplayName.Keys.ToArray(),
+                name: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Name,
+                tooltip: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Desc);
 
             api.AddBoolOption(
                 mod: modManifest,
@@ -320,9 +338,9 @@ namespace ConvenientInventory.Compatibility
                     config.FavoriteItems.HighlightTextureChoice = int.Parse(value[..1]);
                     CachedTextures.FavoriteItemsHighlight = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{value[0]}");
                 },
+                allowedValues: highlightStyleDescriptions,
                 name: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Name,
                 tooltip: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc,
-                allowedValues: highlightStyleDescriptions,
                 fieldId: highlightStyleFieldId);
 
             const string useCustomHighlightColorFieldId = "useCustomHighlightColor";

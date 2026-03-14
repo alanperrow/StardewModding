@@ -28,7 +28,10 @@
   "ModConfigMenu.IsQuickStackOverflowItems.Desc": "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
 
   "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Ignore item quality?",
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain ANY quality of that same item.",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY quality of that same item.",
+
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "Overflow non-stackables:",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "(Requires \"Overflow items?\" to be enabled.)\nChoose which non-stackable item types can be quick stacked as\noverflow items if a chest contains that same item.\n\nChoose \"None\" if non-stackable items should NOT be quick stacked.",
 
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
   "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",

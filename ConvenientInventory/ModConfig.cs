@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ConvenientInventory.QuickStack;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
@@ -89,7 +90,11 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIgnoreItemQuality = value;
             }
 
-            public bool OverflowNonstackables { get; set; } = true;//TODO - full setup; should be false by default
+            public NonStackableTypes NonStackableTypesToOverflow
+            {
+                get => _config.serialConfig.QuickStackNonStackableTypesToOverflow;
+                set => _config.serialConfig.QuickStackNonStackableTypesToOverflow = value;
+            }
 
             public bool IsHotkeyEnabled
             {

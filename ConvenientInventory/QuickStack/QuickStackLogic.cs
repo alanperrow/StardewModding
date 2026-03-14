@@ -86,7 +86,9 @@ namespace ConvenientInventory.QuickStack
                         {
                             if (ModEntry.Config.QuickStack.OverflowItems
                                 && ((ModEntry.Config.QuickStack.IgnoreItemQuality && CanStackWithIgnoreQuality(playerItem, chestItem))
-                                    || (ModEntry.Config.QuickStack.OverflowNonstackables && AreEquivalentNonStackables(playerItem, chestItem))))
+                                    || (ModEntry.Config.QuickStack.NonStackableTypesToOverflow != NonStackableTypes.None
+                                        && NonStackableLogic.AreEquivalentNonStackables(playerItem, chestItem)
+                                        && NonStackableLogic.CanOverflowNonStackable(playerItem))))
                             {
                                 overflowItems.Add(playerItem);
                             }
@@ -330,51 +332,6 @@ namespace ConvenientInventory.QuickStack
             }
 
             if (!item.Name.Equals(other.Name))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Determines whether two items represent the same "type" of non-stackable item.
-        /// </summary>
-        public static bool AreEquivalentNonStackables(Item item, Item other)
-        {
-            if (item is null || other is null)
-            {
-                return false;
-            }
-
-            if (object.ReferenceEquals(item, other))
-            {
-                // Shouldn't be possible, but avoid false positives if the same item instance is compared against itself.
-                return false;
-            }
-
-            if (item.maximumStackSize() > 1 || other.maximumStackSize() > 1)
-            {
-                return false;
-            }
-
-            if (item.QualifiedItemId != other.QualifiedItemId)
-            {
-                return false;
-            }
-
-            if (!item.Name.Equals(other.Name))
-            {
-                return false;
-            }
-
-            if (!ModEntry.Config.QuickStack.IgnoreItemQuality
-                && item.Quality != other.Quality)
-            {
-                return false;
-            }
-
-            if (other.GetType() != item.GetType())
             {
                 return false;
             }

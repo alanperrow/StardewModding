@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ConvenientInventory.QuickStack;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 
@@ -19,6 +20,8 @@ namespace ConvenientInventory
         public bool IsQuickStackOverflowItems { get; set; } = true;
 
         public bool IsQuickStackIgnoreItemQuality { get; set; } = false;
+
+        public NonStackableTypes QuickStackNonStackableTypesToOverflow { get; set; } = NonStackableTypes.None;
 
         public bool IsEnableQuickStackHotkey { get; set; } = false;
 
