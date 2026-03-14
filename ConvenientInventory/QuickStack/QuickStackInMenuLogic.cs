@@ -34,12 +34,12 @@ namespace ConvenientInventory.QuickStack
             itemGrabMenu.fillStacksButton.sourceRect = CachedTextures.FillStacksQuickStackButtonIcon.Bounds;
         }
 
-        public static bool StackToChestInMenu(ItemGrabMenu itemGrabMenu)
+        public static bool StackToChestInMenu(ItemGrabMenu itemGrabMenu, bool playSound)
         {
             try
             {
                 IsStackingToChestInMenu = true;
-                return StackToChestInMenuCore(itemGrabMenu);
+                return StackToChestInMenuCore(itemGrabMenu, playSound);
             }
             finally
             {
@@ -47,15 +47,20 @@ namespace ConvenientInventory.QuickStack
             }
         }
 
-        private static bool StackToChestInMenuCore(ItemGrabMenu itemGrabMenu)
+        private static bool StackToChestInMenuCore(ItemGrabMenu itemGrabMenu, bool playSound)
         {
             Chest chest = GetChestFromContext(itemGrabMenu);
             if (chest is null)
             {
-                Game1.playSound("cancel");
+                if (playSound)
+                {
+                    Game1.playSound("cancel");
+                }
+
                 ModEntry.Instance.Monitor.Log(
                     $"Cannot quick stack into ItemGrabMenu context of type '{itemGrabMenu.context?.GetType().Name ?? "null"}'.",
                     LogLevel.Debug);
+
                 return false;
             }
 
@@ -72,7 +77,11 @@ namespace ConvenientInventory.QuickStack
                 if (chestType is ChestType.Package or ChestType.Dungeon)
                 {
                     // Do not consider new farmer packages or dungeon chests for quick stack.
-                    Game1.playSound("cancel");
+                    if (playSound)
+                    {
+                        Game1.playSound("cancel");
+                    }
+
                     return false;
                 }
                 else if (chestType == ChestType.Normal)
@@ -232,7 +241,10 @@ namespace ConvenientInventory.QuickStack
                 }
             }
 
-            Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
+            if (playSound)
+            {
+                Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
+            }
 
             quickStackAnimation?.Complete();
             if (movedAtLeastOneTotal)

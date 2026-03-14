@@ -722,7 +722,7 @@ namespace ConvenientInventory
 
             if (Game1.activeClickableMenu is ItemGrabMenu itemGrabMenu && itemGrabMenu.fillStacksButton != null)
             {
-                QuickStackInMenuLogic.StackToChestInMenu(itemGrabMenu);
+                QuickStackInMenuLogic.StackToChestInMenu(itemGrabMenu, true);
                 return;
             }
 

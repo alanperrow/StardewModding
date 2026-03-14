@@ -1005,7 +1005,7 @@ namespace ConvenientInventory
 
             try
             {
-                QuickStackInMenuLogic.StackToChestInMenu(__instance);
+                QuickStackInMenuLogic.StackToChestInMenu(__instance, false);
 
                 // Instead of returning false here to skip the base game `FillOutStacks` call, we prefer to
                 // return true so as not to interfere if any other mods want to prefix this method as well.
