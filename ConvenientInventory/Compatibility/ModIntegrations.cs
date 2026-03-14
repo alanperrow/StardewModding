@@ -115,10 +115,17 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
-                getValue: () => config.QuickStack.IgnoreItemVariation,
-                setValue: value => config.QuickStack.IgnoreItemVariation = value,
-                name: I18n.ModConfigMenu_IsQuickStackIgnoreItemVariation_Name,
-                tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemVariation_Desc);
+                getValue: () => config.QuickStack.IgnoreItemColorVariation,
+                setValue: value => config.QuickStack.IgnoreItemColorVariation = value,
+                name: I18n.ModConfigMenu_IsQuickStackIgnoreItemColorVariation_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemColorVariation_Desc);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IgnoreItemNameVariation,
+                setValue: value => config.QuickStack.IgnoreItemNameVariation = value,
+                name: I18n.ModConfigMenu_IsQuickStackIgnoreItemNameVariation_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemNameVariation_Desc);
 
             Dictionary<NonStackableTypes, string> nonStackableTypesDisplayNameByEnum = new()
             {

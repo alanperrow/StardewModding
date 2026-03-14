@@ -40,8 +40,11 @@
   "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Ignore item quality?",
   "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY quality of that same item.",
 
-  "ModConfigMenu.IsQuickStackIgnoreItemVariation.Name": "Ignore item variation?",
-  "ModConfigMenu.IsQuickStackIgnoreItemVariation.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY variation of that same item. For example: flowers of a\ndifferent color, wine from different fruit, etc.",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Name": "Ignore item color variation?",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY color variation of that same item (e.g. colored flowers).",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Name": "Ignore item name variation?",
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY name variation of that same item (e.g. flavored honey).",
 
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "Overflow non-stackables:",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "(Requires \"Overflow items?\" to be enabled.)\nChoose which non-stackable item types can be quick stacked as\noverflow items if a chest contains that same item.\n\nChoose \"None\" if non-stackable items should NOT be quick stacked.",

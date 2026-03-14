@@ -300,7 +300,9 @@ namespace ConvenientInventory.QuickStack
         {
             if (ModEntry.Config.QuickStack.OverflowItems)
             {
-                if ((ModEntry.Config.QuickStack.IgnoreItemQuality || ModEntry.Config.QuickStack.IgnoreItemVariation)
+                if ((ModEntry.Config.QuickStack.IgnoreItemQuality
+                        || ModEntry.Config.QuickStack.IgnoreItemColorVariation
+                        || ModEntry.Config.QuickStack.IgnoreItemNameVariation)
                     && ConfiguredCanStackWith(playerItem, chestItem))
                 {
                     return true;
@@ -326,7 +328,7 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
-            if (!ModEntry.Config.QuickStack.IgnoreItemVariation
+            if (!ModEntry.Config.QuickStack.IgnoreItemColorVariation
                 && item is ColoredObject coloredObj && other is ColoredObject otherColoredObj && !coloredObj.color.Value.Equals(otherColoredObj.color.Value))
             {
                 return false;
@@ -353,7 +355,7 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
-            if (!ModEntry.Config.QuickStack.IgnoreItemVariation
+            if (!ModEntry.Config.QuickStack.IgnoreItemNameVariation
                 && !item.Name.Equals(other.Name))
             {
                 return false;

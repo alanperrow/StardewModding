@@ -108,10 +108,16 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIgnoreItemQuality = value;
             }
 
-            public bool IgnoreItemVariation
+            public bool IgnoreItemColorVariation
             {
-                get => _config.serialConfig.IsQuickStackIgnoreItemVariation;
-                set => _config.serialConfig.IsQuickStackIgnoreItemVariation = value;
+                get => _config.serialConfig.IsQuickStackIgnoreItemColorVariation;
+                set => _config.serialConfig.IsQuickStackIgnoreItemColorVariation = value;
+            }
+
+            public bool IgnoreItemNameVariation
+            {
+                get => _config.serialConfig.IsQuickStackIgnoreItemNameVariation;
+                set => _config.serialConfig.IsQuickStackIgnoreItemNameVariation = value;
             }
 
             public NonStackableTypes NonStackableTypesToOverflow
