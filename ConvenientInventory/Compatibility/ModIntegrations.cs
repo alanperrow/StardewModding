@@ -113,6 +113,13 @@ namespace ConvenientInventory.Compatibility
                 name: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemQuality_Desc);
 
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IgnoreItemVariation,
+                setValue: value => config.QuickStack.IgnoreItemVariation = value,
+                name: I18n.ModConfigMenu_IsQuickStackIgnoreItemVariation_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemVariation_Desc);
+
             Dictionary<NonStackableTypes, string> nonStackableTypesDisplayNameByEnum = new()
             {
                 { NonStackableTypes.None, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescNone() },
