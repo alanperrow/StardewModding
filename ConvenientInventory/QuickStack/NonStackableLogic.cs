@@ -66,8 +66,11 @@ namespace ConvenientInventory.QuickStack
         /// </summary>
         private static NonStackableTypes GetNonStackableType(Item item) => item switch
         {
+            // Scythes and slingshots are considered tools in-game.
             MeleeWeapon mw when mw.isScythe() => NonStackableTypes.Tools,
-            MeleeWeapon or Slingshot => NonStackableTypes.Weapons,
+            Slingshot => NonStackableTypes.Tools,
+
+            MeleeWeapon => NonStackableTypes.Weapons,
             Tool => NonStackableTypes.Tools,
             Boots or Clothing or Hat or Ring or Trinket => NonStackableTypes.Equips,
             _ => NonStackableTypes.Other,
