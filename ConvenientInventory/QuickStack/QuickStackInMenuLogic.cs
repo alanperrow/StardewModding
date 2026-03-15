@@ -75,13 +75,6 @@ namespace ConvenientInventory.QuickStack
             Farmer who = Game1.player;
             Inventory playerInventory = who.Items;
 
-            QuickStackAnimation quickStackAnimation = null;
-            if (ModEntry.Config.QuickStack.IsAnimationEnabled)
-            {
-                quickStackAnimation = new(who);
-            }
-
-            QuickStackSummary quickStackSummary = new();
             HashSet<Item> overflowItems = new();
 
             // Fill chest stacks with player inventory items
@@ -208,16 +201,10 @@ namespace ConvenientInventory.QuickStack
                 Game1.playSound(movedAtLeastOneTotal ? "Ship" : "cancel");
             }
 
-            quickStackAnimation?.Complete();
-            if (movedAtLeastOneTotal)
+            if (movedAtLeastOneTotal && ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
-                if (ModEntry.Config.AutoOrganizeChest.IsEnabled)
-                {
-                    // Manually trigger auto organize now that quick stack has completed and added at least one item.
-                    AutoOrganizeLogic.TryOrganizeChestOnFillOutStacks(itemGrabMenu, chest);
-                }
-
-                ModEntry.Instance.Monitor.Log(quickStackSummary.GetSummaryMessage(), LogLevel.Trace);
+                // Manually trigger auto organize now that quick stack has completed and added at least one item.
+                AutoOrganizeLogic.TryOrganizeChestOnFillOutStacks(itemGrabMenu, chest);
             }
 
             return movedAtLeastOneTotal;
