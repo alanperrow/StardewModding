@@ -267,6 +267,14 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
+            //DEBUG =============================================
+            if (!chest.playerChest.Value)
+            {
+                chestType = default;
+                return false;
+            }
+            //DEBUG =============================================
+
             chestType = TypedChest.DetermineChestType(chest);
             if (chestType is ChestType.Package or ChestType.Dungeon)
             {

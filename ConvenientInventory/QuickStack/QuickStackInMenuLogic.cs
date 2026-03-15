@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using ConvenientInventory.AutoOrganize;
-using ConvenientInventory.TypedChests;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
-using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
 
@@ -72,44 +70,6 @@ namespace ConvenientInventory.QuickStack
 
                 return false;
             }
-
-            // Wrap this chest in a TypedChest.
-            GameLocation chestLocation = chest.Location;
-            ChestType chestType;
-            if (itemGrabMenu.context is JunimoHut)
-            {
-                chestType = ChestType.JunimoHut;
-            }
-            else
-            {
-                chestType = TypedChest.DetermineChestType(chest);
-                if (chestType is ChestType.Package or ChestType.Dungeon)
-                {
-                    // Do not consider new farmer packages or dungeon chests for quick stack.
-                    if (playSound)
-                    {
-                        Game1.playSound("cancel");
-                    }
-
-                    return false;
-                }
-                else if (chestType == ChestType.Normal)
-                {
-                    // Double check for fridge chest before accepting default Normal result.
-                    if (Game1.currentLocation is FarmHouse farmHouse && chest == farmHouse.GetFridge())
-                    {
-                        chestLocation ??= farmHouse;
-                        chestType = ChestType.Fridge;
-                    }
-                    else if (Game1.currentLocation is IslandFarmHouse islandFarmHouse && chest == islandFarmHouse.GetFridge())
-                    {
-                        chestLocation ??= islandFarmHouse;
-                        chestType = ChestType.IslandFridge;
-                    }
-                }
-            }
-
-            TypedChest typedChest = new(chest, chestType, chestLocation ?? Game1.currentLocation, null);
 
             bool movedAtLeastOneTotal = false;
             Farmer who = Game1.player;
@@ -180,9 +140,6 @@ namespace ConvenientInventory.QuickStack
                             who.removeItemFromInventory(playerItem);
                             overflowItems.Remove(playerItem);
                         }
-
-                        quickStackAnimation?.AddToAnimation(typedChest, playerItem);
-                        quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
                     }
 
                     if (chestItem.Stack == chestItem.maximumStackSize() && playerItem.Stack != 0)
@@ -232,10 +189,7 @@ namespace ConvenientInventory.QuickStack
                     {
                         ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[itemIndex];
                         itemGrabMenu._transferredItemSprites.Add(
-                                new ItemGrabMenu.TransferredItemSprite(overflowItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
-
-                        quickStackAnimation?.AddToAnimation(typedChest, overflowItem);
-                        quickStackSummary.AddToSummary(typedChest, overflowItem.Name, leftoverItem?.Stack ?? 0, beforeStack);
+                            new ItemGrabMenu.TransferredItemSprite(overflowItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                     }
 
                     if (leftoverItem is null)
