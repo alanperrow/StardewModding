@@ -167,9 +167,12 @@ namespace ConvenientInventory.QuickStack
                     {
                         itemGrabMenu.ItemsToGrabMenu.ShakeItem(chestItem);
 
+                        if (itemIndex < itemGrabMenu.inventory.inventory.Count)
+                        {
                         ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[itemIndex];
                         itemGrabMenu._transferredItemSprites.Add(
                             new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
+                        }
 
                         if (playerItem.Stack == 0)
                         {

@@ -100,7 +100,7 @@ namespace ConvenientInventory.QuickStack
 
                         if (movedAtLeastOne)
                         {
-                            if (inventoryPage != null)
+                            if (inventoryPage != null && itemIndex < inventoryPage.inventory.inventory.Count)
                             {
                                 ClickableComponent inventoryComponent = inventoryPage.inventory.inventory[itemIndex];
                                 ConvenientInventory.AddTransferredItemSprite(
