@@ -60,7 +60,7 @@
   "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "(Requires \"Enable hotkey?\" to be enabled.)\nIf enabled, allows the Quick Stack hotkey to work within chest menus,\nin which case items will be quick stacked into that specific chest.",
 
   "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "Quick Stack with Add To Stacks?",
-  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "If enabled, the \"Add To Existing Stacks\" button in chest menus will now be a\n\"Quick Stack Items\" button and will quick stack items into that\nspecific chest when pressed.",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "If enabled, the \"Add To Existing Stacks\" button in chest menus will now\nbe a \"Quick Stack Items\" button which will quick stack items into that\nspecific chest when pressed.",
 
   "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "Quick Stack icon for Add To Stacks?",
   "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "(Requires \"Quick Stack with Add To Stacks?\" to be enabled.)\nIf enabled, the \"Quick Stack Items\" button in chest menus will be\nvisually overridden to use a slightly different icon.",
