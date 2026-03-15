@@ -81,6 +81,9 @@ namespace ConvenientInventory
             harmony.PatchAll();
             Monitor.Log("Finished applying Harmony patches.", LogLevel.Trace);
 
+            // Initialize non-API mod integrations.
+            ModIntegrations.InitializeMods(Helper);
+
             // Initialize mod API integrations.
             var modGMCM = Helper.ModRegistry.Get("spacechase0.GenericModConfigMenu");
             if (modGMCM != null)
@@ -108,9 +111,6 @@ namespace ConvenientInventory
             {
                 ModIntegrations.InitializeApi(apiCBF, Helper, Monitor);
             }
-
-            // Initialize all other mod integrations.
-            ModIntegrations.InitializeMods(Helper);
 
             // Load cached textures.
             CachedTextures.LoadGameAssets();
