@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Inventories;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Locations;
+using StardewValley.Menus;
 using StardewValley.Objects;
+using System.Collections.Generic;
 
 namespace ConvenientInventory.TypedChests
 {
@@ -12,6 +15,11 @@ namespace ConvenientInventory.TypedChests
     /// </summary>
     public class TypedChest : ITypedChest
     {
+        private readonly IInventory _itemsInventory;
+
+        /// <summary>
+        /// Constructor for wrapping a chest that exists in the world.
+        /// </summary>
         public TypedChest(Chest chest, ChestType chestType, GameLocation chestGameLocation, Vector2? visualTileLocation)
         {
             this.Chest = chest;
@@ -20,6 +28,26 @@ namespace ConvenientInventory.TypedChests
             this.VisualTileLocation = visualTileLocation;
         }
 
+        /// <summary>
+        /// Constructor for wrapping an inventory that does not correspond to a chest in the world, such as the Lost and Found
+        /// inventory for a player's cabin.
+        /// </summary>
+        public TypedChest(IList<Item> items, ItemGrabMenu itemGrabMenu, GameLocation gameLocation)
+        {
+            Inventory inv = new();
+            inv.OverwriteWith(items);
+            _itemsInventory = inv;
+
+            InventoryName = itemGrabMenu?.context?.ToString() ?? "Unknown";
+            InventoryContext = itemGrabMenu?.context?.GetType().Name ?? "Unknown";
+            InventoryLocation = gameLocation;
+        }
+
+        public IInventory Inventory => Chest?.GetItemsForPlayer() ?? _itemsInventory;
+
+        public int Capacity => Chest?.GetActualCapacity() ?? Inventory?.Count ?? 0;
+
+        // === Chest ===
         public Chest Chest { get; }
 
         public ChestType ChestType { get; }
@@ -27,6 +55,13 @@ namespace ConvenientInventory.TypedChests
         public GameLocation ChestGameLocation { get; }
 
         public Vector2? VisualTileLocation { get; }
+
+        // === Non-chest inventory ===
+        public string InventoryName { get; }
+
+        public string InventoryContext { get; }
+
+        public GameLocation InventoryLocation { get; }
 
         /// <summary>
         /// Given a vanilla <see cref="StardewValley.Objects.Chest"/>, determine its <see cref="TypedChests.ChestType"/> enum for use by this mod.
@@ -71,6 +106,18 @@ namespace ConvenientInventory.TypedChests
                 -1 => ChestType.Package,
                 _ => ChestType.Normal,
             };
+        }
+
+        public Item AddItem(Item item)
+        {
+            if (Chest != null)
+            {
+                return Chest.addItem(item);
+            }
+            else
+            {
+                Inventory.Add(item);
+            }
         }
 
         public bool IsBuildingChestType()

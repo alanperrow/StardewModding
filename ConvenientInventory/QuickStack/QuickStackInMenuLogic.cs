@@ -49,58 +49,7 @@ namespace ConvenientInventory.QuickStack
 
         private static bool StackToChestInMenuCore(ItemGrabMenu itemGrabMenu, bool playSound)
         {
-            Chest chest = GetChestFromContext(itemGrabMenu);
-            if (chest is null)
-            {
-                if (playSound)
-                {
-                    Game1.playSound("cancel");
-                }
-
-                ModEntry.Instance.Monitor.Log(
-                    $"Cannot quick stack into ItemGrabMenu context of type '{itemGrabMenu.context?.GetType().Name ?? "null"}'.",
-                    LogLevel.Debug);
-
-                return false;
-            }
-
-            // Wrap this chest in a TypedChest.
-            GameLocation chestLocation = chest.Location;
-            ChestType chestType;
-            if (itemGrabMenu.context is JunimoHut)
-            {
-                chestType = ChestType.JunimoHut;
-            }
-            else
-            {
-                chestType = TypedChest.DetermineChestType(chest);
-                if (chestType is ChestType.Package or ChestType.Dungeon)
-                {
-                    // Do not consider new farmer packages or dungeon chests for quick stack.
-                    if (playSound)
-                    {
-                        Game1.playSound("cancel");
-                    }
-
-                    return false;
-                }
-                else if (chestType == ChestType.Normal)
-                {
-                    // Double check for fridge chest before accepting default Normal result.
-                    if (Game1.currentLocation is FarmHouse farmHouse && chest == farmHouse.GetFridge())
-                    {
-                        chestLocation ??= farmHouse;
-                        chestType = ChestType.Fridge;
-                    }
-                    else if (Game1.currentLocation is IslandFarmHouse islandFarmHouse && chest == islandFarmHouse.GetFridge())
-                    {
-                        chestLocation ??= islandFarmHouse;
-                        chestType = ChestType.IslandFridge;
-                    }
-                }
-            }
-
-            TypedChest typedChest = new(chest, chestType, chestLocation ?? Game1.currentLocation, null);
+            TypedChest typedChest = GetTypedChestFromMenu(itemGrabMenu);
 
             bool movedAtLeastOneTotal = false;
             Farmer who = Game1.player;
@@ -264,6 +213,56 @@ namespace ConvenientInventory.QuickStack
                     itemGrabMenu.ItemsToGrabMenu.ShakeItem(index);
                 }
             }
+        }
+
+        private static TypedChest GetTypedChestFromMenu(ItemGrabMenu itemGrabMenu)
+        {
+            Chest chest = GetChestFromContext(itemGrabMenu);
+            if (chest != null)
+            {
+                // Wrap this chest in a TypedChest.
+                GameLocation chestLocation = chest.Location;
+                ChestType chestType;
+                if (itemGrabMenu.context is JunimoHut)
+                {
+                    chestType = ChestType.JunimoHut;
+                }
+                else
+                {
+                    chestType = TypedChest.DetermineChestType(chest);
+                    if (chestType == ChestType.Normal)
+                    {
+                        // Double check for fridge chest before accepting default Normal result.
+                        if (chestLocation is FarmHouse farmHouse && chest == farmHouse.GetFridge())
+                        {
+                            chestType = ChestType.Fridge;
+                        }
+                        else if (chestLocation is IslandFarmHouse islandFarmHouse && chest == islandFarmHouse.GetFridge())
+                        {
+                            chestType = ChestType.IslandFridge;
+                        }
+                        else
+                        {
+                            if (Game1.currentLocation is FarmHouse farmHouse2 && chest == farmHouse2.GetFridge())
+                            {
+                                chestLocation ??= farmHouse2;
+                                chestType = ChestType.Fridge;
+                            }
+                            else if (Game1.currentLocation is IslandFarmHouse islandFarmHouse2 && chest == islandFarmHouse2.GetFridge())
+                            {
+                                chestLocation ??= islandFarmHouse2;
+                                chestType = ChestType.IslandFridge;
+                            }
+                        }
+                    }
+                }
+
+                return new TypedChest(chest, chestType, chestLocation ?? Game1.currentLocation, null);
+            }
+
+            // Wrap this non-chest inventory in a TypedChest.
+            IList<Item> items = itemGrabMenu.ItemsToGrabMenu.actualInventory;
+            return new TypedChest(items, itemGrabMenu, Game1.currentLocation);
         }
 
         /// <summary>
