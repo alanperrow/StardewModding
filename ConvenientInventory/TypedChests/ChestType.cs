@@ -19,5 +19,7 @@
         MiniShippingBin,
         Enricher,
         JunimoChest,
+        NonPlayer,
+        Error,
     }
 }

@@ -267,18 +267,10 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
-            //DEBUG =============================================
-            if (!chest.playerChest.Value)
-            {
-                chestType = default;
-                return false;
-            }
-            //DEBUG =============================================
-
             chestType = TypedChest.DetermineChestType(chest);
-            if (chestType is ChestType.Package or ChestType.Dungeon)
+            if (chestType is ChestType.Package or ChestType.Dungeon or ChestType.NonPlayer or ChestType.Error)
             {
-                // Do not consider new farmer packages or dungeon chests for quick stack
+                // Do not consider these chest types for quick stack.
                 return false;
             }
             else if (!ModEntry.Config.QuickStack.IntoHoppers && chestType == ChestType.Hopper)

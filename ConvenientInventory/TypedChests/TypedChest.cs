@@ -64,11 +64,21 @@ namespace ConvenientInventory.TypedChests
                 return ChestType.Dungeon;
             }
 
+            if (chest.giftbox.Value)
+            {
+                return ChestType.Package;
+            }
+
+            if (!chest.playerChest.Value)
+            {
+                return ChestType.NonPlayer;
+            }
+
             return chest.ParentSheetIndex switch
             {
                 232 => ChestType.Stone,
                 216 => ChestType.MiniFridge,
-                -1 => ChestType.Package,
+                -1 => ChestType.Error,
                 _ => ChestType.Normal,
             };
         }
