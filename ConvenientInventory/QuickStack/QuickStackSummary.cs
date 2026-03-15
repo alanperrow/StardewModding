@@ -26,8 +26,8 @@ namespace ConvenientInventory.QuickStack
         /// The summary message.
         /// <para/>Example:
         /// <br/>"Quick Stack deposited items into the following chests, in order:
-        /// <br/>1.) Chest 'Big Chest' at location Farm {2, 3} received items: ['Wood' x 10, 'Stone' x 5]
-        /// <br/>2.) Chest 'Stone Chest' at location Town {42, 6} received items: ['Gold Bar' x 77, 'Prize Ticket' x 1]"
+        /// <br/>1.) BigStone chest 'Custom chest name 1' @ Farm {X:2, Y:3} received items: ['Wood' x 10, 'Stone' x 5]
+        /// <br/>2.) Normal chest 'Chest' @ Town {X:42, Y:6} received items: ['Gold Bar' x 77, 'Prize Ticket' x 1]"
         /// </returns>
         public string GetSummaryMessage()
         {
@@ -42,8 +42,8 @@ namespace ConvenientInventory.QuickStack
             int chestIndex = 0;
             foreach ((TypedChest quickStackedChest, List<MovedItem> movedItems) in _movedItemsByTypedChest)
             {
-                sb.Append($"\t{++chestIndex}.) Chest '{quickStackedChest.Chest.Name}' of type '{quickStackedChest.ChestType}' ");
-                sb.Append($"at location {quickStackedChest.ChestGameLocation.Name} {quickStackedChest.Chest.TileLocation} ");
+                sb.Append($"\t{++chestIndex}.) {quickStackedChest.ChestType} chest '{quickStackedChest.Chest.Name}' ");
+                sb.Append($"@ {quickStackedChest.ChestGameLocation.Name} {quickStackedChest.Chest.TileLocation} ");
                 if (quickStackedChest.VisualTileLocation.HasValue)
                 {
                     sb.Append($"(Visual {quickStackedChest.VisualTileLocation.Value}) ");
