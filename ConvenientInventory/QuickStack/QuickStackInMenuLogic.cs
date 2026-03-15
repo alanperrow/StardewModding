@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.TypedChests;
-using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Buildings;
@@ -74,16 +73,43 @@ namespace ConvenientInventory.QuickStack
                 return false;
             }
 
-            if (!TryGetTypedChestData(itemGrabMenu, chest, out ChestType chestType, out GameLocation actualChestLoc, out Vector2? visualTileLoc))
+            // Wrap this chest in a TypedChest.
+            GameLocation chestLocation = chest.Location;
+            ChestType chestType;
+            if (itemGrabMenu.context is JunimoHut)
             {
-                if (playSound)
+                chestType = ChestType.JunimoHut;
+            }
+            else
+            {
+                chestType = TypedChest.DetermineChestType(chest);
+                if (chestType is ChestType.Package or ChestType.Dungeon)
                 {
-                    Game1.playSound("cancel");
+                    // Do not consider new farmer packages or dungeon chests for quick stack.
+                    if (playSound)
+                    {
+                        Game1.playSound("cancel");
+                    }
+
                     return false;
+                }
+                else if (chestType == ChestType.Normal)
+                {
+                    // Double check for fridge chest before accepting default Normal result.
+                    if (Game1.currentLocation is FarmHouse farmHouse && chest == farmHouse.GetFridge())
+                    {
+                        chestLocation ??= farmHouse;
+                        chestType = ChestType.Fridge;
+                    }
+                    else if (Game1.currentLocation is IslandFarmHouse islandFarmHouse && chest == islandFarmHouse.GetFridge())
+                    {
+                        chestLocation ??= islandFarmHouse;
+                        chestType = ChestType.IslandFridge;
+                    }
                 }
             }
 
-            TypedChest typedChest = new(chest, chestType, actualChestLoc ?? Game1.currentLocation, visualTileLoc);
+            TypedChest typedChest = new(chest, chestType, chestLocation ?? Game1.currentLocation, null);
 
             bool movedAtLeastOneTotal = false;
             Farmer who = Game1.player;
@@ -143,9 +169,9 @@ namespace ConvenientInventory.QuickStack
 
                         if (itemIndex < itemGrabMenu.inventory.inventory.Count)
                         {
-                            ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[itemIndex];
-                            itemGrabMenu._transferredItemSprites.Add(
-                                new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
+                        ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[itemIndex];
+                        itemGrabMenu._transferredItemSprites.Add(
+                            new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                         }
 
                         if (playerItem.Stack == 0)
@@ -250,54 +276,6 @@ namespace ConvenientInventory.QuickStack
                     itemGrabMenu.ItemsToGrabMenu.ShakeItem(index);
                 }
             }
-        }
-
-        private static bool TryGetTypedChestData(
-            ItemGrabMenu itemGrabMenu,
-            Chest chest,
-            out ChestType chestType,
-            out GameLocation actualChestLocation,
-            out Vector2? visualTileLoc)
-        {
-            actualChestLocation = null;
-            visualTileLoc = null;
-
-            if (itemGrabMenu.context is JunimoHut junimoHut)
-            {
-                chestType = ChestType.JunimoHut;
-                visualTileLoc = new(
-                    junimoHut.tileX.Value + junimoHut.tilesWide.Value / 2,
-                    junimoHut.tileY.Value + junimoHut.tilesHigh.Value - 1);
-            }
-            else
-            {
-                chestType = TypedChest.DetermineChestType(chest);
-                if (chestType is ChestType.Package or ChestType.Dungeon)
-                {
-                    // Do not consider new farmer packages or dungeon chests for quick stack.
-                    return false;
-                }
-                else if (chestType == ChestType.Normal)
-                {
-                    // Double check for fridge chest before accepting default Normal result.
-                    if (chest.Location is FarmHouse farmHouse && chest == farmHouse.GetFridge())
-                    {
-                        chestType = ChestType.Fridge;
-
-                        Point fridgeTileLocPoint = farmHouse.GetFridgePosition().Value;
-                        visualTileLoc = new(fridgeTileLocPoint.X, fridgeTileLocPoint.Y);
-                    }
-                    else if (chest.Location is IslandFarmHouse islandFarmHouse && chest == islandFarmHouse.GetFridge())
-                    {
-                        chestType = ChestType.IslandFridge;
-
-                        Point islandFridgeTileLocPoint = islandFarmHouse.GetFridgePosition().Value;
-                        visualTileLoc = new(islandFridgeTileLocPoint.X, islandFridgeTileLocPoint.Y);
-                    }
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
