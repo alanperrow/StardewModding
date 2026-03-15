@@ -23,16 +23,25 @@ namespace ConvenientInventory.QuickStack
         {
             if (!ModEntry.Config.QuickStack.IsEnabled
                 || !ModEntry.Config.QuickStack.WithFillStacksButton
-                || !ModEntry.Config.QuickStack.VisuallyOverrideFillStacksButton
+                || !HasValidContext(itemGrabMenu)
                 || itemGrabMenu.fillStacksButton == null)
             {
                 return;
             }
 
             itemGrabMenu.fillStacksButton.hoverText = I18n.FillStacksQuickStackButton_HoverText();
-            itemGrabMenu.fillStacksButton.texture = CachedTextures.FillStacksQuickStackButtonIcon;
-            itemGrabMenu.fillStacksButton.sourceRect = CachedTextures.FillStacksQuickStackButtonIcon.Bounds;
+
+            if (ModEntry.Config.QuickStack.VisuallyOverrideFillStacksButton)
+            {
+                itemGrabMenu.fillStacksButton.texture = CachedTextures.FillStacksQuickStackButtonIcon;
+                itemGrabMenu.fillStacksButton.sourceRect = CachedTextures.FillStacksQuickStackButtonIcon.Bounds;
+            }
         }
+
+        /// <summary>
+        /// Determines whether the given <see cref="ItemGrabMenu.context"/> is valid for supporting quick stack.
+        /// </summary>
+        public static bool HasValidContext(ItemGrabMenu itemGrabMenu) => itemGrabMenu.context is Chest or JunimoHut;
 
         public static bool StackToChestInMenu(ItemGrabMenu itemGrabMenu, bool playSound)
         {
@@ -267,7 +276,7 @@ namespace ConvenientInventory.QuickStack
         }
 
         /// <summary>
-        /// Gets the <see cref="Chest"/> from the given <see cref="ItemGrabMenu"/>'s <see cref="ItemGrabMenu.context"/>, if any.
+        /// Gets the <see cref="Chest"/> from the given <see cref="ItemGrabMenu.context"/>, if any.
         /// </summary>
         private static Chest GetChestFromContext(ItemGrabMenu itemGrabMenu) => itemGrabMenu.context switch
         {

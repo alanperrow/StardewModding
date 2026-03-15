@@ -792,6 +792,16 @@ namespace ConvenientInventory
                 {
                     __state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
                 }
+
+                if (ModEntry.Config.QuickStack.IsEnabled
+                    && ModEntry.Config.QuickStack.WithFillStacksButton
+                    && QuickStackInMenuLogic.HasValidContext(__instance))
+                {
+                    QuickStackInMenuLogic.StackToChestInMenu(__instance, false);
+
+                    // Instead of returning false here to skip the base game `FillOutStacks` call, we prefer to
+                    // return true so as not to interfere if any other mods want to prefix this method as well.
+                }
             }
             catch (Exception e)
             {
@@ -853,6 +863,8 @@ namespace ConvenientInventory
         {
             try
             {
+                QuickStackInMenuLogic.OnConstructedItemGrabMenu(__instance);
+                QuickStackToggleChestLogic.OnConstructedItemGrabMenu(__instance);
                 if (ModEntry.Config.AutoOrganizeChest.IsEnabled
                     && showOrganizeButton
                     && source == ItemGrabMenu.source_chest)
@@ -867,6 +879,21 @@ namespace ConvenientInventory
             catch (Exception e)
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(Constructor18_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(MethodType.Constructor, new Type[] { typeof(IList<Item>), typeof(object) })]
+        public static void Constructor2_Postfix(ItemGrabMenu __instance)
+        {
+            try
+            {
+                QuickStackInMenuLogic.OnConstructedItemGrabMenu(__instance);
+                QuickStackToggleChestLogic.OnConstructedItemGrabMenu(__instance);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Constructor2_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
 
@@ -968,54 +995,6 @@ namespace ConvenientInventory
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetupBorderNeighbors_Postfix)}:\n{e}", LogLevel.Error);
             }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch(MethodType.Constructor, new Type[]
-        {
-            typeof(IList<Item>), typeof(bool), typeof(bool), typeof(InventoryMenu.highlightThisItem), typeof(ItemGrabMenu.behaviorOnItemSelect),
-            typeof(string), typeof(ItemGrabMenu.behaviorOnItemSelect), typeof(bool), typeof(bool), typeof(bool), typeof(bool), typeof(bool),
-            typeof(int), typeof(Item), typeof(int), typeof(object), typeof(ItemExitBehavior), typeof(bool)
-        })]
-        public static void Constructor18_Postfix(ItemGrabMenu __instance)
-        {
-            try
-            {
-                QuickStackToggleChestLogic.OnConstructedItemGrabMenu(__instance);
-                QuickStackInMenuLogic.OnConstructedItemGrabMenu(__instance);
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Constructor18_Postfix)}:\n{e}", LogLevel.Error);
-            }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch(MethodType.Constructor, new Type[] { typeof(IList<Item>), typeof(object) })]
-        public static void Constructor2_Postfix(ItemGrabMenu __instance) => Constructor18_Postfix(__instance);
-
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(ItemGrabMenu.FillOutStacks))]
-        public static bool FillOutStacks_Prefix(ItemGrabMenu __instance)
-        {
-            if (!ModEntry.Config.QuickStack.IsEnabled || !ModEntry.Config.QuickStack.WithFillStacksButton)
-            {
-                return true;
-            }
-
-            try
-            {
-                QuickStackInMenuLogic.StackToChestInMenu(__instance, false);
-
-                // Instead of returning false here to skip the base game `FillOutStacks` call, we prefer to
-                // return true so as not to interfere if any other mods want to prefix this method as well.
-            }
-            catch (Exception e)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed in {nameof(FillOutStacks_Prefix)}:\n{e}", LogLevel.Error);
-            }
-
-            return true;
         }
     }
 
