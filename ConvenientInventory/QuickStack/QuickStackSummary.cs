@@ -42,11 +42,8 @@ namespace ConvenientInventory.QuickStack
             int chestIndex = 0;
             foreach ((TypedChest quickStackedChest, List<MovedItem> movedItems) in _movedItemsByTypedChest)
             {
-                _ = quickStackedChest.Chest != null
-                    ? sb.Append($"\t{++chestIndex}.) Chest '{quickStackedChest.Chest.Name}' of type '{quickStackedChest.ChestType}' ")
-                        .Append($"at location {quickStackedChest.ChestGameLocation.Name} {quickStackedChest.Chest.TileLocation} ")
-                    : sb.Append($"\t{++chestIndex}.) Inventory '{quickStackedChest.InventoryName}' with context '{quickStackedChest.InventoryContext}' ")
-                        .Append($"at location {quickStackedChest.InventoryLocation.Name} ");
+                sb.Append($"\t{++chestIndex}.) Chest '{quickStackedChest.Chest.Name}' of type '{quickStackedChest.ChestType}' ");
+                sb.Append($"at location {quickStackedChest.ChestGameLocation.Name} {quickStackedChest.Chest.TileLocation} ");
                 if (quickStackedChest.VisualTileLocation.HasValue)
                 {
                     sb.Append($"(Visual {quickStackedChest.VisualTileLocation.Value}) ");
