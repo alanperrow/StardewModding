@@ -22,7 +22,7 @@ namespace ConvenientInventory.AutoOrganize
         private static string AutoOrganizeModDataKey { get; } = $"{ModEntry.Instance.ModManifest.UniqueID}/AutoOrganize";
 
         /// <summary>
-        /// Iterates through all chests in each game location and removes any auto organize mod data.
+        /// Iterates through all chests in the provided game location and removes any auto organize mod data.
         /// </summary>
         public static bool CleanupAutoOrganizeModDataByLocation(GameLocation gameLocation)
         {
@@ -30,7 +30,13 @@ namespace ConvenientInventory.AutoOrganize
             {
                 foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
                 {
-                    chest.modData.Remove(AutoOrganizeModDataKey);
+                    bool removed = chest.modData.Remove(AutoOrganizeModDataKey);
+                    if (removed)
+                    {
+                        ModEntry.Instance.Monitor.Log(
+                            $"Removed auto organize mod data from chest ('{chest.Name}') at location {gameLocation.Name} {chest.TileLocation}.",
+                            LogLevel.Trace);
+                    }
                 }
             }
             catch
@@ -226,13 +232,13 @@ namespace ConvenientInventory.AutoOrganize
 
         private static void UpdateHoverTextByGamePadMode(ClickableTextureComponent organizeButton)
         {
-            organizeButton.hoverText = ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText");
-            if (ModEntry.Config.IsShowAutoOrganizeButtonInstructions)
+            organizeButton.hoverText = I18n.AutoOrganizeButton_HoverText();
+            if (ModEntry.Config.AutoOrganizeChest.ShowInstructionsInTooltip)
             {
                 organizeButton.hoverText += '\n';
                 organizeButton.hoverText += Game1.options.gamepadControls
-                    ? ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText.disable-gamepad")
-                    : ModEntry.Instance.Helper.Translation.Get("AutoOrganizeButton.hoverText.disable");
+                    ? I18n.AutoOrganizeButton_HoverText_DisableGamepad()
+                    : I18n.AutoOrganizeButton_HoverText_Disable();
             }
         }
 

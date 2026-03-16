@@ -6,15 +6,19 @@
   "AutoOrganizeButton.hoverText.disable": "(Right click to disable)",
   "AutoOrganizeButton.hoverText.disable-gamepad": "(X to disable)",
 
+  "QuickStackToggleChestButton.hoverText.enabled": "Nearby Quick Stack Enabled",
+  "QuickStackToggleChestButton.hoverText.disabled": "Nearby Quick Stack Disabled",
+  "QuickStackToggleChestButton.hoverText.priority1": "+1 Priority",
+  "QuickStackToggleChestButton.hoverText.priority2": "+2 Priority",
+  "QuickStackToggleChestButton.hoverText.priority3": "+3 Priority",
+
+  "FillStacksQuickStackButton.hoverText": "Quick Stack Items",
+
   // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "Quick Stack To Nearby Chests",
 
-  "ModConfigMenu.IsEnableQuickStack.Name": "Enable Quick stack?",
+  "ModConfigMenu.IsEnableQuickStack.Name": "Enable Quick Stack?",
   "ModConfigMenu.IsEnableQuickStack.Desc": "If enabled, adds a \"Quick Stack To Nearby Chests\" button to your inventory menu. Pressing this button will stack items from your inventory to any nearby chests which contain that item.",
-
-  "ModConfigMenu.QuickStackRange.Name": "Range",
-  "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.\n\nIf set to \"Location\", all chests in the player's current location will be considered.\n\nIf set to \"Global\", all chests in the world will be considered.",
-  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange config value was \"Global\" but has been reset to \"Location\". \"Global\" is only supported if the Chests Anywhere mod is installed.",
 
   "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Enable hotkey?",
   "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.",
@@ -25,20 +29,69 @@
   "ModConfigMenu.QuickStackControllerHotkey.Name": "Keybind (controller)",
   "ModConfigMenu.QuickStackControllerHotkey.Desc": "Press this button to quick stack your items.",
 
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "Quick stack into buildings?",
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will be considered when quick stacking.",
+  "ModConfigMenu.QuickStackRange.Name": "Range",
+  "ModConfigMenu.QuickStackRange.Desc": "How many tiles away from the player to search for nearby chests.\n\nIf set to \"Location\", all chests in the player's current location will be considered.",
+  "ModConfigMenu.QuickStackRange.Desc-Global": "\n\nIf set to \"Global\", all chests in the world will be considered.",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange config value was \"Global\" but has been reset to \"Location\". \"Global\" is only supported if the Chests Anywhere mod is installed.",
 
-  "ModConfigMenu.IsQuickStackIntoDressers.Name": "Quick stack into dressers?",
-  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, nearby dressers will be considered when quick stacking.",
-
-  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Quick stack overflow items?",
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Overflow items?",
   "ModConfigMenu.IsQuickStackOverflowItems.Desc": "If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.",
 
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Quick stack ignore item quality?",
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Quick stack overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain ANY quality of that same item.",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Ignore item quality?",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY quality of that same item.",
 
-  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Show nearby chests in tooltip?",
-  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "If enabled, hovering over the quick stack button will show a preview of all nearby chests, ordered by distance.",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Name": "Ignore item color variation?",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY color variation of that same item (e.g. colored flowers).",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Name": "Ignore item name variation?",
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, quick stack will place items into chests which contain\nANY name variation of that same item (e.g. flavored honey).",
+
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "Overflow non-stackables:",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "(Requires \"Overflow items?\" to be enabled.)\nChoose which non-stackable item types can be quick stacked as\noverflow items if a chest contains that same item.\n\nChoose \"None\" if non-stackable items should NOT be quick stacked.",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-None": "None",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-All": "All",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptTools": "Except Tools",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeapons": "Except Tools and Weapons",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeaponsEquips": "Except Tools, Weapons, and Equips",
+
+  "ModConfigMenu.SubHeader.InChestMenu": "In Chest Menu",
+
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Name": "Allow hotkey in chest menu?",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "(Requires \"Enable hotkey?\" to be enabled.)\nIf enabled, allows the Quick Stack hotkey to work within chest menus,\nin which case items will be quick stacked into that specific chest.",
+
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "Quick Stack with Add To Stacks?",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "If enabled, the \"Add To Existing Stacks\" button in chest menus will now\nbe a \"Quick Stack Items\" button which will quick stack items into that\nspecific chest when pressed.",
+
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "Quick Stack icon for Add To Stacks?",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "(Requires \"Quick Stack with Add To Stacks?\" to be enabled.)\nIf enabled, the \"Quick Stack Items\" button in chest menus will be\nvisually overridden to use a slightly different icon.",
+
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "Toggle quick stack per-chest?",
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "If enabled, adds a Toggle Quick Stack button to chest menus to determine whether that specific chest will be considered when quick stacking.",
+
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "Prioritize quick stack per-chest?",
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button can also assign a priority level for that specific chest.\nChests with a higher priority level will be considered first when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "Hide Toggle Quick Stack button?",
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "(Requires \"Toggle quick stack per-chest?\" to be enabled.)\nIf enabled, the Toggle Quick Stack button will be hidden from chest menus.\nEven when hidden, a chest's toggle/prioritize quick stack setting will still be used.",
+
+  "ModConfigMenu.SubHeader.OtherInventories": "Other Inventories",
+
+  "ModConfigMenu.IsQuickStackIntoMills.Name": "Into Mills?",
+  "ModConfigMenu.IsQuickStackIntoMills.Desc": "If enabled, nearby mills will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Name": "Into Junimo Huts?",
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Desc": "If enabled, nearby Junimo Huts will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "Into Dressers?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Requires \"Overflow items?\" to be enabled.)\nIf enabled, nearby dressers will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoHoppers.Name": "Into Hoppers?",
+  "ModConfigMenu.IsQuickStackIntoHoppers.Desc": "If enabled, nearby hoppers will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "Into Mini-Shipping Bins?",
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "If enabled, nearby Mini-Shipping Bins will be considered when quick stacking.",
+
+  "ModConfigMenu.SubHeader.Animation": "Animation",
 
   "ModConfigMenu.IsEnableQuickStackAnimation.Name": "Enable quick stack animation?",
   "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "If enabled, an animation will play when items are quick stacked to visually show where each item was stored.",
@@ -49,10 +102,29 @@
   "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "Animation: Stack Speed",
   "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "For quick stack animation:\nAdjusts the speed at which items are individually stacked into their stored chest.\n\n0.5x: Half speed\n1x: Normal speed\n3x: Triple speed",
 
+  "ModConfigMenu.SubHeader.AdditionalSettings": "Additional Settings",
+
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Show nearby chests in tooltip?",
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "If enabled, hovering over the quick stack button will show a preview of all nearby chests considered for quick stack, ordered by distance.",
+
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Name": "Suppress sound for no chests?",
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Desc": "If enabled, pressing the quick stack button or hotkey will only play its sound effect when there are nearby chests.",
+
   "ModConfigMenu.Label.FavoriteItems": "Favorite Items",
 
   "ModConfigMenu.IsEnableFavoriteItems.Name": "Enable favorite items?",
-  "ModConfigMenu.IsEnableFavoriteItems.Desc": "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests. They will also be prevented from being trashed or dropped.",
+  "ModConfigMenu.IsEnableFavoriteItems.Desc": "If enabled, items in your inventory can be favorited. Favorited items will be ignored when stacking into chests. They will also be prevented from being trashed, dropped, and shipped.",
+
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Keybind (keyboard)",
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "Hold this key when selecting an item to favorite it.",
+
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Keybind (controller)",
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Hold this button when selecting an item to favorite it.",
+
+  "ModConfigMenu.SubHeader.Customize": "Customize",
+
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "Preview:",
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "Preview the selected highlight style.",
 
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "Highlight style",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "Choose your preferred texture style for highlighting favorited items in your inventory.",
@@ -63,12 +135,21 @@
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "Gold inset border",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "Dark dashed",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "Thick dark border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "Gold decorative border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-8": "Custom thick border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-9": "Custom dashed border",
 
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Keybind (keyboard)",
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "Hold this key when selecting an item to favorite it.",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Name": "Use Custom Highlight Color?",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Desc": "If enabled, applies a custom color to the highlight style.",
 
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Keybind (controller)",
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Hold this button when selecting an item to favorite it.",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Name": "Custom Highlight Color: R",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Desc": "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nRed component of the custom highlight color.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Name": "Custom Highlight Color: G",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Desc": "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nGreen component of the custom highlight color.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Name": "Custom Highlight Color: B",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Desc": "(Requires \"Use Custom Highlight Color?\" to be enabled.)\nBlue component of the custom highlight color.",
 
   "ModConfigMenu.Label.TakeAllButOne": "Take All But One",
 

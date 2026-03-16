@@ -14,6 +14,12 @@
         Special,
         Package,
         Dresser,
-        Dungeon
+        Dungeon,
+        Hopper,
+        MiniShippingBin,
+        Enricher,
+        JunimoChest,
+        NonPlayer,
+        Error,
     }
 }

@@ -4,21 +4,39 @@
     <EnableHarmony>true</EnableHarmony>
     <AssemblyName>ConvenientInventory</AssemblyName>
     <RootNamespace>ConvenientInventory</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.6.0</Version>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="assets\autoOrganize.png" />
     <None Remove="assets\autoOrganizeIcon.png" />
+    <None Remove="assets\chestQuickStackDisabledIcon.png" />
+    <None Remove="assets\chestQuickStackEnabledIcon.png" />
+    <None Remove="assets\chestQuickStackPriority1Icon.png" />
+    <None Remove="assets\chestQuickStackPriority2Icon.png" />
+    <None Remove="assets\chestQuickStackPriority3Icon.png" />
+    <None Remove="assets\favoriteHighlight_7.png" />
+    <None Remove="assets\favoriteHighlight_8.png" />
+    <None Remove="assets\favoriteHighlight_9.png" />
+    <None Remove="assets\fillStacksQuickStackIcon.png" />
     <None Remove="assets\quickStackIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.3.2" />
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
+    <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.2.1" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\autoOrganizeIcon.png" />
+    <Content Include="assets\chestQuickStackDisabledIcon.png" />
+    <Content Include="assets\chestQuickStackEnabledIcon.png" />
+    <Content Include="assets\chestQuickStackPriority1Icon.png" />
+    <Content Include="assets\chestQuickStackPriority2Icon.png" />
+    <Content Include="assets\chestQuickStackPriority3Icon.png" />
     <Content Include="assets\favoriteBorder.png" />
     <Content Include="assets\favoriteCursor.png" />
+    <Content Include="assets\favoriteHighlight_8.png" />
+    <Content Include="assets\favoriteHighlight_9.png" />
+    <Content Include="assets\fillStacksQuickStackIcon.png" />
     <Content Include="assets\favoriteHighlight_0.png" />
     <Content Include="assets\favoriteHighlight_1.png" />
     <Content Include="assets\favoriteHighlight_2.png" />
@@ -26,6 +44,7 @@
     <Content Include="assets\favoriteHighlight_4.png" />
     <Content Include="assets\favoriteHighlight_5.png" />
     <Content Include="assets\favoriteHighlight_6.png" />
+    <Content Include="assets\favoriteHighlight_7.png" />
     <Content Include="assets\quickStackIcon.png" />
   </ItemGroup>
   <ItemGroup>

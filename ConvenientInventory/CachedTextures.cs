@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 
@@ -30,6 +29,18 @@ namespace ConvenientInventory
 
         public static Texture2D AutoOrganizeButtonIcon { get; private set; }
 
+        public static Texture2D ChestQuickStackDisabledButtonIcon { get; private set; }
+
+        public static Texture2D ChestQuickStackEnabledButtonIcon { get; private set; }
+
+        public static Texture2D ChestQuickStackPriority1ButtonIcon { get; private set; }
+
+        public static Texture2D ChestQuickStackPriority2ButtonIcon { get; private set; }
+
+        public static Texture2D ChestQuickStackPriority3ButtonIcon { get; private set; }
+
+        public static Texture2D FillStacksQuickStackButtonIcon { get; private set; }
+
         public static void LoadGameAssets()
         {
             Mill = Game1.content.Load<Texture2D>(@"Buildings\Mill");
@@ -41,9 +52,15 @@ namespace ConvenientInventory
         {
             QuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "quickStackIcon");
             FavoriteItemsCursor = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteCursor");
-            FavoriteItemsHighlight = Game1.content.Load<Texture2D>(ModAssetPrefix + $"favoriteHighlight_{config.FavoriteItemsHighlightTextureChoice}");
+            FavoriteItemsHighlight = Game1.content.Load<Texture2D>(ModAssetPrefix + $"favoriteHighlight_{config.FavoriteItems.HighlightTextureChoice}");
             FavoriteItemsBorder = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteBorder");
             AutoOrganizeButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "autoOrganizeIcon");
+            ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabledIcon");
+            ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabledIcon");
+            ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1Icon");
+            ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2Icon");
+            ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
+            FillStacksQuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "fillStacksQuickStackIcon");
         }
 
         /// <summary>
@@ -72,6 +89,30 @@ namespace ConvenientInventory
             {
                 e.LoadFromModFile<Texture2D>(@"assets\autoOrganizeIcon.png", AssetLoadPriority.Medium);
             }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackDisabledIcon"))
+            {
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackDisabledIcon.png", AssetLoadPriority.Medium);
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackEnabledIcon"))
+            {
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackEnabledIcon.png", AssetLoadPriority.Medium);
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority1Icon"))
+            {
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority1Icon.png", AssetLoadPriority.Medium);
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority2Icon"))
+            {
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority2Icon.png", AssetLoadPriority.Medium);
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority3Icon"))
+            {
+                e.LoadFromModFile<Texture2D>(@"assets\chestQuickStackPriority3Icon.png", AssetLoadPriority.Medium);
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "fillStacksQuickStackIcon"))
+            {
+                e.LoadFromModFile<Texture2D>(@"assets\fillStacksQuickStackIcon.png", AssetLoadPriority.Medium);
+            }
         }
 
         /// <summary>
@@ -99,6 +140,30 @@ namespace ConvenientInventory
             else if (e.Name.IsEquivalentTo(ModAssetPrefix + "autoOrganizeIcon"))
             {
                 AutoOrganizeButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "autoOrganizeIcon");
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackDisabledIcon"))
+            {
+                ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabledIcon");
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackEnabledIcon"))
+            {
+                ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabledIcon");
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority1Icon"))
+            {
+                ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1Icon");
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority2Icon"))
+            {
+                ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2Icon");
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "chestQuickStackPriority3Icon"))
+            {
+                ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
+            }
+            else if (e.Name.IsEquivalentTo(ModAssetPrefix + "fillStacksQuickStackIcon"))
+            {
+                FillStacksQuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "fillStacksQuickStackIcon");
             }
         }
     }

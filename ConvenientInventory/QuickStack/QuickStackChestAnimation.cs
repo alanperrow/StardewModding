@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 
@@ -41,7 +42,7 @@ namespace ConvenientInventory.QuickStack
         }
 
         /// <summary>
-        /// Iterates through all chests in each game location and removes any quick stack chest animation mod data.
+        /// Iterates through all chests in the provided game location and removes any quick stack chest animation mod data.
         /// </summary>
         public static bool CleanupChestAnimationModDataByLocation(GameLocation gameLocation)
         {
@@ -49,8 +50,16 @@ namespace ConvenientInventory.QuickStack
             {
                 foreach (Chest chest in gameLocation.Objects.Values.OfType<Chest>())
                 {
-                    chest.modData.Remove(StartTimeModDataKey);
-                    chest.modData.Remove(ItemAnimationTotalMsModDataKey);
+                    bool removed = false;
+                    removed |= chest.modData.Remove(StartTimeModDataKey);
+                    removed |= chest.modData.Remove(ItemAnimationTotalMsModDataKey);
+
+                    if (removed)
+                    {
+                        ModEntry.Instance.Monitor.Log(
+                            $"Removed chest animation mod data from chest ('{chest.Name}') at location {gameLocation.Name} {chest.TileLocation}.",
+                            LogLevel.Trace);
+                    }
                 }
             }
             catch
@@ -92,9 +101,9 @@ namespace ConvenientInventory.QuickStack
         /// <returns>The data, if any. Otherwise, null.</returns>
         private static ChestAnimationData GetChestAnimationData(Chest chest)
         {
-            if (!ModEntry.Config.IsEnableQuickStack
-                || !ModEntry.Config.IsEnableQuickStackAnimation
-                || !ModEntry.Config.IsEnableQuickStackChestAnimation)
+            if (!ModEntry.Config.QuickStack.IsEnabled
+                || !ModEntry.Config.QuickStack.IsAnimationEnabled
+                || !ModEntry.Config.QuickStack.IsChestAnimationEnabled)
             {
                 return null;
             }

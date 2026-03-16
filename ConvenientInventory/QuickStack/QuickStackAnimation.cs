@@ -14,7 +14,7 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public class QuickStackAnimation
     {
-        private readonly Random random = new();
+        private static readonly Random random = new();
 
         /// <summary>
         /// Creates a new instance of <see cref="QuickStackAnimation"/> with reference to the provided farmer.
@@ -80,19 +80,23 @@ namespace ConvenientInventory.QuickStack
             Vector2 motionVec = (chestPosition - farmerPosition) * 0.98f; // 0.98 multiplier gives a better result in-game; without it, items slightly overshoot the chest.
 
             float baseLayerDepth = (float)((chestTileLocation.Y + 1) * 64) / 10000f + chestTileLocation.X / 50000f; // Refactored from Object.draw()
-            float addlayerDepth = 1E-06f * NumAnimatedItems; // Avoids z-fighting by drawing each sprite on a separate layer depth.
+            float addlayerDepth = 1E-06f * (NumAnimatedItems * 2 + 1); // Avoids z-fighting by drawing each sprite on a separate layer depth.
+            float addLayerDepthColorOverlay = 1E-06f * NumAnimatedItems * 2; // Avoids z-fighting for color overlay sprite.
 
-            int hoverTimePerItem = (int)(150 / ModEntry.Config.QuickStackAnimationStackSpeed);
-            int fadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationStackSpeed);
+            int hoverTimePerItem = (int)(150 / ModEntry.Config.QuickStack.AnimationStackSpeedFactor);
+            int fadeTime = (int)(500 / ModEntry.Config.QuickStack.AnimationStackSpeedFactor);
 
             ParsedItemData itemData = ItemRegistry.GetDataOrErrorItem(item.QualifiedItemId);
+            ColoredObject coloredObj = item as ColoredObject;
+            bool itemHasColorOverlay = coloredObj != null && !coloredObj.ColorSameIndexAsParentSheetIndex;
 
-            TemporaryAnimatedSprite itemTossSprite;
+            TemporaryAnimatedSprite itemTossSprite = GetBaseItemSprite(farmerPosition, itemData);
+            TemporaryAnimatedSprite itemTossSpriteColorOverlay = itemHasColorOverlay ? GetBaseItemSprite(farmerPosition, itemData, coloredObj.color.Value) : null;
             bool isChestInCurrentLocation = typedChest.ChestGameLocation == Game1.currentLocation;
             if (isChestInCurrentLocation)
             {
                 // "Item toss" animation is used if the chest is in the current GameLocation.
-                float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStackAnimationItemSpeed;
+                float tossTime = ((float)(10 * Math.Pow(distance, 0.5)) + 400 - 0.5f * Math.Min(0, motionVec.Y)) / ModEntry.Config.QuickStack.AnimationItemSpeedFactor;
 
                 float extraHeight = 192 - Math.Min(0, motionVec.Y);
                 float gravity = 2 * extraHeight / tossTime;
@@ -101,51 +105,72 @@ namespace ConvenientInventory.QuickStack
                 float xAccel = -2 * motionVec.X / tossTime;
                 motionVec.X += extraX;
 
-                itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, alphaFade: 0f, Color.White)
+                foreach (TemporaryAnimatedSprite sprite in new[] { itemTossSprite, itemTossSpriteColorOverlay })
                 {
-                    scale = 4f,
-                    layerDepth = 1f - addlayerDepth,
-                    totalNumberOfLoops = 0,
-                    interval = tossTime,
-                    motion = motionVec / tossTime,
-                    acceleration = new Vector2(xAccel, gravity) / tossTime,
-                    timeBasedMotion = true,
-                };
+                    if (sprite == null)
+                    {
+                        continue;
+                    }
+
+                    sprite.layerDepth = 1f - (sprite == itemTossSprite ? addlayerDepth : addLayerDepthColorOverlay);
+                    sprite.totalNumberOfLoops = 0;
+                    sprite.interval = tossTime;
+                    sprite.motion = motionVec / tossTime;
+                    sprite.acceleration = new Vector2(xAccel, gravity) / tossTime;
+                    sprite.timeBasedMotion = true;
+                }
             }
             else
             {
                 // "Upward item fade" animation is used if the chest is in a separate GameLocation.
-                int upwardFadeTime = (int)(500 / ModEntry.Config.QuickStackAnimationItemSpeed);
-                itemTossSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), farmerPosition, false, 0f, Color.White)
+                int upwardFadeTime = (int)(500 / ModEntry.Config.QuickStack.AnimationItemSpeedFactor);
+                foreach (TemporaryAnimatedSprite sprite in new[] { itemTossSprite, itemTossSpriteColorOverlay })
                 {
-                    scale = 4f,
-                    layerDepth = 1f - addlayerDepth,
-                    alphaFade = 0.04f * ModEntry.Config.QuickStackAnimationItemSpeed,
-                    interval = upwardFadeTime,
-                    motion = new Vector2(0.6f, -4.5f) * ModEntry.Config.QuickStackAnimationItemSpeed,
-                    acceleration = new Vector2(0f, 0.08f) * ModEntry.Config.QuickStackAnimationItemSpeed,
-                    scaleChange = -0.07f * ModEntry.Config.QuickStackAnimationItemSpeed,
-                };
+                    if (sprite == null)
+                    {
+                        continue;
+                    }
+
+                    sprite.layerDepth = 1f - (sprite == itemTossSprite ? addlayerDepth : addLayerDepthColorOverlay);
+                    sprite.alphaFade = 0.04f * ModEntry.Config.QuickStack.AnimationItemSpeedFactor;
+                    sprite.interval = upwardFadeTime;
+                    sprite.motion = new Vector2(0.6f, -4.5f) * ModEntry.Config.QuickStack.AnimationItemSpeedFactor;
+                    sprite.acceleration = new Vector2(0f, 0.08f) * ModEntry.Config.QuickStack.AnimationItemSpeedFactor;
+                    sprite.scaleChange = -0.07f * ModEntry.Config.QuickStack.AnimationItemSpeedFactor;
+                }
             }
-            
-            TemporaryAnimatedSprite itemHoverSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, alphaFade: 0f, Color.White)
+
+            TemporaryAnimatedSprite itemHoverSprite = GetBaseItemSprite(chestPosition, itemData);
+            TemporaryAnimatedSprite itemHoverSpriteColorOverlay = itemHasColorOverlay ? GetBaseItemSprite(chestPosition, itemData, coloredObj.color.Value) : null;
+            foreach (TemporaryAnimatedSprite sprite in new[] { itemHoverSprite, itemHoverSpriteColorOverlay })
             {
-                delayBeforeAnimationStart = isChestInCurrentLocation ? itemTossSprite.delayBeforeAnimationStart + (int)itemTossSprite.interval : 0,
-                scale = 4f,
-                layerDepth = baseLayerDepth - addlayerDepth,
-                interval = numChestAnimatedItems * hoverTimePerItem,
-            };
-            TemporaryAnimatedSprite itemFadeSprite = new(itemData.GetTextureName(), itemData.GetSourceRect(), chestPosition, false, 0f, Color.White)
+                if (sprite == null)
+                {
+                    continue;
+                }
+
+                sprite.delayBeforeAnimationStart = isChestInCurrentLocation ? itemTossSprite.delayBeforeAnimationStart + (int)itemTossSprite.interval : 0;
+                sprite.layerDepth = baseLayerDepth - (sprite == itemHoverSprite ? addlayerDepth : addLayerDepthColorOverlay);
+                sprite.interval = numChestAnimatedItems * hoverTimePerItem;
+            }
+
+            TemporaryAnimatedSprite itemFadeSprite = GetBaseItemSprite(chestPosition, itemData);
+            TemporaryAnimatedSprite itemFadeSpriteColorOverlay = itemHasColorOverlay ? GetBaseItemSprite(chestPosition, itemData, coloredObj.color.Value) : null;
+            foreach (TemporaryAnimatedSprite sprite in new[] { itemFadeSprite, itemFadeSpriteColorOverlay })
             {
-                delayBeforeAnimationStart = itemHoverSprite.delayBeforeAnimationStart + (int)itemHoverSprite.interval,
-                scale = 4f,
-                layerDepth = baseLayerDepth + addlayerDepth,
-                alphaFade = 0.04f * ModEntry.Config.QuickStackAnimationStackSpeed,
-                interval = fadeTime,
-                motion = new Vector2(0.6f, 4.5f) * ModEntry.Config.QuickStackAnimationStackSpeed,
-                acceleration = new Vector2(0f, -0.08f) * ModEntry.Config.QuickStackAnimationStackSpeed,
-                scaleChange = -0.07f * ModEntry.Config.QuickStackAnimationStackSpeed,
-            };
+                if (sprite == null)
+                {
+                    continue;
+                }
+
+                sprite.delayBeforeAnimationStart = itemHoverSprite.delayBeforeAnimationStart + (int)itemHoverSprite.interval;
+                sprite.layerDepth = baseLayerDepth - (sprite == itemFadeSprite ? addlayerDepth : addLayerDepthColorOverlay);
+                sprite.alphaFade = 0.04f * ModEntry.Config.QuickStack.AnimationStackSpeedFactor;
+                sprite.interval = fadeTime;
+                sprite.motion = new Vector2(0.6f, 4.5f) * ModEntry.Config.QuickStack.AnimationStackSpeedFactor;
+                sprite.acceleration = new Vector2(0f, -0.08f) * ModEntry.Config.QuickStack.AnimationStackSpeedFactor;
+                sprite.scaleChange = -0.07f * ModEntry.Config.QuickStack.AnimationStackSpeedFactor;
+            }
 
             // Animate sprites separately by game location.
             if (!ItemSpritesByLocation.ContainsKey(typedChest.ChestGameLocation))
@@ -156,6 +181,10 @@ namespace ConvenientInventory.QuickStack
             if (isChestInCurrentLocation)
             {
                 ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemTossSprite);
+                if (itemHasColorOverlay)
+                {
+                    ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemTossSpriteColorOverlay);
+                }
             }
             else
             {
@@ -166,10 +195,19 @@ namespace ConvenientInventory.QuickStack
                 }
 
                 ItemSpritesByLocation[Game1.currentLocation].Add(itemTossSprite);
+                if (itemHasColorOverlay)
+                {
+                    ItemSpritesByLocation[Game1.currentLocation].Add(itemTossSpriteColorOverlay);
+                }
             }
 
             ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemHoverSprite);
             ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemFadeSprite);
+            if (itemHasColorOverlay)
+            {
+                ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemHoverSpriteColorOverlay);
+                ItemSpritesByLocation[typedChest.ChestGameLocation].Add(itemFadeSpriteColorOverlay);
+            }
 
             NumAnimatedItems++;
             NumAnimatedItemsByChest[typedChest]++;
@@ -177,5 +215,11 @@ namespace ConvenientInventory.QuickStack
             int totalAnimationTimeMs = itemFadeSprite.delayBeforeAnimationStart + (int)itemFadeSprite.interval;
             QuickStackChestAnimation.SetModData(chest, totalAnimationTimeMs);
         }
+
+        /// <summary>
+        /// Creates a base temporary animated sprite for this item.
+        /// </summary>
+        private static TemporaryAnimatedSprite GetBaseItemSprite(Vector2 position, ParsedItemData itemData, Color? overlayColor = null) =>
+            new(itemData.TextureName, itemData.GetSourceRect(overlayColor is null ? 0 : 1), position, false, 0f, overlayColor ?? Color.White) { scale = 4f };
     }
 }

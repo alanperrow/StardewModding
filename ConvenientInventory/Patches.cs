@@ -1,30 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq;
 using System.Text;
+using ConvenientInventory.AutoOrganize;
+using ConvenientInventory.QuickStack;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Menus;
 using StardewValley.Inventories;
+using StardewValley.Menus;
 using StardewValley.Objects;
-using ConvenientInventory.QuickStack;
-using ConvenientInventory.AutoOrganize;
 
-namespace ConvenientInventory.Patches
+namespace ConvenientInventory
 {
     public static class InventoryPageConstructorPatch
     {
-        public static void Postfix(InventoryPage __instance, int x, int y, int width, int height)
+        public static void Postfix(InventoryPage __instance)
         {
             try
             {
-                ConvenientInventory.InventoryPageConstructor(__instance, x, y, width, height);
+                ConvenientInventory.OnConstructedInventoryPage(__instance);
             }
             catch (Exception e)
             {
@@ -165,6 +165,23 @@ namespace ConvenientInventory.Patches
     public static class IClickableMenuPatches
     {
         [HarmonyPostfix]
+        [HarmonyPatch(nameof(IClickableMenu.exitThisMenu))]
+        public static void ExitThisMenu_Postfix(IClickableMenu __instance)
+        {
+            try
+            {
+                if (__instance is ItemGrabMenu itemGrabMenu)
+                {
+                    QuickStackToggleChestLogic.OnExitedItemGrabMenu(itemGrabMenu);
+                }
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ExitThisMenu_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch(nameof(IClickableMenu.populateClickableComponentList))]
         public static void PopulateClickableComponentsList_Postfix(IClickableMenu __instance)
         {
@@ -173,6 +190,10 @@ namespace ConvenientInventory.Patches
                 if (__instance is InventoryPage inventoryPage)
                 {
                     ConvenientInventory.PopulateClickableComponentsListInInventoryPage(inventoryPage);
+                }
+                else if (__instance is ItemGrabMenu)
+                {
+                    QuickStackToggleChestLogic.OnPopulateClickableComponentsListInItemGrabMenu();
                 }
             }
             catch (Exception e)
@@ -221,7 +242,7 @@ namespace ConvenientInventory.Patches
                 // Find instruction after if(boldTitleText != null){ ... b.DrawString() x 3 ... } block
                 // IL_084e (instructionsList[?])
                 if (i > 0 && i < instructionsList.Count - 1
-                    && instructionsList[i - 1].opcode == OpCodes.Stloc_S && (instructionsList[i - 1].operand as LocalBuilder)?.LocalIndex == 6
+                    && instructionsList[i - 1].opcode == OpCodes.Stloc_S && instructionsList[i - 1].operand is LocalBuilder { LocalIndex: 6 }
                     && instructionsList[i].opcode == OpCodes.Ldarg_S && instructionsList[i].operand is byte b && b == 9
                     && instructionsList[i + 1].opcode == OpCodes.Brfalse)
                 {
@@ -248,7 +269,7 @@ namespace ConvenientInventory.Patches
             yield break;
         }
 
-        public static int GetYMinusBoldTitleTextHeight(int y, string boldTitleText) => (boldTitleText is null) ? y : (y - (int)Game1.dialogueFont.MeasureString(boldTitleText).Y);
+        public static int GetYMinusBoldTitleTextHeight(int y, string boldTitleText) => boldTitleText is null ? y : y - (int)Game1.dialogueFont.MeasureString(boldTitleText).Y;
     }
 
     [HarmonyPatch(typeof(ClickableTextureComponent))]
@@ -262,6 +283,7 @@ namespace ConvenientInventory.Patches
             try
             {
                 ConvenientInventory.PostClickableTextureComponentDraw(__instance, b);
+                QuickStackToggleChestLogic.OnDrawComponent(__instance, b);
             }
             catch (Exception e)
             {
@@ -332,7 +354,7 @@ namespace ConvenientInventory.Patches
             MethodInfo isPlayerInventory = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.IsPlayerInventory));
             MethodInfo drawFavoriteItemSlotHighlights = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemSlotHighlights));
 
-            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.IsConfigEnableFavoriteItems));
+            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(InventoryMenuPatches), nameof(IsConfigEnableFavoriteItems));
 
             List<CodeInstruction> instructionsList = instructions.ToList();
 
@@ -344,7 +366,7 @@ namespace ConvenientInventory.Patches
                 // IL_02d7 (instructionsList[?])
                 if (i < instructionsList.Count - 2
                     && instructionsList[i].opcode == OpCodes.Ldc_I4_0
-                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 10
+                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && instructionsList[i + 1].operand is LocalBuilder { LocalIndex: 10 }
                     && instructionsList[i + 2].opcode == OpCodes.Br)
                 {
                     Label label = ilg.DefineLabel();
@@ -377,7 +399,7 @@ namespace ConvenientInventory.Patches
             yield break;
         }
 
-        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.IsEnableFavoriteItems;
+        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.FavoriteItems.IsEnabled;
 
 
         [HarmonyPostfix]
@@ -402,8 +424,8 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(InventoryMenu.rightClick))]
         public static IEnumerable<CodeInstruction> RightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo tryTakeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TryTakeAllButOneItem));
-            MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(InventoryMenuPatches.TakeAllButOneItemWithAddTo));
+            MethodInfo tryTakeAllButOneItemMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(TryTakeAllButOneItem));
+            MethodInfo takeAllButOneItemWithAddToMethod = AccessTools.DeclaredMethod(typeof(InventoryMenuPatches), nameof(TakeAllButOneItemWithAddTo));
 
             MemberInfo itemStackSetter = AccessTools.PropertySetter(typeof(Item), nameof(Item.Stack));
             FieldInfo oldKBStateField = AccessTools.Field(typeof(Game1), nameof(Game1.oldKBState));
@@ -497,11 +519,8 @@ namespace ConvenientInventory.Patches
 
         public static bool IsTakeAllButOneHotkeyDown(InventoryMenu inventoryMenu, int slotNumber)
         {
-            bool _debug_kbhotkey = ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown();
-            bool _debug_gphotkey = ModEntry.Config.TakeAllButOneControllerHotkey.IsDown();
-
-            return ModEntry.Config.IsEnableTakeAllButOne
-                && (ModEntry.Config.TakeAllButOneKeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOneControllerHotkey.IsDown())
+            return ModEntry.Config.TakeAllButOne.IsEnabled
+                && (ModEntry.Config.TakeAllButOne.KeyboardHotkey.IsDown() || ModEntry.Config.TakeAllButOne.ControllerHotkey.IsDown())
                 && inventoryMenu.actualInventory[slotNumber].Stack > 1;
         }
 
@@ -537,7 +556,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(new Type[] { typeof(SpriteBatch) })]
         public static IEnumerable<CodeInstruction> Draw_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(ToolbarPatches), nameof(ToolbarPatches.IsConfigEnableFavoriteItems));
+            MethodInfo isConfigEnableFavoriteItems = AccessTools.Method(typeof(ToolbarPatches), nameof(IsConfigEnableFavoriteItems));
             MethodInfo DrawFavoriteItemSlotHighlightsInToolbar = AccessTools.Method(typeof(ConvenientInventory), nameof(ConvenientInventory.DrawFavoriteItemSlotHighlightsInToolbar));
 
             FieldInfo yPositionOnScreen = typeof(Toolbar).GetField("yPositionOnScreen", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
@@ -555,7 +574,7 @@ namespace ConvenientInventory.Patches
                 if (i > 0 && i < instructionsList.Count - 2
                     && instructionsList[i - 1].opcode == OpCodes.Blt
                     && instructionsList[i].opcode == OpCodes.Ldc_I4_0
-                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && (instructionsList[i + 1].operand as LocalBuilder)?.LocalIndex == 8
+                    && instructionsList[i + 1].opcode == OpCodes.Stloc_S && instructionsList[i + 1].operand is LocalBuilder { LocalIndex: 8 }
                     && instructionsList[i + 2].opcode == OpCodes.Br)
                 {
                     Label label = ilg.DefineLabel();
@@ -592,13 +611,13 @@ namespace ConvenientInventory.Patches
             yield break;
         }
 
-        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.IsEnableFavoriteItems;
+        public static bool IsConfigEnableFavoriteItems() => ModEntry.Config.FavoriteItems.IsEnabled;
 
         [HarmonyTranspiler]
         [HarmonyPatch(nameof(Toolbar.receiveRightClick))]
         public static IEnumerable<CodeInstruction> ReceiveRightClick_Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator ilg)
         {
-            MethodInfo isItemSlotFavoritedMethod = AccessTools.DeclaredMethod(typeof(ToolbarPatches), nameof(ToolbarPatches.IsItemSlotFavorited));
+            MethodInfo isItemSlotFavoritedMethod = AccessTools.DeclaredMethod(typeof(ToolbarPatches), nameof(IsItemSlotFavorited));
 
             List<CodeInstruction> instructionsList = instructions.ToList();
             bool flag = false;
@@ -645,7 +664,7 @@ namespace ConvenientInventory.Patches
 
         public static bool IsItemSlotFavorited(int slotNumber)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return false;
             }
@@ -709,11 +728,11 @@ namespace ConvenientInventory.Patches
     {
         [HarmonyPrefix]
         [HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
-        public static bool OrganizeItemsInList_Prefix(ItemGrabMenu __instance, out Item[] __state, IList<Item> items)
+        public static bool OrganizeItemsInList_Prefix(out Item[] __state, IList<Item> items)
         {
             __state = null;
 
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -736,9 +755,9 @@ namespace ConvenientInventory.Patches
 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(ItemGrabMenu.organizeItemsInList))]
-        public static void OrganizeItemsInList_Postfix(ItemGrabMenu __instance, Item[] __state, IList<Item> items)
+        public static void OrganizeItemsInList_Postfix(Item[] __state, IList<Item> items)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -765,9 +784,19 @@ namespace ConvenientInventory.Patches
 
             try
             {
-                if (ModEntry.Config.IsEnableFavoriteItems)
+                if (ModEntry.Config.FavoriteItems.IsEnabled)
                 {
                     __state = ConvenientInventory.ExtractFavoriteItemsFromList(__instance.inventory.actualInventory);
+                }
+
+                if (ModEntry.Config.QuickStack.IsEnabled
+                    && ModEntry.Config.QuickStack.WithFillStacksButton
+                    && QuickStackInMenuLogic.HasValidContext(__instance))
+                {
+                    QuickStackInMenuLogic.StackToChestInMenu(__instance, false);
+
+                    // Instead of returning false here to skip the base game `FillOutStacks` call, we prefer to
+                    // return true so as not to interfere if any other mods want to prefix this method as well.
                 }
             }
             catch (Exception e)
@@ -784,12 +813,12 @@ namespace ConvenientInventory.Patches
         {
             try
             {
-                if (ModEntry.Config.IsEnableFavoriteItems)
+                if (ModEntry.Config.FavoriteItems.IsEnabled)
                 {
                     ConvenientInventory.ReinsertExtractedFavoriteItemsIntoList(__state, __instance.inventory.actualInventory, false);
                 }
 
-                if (ModEntry.Config.IsEnableAutoOrganizeChest)
+                if (ModEntry.Config.AutoOrganizeChest.IsEnabled)
                 {
                     Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
                     if (chest != null)
@@ -830,7 +859,9 @@ namespace ConvenientInventory.Patches
         {
             try
             {
-                if (ModEntry.Config.IsEnableAutoOrganizeChest
+                QuickStackInMenuLogic.OnConstructedItemGrabMenu(__instance);
+                QuickStackToggleChestLogic.OnConstructedItemGrabMenu(__instance);
+                if (ModEntry.Config.AutoOrganizeChest.IsEnabled
                     && showOrganizeButton
                     && source == ItemGrabMenu.source_chest)
                 {
@@ -848,24 +879,39 @@ namespace ConvenientInventory.Patches
         }
 
         [HarmonyPostfix]
+        [HarmonyPatch(MethodType.Constructor, new Type[] { typeof(IList<Item>), typeof(object) })]
+        public static void Constructor2_Postfix(ItemGrabMenu __instance)
+        {
+            try
+            {
+                QuickStackInMenuLogic.OnConstructedItemGrabMenu(__instance);
+                QuickStackToggleChestLogic.OnConstructedItemGrabMenu(__instance);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(Constructor2_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch(nameof(ItemGrabMenu.receiveRightClick))]
         public static void ReceiveRightClick_Postfix(ItemGrabMenu __instance, int x, int y)
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
-            {
-                return;
-            }
-
             try
             {
-                if (__instance.source == ItemGrabMenu.source_chest
-                    && __instance.organizeButton != null
-                    && __instance.organizeButton.containsPoint(x, y))
+                QuickStackToggleChestLogic.OnReceiveRightClickInItemGrabMenu(x, y);
+
+                if (ModEntry.Config.AutoOrganizeChest.IsEnabled)
                 {
-                    Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
-                    if (chest != null)
+                    if (__instance.source == ItemGrabMenu.source_chest
+                        && __instance.organizeButton != null
+                        && __instance.organizeButton.containsPoint(x, y))
                     {
-                        AutoOrganizeLogic.ToggleChestAutoOrganize(__instance, chest);
+                        Chest chest = AutoOrganizeLogic.GetChestFromItemGrabMenuContext(__instance.context);
+                        if (chest != null)
+                        {
+                            AutoOrganizeLogic.ToggleChestAutoOrganize(__instance, chest);
+                        }
                     }
                 }
             }
@@ -881,7 +927,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(typeof(IClickableMenu), nameof(IClickableMenu.setUpForGamePadMode))]
         public static void SetUpForGamePadMode_Postfix(IClickableMenu __instance)
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
                 return;
             }
@@ -904,6 +950,48 @@ namespace ConvenientInventory.Patches
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetUpForGamePadMode_Postfix)}:\n{e}", LogLevel.Error);
             }
         }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ItemGrabMenu.performHoverAction))]
+        public static void PerformHoverAction_Postfix(int x, int y)
+        {
+            try
+            {
+                QuickStackToggleChestLogic.OnPerformHoverActionInItemGrabMenu(x, y);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(PerformHoverAction_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ItemGrabMenu.receiveLeftClick))]
+        public static void ReceiveLeftClick_Postfix(int x, int y)
+        {
+            try
+            {
+                QuickStackToggleChestLogic.OnReceiveLeftClickInItemGrabMenu(x, y);
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(ReceiveLeftClick_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(ItemGrabMenu.SetupBorderNeighbors))]
+        public static void SetupBorderNeighbors_Postfix()
+        {
+            try
+            {
+                QuickStackToggleChestLogic.OnSetupBorderNeighborsInItemGrabMenu();
+            }
+            catch (Exception e)
+            {
+                ModEntry.Instance.Monitor.Log($"Failed in {nameof(SetupBorderNeighbors_Postfix)}:\n{e}", LogLevel.Error);
+            }
+        }
     }
 
     [HarmonyPatch(typeof(Item))]
@@ -913,7 +1001,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Item.canBeTrashed))]
         public static bool CanBeTrashed_Prefix(Item __instance, ref bool __result)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems || !ConvenientInventory.FavoriteItemsIsItemSelected)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled || !ConvenientInventory.FavoriteItemsIsItemSelected)
             {
                 return true;
             }
@@ -949,7 +1037,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Item.ConsumeStack))]
         public static void ConsumeStack_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -973,7 +1061,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Farmer.shiftToolbar))]
         public static void ShiftToolbar_Postfix(Farmer __instance, bool right)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1005,7 +1093,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Farmer.reduceActiveItemByOne))]
         public static bool ReduceActiveItemByOne_Prefix(Farmer __instance)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1030,7 +1118,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(ForgeMenu.receiveKeyPress))]
         public static bool ReceiveKeyPress_Prefix(Keys key)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems || !ConvenientInventory.FavoriteItemsIsItemSelected)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled || !ConvenientInventory.FavoriteItemsIsItemSelected)
             {
                 return true;
             }
@@ -1055,7 +1143,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch("_leftIngredientSpotClicked")]
         public static bool LeftIngredientSpotClicked_Prefix(ForgeMenu __instance)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1079,7 +1167,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch("_rightIngredientSpotClicked")]
         public static bool RightIngredientSpotClicked_Prefix(ForgeMenu __instance)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1103,7 +1191,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(ForgeMenu.CraftItem))]
         public static void CraftItem_Postfix(bool forReal = false)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems || !forReal)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled || !forReal)
             {
                 return;
             }
@@ -1127,7 +1215,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Inventory.ReduceId))]
         public static void ReduceId_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1169,7 +1257,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Chest.grabItemFromInventory))]
         public static void GrabItemFromInventory_Postfix()
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
                 return;
             }
@@ -1197,8 +1285,15 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Chest.addItem))]
         public static void AddItem_Postfix(Chest __instance)
         {
-            if (!ModEntry.Config.IsEnableAutoOrganizeChest)
+            if (!ModEntry.Config.AutoOrganizeChest.IsEnabled)
             {
+                return;
+            }
+
+            if (QuickStackInMenuLogic.IsStackingToChestInMenu)
+            {
+                // We return early in this case to prevent organizing the chest prematurely,
+                // as this interferes with the shake item indices when quick stacking in a chest menu.
                 return;
             }
 
@@ -1227,7 +1322,7 @@ namespace ConvenientInventory.Patches
             }
 
 
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1252,7 +1347,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(StardewValley.Object.performObjectDropInAction))]
         public static void PerformObjectDropInAction_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1272,13 +1367,13 @@ namespace ConvenientInventory.Patches
     [HarmonyPatch(typeof(GameLocation))]
     public static class GameLocationPatches
     {
-        private static Item lastToolbarSlotItem;
-
         [HarmonyPrefix]
         [HarmonyPatch("removeQueuedFurniture")]
-        public static bool RemoveQueuedFurniture_Prefix()
+        public static bool RemoveQueuedFurniture_Prefix(out Item __state)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            __state = null;
+
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return true;
             }
@@ -1293,7 +1388,7 @@ namespace ConvenientInventory.Patches
 
                 // Track the last slot of the inventory toolbar to handle base game behavior where, if all toolbar slots have an item,
                 // the removed furniture will be placed into the last toolbar slot and add the previous item into the inventory.
-                lastToolbarSlotItem = Game1.player.Items[11];
+                __state = Game1.player.Items[11];
             }
             catch (Exception e)
             {
@@ -1305,17 +1400,19 @@ namespace ConvenientInventory.Patches
 
         [HarmonyPostfix]
         [HarmonyPatch("removeQueuedFurniture")]
-        public static void RemoveQueuedFurniture_Postfix()
+        public static void RemoveQueuedFurniture_Postfix(Item __state)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
 
-            if (lastToolbarSlotItem == null)
+            if (__state == null)
             {
                 return;
             }
+
+            Item lastToolbarSlotItem = __state;
 
             try
             {
@@ -1347,10 +1444,6 @@ namespace ConvenientInventory.Patches
             {
                 ModEntry.Instance.Monitor.Log($"Failed in {nameof(RemoveQueuedFurniture_Postfix)}:\n{e}", LogLevel.Error);
             }
-            finally
-            {
-                lastToolbarSlotItem = null;
-            }
         }
     }
 
@@ -1361,7 +1454,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(JunimoNoteMenu.HandlePartialDonation))]
         public static void HandlePartialDonation_Postfix(Item item)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1394,7 +1487,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(Bundle.tryToDepositThisItem))]
         public static void TryToDepositThisItem_Postfix(Item __result)
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1421,7 +1514,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(CraftingRecipe.consumeIngredients))]
         public static void ConsumeIngredients_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }
@@ -1441,7 +1534,7 @@ namespace ConvenientInventory.Patches
         [HarmonyPatch(nameof(CraftingRecipe.ConsumeAdditionalIngredients))]
         public static void ConsumeAdditionalIngredients_Postfix()
         {
-            if (!ModEntry.Config.IsEnableFavoriteItems)
+            if (!ModEntry.Config.FavoriteItems.IsEnabled)
             {
                 return;
             }

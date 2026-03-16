@@ -1,11 +1,11 @@
 ﻿using System;
 using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
-using ConvenientInventory.Patches;
 using ConvenientInventory.QuickStack;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley.Menus;
 
 namespace ConvenientInventory
 {
@@ -21,14 +21,16 @@ namespace ConvenientInventory
         public override void Entry(IModHelper helper)
         {
             Instance = this;
-            Config = helper.ReadConfig<ModConfig>();
-            Config.QuickStackRange = ConfigHelper.ValidateAndConstrainQuickStackRange(Config.QuickStackRange);
+            Config = ModConfig.Load(helper);
+            I18n.Init(helper.Translation);
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.Content.AssetReady += OnAssetReady;
 
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.Display.WindowResized += OnWindowResized;
+            helper.Events.Display.MenuChanged += OnMenuChanged;
 
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.Saving += OnSaving;
 
@@ -46,7 +48,7 @@ namespace ConvenientInventory
                 "Clears all mod data set by Convenient Inventory for the currently loaded save; no other mod data is removed. " +
                 "Changes to the save file will take effect the next time the game is saved." +
                 "\n(This command is intended for players who want to remove any Convenient Inventory mod data from their save file for a complete uninstallation.)" +
-                "\n\nUsage: convinv_cleanup_autoorganize",
+                "\n\nUsage: convinv_clearmoddata",
                 ClearModDataForCurrentlyLoadedSave);
         }
 
@@ -56,38 +58,61 @@ namespace ConvenientInventory
         /// <summary>Raised after an asset is loaded by the content pipeline, after all mod edits specified via "AssetRequested" have been applied.</summary>
         private void OnAssetReady(object sender, AssetReadyEventArgs e) => CachedTextures.OnAssetReady(e);
 
+        /// <summary>Raised after the game window is resized.</summary>
+        private void OnWindowResized(object sender, WindowResizedEventArgs e) => QuickStackToggleChestLogic.OnWindowResized();
+
+        /// <summary>Raised after a game menu is opened, closed, or replaced.</summary>
+        private void OnMenuChanged(object sender, MenuChangedEventArgs e) => ConvenientInventory.OnMenuChanged(e);
+
         /// <summary>Raised after the game is launched, right before the first update tick. This happens once per game session (unrelated to loading saves).
         /// All mods are loaded and initialised at this point, so this is a good time to set up mod integrations.</summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="e">The event data.</param>
         private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
         {
+            Monitor.Log("Applying Harmony patches...", LogLevel.Trace);
             var harmony = new Harmony(ModManifest.UniqueID);
 
             // Manually patch InventoryPage constructor, otherwise Harmony cannot find method.
             harmony.Patch(
-                original: AccessTools.Constructor(typeof(StardewValley.Menus.InventoryPage), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int) }),
-                postfix: new HarmonyMethod(typeof(InventoryPageConstructorPatch), nameof(InventoryPageConstructorPatch.Postfix))
-            );
+                original: AccessTools.Constructor(typeof(InventoryPage), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int) }),
+                postfix: new HarmonyMethod(typeof(InventoryPageConstructorPatch), nameof(InventoryPageConstructorPatch.Postfix)));
 
             harmony.PatchAll();
+            Monitor.Log("Finished applying Harmony patches.", LogLevel.Trace);
 
-            // Initialize mod API integrations
-            var apiCA = Helper.ModRegistry.GetApi<IChestsAnywhereApi>("Pathoschild.ChestsAnywhere");
-            if (apiCA != null)
+            // Initialize non-API mod integrations.
+            ModIntegrations.InitializeMods(Helper);
+
+            // Initialize mod API integrations.
+            var modGMCM = Helper.ModRegistry.Get("spacechase0.GenericModConfigMenu");
+            if (modGMCM != null)
             {
-                ApiHelper.Initialize(apiCA);
+                if (modGMCM.Manifest.Version.IsOlderThan("1.16.0"))
+                {
+                    var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
+                    }
+                }
+                else
+                {
+                    var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi16>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
+                    }
+                }
             }
 
-            var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-            if (apiGMCM != null)
+            var apiCBF = Helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
+            if (apiCBF != null)
             {
-                ApiHelper.Initialize(apiGMCM, Config, ModManifest, Helper, Monitor);
+                ModIntegrations.InitializeApi(apiCBF, Helper, Monitor);
             }
 
-            ApiHelper.IsWearMoreRingsInstalled = Helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
-
-            // Load cached textures
+            // Load cached textures.
             CachedTextures.LoadGameAssets();
             CachedTextures.LoadModAssets(Config);
         }
@@ -95,7 +120,7 @@ namespace ConvenientInventory
         /// <summary>Raised after the player loads a save slot and the world is initialized.</summary>
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
-            if (Config.IsEnableFavoriteItems)
+            if (Config.FavoriteItems.IsEnabled)
             {
                 ConvenientInventory.LoadFavoriteItemSlots();
             }
@@ -104,7 +129,7 @@ namespace ConvenientInventory
         /// <summary>Raised before the game begins writing data to the save file (except the initial save creation).</summary>
         private void OnSaving(object sender, SavingEventArgs e)
         {
-            if (Config.IsEnableFavoriteItems)
+            if (Config.FavoriteItems.IsEnabled)
             {
                 ConvenientInventory.SaveFavoriteItemSlots();
             }
@@ -116,10 +141,10 @@ namespace ConvenientInventory
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             // Handle quick stack hotkey being pressed.
-            if (Config.IsEnableQuickStackHotkey
+            if (Config.QuickStack.IsHotkeyEnabled
                 && Context.IsWorldReady
                 && StardewValley.Game1.CurrentEvent is null
-                && (Config.QuickStackKeyboardHotkey.JustPressed() || Config.QuickStackControllerHotkey.JustPressed()))
+                && (Config.QuickStack.KeyboardHotkey.JustPressed() || Config.QuickStack.ControllerHotkey.JustPressed()))
             {
                 ConvenientInventory.OnQuickStackHotkeyPressed();
             }
@@ -129,9 +154,9 @@ namespace ConvenientInventory
         private void OnButtonsChanged(object sender, ButtonsChangedEventArgs e)
         {
             // Handle favorite items hotkey being toggled.
-            if (Config.IsEnableFavoriteItems)
+            if (Config.FavoriteItems.IsEnabled)
             {
-                bool isHotkeyDown = Config.FavoriteItemsKeyboardHotkey.IsDown() || Config.FavoriteItemsControllerHotkey.IsDown();
+                bool isHotkeyDown = Config.FavoriteItems.KeyboardHotkey.IsDown() || Config.FavoriteItems.ControllerHotkey.IsDown();
                 if (!ConvenientInventory.IsFavoriteItemsHotkeyDown && Context.IsWorldReady && isHotkeyDown)
                 {
                     ConvenientInventory.IsFavoriteItemsHotkeyDown = true;
@@ -178,13 +203,22 @@ namespace ConvenientInventory
                     StardewValley.Game1.createItemDebris(items[index], who.getStandingPosition(), who.FacingDirection)
                         .DroppedByPlayerID.Value = who.UniqueMultiplayerID;
 
-                    Monitor.Log($"Found non-null item: '{items[index].Name}' (x {items[index].Stack}) at index: {index} when resizing inventory."
+                    Monitor.Log($"Found non-null item: '{items[index].Name}' (x {items[index].Stack}) at index={index} when resizing inventory."
                         + " The item was manually dropped; this may have resulted in unexpected behavior.",
                         LogLevel.Warn);
                 }
 
                 // Remove the last item of the list
                 items.RemoveAt(index);
+            }
+
+            Monitor.Log($"Finished resizing inventory.", LogLevel.Info);
+
+            if (items.Count != who.MaxItems)
+            {
+                Monitor.Log($"Inventory size is still incorrect after attempting to resize it (Inventory size: {items.Count}, Max items: {who.MaxItems})." +
+                    " This should never happen; check your SMAPI log for any other errors that may be causing this.",
+                    LogLevel.Warn);
             }
         }
 
