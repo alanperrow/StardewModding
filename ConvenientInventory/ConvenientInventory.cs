@@ -311,8 +311,12 @@ namespace ConvenientInventory
                         {
                             if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuIP && gameMenuIP.pages[gameMenuIP.currentTab] is InventoryPage)
                             {
-                                // Game logic for shift-clicking in player's inventory page
-                                HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
+                                Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
+                                if (cursorSlotItem == null || !cursorSlotItem.canStackWith(clickedItem))
+                                {
+                                    // Game logic for shift-clicking in player's inventory page.
+                                    HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
+                                }
                             }
                             else if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuCP && gameMenuCP.pages[gameMenuCP.currentTab] is CraftingPage
                                 && (clickedItem is Hat or Clothing or Boots or Tool or Ring or Trinket))
@@ -407,41 +411,51 @@ namespace ConvenientInventory
                     // We have a favorited item selected and have clicked a valid inventory slot.
                     Item clickedItem = inventoryMenu.actualInventory[clickPos];
 
-                        if (FavoriteItemSlots[clickPos] && clickedItem != null && inventoryMenu.highlightMethod(clickedItem))
-                        {
-                            Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
+                    if (FavoriteItemSlots[clickPos] && clickedItem != null && inventoryMenu.highlightMethod(clickedItem))
+                    {
+                        Item cursorSlotItem = GetHeldItemOrCursorSlotItem();
 
-                            // We are placing the selected favorited item into a favorited slot with an item in it.
-                            if (cursorSlotItem != null && cursorSlotItem.canStackWith(clickedItem))
+                        // We are placing the selected favorited item into a favorited slot with an item in it.
+                        if (cursorSlotItem != null && cursorSlotItem.canStackWith(clickedItem))
+                        {
+                            if (!IsOverMaxStackSize(cursorSlotItem, clickedItem))
                             {
-                                if (!IsOverMaxStackSize(cursorSlotItem, clickedItem))
-                                {
-                                    // Clicked item can stack with ours, so stop tracking.
-                                    ResetFavoriteItemSlotsTracking();
-                                }
+                                // Clicked item can stack with ours, so stop tracking.
+                                ResetFavoriteItemSlotsTracking();
                             }
-                            else
+                            else if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuIP && gameMenuIP.pages[gameMenuIP.currentTab] is InventoryPage)
                             {
-                                // Clicked item cannot stack with ours, so swap which item slot we are tracking.
-                                FavoriteItemsLastSelectedSlot = clickPos;
-                                FavoriteItemsSelectedItem = clickedItem;
+                                // Game logic for shift-clicking in player's inventory page, plus extra logic for handling the currently selected favorite item.
+                                HandleFavoriteItemSlotShiftClickedInInventoryPageWithFavoriteItemSelected(clickPos, clickedItem);
                             }
                         }
                         else
                         {
-                            if (clickedItem == null || inventoryMenu.highlightMethod(clickedItem))
+                            // Clicked item cannot stack with ours, so swap which item slot we are tracking.
+                            if (Game1.oldKBState.IsKeyDown(Keys.LeftShift) && Game1.activeClickableMenu is GameMenu gameMenuIP && gameMenuIP.pages[gameMenuIP.currentTab] is InventoryPage)
                             {
-                                // We are placing our selected favorited item into a slot which is either empty or
-                                // contains a highlighted item, so stop tracking, and favorite this new slot.
-                                ResetFavoriteItemSlotsTracking();
-
-                                if (!FavoriteItemSlots[clickPos])
-                                {
-                                    FavoriteItemSlots[clickPos] = true;
-                                }
+                                // Game logic for shift-clicking in player's inventory page, plus extra logic for handling the currently selected favorite item.
+                                HandleFavoriteItemSlotShiftClickedInInventoryPageWithFavoriteItemSelected(clickPos, clickedItem);
+                            }
+                            else
+                            {
+                                FavoriteItemsLastSelectedSlot = clickPos;
+                                FavoriteItemsSelectedItem = clickedItem;
                             }
                         }
                     }
+                    else if (clickedItem == null || inventoryMenu.highlightMethod(clickedItem))
+                    {
+                        // We are placing our selected favorited item into a slot which is either empty or
+                        // contains a highlighted item, so stop tracking, and favorite this new slot.
+                        ResetFavoriteItemSlotsTracking();
+
+                        if (!FavoriteItemSlots[clickPos])
+                        {
+                            FavoriteItemSlots[clickPos] = true;
+                        }
+                    }
+                }
                 else if (!isRightClick)
                 {
                     // We have a favorited item selected and have clicked somewhere outside the inventory slots.
@@ -701,6 +715,18 @@ namespace ConvenientInventory
             FavoriteItemsSelectedItem = item;
             FavoriteItemSlots[clickPos] = false;
             return false;
+        }
+
+        private static void HandleFavoriteItemSlotShiftClickedInInventoryPageWithFavoriteItemSelected(int clickPos, Item clickedItem)
+        {
+            // Game logic for shift-clicking in player's inventory page.
+            HandleFavoriteItemSlotShiftClickedInInventoryPage(clickPos, clickedItem);
+
+            // Reset incorrect tracking state after previous method call.
+            // (This works well enough, but I would assume there are some edge cases that might not behave as expected;
+            // it's hard to account for all base-game cases with unusual behavior.)
+            ResetFavoriteItemSlotsTracking();
+            FavoriteItemSlots[clickPos] = true;
         }
 
         public static void PostReceiveLeftClickInMenu<T>(T menu, int x, int y) where T : IClickableMenu
