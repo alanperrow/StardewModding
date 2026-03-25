@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ConvenientInventory.Compatibility;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -49,25 +50,31 @@ namespace ConvenientInventory.QuickStack
 
                 HashSet<Item> overflowItems = new();
 
-                // Fill chest stacks with player inventory items
-                foreach (Item chestItem in chestItems)
+                foreach (Item playerItem in playerInventory)
                 {
-                    if (chestItem is null)
+                    if (playerItem is null)
                     {
                         continue;
                     }
 
-                    foreach (Item playerItem in playerInventory)
+                    int itemIndex = playerInventory.IndexOf(playerItem);
+                    if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[itemIndex])
                     {
-                        if (playerItem is null)
-                        {
-                            continue;
-                        }
+                        // Skip favorited items
+                        continue;
+                    }
 
-                        int itemIndex = playerInventory.IndexOf(playerItem);
-                        if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[itemIndex])
+                    if (ModIntegrations.IsConvenientChestsInstalled && playerItem.modData.TryGetValue("SummerFleur.ConvenientChests", out _))
+                    {
+                        // Skip item locked by ConvenientChests
+                        continue;
+                    }
+
+                    // Fill chest stacks with player inventory items
+                    foreach (Item chestItem in chestItems)
+                    {
+                        if (chestItem is null)
                         {
-                            // Skip favorited items
                             continue;
                         }
 
@@ -125,6 +132,16 @@ namespace ConvenientInventory.QuickStack
                             {
                                 overflowItems.Add(playerItem);
                             }
+                        }
+                    }
+
+                    // Check if mod Convenient Chests accept this item
+                    if (ModIntegrations.IsConvenientChestsInstalled)
+                    {
+                        bool accepts = chest.AcceptThisItemByConvenientChest(playerItem);
+                        if (accepts)
+                        {
+                            overflowItems.Add(playerItem);
                         }
                     }
                 }

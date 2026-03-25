@@ -1,4 +1,5 @@
 ﻿using System;
+using ConvenientInventory.API;
 using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.QuickStack;
@@ -51,6 +52,9 @@ namespace ConvenientInventory
                 "\n\nUsage: convinv_clearmoddata",
                 ClearModDataForCurrentlyLoadedSave);
         }
+
+        /// <summary>Provide access for other mods to get the api of this mod.</summary>
+        public override object GetApi() => ConvenientInventoryAPI.Instance;
 
         /// <summary>Raised when an asset is being requested from the content pipeline.</summary>
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e) => CachedTextures.OnAssetRequested(e);
@@ -110,6 +114,12 @@ namespace ConvenientInventory
             if (apiCBF != null)
             {
                 ModIntegrations.InitializeApi(apiCBF, Helper, Monitor);
+            }
+
+            var apiCC = Helper.ModRegistry.GetApi<IConvenientChestAPI>("SummerFleur.ConvenientChests");
+            if (apiCC != null)
+            {
+                ModIntegrations.InitializeApi(apiCC, Helper, Monitor);
             }
 
             // Load cached textures.

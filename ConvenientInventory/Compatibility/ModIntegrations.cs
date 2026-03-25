@@ -8,6 +8,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Objects;
 
 namespace ConvenientInventory.Compatibility
 {
@@ -20,10 +21,13 @@ namespace ConvenientInventory.Compatibility
         private static readonly PerScreen<bool> useHighlightStylePreviewColor = new();
         private static readonly PerScreen<Color> highlightStylePreviewColor = new(() => Color.White);
 
+        private static IConvenientChestAPI convenientChestsApi;
         private static ICustomBackpackApi customBackpackApi;
         private static Type customBackpackFullInventoryPageType;
 
         public static bool IsChestsAnywhereInstalled { get; private set; }
+
+        public static bool IsConvenientChestsInstalled { get; private set; }
 
         public static bool IsCustomBackpackFrameworkInstalled => customBackpackApi != null;
 
@@ -541,17 +545,52 @@ namespace ConvenientInventory.Compatibility
         }
 
         /// <summary>
+        /// Initializes mod integrations with the Convenient Chests 2 mod and API.
+        /// </summary>
+        public static void InitializeApi(IConvenientChestAPI api, IModHelper helper, IMonitor monitor)
+        {
+            try
+            {
+                IModInfo ccModInfo = helper.ModRegistry.Get("SummerFleur.ConvenientChests")
+                                      ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
+
+                // Ensure mod version is recent enough where API interface includes `ChestAcceptThisItem(Chest, Item)` method.
+                if (ccModInfo.Manifest.Version.IsOlderThan("2.0.0-alpha"))
+                {
+                    throw new InvalidOperationException($"Convenient Chests mod version {ccModInfo.Manifest.Version} is outdated. " +
+                                                        "Please update to version 2.0.0 or later to enable compatibility with Convenient Inventory.");
+                }
+
+                // Initialization successful.
+                convenientChestsApi = api;
+            }
+            catch (Exception ex)
+            {
+                monitor.Log($"Could not initialize mod integrations with Convenient Chests:\n{ex.Message}", LogLevel.Warn);
+            }
+        }
+
+        /// <summary>
         /// Initializes mod integrations for cases not using a mod API.
         /// </summary>
         public static void InitializeMods(IModHelper helper)
         {
             IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
             IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
+            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests");
         }
 
         /// <summary>
         /// Determines whether the given menu is an instance of Custom Backpack Framework's full inventory page.
         /// </summary>
         public static bool IsCustomBackpackFullInventoryPage(IClickableMenu menu) => menu?.GetType() == customBackpackFullInventoryPageType;
+
+        /// <summary>
+        /// Get whether the given chest accepts the given item.
+        /// </summary>
+        /// <returns>
+        /// true if the chest accepts the item, false otherwise.
+        /// </returns>
+        public static bool AcceptThisItemByConvenientChest(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
     }
 }
