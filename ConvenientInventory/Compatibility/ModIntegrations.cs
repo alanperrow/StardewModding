@@ -552,13 +552,13 @@ namespace ConvenientInventory.Compatibility
             try
             {
                 IModInfo ccModInfo = helper.ModRegistry.Get("SummerFleur.ConvenientChests")
-                    ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
+                                      ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
 
                 // Ensure mod version is recent enough where API interface includes `ChestAcceptThisItem(Chest, Item)` method.
-                if (ccModInfo.Manifest.Version.IsOlderThan("2.0.0-alpha"))
+                if (ccModInfo.Manifest.Version.IsOlderThan("2.0.2"))
                 {
                     throw new InvalidOperationException($"Convenient Chests mod version {ccModInfo.Manifest.Version} is outdated. " +
-                        "Please update to version 2.0.0 or later to enable compatibility with Convenient Inventory.");
+                                                        "Please update to version 2.0.2 or later to enable compatibility with Convenient Inventory.");
                 }
 
                 // Initialization successful.
@@ -586,11 +586,19 @@ namespace ConvenientInventory.Compatibility
         public static bool IsCustomBackpackFullInventoryPage(IClickableMenu menu) => menu?.GetType() == customBackpackFullInventoryPageType;
 
         /// <summary>
-        /// Get whether the given chest accepts the given item.
+        /// Get whether the given chest accepts the given item. (by convenient chest API)
         /// </summary>
         /// <returns>
         /// true if the chest accepts the item, false otherwise.
         /// </returns>
         public static bool AcceptThisItemByConvenientChest(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
+
+        /// <summary>
+        /// Check whether the given item is locked in inventory. (by convenient chest API)
+        /// </summary>
+        /// <returns>
+        /// true if the item is locked, false otherwise.
+        /// </returns>
+        public static bool ItemLockedByConvenientChest(Item item) => convenientChestsApi.InventoryLockThisItem(item);
     }
 }

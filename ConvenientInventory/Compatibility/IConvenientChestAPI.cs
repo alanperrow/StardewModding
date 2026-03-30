@@ -5,7 +5,7 @@ using StardewValley.Objects;
 namespace ConvenientInventory.Compatibility
 {
     /// <summary>
-    /// SummerFleur.ConvenientChests API, for Version 2.0.0 or later.
+    /// SummerFleur.ConvenientChests API, for Version 2.0.2 or later.
     /// </summary>
     public interface IConvenientChestAPI
     {
@@ -16,6 +16,14 @@ namespace ConvenientInventory.Compatibility
         /// true if the chest accepts the item, false otherwise.
         /// </returns>
         public bool ChestAcceptThisItem(Chest chest, Item item);
+
+        /// <summary>
+        /// Check whether the given item is locked in inventory.
+        /// </summary>
+        /// <returns>
+        /// true if the item is locked, false otherwise.
+        /// </returns>
+        public bool InventoryLockThisItem(Item item);
 
         /// <summary>
         /// Get the accepted item lists of the given chest.

@@ -1,4 +1,4 @@
-﻿namespace ConvenientInventory.API
+﻿namespace ConvenientInventory
 {
     /// <summary>
     /// The API provided by the Convenient Inventory mod.

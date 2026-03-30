@@ -52,7 +52,7 @@ namespace ConvenientInventory
                 ClearModDataForCurrentlyLoadedSave);
         }
 
-        /// <summary>Gets an instance of <see cref="ConvenientInventoryApi"/> that other mods can access.</summary>
+        /// <summary>Provide access for other mods to get the api of this mod.</summary>
         public override object GetApi() => new ConvenientInventoryApi();
 
         /// <summary>Raised when an asset is being requested from the content pipeline.</summary>

@@ -50,6 +50,7 @@ namespace ConvenientInventory.QuickStack
 
                 HashSet<Item> overflowItems = new();
 
+                // Fill chest stacks with player inventory items
                 foreach (Item playerItem in playerInventory)
                 {
                     if (playerItem is null)
@@ -64,13 +65,12 @@ namespace ConvenientInventory.QuickStack
                         continue;
                     }
 
-                    if (ModIntegrations.IsConvenientChestsInstalled && playerItem.modData.TryGetValue("SummerFleur.ConvenientChests", out _))
+                    if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChest(playerItem))
                     {
                         // Skip item locked by ConvenientChests
                         continue;
                     }
 
-                    // Fill chest stacks with player inventory items
                     foreach (Item chestItem in chestItems)
                     {
                         if (chestItem is null)
@@ -136,13 +136,10 @@ namespace ConvenientInventory.QuickStack
                     }
 
                     // Check if mod Convenient Chests accept this item
-                    if (ModIntegrations.IsConvenientChestsInstalled)
+                    if (ModIntegrations.IsConvenientChestsInstalled && chest.AcceptThisItemByConvenientChest(playerItem))
                     {
-                        bool accepts = chest.AcceptThisItemByConvenientChest(playerItem);
-                        if (accepts)
-                        {
-                            overflowItems.Add(playerItem);
-                        }
+                        // accepted by the convenient chests, add it to overflow items to deal with it later
+                        overflowItems.Add(playerItem);
                     }
                 }
 
