@@ -1,5 +1,4 @@
 ﻿using System;
-using ConvenientInventory.API;
 using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using ConvenientInventory.QuickStack;
@@ -53,8 +52,8 @@ namespace ConvenientInventory
                 ClearModDataForCurrentlyLoadedSave);
         }
 
-        /// <summary>Provide access for other mods to get the api of this mod.</summary>
-        public override object GetApi() => ConvenientInventoryAPI.Instance;
+        /// <summary>Gets an instance of <see cref="ConvenientInventoryApi"/> that other mods can access.</summary>
+        public override object GetApi() => new ConvenientInventoryApi();
 
         /// <summary>Raised when an asset is being requested from the content pipeline.</summary>
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e) => CachedTextures.OnAssetRequested(e);

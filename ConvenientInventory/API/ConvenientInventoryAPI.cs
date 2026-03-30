@@ -1,6 +1,6 @@
 ﻿namespace ConvenientInventory.API
 {
-    public class ConvenientInventoryAPI : IConvenientInventoryAPI
+    public class ConvenientInventoryApi : IConvenientInventoryApi
     {
         /// <summary>Get the exclusive instance of the ConvenientInventoryAPI.</summary>
         public static readonly ConvenientInventoryAPI Instance = new();
