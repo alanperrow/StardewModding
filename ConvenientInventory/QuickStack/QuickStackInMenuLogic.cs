@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ConvenientInventory.AutoOrganize;
+using ConvenientInventory.Compatibility;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Buildings;
@@ -79,24 +80,30 @@ namespace ConvenientInventory.QuickStack
 
             // Fill chest stacks with player inventory items
             IInventory chestItems = chest.GetItemsForPlayer(who.UniqueMultiplayerID);
-            foreach (Item chestItem in chestItems)
+            foreach (Item playerItem in playerInventory)
             {
-                if (chestItem is null)
+                if (playerItem is null)
                 {
                     continue;
                 }
 
-                foreach (Item playerItem in playerInventory)
+                int itemIndex = playerInventory.IndexOf(playerItem);
+                if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[itemIndex])
                 {
-                    if (playerItem is null)
-                    {
-                        continue;
-                    }
+                    // Skip favorited items
+                    continue;
+                }
 
-                    int itemIndex = playerInventory.IndexOf(playerItem);
-                    if (ModEntry.Config.FavoriteItems.IsEnabled && ConvenientInventory.FavoriteItemSlots[itemIndex])
+                if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChest(playerItem))
+                {
+                    // Skip item locked by ConvenientChests
+                    continue;
+                }
+
+                foreach (Item chestItem in chestItems)
+                {
+                    if (chestItem is null)
                     {
-                        // Skip favorited items
                         continue;
                     }
 
@@ -122,9 +129,9 @@ namespace ConvenientInventory.QuickStack
 
                         if (itemIndex < itemGrabMenu.inventory.inventory.Count)
                         {
-                        ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[itemIndex];
-                        itemGrabMenu._transferredItemSprites.Add(
-                            new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
+                            ClickableComponent inventoryComponent = itemGrabMenu.inventory.inventory[itemIndex];
+                            itemGrabMenu._transferredItemSprites.Add(
+                                new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                         }
 
                         if (playerItem.Stack == 0)
@@ -143,6 +150,13 @@ namespace ConvenientInventory.QuickStack
                             overflowItems.Add(playerItem);
                         }
                     }
+                }
+
+                // Check if mod Convenient Chests accept this item
+                if (ModIntegrations.IsConvenientChestsInstalled && chest.AcceptThisItemByConvenientChest(playerItem))
+                {
+                    // accepted by the convenient chests, add it to overflow items to deal with it later
+                    overflowItems.Add(playerItem);
                 }
             }
 
