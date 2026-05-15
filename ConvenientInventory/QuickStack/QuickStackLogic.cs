@@ -65,9 +65,9 @@ namespace ConvenientInventory.QuickStack
                         continue;
                     }
 
-                    if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChest(playerItem))
+                    if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChests(playerItem))
                     {
-                        // Skip item locked by ConvenientChests
+                        // Skip item locked by Convenient Chests
                         continue;
                     }
 
@@ -114,15 +114,18 @@ namespace ConvenientInventory.QuickStack
                                     new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                             }
 
+                            quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                            quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
+
                             if (playerItem.Stack == 0)
                             {
                                 // Remove player item from inventory (and overflow list, if we are tracking it).
                                 who.removeItemFromInventory(playerItem);
                                 overflowItems.Remove(playerItem);
-                            }
 
-                            quickStackAnimation?.AddToAnimation(typedChest, playerItem);
-                            quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
+                                // Move onto the next player item since we just removed this one.
+                                break;
+                            }
                         }
 
                         if (chestItem.Stack == chestItem.maximumStackSize() && playerItem.Stack != 0)
@@ -135,10 +138,9 @@ namespace ConvenientInventory.QuickStack
                         }
                     }
 
-                    // Check if mod Convenient Chests accept this item
-                    if (ModIntegrations.IsConvenientChestsInstalled && chest.AcceptThisItemByConvenientChest(playerItem))
+                    if (ModIntegrations.IsConvenientChestsInstalled && chest.AcceptThisItemByConvenientChests(playerItem))
                     {
-                        // accepted by the convenient chests, add it to overflow items to deal with it later
+                        // Item accepted by Convenient Chests; add it to overflow items regardless of finding a stackable chest item.
                         overflowItems.Add(playerItem);
                     }
                 }
