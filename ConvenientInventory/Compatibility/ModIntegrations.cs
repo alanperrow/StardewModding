@@ -586,19 +586,19 @@ namespace ConvenientInventory.Compatibility
         public static bool IsCustomBackpackFullInventoryPage(IClickableMenu menu) => menu?.GetType() == customBackpackFullInventoryPageType;
 
         /// <summary>
-        /// Get whether the given chest accepts the given item. (by convenient chest API)
+        /// Determines whether the given chest accepts the given item by Convenient Chests.
         /// </summary>
         /// <returns>
-        /// true if the chest accepts the item, false otherwise.
+        /// <see langword="true"/> if the chest accepts the item; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool AcceptThisItemByConvenientChest(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
+        public static bool AcceptThisItemByConvenientChests(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
 
         /// <summary>
-        /// Check whether the given item is locked in inventory. (by convenient chest API)
+        /// Determines whether the given item is locked in inventory by Convenient Chests.
         /// </summary>
         /// <returns>
-        /// true if the item is locked, false otherwise.
+        /// <see langword="true"/> if the item is locked; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool ItemLockedByConvenientChest(Item item) => convenientChestsApi.InventoryLockThisItem(item);
+        public static bool ItemLockedByConvenientChests(Item item) => convenientChestsApi.InventoryLockThisItem(item);
     }
 }
