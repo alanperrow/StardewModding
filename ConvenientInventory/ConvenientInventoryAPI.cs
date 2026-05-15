@@ -3,6 +3,7 @@ using StardewModdingAPI;
 
 namespace ConvenientInventory
 {
+    /// <inheritdoc/>
     public class ConvenientInventoryApi : IConvenientInventoryApi
     {
         /// <inheritdoc/>

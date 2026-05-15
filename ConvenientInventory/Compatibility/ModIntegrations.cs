@@ -552,13 +552,13 @@ namespace ConvenientInventory.Compatibility
             try
             {
                 IModInfo ccModInfo = helper.ModRegistry.Get("SummerFleur.ConvenientChests")
-                                      ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
+                    ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
 
                 // Ensure mod version is recent enough where API interface includes `ChestAcceptThisItem(Chest, Item)` method.
                 if (ccModInfo.Manifest.Version.IsOlderThan("2.0.2"))
                 {
                     throw new InvalidOperationException($"Convenient Chests mod version {ccModInfo.Manifest.Version} is outdated. " +
-                                                        "Please update to version 2.0.2 or later to enable compatibility with Convenient Inventory.");
+                        $"Please update to version 2.0.2 or later to enable compatibility with Convenient Inventory.");
                 }
 
                 // Initialization successful.
