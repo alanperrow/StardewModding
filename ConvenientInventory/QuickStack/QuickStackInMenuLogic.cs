@@ -16,7 +16,7 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public static class QuickStackInMenuLogic
     {
-        public static bool IsStackingToChestInMenu { get; private set; }
+        public static bool IsStackingToChestInMenu { get; private set; } // TODO: Make PerScreen<T> to avoid potential edge cases with multiple open ItemGrabMenus across different screens.
 
         public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {

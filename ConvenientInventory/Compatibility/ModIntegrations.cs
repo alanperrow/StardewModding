@@ -203,6 +203,20 @@ namespace ConvenientInventory.Compatibility
 
             api.AddBoolOption(
                 mod: modManifest,
+                getValue: () => config.QuickStack.IntoFridges,
+                setValue: value => config.QuickStack.IntoFridges = value,
+                name: I18n.ModConfigMenu_IsQuickStackIntoFridges_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIntoFridges_Desc);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IntoMiniFridges,
+                setValue: value => config.QuickStack.IntoMiniFridges = value,
+                name: I18n.ModConfigMenu_IsQuickStackIntoMiniFridges_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIntoMiniFridges_Desc);
+
+            api.AddBoolOption(
+                mod: modManifest,
                 getValue: () => config.QuickStack.IntoMills,
                 setValue: value => config.QuickStack.IntoMills = value,
                 name: I18n.ModConfigMenu_IsQuickStackIntoMills_Name,
