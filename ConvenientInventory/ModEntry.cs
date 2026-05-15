@@ -53,7 +53,7 @@ namespace ConvenientInventory
         }
 
         /// <summary>Provide access for other mods to get the api of this mod.</summary>
-        public override object GetApi() => new ConvenientInventoryApi();
+        public override object GetApi() => new ConvenientInventoryApi2();
 
         /// <summary>Raised when an asset is being requested from the content pipeline.</summary>
         private void OnAssetRequested(object sender, AssetRequestedEventArgs e) => CachedTextures.OnAssetRequested(e);

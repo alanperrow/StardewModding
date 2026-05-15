@@ -3,7 +3,7 @@
     /// <summary>
     /// The API provided by the Convenient Inventory mod.
     /// </summary>
-    public interface IConvenientInventoryApi
+    public interface IConvenientInventoryApi2
     {
         /// <summary>
         /// Gets an array representing all item slots in the player's inventory and whether they are favorited.

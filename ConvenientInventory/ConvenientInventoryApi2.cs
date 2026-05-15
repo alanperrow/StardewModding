@@ -4,7 +4,7 @@ using StardewModdingAPI;
 namespace ConvenientInventory
 {
     /// <inheritdoc/>
-    public class ConvenientInventoryApi : IConvenientInventoryApi
+    public class ConvenientInventoryApi2 : IConvenientInventoryApi2
     {
         /// <inheritdoc/>
         public bool[] GetFavoriteItemSlots()
