@@ -1,7 +1,7 @@
-﻿using StardewValley;
-using System;
+﻿using System;
+using StardewValley;
 
-namespace ConvenientInventory.Compatibility
+namespace ConvenientInventory.Integrations
 {
     /// <summary>
     /// Supports compatibility with mods that change the player's inventory size.

@@ -1,6 +1,6 @@
 ﻿using System;
 using ConvenientInventory.AutoOrganize;
-using ConvenientInventory.Compatibility;
+using ConvenientInventory.Integrations;
 using ConvenientInventory.QuickStack;
 using HarmonyLib;
 using StardewModdingAPI;
@@ -84,46 +84,8 @@ namespace ConvenientInventory
             harmony.PatchAll();
             Monitor.Log("Finished applying Harmony patches.", LogLevel.Trace);
 
-            // Initialize non-API mod integrations.
-            ModIntegrations.InitializeMods(Helper);
-
-            // Initialize mod API integrations.
-            var modGMCM = Helper.ModRegistry.Get("spacechase0.GenericModConfigMenu");
-            if (modGMCM != null)
-            {
-                if (modGMCM.Manifest.Version.IsOlderThan("1.16.0"))
-                {
-                    var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-                    if (apiGMCM != null)
-                    {
-                        ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
-                    }
-                }
-                else
-                {
-                    var apiGMCM = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi16>("spacechase0.GenericModConfigMenu");
-                    if (apiGMCM != null)
-                    {
-                        ModIntegrations.InitializeApi(apiGMCM, Config, ModManifest, Monitor);
-                    }
-                }
-            }
-
-            var apiCBF = Helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
-            if (apiCBF != null)
-            {
-                ModIntegrations.InitializeApi(apiCBF, Helper, Monitor);
-            }
-
-            var apiCC = Helper.ModRegistry.GetApi<IConvenientChestAPI>("SummerFleur.ConvenientChests");
-            if (apiCC != null)
-            {
-                ModIntegrations.InitializeApi(apiCC, Helper, Monitor);
-            }
-
-            // Load cached textures.
-            CachedTextures.LoadGameAssets();
-            CachedTextures.LoadModAssets(Config);
+            ModIntegrations.Initialize(Helper, Config, ModManifest, Monitor);
+            CachedTextures.Load(Config);
         }
 
         /// <summary>Raised after the player loads a save slot and the world is initialized.</summary>

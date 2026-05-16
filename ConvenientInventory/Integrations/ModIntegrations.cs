@@ -10,7 +10,7 @@ using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
 
-namespace ConvenientInventory.Compatibility
+namespace ConvenientInventory.Integrations
 {
     /// <summary>
     /// Supports integration/compatibility with other mods and provides access to their API methods.
@@ -36,9 +36,67 @@ namespace ConvenientInventory.Compatibility
         public static int CustomBackpackScrollAmount => IsCustomBackpackFrameworkInstalled ? customBackpackApi.GetScroll() : 0;
 
         /// <summary>
+        /// Initializes mod integrations.
+        /// </summary>
+        public static void Initialize(IModHelper helper, ModConfig config, IManifest modManifest, IMonitor monitor)
+        {
+            InitializeMods(helper);
+            InitializeApis(helper, config, modManifest, monitor);
+        }
+
+        /// <summary>
+        /// Initializes mod integrations for cases not using a mod API.
+        /// </summary>
+        private static void InitializeMods(IModHelper helper)
+        {
+            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
+            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
+            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests");
+        }
+
+        /// <summary>
+        /// Initializes mod API integrations.
+        /// </summary>
+        private static void InitializeApis(IModHelper helper, ModConfig config, IManifest modManifest, IMonitor monitor)
+        {
+            var modGMCM = helper.ModRegistry.Get("spacechase0.GenericModConfigMenu");
+            if (modGMCM != null)
+            {
+                if (modGMCM.Manifest.Version.IsOlderThan("1.16.0"))
+                {
+                    var apiGMCM = helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        InitializeApi(apiGMCM, config, modManifest, monitor);
+                    }
+                }
+                else
+                {
+                    var apiGMCM = helper.ModRegistry.GetApi<IGenericModConfigMenuApi16>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        InitializeApi(apiGMCM, config, modManifest, monitor);
+                    }
+                }
+            }
+
+            var apiCBF = helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
+            if (apiCBF != null)
+            {
+                InitializeApi(apiCBF, helper, monitor);
+            }
+
+            var apiCC = helper.ModRegistry.GetApi<IConvenientChestAPI>("SummerFleur.ConvenientChests");
+            if (apiCC != null)
+            {
+                InitializeApi(apiCC, helper, monitor);
+            }
+        }
+
+        /// <summary>
         /// Initializes our mod config through the Generic Mod Config Menu API.
         /// </summary>
-        public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
+        private static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
             // == Config Validation ==
             if (!IsChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
@@ -582,16 +640,6 @@ namespace ConvenientInventory.Compatibility
             {
                 monitor.Log($"Could not initialize mod integrations with Convenient Chests:\n{ex.Message}", LogLevel.Warn);
             }
-        }
-
-        /// <summary>
-        /// Initializes mod integrations for cases not using a mod API.
-        /// </summary>
-        public static void InitializeMods(IModHelper helper)
-        {
-            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
-            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
-            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests");
         }
 
         /// <summary>

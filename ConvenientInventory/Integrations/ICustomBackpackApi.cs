@@ -1,6 +1,6 @@
 ﻿using StardewValley.Menus;
 
-namespace ConvenientInventory.Compatibility
+namespace ConvenientInventory.Integrations
 {
     public interface ICustomBackpackApi
     {

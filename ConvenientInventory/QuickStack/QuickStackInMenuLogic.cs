@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using ConvenientInventory.AutoOrganize;
-using ConvenientInventory.Compatibility;
+using ConvenientInventory.Integrations;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;

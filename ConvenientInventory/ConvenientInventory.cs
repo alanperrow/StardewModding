@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ConvenientInventory.Compatibility;
+using ConvenientInventory.Integrations;
 using ConvenientInventory.QuickStack;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
