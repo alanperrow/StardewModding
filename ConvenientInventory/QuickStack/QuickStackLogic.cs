@@ -138,7 +138,7 @@ namespace ConvenientInventory.QuickStack
                         }
                     }
 
-                    if (ModIntegrations.IsConvenientChestsInstalled && chest.AcceptThisItemByConvenientChests(playerItem))
+                    if (ModIntegrations.IsConvenientChestsInstalled && chest.ItemAcceptedByConvenientChests(playerItem))
                     {
                         // Item accepted by Convenient Chests; add it to overflow items regardless of finding a stackable chest item.
                         overflowItems.Add(playerItem);
