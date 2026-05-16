@@ -192,10 +192,10 @@ namespace ConvenientInventory
 
         public static void OnMenuChanged(MenuChangedEventArgs e)
         {
-            if (ModIntegrations.CustomBackpackFramework.IsInstalled)
+            if (ModIntegrations.IsCustomBackpackFrameworkInstalled)
             {
                 if (e.OldMenu is GameMenu && e.NewMenu is InventoryPage
-                    && ModIntegrations.CustomBackpackFramework.IsFullInventoryPage(e.NewMenu))
+                    && ModIntegrations.IsCustomBackpackFullInventoryPage(e.NewMenu))
                 {
                     // We have opened Custom Backpack Framework's FullInventoryPage from InventoryPage.
                     // Temporarily remove the quick stack button as it is behaving strangely with the custom menu.
@@ -203,7 +203,7 @@ namespace ConvenientInventory
                     QuickStackButton = null;
                 }
                 else if (e.OldMenu is InventoryPage && e.NewMenu is GameMenu gameMenu
-                    && ModIntegrations.CustomBackpackFramework.IsFullInventoryPage(e.OldMenu)
+                    && ModIntegrations.IsCustomBackpackFullInventoryPage(e.OldMenu)
                     && gameMenu.GetCurrentPage() is InventoryPage inventoryPage)
                 {
                     // We have switched back to InventoryPage from Custom Backpack Framework's FullInventoryPage.
