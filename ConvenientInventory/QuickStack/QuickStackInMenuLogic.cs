@@ -2,6 +2,7 @@
 using ConvenientInventory.AutoOrganize;
 using ConvenientInventory.Compatibility;
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
@@ -16,7 +17,7 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public static class QuickStackInMenuLogic
     {
-        public static bool IsStackingToChestInMenu { get; private set; } // TODO: Make PerScreen<T> to avoid potential edge cases with multiple open ItemGrabMenus across different screens.
+        public static PerScreen<bool> IsStackingToChestInMenu { get; } = new();
 
         public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
@@ -46,12 +47,12 @@ namespace ConvenientInventory.QuickStack
         {
             try
             {
-                IsStackingToChestInMenu = true;
+                IsStackingToChestInMenu.Value = true;
                 return StackToChestInMenuCore(itemGrabMenu, playSound);
             }
             finally
             {
-                IsStackingToChestInMenu = false;
+                IsStackingToChestInMenu.Value = false;
             }
         }
 

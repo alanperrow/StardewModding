@@ -1290,7 +1290,7 @@ namespace ConvenientInventory
                 return;
             }
 
-            if (QuickStackInMenuLogic.IsStackingToChestInMenu)
+            if (QuickStackInMenuLogic.IsStackingToChestInMenu.Value)
             {
                 // We return early in this case to prevent organizing the chest prematurely,
                 // as this interferes with the shake item indices when quick stacking in a chest menu.
