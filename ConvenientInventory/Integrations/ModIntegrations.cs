@@ -21,9 +21,13 @@ namespace ConvenientInventory.Integrations
         private static readonly PerScreen<bool> useHighlightStylePreviewColor = new();
         private static readonly PerScreen<Color> highlightStylePreviewColor = new(() => Color.White);
 
-        private static IConvenientChestAPI convenientChestsApi;
-        private static ICustomBackpackApi customBackpackApi;
-        private static Type customBackpackFullInventoryPageType;
+        public static WearMoreRingsMod WearMoreRings { get; private set; }
+
+        //public static ChestsAnywhere ChestsAnywhere { get; private set; }
+
+        public static CustomBackpackFrameworkMod CustomBackpackFramework { get; private set; }
+
+        public static ConvenientChests2Mod ConvenientChests2 { get; private set; }
 
         public static bool IsChestsAnywhereInstalled { get; private set; }
 
@@ -32,8 +36,6 @@ namespace ConvenientInventory.Integrations
         public static bool IsCustomBackpackFrameworkInstalled => customBackpackApi != null;
 
         public static bool IsWearMoreRingsInstalled { get; private set; }
-
-        public static int CustomBackpackScrollAmount => IsCustomBackpackFrameworkInstalled ? customBackpackApi.GetScroll() : 0;
 
         /// <summary>
         /// Initializes mod integrations.
@@ -49,9 +51,8 @@ namespace ConvenientInventory.Integrations
         /// </summary>
         private static void InitializeMods(IModHelper helper)
         {
-            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
-            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
-            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests");
+            WearMoreRings = new WearMoreRingsMod(helper);
+            ChestsAnywhere.Initialize(helper);
         }
 
         /// <summary>
@@ -81,16 +82,14 @@ namespace ConvenientInventory.Integrations
             }
 
             var apiCBF = helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
-            if (apiCBF != null)
-            {
-                InitializeApi(apiCBF, helper, monitor);
-            }
+            CustomBackpackFramework = apiCBF != null
+                ? InitializeApi(apiCBF, helper, monitor)
+                : new CustomBackpackFrameworkMod();
 
-            var apiCC = helper.ModRegistry.GetApi<IConvenientChestAPI>("SummerFleur.ConvenientChests");
-            if (apiCC != null)
-            {
-                InitializeApi(apiCC, helper, monitor);
-            }
+            var apiCC2 = helper.ModRegistry.GetApi<IConvenientChestAPI>("SummerFleur.ConvenientChests");
+            ConvenientChests2 = apiCC2 != null
+                ? InitializeApi(apiCC2, helper, monitor)
+                : new ConvenientChests2Mod();
         }
 
         /// <summary>
@@ -99,7 +98,7 @@ namespace ConvenientInventory.Integrations
         private static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
             // == Config Validation ==
-            if (!IsChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
+            if (!ChestsAnywhere.IsInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
             {
                 // QuickStackRange: "Global" option is only supported if the Chests Anywhere mod is installed.
                 // If Chests Anywhere API is not found and config value is loaded as "Global", log a warning message to SMAPI and overwrite the config value to "Location".
@@ -584,7 +583,7 @@ namespace ConvenientInventory.Integrations
         /// <summary>
         /// Initializes mod integrations with the Custom Backpack Framework mod and API.
         /// </summary>
-        public static void InitializeApi(ICustomBackpackApi api, IModHelper helper, IMonitor monitor)
+        public static CustomBackpackFrameworkMod InitializeApi(ICustomBackpackApi api, IModHelper helper, IMonitor monitor)
         {
             try
             {
@@ -600,26 +599,24 @@ namespace ConvenientInventory.Integrations
 
                 // Cache the `FullInventoryPage` type to be used for comparisons.
                 IMod cbfMod = cbfModInfo.GetType().GetProperty("Mod").GetValue(cbfModInfo) as IMod;
-                Type cbfModType = cbfMod?.GetType();
-                customBackpackFullInventoryPageType = cbfModType?.Assembly.GetType("CustomBackpack.FullInventoryPage");
-                if (customBackpackFullInventoryPageType == null)
-                {
-                    throw new InvalidOperationException("Unable to find type 'CustomBackpack.FullInventoryPage' in mod assembly.");
-                }
+                Type customBackpackFullInventoryPageType = cbfMod?.GetType().Assembly.GetType("CustomBackpack.FullInventoryPage")
+                    ?? throw new InvalidOperationException("Unable to find type 'CustomBackpack.FullInventoryPage' in mod assembly.");
 
                 // Initialization successful.
-                customBackpackApi = api;
+                return new CustomBackpackFrameworkMod(api, customBackpackFullInventoryPageType);
             }
             catch (Exception ex)
             {
                 monitor.Log($"Could not initialize mod integrations with Custom Backpack Framework:\n{ex.Message}", LogLevel.Warn);
             }
+
+            return new CustomBackpackFrameworkMod();
         }
 
         /// <summary>
         /// Initializes mod integrations with the Convenient Chests 2 mod and API.
         /// </summary>
-        public static void InitializeApi(IConvenientChestAPI api, IModHelper helper, IMonitor monitor)
+        public static ConvenientChests2Mod InitializeApi(IConvenientChestAPI api, IModHelper helper, IMonitor monitor)
         {
             try
             {
@@ -634,33 +631,95 @@ namespace ConvenientInventory.Integrations
                 }
 
                 // Initialization successful.
-                convenientChestsApi = api;
+                return new ConvenientChests2Mod(api);
             }
             catch (Exception ex)
             {
                 monitor.Log($"Could not initialize mod integrations with Convenient Chests:\n{ex.Message}", LogLevel.Warn);
             }
+
+            return new ConvenientChests2Mod();
         }
 
-        /// <summary>
-        /// Determines whether the given menu is an instance of Custom Backpack Framework's full inventory page.
-        /// </summary>
-        public static bool IsCustomBackpackFullInventoryPage(IClickableMenu menu) => menu?.GetType() == customBackpackFullInventoryPageType;
+        #region Supported Mods
+        public abstract class SupportedMod
+        {
+            public bool IsInstalled { get; protected init; }
+        }
 
-        /// <summary>
-        /// Determines whether this chest accepts the given item by Convenient Chests.
-        /// </summary>
-        /// <returns>
-        /// <see langword="true"/> if the chest accepts the item; <see langword="false"/> otherwise.
-        /// </returns>
-        public static bool ItemAcceptedByConvenientChests(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
+        public static class ChestsAnywhere
+        {
+            public static void Initialize(IModHelper helper)
+            {
+                IsInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
+            }
 
-        /// <summary>
-        /// Determines whether the given item is locked in inventory by Convenient Chests.
-        /// </summary>
-        /// <returns>
-        /// <see langword="true"/> if the item is locked; <see langword="false"/> otherwise.
-        /// </returns>
-        public static bool ItemLockedByConvenientChests(Item item) => convenientChestsApi.InventoryLockThisItem(item);
+            public static bool IsInstalled { get; private set; }
+        }
+
+        public class WearMoreRingsMod : SupportedMod
+        {
+            public WearMoreRingsMod(IModHelper helper)
+            {
+                IsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
+            }
+        }
+
+        public class CustomBackpackFrameworkMod : SupportedMod
+        {
+            private readonly ICustomBackpackApi _api;
+            private readonly Type _fullInventoryPageType;
+
+            public CustomBackpackFrameworkMod()
+            {
+            }
+
+            public CustomBackpackFrameworkMod(ICustomBackpackApi api, Type fullInventoryPageType)
+            {
+                _api = api;
+                _fullInventoryPageType = fullInventoryPageType;
+                IsInstalled = true;
+            }
+
+            /// <inheritdoc cref="ICustomBackpackApi.GetScroll"/>
+            public int ScrollAmount => _api.GetScroll();
+
+            /// <summary>
+            /// Determines whether the given menu is an instance of Custom Backpack Framework's full inventory page.
+            /// </summary>
+            public bool IsFullInventoryPage(IClickableMenu menu) => menu?.GetType() == _fullInventoryPageType;
+        }
+
+        public class ConvenientChests2Mod : SupportedMod
+        {
+            private readonly IConvenientChestAPI _api;
+
+            public ConvenientChests2Mod()
+            {
+            }
+
+            public ConvenientChests2Mod(IConvenientChestAPI api)
+            {
+                _api = api;
+                IsInstalled = true;
+            }
+
+            /// <summary>
+            /// Determines whether the given chest accepts the given item according to Convenient Chests.
+            /// </summary>
+            /// <returns>
+            /// <see langword="true"/> if the chest accepts the item; <see langword="false"/> otherwise.
+            /// </returns>
+            public bool ChestAcceptsItem(Chest chest, Item item) => _api.ChestAcceptThisItem(chest, item);
+
+            /// <summary>
+            /// Determines whether the given item is locked in inventory by Convenient Chests.
+            /// </summary>
+            /// <returns>
+            /// <see langword="true"/> if the item is locked; <see langword="false"/> otherwise.
+            /// </returns>
+            public bool IsItemLocked(Item item) => _api.InventoryLockThisItem(item);
+        }
+        #endregion
     }
 }
