@@ -76,6 +76,12 @@
 
   "ModConfigMenu.SubHeader.OtherInventories": "Other Inventories",
 
+  "ModConfigMenu.IsQuickStackIntoFridges.Name": "Into Fridges?",
+  "ModConfigMenu.IsQuickStackIntoFridges.Desc": "If enabled, nearby Fridges will be considered when quick stacking.",
+
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Name": "Into Mini-Fridges?",
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Desc": "If enabled, nearby Mini-Fridges will be considered when quick stacking.",
+
   "ModConfigMenu.IsQuickStackIntoMills.Name": "Into Mills?",
   "ModConfigMenu.IsQuickStackIntoMills.Desc": "If enabled, nearby mills will be considered when quick stacking.",
 

@@ -41,26 +41,14 @@ namespace ConvenientInventory
 
         public static Texture2D FillStacksQuickStackButtonIcon { get; private set; }
 
-        public static void LoadGameAssets()
+        /// <summary>
+        /// Loads and caches game and mod assets.
+        /// </summary>
+        /// <param name="config">The mod configuration.</param>
+        public static void Load(ModConfig config)
         {
-            Mill = Game1.content.Load<Texture2D>(@"Buildings\Mill");
-            JunimoHut = Game1.content.Load<Texture2D>(@"Buildings\Junimo Hut");
-            FarmHouse = Game1.content.Load<Texture2D>(@"Maps\farmhouse_tiles");
-        }
-
-        public static void LoadModAssets(ModConfig config)
-        {
-            QuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "quickStackIcon");
-            FavoriteItemsCursor = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteCursor");
-            FavoriteItemsHighlight = Game1.content.Load<Texture2D>(ModAssetPrefix + $"favoriteHighlight_{config.FavoriteItems.HighlightTextureChoice}");
-            FavoriteItemsBorder = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteBorder");
-            AutoOrganizeButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "autoOrganizeIcon");
-            ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabledIcon");
-            ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabledIcon");
-            ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1Icon");
-            ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2Icon");
-            ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
-            FillStacksQuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "fillStacksQuickStackIcon");
+            LoadGameAssets();
+            LoadModAssets(config);
         }
 
         /// <summary>
@@ -165,6 +153,28 @@ namespace ConvenientInventory
             {
                 FillStacksQuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "fillStacksQuickStackIcon");
             }
+        }
+
+        private static void LoadGameAssets()
+        {
+            Mill = Game1.content.Load<Texture2D>(@"Buildings\Mill");
+            JunimoHut = Game1.content.Load<Texture2D>(@"Buildings\Junimo Hut");
+            FarmHouse = Game1.content.Load<Texture2D>(@"Maps\farmhouse_tiles");
+        }
+
+        private static void LoadModAssets(ModConfig config)
+        {
+            QuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "quickStackIcon");
+            FavoriteItemsCursor = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteCursor");
+            FavoriteItemsHighlight = Game1.content.Load<Texture2D>(ModAssetPrefix + $"favoriteHighlight_{config.FavoriteItems.HighlightTextureChoice}");
+            FavoriteItemsBorder = Game1.content.Load<Texture2D>(ModAssetPrefix + "favoriteBorder");
+            AutoOrganizeButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "autoOrganizeIcon");
+            ChestQuickStackDisabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackDisabledIcon");
+            ChestQuickStackEnabledButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackEnabledIcon");
+            ChestQuickStackPriority1ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority1Icon");
+            ChestQuickStackPriority2ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority2Icon");
+            ChestQuickStackPriority3ButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "chestQuickStackPriority3Icon");
+            FillStacksQuickStackButtonIcon = Game1.content.Load<Texture2D>(ModAssetPrefix + "fillStacksQuickStackIcon");
         }
     }
 }

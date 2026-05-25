@@ -10,7 +10,7 @@ using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Objects;
 
-namespace ConvenientInventory.Compatibility
+namespace ConvenientInventory.Integrations
 {
     /// <summary>
     /// Supports integration/compatibility with other mods and provides access to their API methods.
@@ -36,9 +36,67 @@ namespace ConvenientInventory.Compatibility
         public static int CustomBackpackScrollAmount => IsCustomBackpackFrameworkInstalled ? customBackpackApi.GetScroll() : 0;
 
         /// <summary>
+        /// Initializes mod integrations.
+        /// </summary>
+        public static void Initialize(IModHelper helper, ModConfig config, IManifest modManifest, IMonitor monitor)
+        {
+            InitializeMods(helper);
+            InitializeApis(helper, config, modManifest, monitor);
+        }
+
+        /// <summary>
+        /// Initializes mod integrations for cases not using a mod API.
+        /// </summary>
+        private static void InitializeMods(IModHelper helper)
+        {
+            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
+            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
+            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests");
+        }
+
+        /// <summary>
+        /// Initializes mod API integrations.
+        /// </summary>
+        private static void InitializeApis(IModHelper helper, ModConfig config, IManifest modManifest, IMonitor monitor)
+        {
+            var modGMCM = helper.ModRegistry.Get("spacechase0.GenericModConfigMenu");
+            if (modGMCM != null)
+            {
+                if (modGMCM.Manifest.Version.IsOlderThan("1.16.0"))
+                {
+                    var apiGMCM = helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        InitializeApi(apiGMCM, config, modManifest, monitor);
+                    }
+                }
+                else
+                {
+                    var apiGMCM = helper.ModRegistry.GetApi<IGenericModConfigMenuApi16>("spacechase0.GenericModConfigMenu");
+                    if (apiGMCM != null)
+                    {
+                        InitializeApi(apiGMCM, config, modManifest, monitor);
+                    }
+                }
+            }
+
+            var apiCBF = helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
+            if (apiCBF != null)
+            {
+                InitializeApi(apiCBF, helper, monitor);
+            }
+
+            var apiCC = helper.ModRegistry.GetApi<IConvenientChestAPI>("SummerFleur.ConvenientChests");
+            if (apiCC != null)
+            {
+                InitializeApi(apiCC, helper, monitor);
+            }
+        }
+
+        /// <summary>
         /// Initializes our mod config through the Generic Mod Config Menu API.
         /// </summary>
-        public static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
+        private static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
             // == Config Validation ==
             if (!IsChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
@@ -200,6 +258,20 @@ namespace ConvenientInventory.Compatibility
             api16?.AddSubHeader(
                 mod: modManifest,
                 text: I18n.ModConfigMenu_SubHeader_OtherInventories);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IntoFridges,
+                setValue: value => config.QuickStack.IntoFridges = value,
+                name: I18n.ModConfigMenu_IsQuickStackIntoFridges_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIntoFridges_Desc);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IntoMiniFridges,
+                setValue: value => config.QuickStack.IntoMiniFridges = value,
+                name: I18n.ModConfigMenu_IsQuickStackIntoMiniFridges_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackIntoMiniFridges_Desc);
 
             api.AddBoolOption(
                 mod: modManifest,
@@ -552,13 +624,13 @@ namespace ConvenientInventory.Compatibility
             try
             {
                 IModInfo ccModInfo = helper.ModRegistry.Get("SummerFleur.ConvenientChests")
-                                      ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
+                    ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
 
                 // Ensure mod version is recent enough where API interface includes `ChestAcceptThisItem(Chest, Item)` method.
                 if (ccModInfo.Manifest.Version.IsOlderThan("2.0.2"))
                 {
                     throw new InvalidOperationException($"Convenient Chests mod version {ccModInfo.Manifest.Version} is outdated. " +
-                                                        "Please update to version 2.0.2 or later to enable compatibility with Convenient Inventory.");
+                        $"Please update to version 2.0.2 or later to enable compatibility with Convenient Inventory.");
                 }
 
                 // Initialization successful.
@@ -571,34 +643,24 @@ namespace ConvenientInventory.Compatibility
         }
 
         /// <summary>
-        /// Initializes mod integrations for cases not using a mod API.
-        /// </summary>
-        public static void InitializeMods(IModHelper helper)
-        {
-            IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
-            IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
-            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests");
-        }
-
-        /// <summary>
         /// Determines whether the given menu is an instance of Custom Backpack Framework's full inventory page.
         /// </summary>
         public static bool IsCustomBackpackFullInventoryPage(IClickableMenu menu) => menu?.GetType() == customBackpackFullInventoryPageType;
 
         /// <summary>
-        /// Get whether the given chest accepts the given item. (by convenient chest API)
+        /// Determines whether this chest accepts the given item by Convenient Chests.
         /// </summary>
         /// <returns>
-        /// true if the chest accepts the item, false otherwise.
+        /// <see langword="true"/> if the chest accepts the item; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool AcceptThisItemByConvenientChest(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
+        public static bool ItemAcceptedByConvenientChests(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
 
         /// <summary>
-        /// Check whether the given item is locked in inventory. (by convenient chest API)
+        /// Determines whether the given item is locked in inventory by Convenient Chests.
         /// </summary>
         /// <returns>
-        /// true if the item is locked, false otherwise.
+        /// <see langword="true"/> if the item is locked; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool ItemLockedByConvenientChest(Item item) => convenientChestsApi.InventoryLockThisItem(item);
+        public static bool ItemLockedByConvenientChests(Item item) => convenientChestsApi.InventoryLockThisItem(item);
     }
 }

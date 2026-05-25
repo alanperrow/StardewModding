@@ -45,6 +45,10 @@ namespace ConvenientInventory
 
         public bool IsQuickStackToggleChestButtonHidden { get; set; } = false;
 
+        public bool IsQuickStackIntoFridges { get; set; } = true;
+
+        public bool IsQuickStackIntoMiniFridges { get; set; } = true;
+
         public bool IsQuickStackIntoMills { get; set; } = true;
 
         public bool IsQuickStackIntoJunimoHuts { get; set; } = true;

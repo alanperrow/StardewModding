@@ -1,7 +1,7 @@
 ﻿using System;
 using StardewModdingAPI;
 
-namespace ConvenientInventory.Compatibility
+namespace ConvenientInventory.Integrations
 {
     /// <inheritdoc/>
     /// <remarks>Includes new features as of GMCM version 1.16.0.</remarks>

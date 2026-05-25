@@ -2,7 +2,7 @@
 using StardewValley;
 using StardewValley.Objects;
 
-namespace ConvenientInventory.Compatibility
+namespace ConvenientInventory.Integrations
 {
     /// <summary>
     /// SummerFleur.ConvenientChests API, for Version 2.0.2 or later.

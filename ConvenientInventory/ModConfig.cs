@@ -162,6 +162,18 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackToggleChestButtonHidden = value;
             }
 
+            public bool IntoFridges
+            {
+                get => _config.serialConfig.IsQuickStackIntoFridges;
+                set => _config.serialConfig.IsQuickStackIntoFridges = value;
+            }
+
+            public bool IntoMiniFridges
+            {
+                get => _config.serialConfig.IsQuickStackIntoMiniFridges;
+                set => _config.serialConfig.IsQuickStackIntoMiniFridges = value;
+            }
+
             public bool IntoMills
             {
                 get => _config.serialConfig.IsQuickStackIntoMills;

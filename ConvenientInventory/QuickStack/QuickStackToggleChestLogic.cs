@@ -179,8 +179,7 @@ namespace ConvenientInventory.QuickStack
 
             QuickStackToggleChestButton.hoverText = GetHoverText(menuContextChest, updatedState);
             QuickStackToggleChestButton.texture = GetButtonTexture(menuContextChest, updatedState);
-
-            Game1.playSound("drumkit6");
+            PlayToggleSound(updatedState);
         }
 
         public static void OnReceiveRightClickInItemGrabMenu(int x, int y)
@@ -195,8 +194,7 @@ namespace ConvenientInventory.QuickStack
 
             QuickStackToggleChestButton.hoverText = GetHoverText(menuContextChest, updatedState);
             QuickStackToggleChestButton.texture = GetButtonTexture(menuContextChest, updatedState);
-
-            Game1.playSound("drumkit6");
+            PlayToggleSound(updatedState);
         }
 
         private static bool ShouldQuickStackIntoMenuContext(ItemGrabMenu itemGrabMenu) => itemGrabMenu.context switch
@@ -282,6 +280,21 @@ namespace ConvenientInventory.QuickStack
                 QuickStackToggleChestState.Priority3 => CachedTextures.ChestQuickStackPriority3ButtonIcon,
                 _ => CachedTextures.ChestQuickStackEnabledButtonIcon,
             };
+        }
+
+        private static void PlayToggleSound(QuickStackToggleChestState state)
+        {
+            var cue = Game1.soundBank.GetCue("drumkit6");
+            cue.Pitch = state switch
+            {
+                QuickStackToggleChestState.Disabled => -0.5f,
+                QuickStackToggleChestState.Enabled => 0f,
+                QuickStackToggleChestState.Priority1 => 0.33f,
+                QuickStackToggleChestState.Priority2 => 0.6f,
+                QuickStackToggleChestState.Priority3 => 1f,
+                _ => 0f,
+            };
+            cue.Play();
         }
 
         private static void SetButtonNeighborIds(ClickableTextureComponent button, ItemGrabMenu itemGrabMenu)

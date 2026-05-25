@@ -3,6 +3,9 @@ using StardewModdingAPI;
 
 namespace ConvenientInventory
 {
+    /// <summary>
+    /// The API provided by the Convenient Inventory mod.
+    /// </summary>
     public class ConvenientInventoryApi : IConvenientInventoryApi
     {
         /// <inheritdoc/>

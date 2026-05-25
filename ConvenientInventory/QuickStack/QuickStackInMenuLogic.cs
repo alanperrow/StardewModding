@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using ConvenientInventory.AutoOrganize;
-using ConvenientInventory.Compatibility;
+using ConvenientInventory.Integrations;
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
@@ -16,7 +17,7 @@ namespace ConvenientInventory.QuickStack
     /// </summary>
     public static class QuickStackInMenuLogic
     {
-        public static bool IsStackingToChestInMenu { get; private set; }
+        public static PerScreen<bool> IsStackingToChestInMenu { get; } = new();
 
         public static void OnConstructedItemGrabMenu(ItemGrabMenu itemGrabMenu)
         {
@@ -46,12 +47,12 @@ namespace ConvenientInventory.QuickStack
         {
             try
             {
-                IsStackingToChestInMenu = true;
+                IsStackingToChestInMenu.Value = true;
                 return StackToChestInMenuCore(itemGrabMenu, playSound);
             }
             finally
             {
-                IsStackingToChestInMenu = false;
+                IsStackingToChestInMenu.Value = false;
             }
         }
 
@@ -94,9 +95,9 @@ namespace ConvenientInventory.QuickStack
                     continue;
                 }
 
-                if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChest(playerItem))
+                if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChests(playerItem))
                 {
-                    // Skip item locked by ConvenientChests
+                    // Skip item locked by Convenient Chests
                     continue;
                 }
 
@@ -139,6 +140,9 @@ namespace ConvenientInventory.QuickStack
                             // Remove player item from inventory (and overflow list, if we are tracking it).
                             who.removeItemFromInventory(playerItem);
                             overflowItems.Remove(playerItem);
+
+                            // Move onto the next player item since we just removed this one.
+                            break;
                         }
                     }
 
@@ -152,10 +156,9 @@ namespace ConvenientInventory.QuickStack
                     }
                 }
 
-                // Check if mod Convenient Chests accept this item
-                if (ModIntegrations.IsConvenientChestsInstalled && chest.AcceptThisItemByConvenientChest(playerItem))
+                if (ModIntegrations.IsConvenientChestsInstalled && chest.ItemAcceptedByConvenientChests(playerItem))
                 {
-                    // accepted by the convenient chests, add it to overflow items to deal with it later
+                    // Item accepted by Convenient Chests; add it to overflow items regardless of finding a stackable chest item.
                     overflowItems.Add(playerItem);
                 }
             }

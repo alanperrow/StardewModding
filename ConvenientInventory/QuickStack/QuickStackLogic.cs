@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ConvenientInventory.Compatibility;
+using ConvenientInventory.Integrations;
 using ConvenientInventory.TypedChests;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -65,9 +65,9 @@ namespace ConvenientInventory.QuickStack
                         continue;
                     }
 
-                    if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChest(playerItem))
+                    if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChests(playerItem))
                     {
-                        // Skip item locked by ConvenientChests
+                        // Skip item locked by Convenient Chests
                         continue;
                     }
 
@@ -114,15 +114,18 @@ namespace ConvenientInventory.QuickStack
                                     new ItemGrabMenu.TransferredItemSprite(playerItem.getOne(), inventoryComponent.bounds.X, inventoryComponent.bounds.Y));
                             }
 
+                            quickStackAnimation?.AddToAnimation(typedChest, playerItem);
+                            quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
+
                             if (playerItem.Stack == 0)
                             {
                                 // Remove player item from inventory (and overflow list, if we are tracking it).
                                 who.removeItemFromInventory(playerItem);
                                 overflowItems.Remove(playerItem);
-                            }
 
-                            quickStackAnimation?.AddToAnimation(typedChest, playerItem);
-                            quickStackSummary.AddToSummary(typedChest, playerItem.Name, playerItem.Stack, beforeStack);
+                                // Move onto the next player item since we just removed this one.
+                                break;
+                            }
                         }
 
                         if (chestItem.Stack == chestItem.maximumStackSize() && playerItem.Stack != 0)
@@ -135,10 +138,9 @@ namespace ConvenientInventory.QuickStack
                         }
                     }
 
-                    // Check if mod Convenient Chests accept this item
-                    if (ModIntegrations.IsConvenientChestsInstalled && chest.AcceptThisItemByConvenientChest(playerItem))
+                    if (ModIntegrations.IsConvenientChestsInstalled && chest.ItemAcceptedByConvenientChests(playerItem))
                     {
-                        // accepted by the convenient chests, add it to overflow items to deal with it later
+                        // Item accepted by Convenient Chests; add it to overflow items regardless of finding a stackable chest item.
                         overflowItems.Add(playerItem);
                     }
                 }
@@ -285,6 +287,10 @@ namespace ConvenientInventory.QuickStack
             if (chestType is ChestType.Package or ChestType.Dungeon or ChestType.NonPlayer or ChestType.Error)
             {
                 // Do not consider these chest types for quick stack.
+                return false;
+            }
+            else if (!ModEntry.Config.QuickStack.IntoMiniFridges && chestType == ChestType.MiniFridge)
+            {
                 return false;
             }
             else if (!ModEntry.Config.QuickStack.IntoHoppers && chestType == ChestType.Hopper)
@@ -446,52 +452,55 @@ namespace ConvenientInventory.QuickStack
                 }
             }
 
-            // Kitchen fridge
-            if (gameLocation is FarmHouse farmHouse)
+            if (ModEntry.Config.QuickStack.IntoFridges)
             {
-                Chest fridgeChest = farmHouse.GetFridge();
-                if (ShouldQuickStackInto(fridgeChest, out _))
+                // Kitchen fridge
+                if (gameLocation is FarmHouse farmHouse)
                 {
-                    Point fridgeTileLocPoint = farmHouse.GetFridgePosition().Value;
-                    Vector2 fridgeTileLoc = new(
-                        fridgeTileLocPoint.X,
-                        fridgeTileLocPoint.Y);
+                    Chest fridgeChest = farmHouse.GetFridge();
+                    if (ShouldQuickStackInto(fridgeChest, out _))
+                    {
+                        Point fridgeTileLocPoint = farmHouse.GetFridgePosition().Value;
+                        Vector2 fridgeTileLoc = new(
+                            fridgeTileLocPoint.X,
+                            fridgeTileLocPoint.Y);
 
-                    if (orderByDistance)
-                    {
-                        Vector2 fridgeTileCenterPosition = GetTileCenterPosition(fridgeTileLocPoint);
-                        int fridgePosX = (int)fridgeTileCenterPosition.X;
-                        int fridgePosY = (int)fridgeTileCenterPosition.Y;
-                        AddChestToList(fridgeChest, typedChestsWithDistance, true, gameLocation, fridgePosX, fridgePosY, origin, ChestType.Fridge, fridgeTileLoc);
-                    }
-                    else
-                    {
-                        AddChestToList(fridgeChest, typedChests, false, gameLocation, chestType: ChestType.Fridge, visualTileLoc: fridgeTileLoc);
+                        if (orderByDistance)
+                        {
+                            Vector2 fridgeTileCenterPosition = GetTileCenterPosition(fridgeTileLocPoint);
+                            int fridgePosX = (int)fridgeTileCenterPosition.X;
+                            int fridgePosY = (int)fridgeTileCenterPosition.Y;
+                            AddChestToList(fridgeChest, typedChestsWithDistance, true, gameLocation, fridgePosX, fridgePosY, origin, ChestType.Fridge, fridgeTileLoc);
+                        }
+                        else
+                        {
+                            AddChestToList(fridgeChest, typedChests, false, gameLocation, chestType: ChestType.Fridge, visualTileLoc: fridgeTileLoc);
+                        }
                     }
                 }
-            }
 
-            // Island kitchen fridge
-            if (gameLocation is IslandFarmHouse islandFarmHouse)
-            {
-                Chest islandFridgeChest = islandFarmHouse.GetFridge();
-                if (ShouldQuickStackInto(islandFridgeChest, out _))
+                // Island kitchen fridge
+                if (gameLocation is IslandFarmHouse islandFarmHouse)
                 {
-                    Point islandFridgeTileLocPoint = islandFarmHouse.GetFridgePosition().Value;
-                    Vector2 islandFridgeTileLoc = new(
-                        islandFridgeTileLocPoint.X,
-                        islandFridgeTileLocPoint.Y);
+                    Chest islandFridgeChest = islandFarmHouse.GetFridge();
+                    if (ShouldQuickStackInto(islandFridgeChest, out _))
+                    {
+                        Point islandFridgeTileLocPoint = islandFarmHouse.GetFridgePosition().Value;
+                        Vector2 islandFridgeTileLoc = new(
+                            islandFridgeTileLocPoint.X,
+                            islandFridgeTileLocPoint.Y);
 
-                    if (orderByDistance)
-                    {
-                        Vector2 islandFridgeTileCenterPosition = GetTileCenterPosition(islandFridgeTileLocPoint);
-                        int fridgePosX = (int)islandFridgeTileCenterPosition.X;
-                        int fridgePosY = (int)islandFridgeTileCenterPosition.Y;
-                        AddChestToList(islandFridgeChest, typedChestsWithDistance, true, gameLocation, fridgePosX, fridgePosY, origin, ChestType.IslandFridge, islandFridgeTileLoc);
-                    }
-                    else
-                    {
-                        AddChestToList(islandFridgeChest, typedChests, false, gameLocation, chestType: ChestType.IslandFridge, visualTileLoc: islandFridgeTileLoc);
+                        if (orderByDistance)
+                        {
+                            Vector2 islandFridgeTileCenterPosition = GetTileCenterPosition(islandFridgeTileLocPoint);
+                            int fridgePosX = (int)islandFridgeTileCenterPosition.X;
+                            int fridgePosY = (int)islandFridgeTileCenterPosition.Y;
+                            AddChestToList(islandFridgeChest, typedChestsWithDistance, true, gameLocation, fridgePosX, fridgePosY, origin, ChestType.IslandFridge, islandFridgeTileLoc);
+                        }
+                        else
+                        {
+                            AddChestToList(islandFridgeChest, typedChests, false, gameLocation, chestType: ChestType.IslandFridge, visualTileLoc: islandFridgeTileLoc);
+                        }
                     }
                 }
             }
@@ -673,67 +682,70 @@ namespace ConvenientInventory.QuickStack
                 }
             }
 
-            // Kitchen fridge
-            if (gameLocation is FarmHouse farmHouse)
+            if (ModEntry.Config.QuickStack.IntoFridges)
             {
-                Chest fridgeChest = farmHouse.GetFridge();
-                if (ShouldQuickStackInto(fridgeChest, out _))
+                // Kitchen fridge
+                if (gameLocation is FarmHouse farmHouse)
                 {
-                    Point fridgeTileLocPoint = farmHouse.GetFridgePosition().Value;
-                    Vector2 fridgeTileLoc = new(
-                        fridgeTileLocPoint.X,
-                        fridgeTileLocPoint.Y);
+                    Chest fridgeChest = farmHouse.GetFridge();
+                    if (ShouldQuickStackInto(fridgeChest, out _))
+                    {
+                        Point fridgeTileLocPoint = farmHouse.GetFridgePosition().Value;
+                        Vector2 fridgeTileLoc = new(
+                            fridgeTileLocPoint.X,
+                            fridgeTileLocPoint.Y);
 
-                    if (originTile == null)
-                    {
-                        // We are dealing with actual positions
-                        Vector2 fridgeTileCenterPosition = GetTileCenterPosition(fridgeTileLocPoint);
-                        if (IsPositionWithinRange(originPosition.Value, fridgeTileCenterPosition, range))
+                        if (originTile == null)
                         {
-                            tx = (int)fridgeTileCenterPosition.X;
-                            ty = (int)fridgeTileCenterPosition.Y;
-                            AddChestToList(fridgeChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.Fridge, fridgeTileLoc);
+                            // We are dealing with actual positions
+                            Vector2 fridgeTileCenterPosition = GetTileCenterPosition(fridgeTileLocPoint);
+                            if (IsPositionWithinRange(originPosition.Value, fridgeTileCenterPosition, range))
+                            {
+                                tx = (int)fridgeTileCenterPosition.X;
+                                ty = (int)fridgeTileCenterPosition.Y;
+                                AddChestToList(fridgeChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.Fridge, fridgeTileLoc);
+                            }
                         }
-                    }
-                    else
-                    {
-                        // We have a specified tile origin point
-                        if (IsTileWithinRange(originTile.Value, fridgeTileLocPoint, range))
+                        else
                         {
-                            AddChestToList(fridgeChest, chestList, withDist, gameLocation, chestType: ChestType.Fridge, visualTileLoc: fridgeTileLoc);
+                            // We have a specified tile origin point
+                            if (IsTileWithinRange(originTile.Value, fridgeTileLocPoint, range))
+                            {
+                                AddChestToList(fridgeChest, chestList, withDist, gameLocation, chestType: ChestType.Fridge, visualTileLoc: fridgeTileLoc);
+                            }
                         }
                     }
                 }
-            }
 
-            // Island kitchen fridge
-            if (gameLocation is IslandFarmHouse islandFarmHouse)
-            {
-                Chest islandFridgeChest = islandFarmHouse.GetFridge();
-                if (ShouldQuickStackInto(islandFridgeChest, out _))
+                // Island kitchen fridge
+                if (gameLocation is IslandFarmHouse islandFarmHouse)
                 {
-                    Point islandFridgeTileLocPoint = islandFarmHouse.GetFridgePosition().Value;
-                    Vector2 islandFridgeTileLoc = new(
-                        islandFridgeTileLocPoint.X,
-                        islandFridgeTileLocPoint.Y);
+                    Chest islandFridgeChest = islandFarmHouse.GetFridge();
+                    if (ShouldQuickStackInto(islandFridgeChest, out _))
+                    {
+                        Point islandFridgeTileLocPoint = islandFarmHouse.GetFridgePosition().Value;
+                        Vector2 islandFridgeTileLoc = new(
+                            islandFridgeTileLocPoint.X,
+                            islandFridgeTileLocPoint.Y);
 
-                    if (originTile == null)
-                    {
-                        // We are dealing with actual positions
-                        Vector2 fridgeTileCenterPosition = GetTileCenterPosition(islandFridgeTileLocPoint);
-                        if (IsPositionWithinRange(originPosition.Value, fridgeTileCenterPosition, range))
+                        if (originTile == null)
                         {
-                            tx = (int)fridgeTileCenterPosition.X;
-                            ty = (int)fridgeTileCenterPosition.Y;
-                            AddChestToList(islandFridgeChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.IslandFridge, islandFridgeTileLoc);
+                            // We are dealing with actual positions
+                            Vector2 fridgeTileCenterPosition = GetTileCenterPosition(islandFridgeTileLocPoint);
+                            if (IsPositionWithinRange(originPosition.Value, fridgeTileCenterPosition, range))
+                            {
+                                tx = (int)fridgeTileCenterPosition.X;
+                                ty = (int)fridgeTileCenterPosition.Y;
+                                AddChestToList(islandFridgeChest, chestList, withDist, gameLocation, tx, ty, originPosition.Value, ChestType.IslandFridge, islandFridgeTileLoc);
+                            }
                         }
-                    }
-                    else
-                    {
-                        // We have a specified tile origin point
-                        if (IsTileWithinRange(originTile.Value, islandFarmHouse.fridgePosition, range))
+                        else
                         {
-                            AddChestToList(islandFridgeChest, chestList, withDist, gameLocation, chestType: ChestType.IslandFridge, visualTileLoc: islandFridgeTileLoc);
+                            // We have a specified tile origin point
+                            if (IsTileWithinRange(originTile.Value, islandFarmHouse.fridgePosition, range))
+                            {
+                                AddChestToList(islandFridgeChest, chestList, withDist, gameLocation, chestType: ChestType.IslandFridge, visualTileLoc: islandFridgeTileLoc);
+                            }
                         }
                     }
                 }
