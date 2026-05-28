@@ -21,7 +21,7 @@ namespace ConvenientInventory.Integrations
         private static readonly PerScreen<bool> useHighlightStylePreviewColor = new();
         private static readonly PerScreen<Color> highlightStylePreviewColor = new(() => Color.White);
 
-        private static IConvenientChestAPI convenientChestsApi;
+        private static IConvenientChests2Api convenientChests2Api;
         private static ICustomBackpackApi customBackpackApi;
         private static Type customBackpackFullInventoryPageType;
 
@@ -86,7 +86,7 @@ namespace ConvenientInventory.Integrations
                 InitializeApi(apiCBF, helper, monitor);
             }
 
-            var apiCC = helper.ModRegistry.GetApi<IConvenientChestAPI>("SummerFleur.ConvenientChests");
+            var apiCC = helper.ModRegistry.GetApi<IConvenientChests2Api>("SummerFleur.ConvenientChests");
             if (apiCC != null)
             {
                 InitializeApi(apiCC, helper, monitor);
@@ -619,26 +619,26 @@ namespace ConvenientInventory.Integrations
         /// <summary>
         /// Initializes mod integrations with the Convenient Chests 2 mod and API.
         /// </summary>
-        public static void InitializeApi(IConvenientChestAPI api, IModHelper helper, IMonitor monitor)
+        public static void InitializeApi(IConvenientChests2Api api, IModHelper helper, IMonitor monitor)
         {
             try
             {
                 IModInfo ccModInfo = helper.ModRegistry.Get("SummerFleur.ConvenientChests")
-                    ?? throw new InvalidOperationException("Convenient Chests mod not found in mod registry.");
+                    ?? throw new InvalidOperationException("Convenient Chests 2 mod not found in mod registry.");
 
                 // Ensure mod version is recent enough where API interface includes `ChestAcceptThisItem(Chest, Item)` method.
                 if (ccModInfo.Manifest.Version.IsOlderThan("2.0.2"))
                 {
-                    throw new InvalidOperationException($"Convenient Chests mod version {ccModInfo.Manifest.Version} is outdated. " +
+                    throw new InvalidOperationException($"Convenient Chests 2 mod version {ccModInfo.Manifest.Version} is outdated. " +
                         $"Please update to version 2.0.2 or later to enable compatibility with Convenient Inventory.");
                 }
 
                 // Initialization successful.
-                convenientChestsApi = api;
+                convenientChests2Api = api;
             }
             catch (Exception ex)
             {
-                monitor.Log($"Could not initialize mod integrations with Convenient Chests:\n{ex.Message}", LogLevel.Warn);
+                monitor.Log($"Could not initialize mod integrations with Convenient Chests 2:\n{ex.Message}", LogLevel.Warn);
             }
         }
 
@@ -653,7 +653,7 @@ namespace ConvenientInventory.Integrations
         /// <returns>
         /// <see langword="true"/> if the chest accepts the item; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool ItemAcceptedByConvenientChests(this Chest chest, Item item) => convenientChestsApi.ChestAcceptThisItem(chest, item);
+        public static bool ItemAcceptedByConvenientChests(this Chest chest, Item item) => convenientChests2Api.ChestAcceptThisItem(chest, item);
 
         /// <summary>
         /// Determines whether the given item is locked in inventory by Convenient Chests.
@@ -661,6 +661,6 @@ namespace ConvenientInventory.Integrations
         /// <returns>
         /// <see langword="true"/> if the item is locked; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool ItemLockedByConvenientChests(Item item) => convenientChestsApi.InventoryLockThisItem(item);
+        public static bool ItemLockedByConvenientChests(Item item) => convenientChests2Api.InventoryLockThisItem(item);
     }
 }

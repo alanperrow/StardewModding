@@ -7,7 +7,7 @@ namespace ConvenientInventory.Integrations
     /// <summary>
     /// SummerFleur.ConvenientChests API, for Version 2.0.2 or later.
     /// </summary>
-    public interface IConvenientChestAPI
+    public interface IConvenientChests2Api
     {
         /// <summary>
         /// Get whether the given chest accepts the given item.
