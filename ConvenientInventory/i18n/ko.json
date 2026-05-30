@@ -1,126 +1,183 @@
-﻿{
-  // Translated by asas84562
-  "QuickStackButton.hoverText": "주변 상자에 빠른 정리",
+{
+  // UI
+  "QuickStackButton.hoverText": "주변 상자에 빠른 중첩", // If this is translated, try to keep the string length as close to the original as possible.
+
   "AutoOrganizeButton.hoverText": "자동 정리 켜짐",
-  "AutoOrganizeButton.hoverText.disable": "(우클릭으로 비활성화)",
-  "AutoOrganizeButton.hoverText.disable-gamepad": "(X 버튼으로 비활성화)",
-  "QuickStackToggleChestButton.hoverText.enabled": "주변 빠른 정리 활성화됨",
-  "QuickStackToggleChestButton.hoverText.disabled": "주변 빠른 정리 비활성화됨",
-  "QuickStackToggleChestButton.hoverText.priority1": "우선순위 +1",
-  "QuickStackToggleChestButton.hoverText.priority2": "우선순위 +2",
-  "QuickStackToggleChestButton.hoverText.priority3": "우선순위 +3",
-  "FillStacksQuickStackButton.hoverText": "아이템 빠른 정리",
-  "ModConfigMenu.Label.QuickStackToNearbyChests": "주변 상자에 빠른 정리",
-  "ModConfigMenu.IsEnableQuickStack.Name": "빠른 정리 활성화?",
-  "ModConfigMenu.IsEnableQuickStack.Desc": "활성화하면 인벤토리에 \"주변 상자에 빠른 정리\" 버튼이 추가됩니다. 버튼을 누르면 인벤토리의 아이템이 해당 아이템을 가진 주변 상자에 자동으로 정리됩니다.",
-  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "단축키 사용?",
-  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "활성화하면 아래에 설정된 단축키를 눌러 인벤토리를 열지 않아도 빠른 정리를 사용할 수 있습니다.",
-  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "키 설정 (키보드)",
-  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "이 키를 눌러 빠른 정리를 실행합니다.",
-  "ModConfigMenu.QuickStackControllerHotkey.Name": "키 설정 (컨트롤러)",
-  "ModConfigMenu.QuickStackControllerHotkey.Desc": "이 버튼을 눌러 빠른 정리를 실행합니다.",
+  "AutoOrganizeButton.hoverText.disable": "(우클릭하여 비활성화)",
+  "AutoOrganizeButton.hoverText.disable-gamepad": "(X를 눌러 비활성화)",
+
+  "QuickStackToggleChestButton.hoverText.enabled": "주변 빠른 중첩 활성화됨",
+  "QuickStackToggleChestButton.hoverText.disabled": "주변 빠른 중첩 비활성화됨",
+  "QuickStackToggleChestButton.hoverText.priority1": "+1 우선순위",
+  "QuickStackToggleChestButton.hoverText.priority2": "+2 우선순위",
+  "QuickStackToggleChestButton.hoverText.priority3": "+3 우선순위",
+
+  "FillStacksQuickStackButton.hoverText": "아이템 빠른 중첩",
+
+  // ModConfigMenu
+  "ModConfigMenu.Label.QuickStackToNearbyChests": "주변 상자에 빠른 중첩",
+
+  "ModConfigMenu.IsEnableQuickStack.Name": "빠른 중첩 활성화?",
+  "ModConfigMenu.IsEnableQuickStack.Desc": "활성화하면 인벤토리 메뉴에 \"주변 상자에 빠른 중첩\" 버튼이 추가됩니다. 이 버튼을 누르면 인벤토리의 아이템을 해당 아이템이 들어있는 주변 상자로 중첩하여 이동시킵니다.",
+
+  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "단축키 활성화?",
+  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "활성화하면 아래에 지정된 빠른 중첩 단축키를 눌러 인벤토리 메뉴 밖에서도 아이템을 빠르게 중첩할 수 있습니다.",
+
+  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "단축키 (키보드)",
+  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "이 키를 눌러 아이템을 빠르게 중첩합니다.",
+
+  "ModConfigMenu.QuickStackControllerHotkey.Name": "단축키 (컨트롤러)",
+  "ModConfigMenu.QuickStackControllerHotkey.Desc": "이 버튼을 눌러 아이템을 빠르게 중첩합니다.",
+
   "ModConfigMenu.QuickStackRange.Name": "범위",
-  "ModConfigMenu.QuickStackRange.Desc": "플레이어 주변 몇 타일까지 상자를 검색할지 설정합니다.\n\n\"Location\"으로 설정하면 현재 맵의 모든 상자가 대상이 됩니다.",
-  "ModConfigMenu.QuickStackRange.Desc-Global": "\n\n\"Global\"로 설정하면 세계 전체의 모든 상자가 대상이 됩니다.",
-  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "범위가 \"Global\"로 설정되었지만 \"Location\"으로 변경되었습니다. \"Global\"은 Chests Anywhere 모드가 있어야 사용 가능합니다.",
-  "ModConfigMenu.IsQuickStackOverflowItems.Name": "오버플로우 아이템?",
-  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "활성화하면 하나의 스택만 채우는 것이 아니라 가능한 최대한 상자에 아이템을 넣습니다.",
+  "ModConfigMenu.QuickStackRange.Desc": "주변 상자를 검색할 플레이어로부터의 타일 거리입니다.\n\n\"Location\"으로 설정하면 플레이어의 현재 위치에 있는 모든 상자가 고려됩니다.",
+  "ModConfigMenu.QuickStackRange.Desc-Global": "\n\n\"Global\"로 설정하면 전 세계의 모든 상자가 고려됩니다.",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange 설정값이 \"Global\"이었으나 \"Location\"으로 재설정되었습니다. \"Global\"은 Chests Anywhere 모드가 설치된 경우에만 지원됩니다.",
+
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "초과 아이템 허용?",
+  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "활성화하면 빠른 중첩 시 단일 스택뿐만 아니라 해당 아이템이 포함된 상자에 가능한 한 많은 아이템을 채워 넣습니다.",
+
   "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "아이템 품질 무시?",
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(\"오버플로우 아이템\" 필요)\n활성화하면 같은 아이템이라면 품질이 달라도 같은 상자에 정리됩니다.",
-  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Name": "색상 차이 무시?",
-  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Desc": "(\"오버플로우 아이템\" 필요)\n활성화하면 같은 아이템의 색상 변형(예: 꽃 색상)이 달라도 함께 정리됩니다.",
-  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Name": "이름 변형 무시?",
-  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Desc": "(\"오버플로우 아이템\" 필요)\n활성화하면 같은 종류의 이름 변형(예: 맛이 다른 꿀)도 함께 정리됩니다.",
-  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "비중첩 아이템 처리:",
-  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "(\"오버플로우 아이템\" 필요)\n같은 아이템이 있는 상자에 비중첩 아이템을 정리할지 선택합니다.",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(\"초과 아이템 허용?\" 활성화 필요)\n활성화하면 빠른 중첩 시 동일한 아이템의 '어떤 품질'이라도 들어있는 상자에 아이템을 넣습니다.",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Name": "아이템 색상 변형 무시?",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Desc": "(\"초과 아이템 허용?\" 활성화 필요)\n활성화하면 빠른 중첩 시 동일한 아이템의 '어떤 색상 변형'(예: 색상이 있는 꽃)이라도 들어있는 상자에 아이템을 넣습니다.",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Name": "아이템 이름 변형 무시?",
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Desc": "(\"초과 아이템 허용?\" 활성화 필요)\n활성화하면 빠른 중첩 시 동일한 아이템의 '어떤 이름 변형'(예: 맛이 가미된 꿀)이라도 들어있는 상자에 아이템을 넣습니다.",
+
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "비중첩 아이템 초과 허용:",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "(\"초과 아이템 허용?\" 활성화 필요)\n상자에 동일한 아이템이 있을 때 초과 아이템으로 빠른 중첩이 가능한 비중첩 아이템 유형을 선택하세요.\n\n비중첩 아이템을 빠른 중첩하지 않으려면 \"None\"을 선택하세요.",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-None": "없음",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-All": "모두",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptTools": "도구 제외",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeapons": "도구 및 무기 제외",
   "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeaponsEquips": "도구, 무기, 장비 제외",
-  "ModConfigMenu.SubHeader.InChestMenu": "상자 메뉴",
-  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Name": "상자에서도 단축키 허용?",
-  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "활성화하면 상자 UI에서도 빠른 정리 단축키를 사용할 수 있습니다.",
-  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "기존 스택 버튼 대체?",
-  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "활성화하면 \"기존 스택 채우기\" 버튼이 \"빠른 정리\" 버튼으로 변경됩니다.",
-  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "아이콘 변경?",
-  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "빠른 정리 버튼의 아이콘을 다른 스타일로 변경합니다.",
-  "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "상자별 사용 설정?",
-  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "각 상자별로 빠른 정리 대상 포함 여부를 설정할 수 있습니다.",
-  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "상자 우선순위 설정?",
-  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "상자마다 우선순위를 설정할 수 있으며 높은 순서대로 정리됩니다.",
-  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "토글 버튼 숨기기?",
-  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "상자 메뉴에서 토글 버튼을 숨깁니다.",
-  "ModConfigMenu.SubHeader.OtherInventories": "기타 저장소",
-  "ModConfigMenu.IsQuickStackIntoFridges.Name": "냉장고에도 넣기?",
-  "ModConfigMenu.IsQuickStackIntoFridges.Desc": "활성화하면 빠른 정리 사용 시 근처의 냉장고도 대상으로 포함됩니다.",
-  "ModConfigMenu.IsQuickStackIntoMiniFridges.Name": "미니 냉장고에도 넣기?",
-  "ModConfigMenu.IsQuickStackIntoMiniFridges.Desc": "활성화하면 빠른 정리 사용 시 근처의 미니 냉장고도 대상으로 포함됩니다.",
-  "ModConfigMenu.IsQuickStackIntoMills.Name": "제분기 포함?",
-  "ModConfigMenu.IsQuickStackIntoMills.Desc": "주변 제분기도 정리 대상에 포함합니다.",
+
+  "ModConfigMenu.SubHeader.InChestMenu": "상자 메뉴 내 설정",
+
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Name": "상자 메뉴 내 단축키 허용?",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "(\"단축키 활성화?\" 활성화 필요)\n활성화하면 상자 메뉴 내에서도 빠른 중첩 단축키가 작동하며, 이 경우 해당 특정 상자로 아이템이 빠르게 중첩됩니다.",
+
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "중첩 추가 버튼으로 빠른 중첩?",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "활성화하면 상자 메뉴의 \"기존 중첩에 추가\" 버튼이 \"아이템 빠른 중첩\" 버튼으로 변경되며, 클릭 시 해당 상자로 아이템을 빠르게 중첩합니다.",
+
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "중첩 추가 버튼에 빠른 중첩 아이콘 사용?",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "(\"중첩 추가 버튼으로 빠른 중첩?\" 활성화 필요)\n활성화하면 상자 메뉴의 \"아이템 빠른 중첩\" 버튼 아이콘이 약간 다른 아이콘으로 시각적으로 대체됩니다.",
+
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "상자별 빠른 중첩 토글 활성화?",
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "활성화하면 상자 메뉴에 빠른 중첩 토글 버튼이 추가되어, 빠른 중첩 시 해당 상자를 고려할지 여부를 결정할 수 있습니다.",
+
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "상자별 빠른 중첩 우선순위 설정?",
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "(\"상자별 빠른 중첩 토글 활성화?\" 활성화 필요)\n활성화하면 빠른 중첩 토글 버튼으로 해당 상자의 우선순위 레벨을 지정할 수 있습니다. 우선순위가 높은 상자가 빠른 중첩 시 먼저 고려됩니다.",
+
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "빠른 중첩 토글 버튼 숨기기?",
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "(\"상자별 빠른 중첩 토글 활성화?\" 활성화 필요)\n활성화하면 상자 메뉴에서 빠른 중첩 토글 버튼이 숨겨집니다. 숨겨진 상태에서도 상자의 토글/우선순위 설정은 계속 적용됩니다.",
+
+  "ModConfigMenu.SubHeader.OtherInventories": "기타 보관함",
+
+  "ModConfigMenu.IsQuickStackIntoFridges.Name": "냉장고 포함?",
+  "ModConfigMenu.IsQuickStackIntoFridges.Desc": "활성화하면 빠른 중첩 시 주변의 냉장고를 고려합니다.",
+
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Name": "미니 냉장고 포함?",
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Desc": "활성화하면 빠른 중첩 시 주변의 미니 냉장고를 고려합니다.",
+
+  "ModConfigMenu.IsQuickStackIntoMills.Name": "방앗간 포함?",
+  "ModConfigMenu.IsQuickStackIntoMills.Desc": "활성화하면 빠른 중첩 시 주변의 방앗간을 고려합니다.",
+
   "ModConfigMenu.IsQuickStackIntoJunimoHuts.Name": "주니모 오두막 포함?",
-  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Desc": "주니모 오두막도 포함합니다.",
-  "ModConfigMenu.IsQuickStackIntoDressers.Name": "옷장 포함?",
-  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "옷장도 포함합니다.",
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Desc": "활성화하면 빠른 중첩 시 주변의 주니모 오두막을 고려합니다.",
+
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "서랍장 포함?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(\"초과 아이템 허용?\" 활성화 필요)\n활성화하면 빠른 중첩 시 주변의 서랍장을 고려합니다.",
+
   "ModConfigMenu.IsQuickStackIntoHoppers.Name": "호퍼 포함?",
-  "ModConfigMenu.IsQuickStackIntoHoppers.Desc": "호퍼도 포함합니다.",
-  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "미니 출하함 포함?",
-  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "미니 출하함도 포함합니다.",
+  "ModConfigMenu.IsQuickStackIntoHoppers.Desc": "활성화하면 빠른 중첩 시 주변의 호퍼를 고려합니다.",
+
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "미니 배송함 포함?",
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "활성화하면 빠른 중첩 시 주변의 미니 배송함을 고려합니다.",
+
   "ModConfigMenu.SubHeader.Animation": "애니메이션",
-  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "애니메이션 사용?",
-  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "아이템이 어디로 이동했는지 보여주는 애니메이션을 재생합니다.",
-  "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "아이템 이동 속도",
-  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "아이템 이동 속도 설정",
-  "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "스택 속도",
-  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "아이템이 쌓이는 속도 설정",
+
+  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "빠른 중첩 애니메이션 활성화?",
+  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "활성화하면 아이템이 빠른 중첩될 때 각 아이템이 어디에 저장되는지 시각적으로 보여주는 애니메이션이 재생됩니다.",
+
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "애니메이션: 아이템 속도",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "빠른 중첩 애니메이션용:\n빠른 중첩된 아이템이 저장된 상자로 이동하는 속도를 조절합니다.\n\n0.5x: 절반 속도\n1x: 보통 속도\n3x: 3배 속도",
+
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "애니메이션: 중첩 속도",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "빠른 중첩 애니메이션용:\n아이템이 저장된 상자에 개별적으로 중첩되는 속도를 조절합니다.\n\n0.5x: 절반 속도\n1x: 보통 속도\n3x: 3배 속도",
+
   "ModConfigMenu.SubHeader.AdditionalSettings": "추가 설정",
-  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "툴팁에 상자 표시?",
-  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "마우스를 올리면 주변 상자 미리보기를 표시합니다.",
-  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Name": "상자 없을 때 소리 끄기?",
-  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Desc": "주변 상자가 있을 때만 효과음을 재생합니다.",
+
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "툴팁에 주변 상자 표시?",
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "활성화하면 빠른 중첩 버튼에 마우스를 올렸을 때 빠른 중첩 대상으로 고려된 모든 주변 상자의 미리보기를 거리순으로 보여줍니다.",
+
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Name": "주변 상자 없을 때 효과음 억제?",
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Desc": "활성화하면 주변에 상자가 없을 때 빠른 중첩 버튼이나 단축키를 눌러도 효과음이 재생되지 않습니다.",
+
   "ModConfigMenu.Label.FavoriteItems": "즐겨찾기 아이템",
-  "ModConfigMenu.IsEnableFavoriteItems.Name": "즐겨찾기 기능 사용?",
-  "ModConfigMenu.IsEnableFavoriteItems.Desc": "즐겨찾기된 아이템은 상자로 이동되지 않고 삭제/버리기/출하도 방지됩니다.",
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "키 설정 (키보드)",
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "아이템 선택 시 이 키를 누르고 있으면 즐겨찾기로 설정됩니다.",
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "키 설정 (컨트롤러)",
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "아이템 선택 시 이 버튼을 누르고 있으면 즐겨찾기로 설정됩니다.",
-  "ModConfigMenu.SubHeader.Customize": "커스터마이즈",
+
+  "ModConfigMenu.IsEnableFavoriteItems.Name": "즐겨찾기 아이템 활성화?",
+  "ModConfigMenu.IsEnableFavoriteItems.Desc": "활성화하면 인벤토리의 아이템을 즐겨찾기로 지정할 수 있습니다. 즐겨찾기된 아이템은 상자에 중첩할 때 무시됩니다. 또한 쓰레기통에 버리기, 떨어뜨리기, 배송하기가 방지됩니다.",
+
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "단축키 (키보드)",
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "아이템을 선택할 때 이 키를 누르고 있으면 즐겨찾기로 지정합니다.",
+
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "단축키 (컨트롤러)",
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "아이템을 선택할 때 이 버튼을 누르고 있으면 즐겨찾기로 지정합니다.",
+
+  "ModConfigMenu.SubHeader.Customize": "사용자 정의",
+
   "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "미리보기:",
-  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "선택한 강조 스타일을 미리 확인합니다.",
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "선택한 강조 스타일을 미리 봅니다.",
+
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "강조 스타일",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "인벤토리에서 즐겨찾기 아이템을 강조 표시할 스타일을 선택하세요.",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0": "금색 점선",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1": "깔끔한 금색 점선",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2": "두꺼운 금색 테두리",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3": "질감 있는 금색 안쪽 테두리",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "금색 안쪽 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "인벤토리에서 즐겨찾기된 아이템을 강조 표시할 텍스처 스타일을 선택하세요.",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0": "황금 점선",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1": "깔끔한 황금 점선",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2": "굵은 황금 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3": "질감 있는 황금 삽입 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "황금 삽입 테두리",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "어두운 점선",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "두꺼운 어두운 테두리",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "장식된 금색 테두리",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-8": "커스텀 두꺼운 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "굵은 어두운 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "황금 장식 테두리",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-8": "커스텀 굵은 테두리",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-9": "커스텀 점선 테두리",
+
   "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Name": "커스텀 강조 색상 사용?",
-  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Desc": "활성화하면 강조 스타일에 사용자 지정 색상을 적용합니다.",
-  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Name": "강조 색상: R",
-  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Desc": "(\"커스텀 강조 색상 사용\" 필요)\n강조 색상의 빨간색 값입니다.",
-  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Name": "강조 색상: G",
-  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Desc": "(\"커스텀 강조 색상 사용\" 필요)\n강조 색상의 초록색 값입니다.",
-  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Name": "강조 색상: B",
-  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Desc": "(\"커스텀 강조 색상 사용\" 필요)\n강조 색상의 파란색 값입니다.",
-  "ModConfigMenu.Label.TakeAllButOne": "하나만 남기고 전부 가져오기",
-  "ModConfigMenu.IsEnableTakeAllButOne.Name": "하나만 남기기 기능 사용?",
-  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "활성화하면 아래 단축키를 누른 상태에서 아이템을 가져올 때 한 개만 남기고 모두 가져옵니다.",
-  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "키 설정 (키보드)",
-  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "아이템 스택에서 가져올 때 이 키를 누르면 하나만 남기고 전부 가져옵니다.",
-  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "키 설정 (컨트롤러)",
-  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "아이템 스택에서 가져올 때 이 버튼을 누르면 하나만 남기고 전부 가져옵니다.",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Desc": "활성화하면 강조 스타일에 사용자 정의 색상을 적용합니다.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Name": "커스텀 강조 색상: R (빨강)",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Desc": "(\"커스텀 강조 색상 사용?\" 활성화 필요)\n커스텀 강조 색상의 빨간색 구성 요소입니다.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Name": "커스텀 강조 색상: G (초록)",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Desc": "(\"커스텀 강조 색상 사용?\" 활성화 필요)\n커스텀 강조 색상의 초록색 구성 요소입니다.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Name": "커스텀 강조 색상: B (파랑)",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Desc": "(\"커스텀 강조 색상 사용?\" 활성화 필요)\n커스텀 강조 색상의 파란색 구성 요소입니다.",
+
+  "ModConfigMenu.Label.TakeAllButOne": "하나 남기고 모두 가져오기",
+
+  "ModConfigMenu.IsEnableTakeAllButOne.Name": "하나 남기고 모두 가져오기 활성화?",
+  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "활성화하면 아래의 단축키를 누른 상태에서 아이템 묶음을 선택할 때, 하나씩 가져오는 대신 하나만 남기고 즉시 모두 가져옵니다.",
+
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "단축키 (키보드)",
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "아이템 묶음에서 아이템을 가져올 때 이 키를 누르고 있으면 즉시 하나만 남기고 모두 가져옵니다.",
+
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "단축키 (컨트롤러)",
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "아이템 묶음에서 아이템을 가져올 때 이 버튼을 누르고 있으면 즉시 하나만 남기고 모두 가져옵니다.",
+
   "ModConfigMenu.Label.AutoOrganizeChest": "상자 자동 정리",
-  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "자동 정리 버튼 사용?",
-  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "활성화하면 상자 메뉴의 정리 버튼을 우클릭(또는 게임패드 X)으로 자동 정리 ON/OFF를 전환할 수 있습니다. 자동 정리가 켜진 상자는 아이템이 추가되어도 항상 정렬 상태를 유지합니다.",
-  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "설명 표시?",
-  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "활성화하면 자동 정리 버튼 툴팁에 끄는 방법 설명이 추가됩니다.",
+
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "상자 자동 정리 버튼 활성화?",
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "활성화하면 상자 메뉴의 정리 버튼을 우클릭(또는 게임패드에서 (X) 누름)하여 해당 상자의 자동 정리 기능을 켜거나 끌 수 있습니다. 자동 정리가 켜진 상자는 새로운 아이템이 추가되어도 항상 정리된 상태를 유지합니다.",
+
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "설명 툴팁 표시?",
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "활성화하면 자동 정리 버튼의 툴팁에 자동 정리를 끄는 방법에 대한 추가 설명이 포함됩니다.",
+
   "ModConfigMenu.Label.Miscellaneous": "기타",
-  "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "커서 좌우 워프 사용?",
-  "ModConfigMenu.IsEnableInventoryPageSideWarp.Desc": "활성화하면 인벤토리 좌우 끝을 넘길 때 커서가 반대쪽으로 이동합니다."
+
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "인벤토리 커서 측면 이동 활성화?",
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Desc": "활성화하면 컨트롤러 커서를 인벤토리 메뉴의 양쪽 끝 너머로 이동시켰을 때 커서가 반대편 끝으로 즉시 이동합니다."
 }
