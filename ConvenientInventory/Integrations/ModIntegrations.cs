@@ -40,18 +40,13 @@ namespace ConvenientInventory.Integrations
         /// </summary>
         public static void Initialize(IModHelper helper, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
-            InitializeMods(helper);
-            InitializeApis(helper, config, modManifest, monitor);
-        }
-
-        /// <summary>
-        /// Initializes mod integrations for cases not using a mod API.
-        /// </summary>
-        private static void InitializeMods(IModHelper helper)
-        {
+            //TODO: Not seeing Volcano Chest become quick stackable with UnlimitedStorage installed. Is there some other mod causing this?
+            //(Users have reported removing unlimited storage resolves the issue, but I haven't been able to reproduce it myself with just unlimited storage + convenient inventory)
             IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
             IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
-            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests");
+            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests"); // TODO: UNSAFE! If GetApi fails below, this will cause NREs in-game.
+
+            InitializeApis(helper, config, modManifest, monitor);
         }
 
         /// <summary>
@@ -86,7 +81,7 @@ namespace ConvenientInventory.Integrations
                 InitializeApi(apiCBF, helper, monitor);
             }
 
-            var apiCC = helper.ModRegistry.GetApi<IConvenientChests2Api>("SummerFleur.ConvenientChests");
+            var apiCC = helper.ModRegistry.GetApi<IConvenientChests2Api>("SummerFleur.ConvenientChests"); // TODO: UNSAFE! GetApi can fail, we should move this into Init method.
             if (apiCC != null)
             {
                 InitializeApi(apiCC, helper, monitor);
