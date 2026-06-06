@@ -27,7 +27,7 @@ namespace ConvenientInventory.Integrations
 
         public static bool IsChestsAnywhereInstalled { get; private set; }
 
-        public static bool IsConvenientChestsInstalled { get; private set; }
+        public static bool IsConvenientChests2Installed => convenientChests2Api != null;
 
         public static bool IsCustomBackpackFrameworkInstalled => customBackpackApi != null;
 
@@ -40,20 +40,9 @@ namespace ConvenientInventory.Integrations
         /// </summary>
         public static void Initialize(IModHelper helper, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
-            //TODO: Not seeing Volcano Chest become quick stackable with UnlimitedStorage installed. Is there some other mod causing this?
-            //(Users have reported removing unlimited storage resolves the issue, but I haven't been able to reproduce it myself with just unlimited storage + convenient inventory)
             IsWearMoreRingsInstalled = helper.ModRegistry.IsLoaded("bcmpinc.WearMoreRings");
             IsChestsAnywhereInstalled = helper.ModRegistry.IsLoaded("Pathoschild.ChestsAnywhere");
-            IsConvenientChestsInstalled = helper.ModRegistry.IsLoaded("SummerFleur.ConvenientChests"); // TODO: UNSAFE! If GetApi fails below, this will cause NREs in-game.
 
-            InitializeApis(helper, config, modManifest, monitor);
-        }
-
-        /// <summary>
-        /// Initializes mod API integrations.
-        /// </summary>
-        private static void InitializeApis(IModHelper helper, ModConfig config, IManifest modManifest, IMonitor monitor)
-        {
             var modGMCM = helper.ModRegistry.Get("spacechase0.GenericModConfigMenu");
             if (modGMCM != null)
             {
@@ -62,7 +51,7 @@ namespace ConvenientInventory.Integrations
                     var apiGMCM = helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
                     if (apiGMCM != null)
                     {
-                        InitializeApi(apiGMCM, config, modManifest, monitor);
+                        InitializeGMCM(apiGMCM, config, modManifest, monitor);
                     }
                 }
                 else
@@ -70,7 +59,7 @@ namespace ConvenientInventory.Integrations
                     var apiGMCM = helper.ModRegistry.GetApi<IGenericModConfigMenuApi16>("spacechase0.GenericModConfigMenu");
                     if (apiGMCM != null)
                     {
-                        InitializeApi(apiGMCM, config, modManifest, monitor);
+                        InitializeGMCM(apiGMCM, config, modManifest, monitor);
                     }
                 }
             }
@@ -78,20 +67,20 @@ namespace ConvenientInventory.Integrations
             var apiCBF = helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
             if (apiCBF != null)
             {
-                InitializeApi(apiCBF, helper, monitor);
+                InitializeCBF(apiCBF, helper, monitor);
             }
 
-            var apiCC = helper.ModRegistry.GetApi<IConvenientChests2Api>("SummerFleur.ConvenientChests"); // TODO: UNSAFE! GetApi can fail, we should move this into Init method.
-            if (apiCC != null)
+            var modCC2 = helper.ModRegistry.Get("SummerFleur.ConvenientChests");
+            if (modCC2 != null)
             {
-                InitializeApi(apiCC, helper, monitor);
+                InitializeCC2(modCC2, helper, monitor);
             }
         }
 
         /// <summary>
         /// Initializes our mod config through the Generic Mod Config Menu API.
         /// </summary>
-        private static void InitializeApi(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
+        private static void InitializeGMCM(IGenericModConfigMenuApi api, ModConfig config, IManifest modManifest, IMonitor monitor)
         {
             // == Config Validation ==
             if (!IsChestsAnywhereInstalled && ConfigHelper.ParseQuickStackRangeFromConfig(config.QuickStack.Range) == ConfigHelper.QuickStackRange_GlobalInt)
@@ -579,7 +568,7 @@ namespace ConvenientInventory.Integrations
         /// <summary>
         /// Initializes mod integrations with the Custom Backpack Framework mod and API.
         /// </summary>
-        public static void InitializeApi(ICustomBackpackApi api, IModHelper helper, IMonitor monitor)
+        public static void InitializeCBF(ICustomBackpackApi api, IModHelper helper, IMonitor monitor)
         {
             try
             {
@@ -614,22 +603,19 @@ namespace ConvenientInventory.Integrations
         /// <summary>
         /// Initializes mod integrations with the Convenient Chests 2 mod and API.
         /// </summary>
-        public static void InitializeApi(IConvenientChests2Api api, IModHelper helper, IMonitor monitor)
+        public static void InitializeCC2(IModInfo cc2ModInfo, IModHelper helper, IMonitor monitor)
         {
             try
             {
-                IModInfo ccModInfo = helper.ModRegistry.Get("SummerFleur.ConvenientChests")
-                    ?? throw new InvalidOperationException("Convenient Chests 2 mod not found in mod registry.");
-
-                // Ensure mod version is recent enough where API interface includes `ChestAcceptThisItem(Chest, Item)` method.
-                if (ccModInfo.Manifest.Version.IsOlderThan("2.0.2"))
+                // Ensure mod version is recent enough where API includes `ItemAccepted` and `ItemLocked` methods.
+                if (cc2ModInfo.Manifest.Version.IsOlderThan("2.0.2"))
                 {
-                    throw new InvalidOperationException($"Convenient Chests 2 mod version {ccModInfo.Manifest.Version} is outdated. " +
+                    throw new InvalidOperationException($"Convenient Chests 2 mod version {cc2ModInfo.Manifest.Version} is outdated. " +
                         $"Please update to version 2.0.2 or later to enable compatibility with Convenient Inventory.");
                 }
 
                 // Initialization successful.
-                convenientChests2Api = api;
+                convenientChests2Api = helper.ModRegistry.GetApi<IConvenientChests2Api>("SummerFleur.ConvenientChests");
             }
             catch (Exception ex)
             {
@@ -648,7 +634,7 @@ namespace ConvenientInventory.Integrations
         /// <returns>
         /// <see langword="true"/> if the chest accepts the item; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool ItemAcceptedByConvenientChests(this Chest chest, Item item) => convenientChests2Api.ChestAcceptThisItem(chest, item);
+        public static bool ItemAcceptedByConvenientChests2(this Chest chest, Item item) => convenientChests2Api.ChestAcceptThisItem(chest, item);
 
         /// <summary>
         /// Determines whether the given item is locked in inventory by Convenient Chests.
@@ -656,6 +642,6 @@ namespace ConvenientInventory.Integrations
         /// <returns>
         /// <see langword="true"/> if the item is locked; <see langword="false"/> otherwise.
         /// </returns>
-        public static bool ItemLockedByConvenientChests(Item item) => convenientChests2Api.InventoryLockThisItem(item);
+        public static bool ItemLockedByConvenientChests2(Item item) => convenientChests2Api.InventoryLockThisItem(item);
     }
 }

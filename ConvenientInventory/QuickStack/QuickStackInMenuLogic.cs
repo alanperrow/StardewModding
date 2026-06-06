@@ -95,7 +95,7 @@ namespace ConvenientInventory.QuickStack
                     continue;
                 }
 
-                if (ModIntegrations.IsConvenientChestsInstalled && ModIntegrations.ItemLockedByConvenientChests(playerItem))
+                if (ModIntegrations.IsConvenientChests2Installed && ModIntegrations.ItemLockedByConvenientChests2(playerItem))
                 {
                     // Skip item locked by Convenient Chests
                     continue;
@@ -156,7 +156,7 @@ namespace ConvenientInventory.QuickStack
                     }
                 }
 
-                if (ModIntegrations.IsConvenientChestsInstalled && chest.ItemAcceptedByConvenientChests(playerItem))
+                if (ModIntegrations.IsConvenientChests2Installed && chest.ItemAcceptedByConvenientChests2(playerItem))
                 {
                     // Item accepted by Convenient Chests; add it to overflow items regardless of finding a stackable chest item.
                     overflowItems.Add(playerItem);
