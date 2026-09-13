@@ -173,7 +173,8 @@ namespace ConvenientInventory.Integrations
                 name: I18n.ModConfigMenu_IsQuickStackIgnoreItemNameVariation_Name,
                 tooltip: I18n.ModConfigMenu_IsQuickStackIgnoreItemNameVariation_Desc);
 
-            Dictionary<NonStackableTypes, string> nonStackableTypesDisplayNameByEnum = new()
+            // Local function to support switching languages after intializing GMCM.
+            static Dictionary<NonStackableTypes, string> NonStackableTypesDisplayNameByEnum() => new()
             {
                 { NonStackableTypes.None, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescNone() },
                 { NonStackableTypes.All, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescAll() },
@@ -181,15 +182,13 @@ namespace ConvenientInventory.Integrations
                 { NonStackableTypes.ExceptToolsWeapons, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescExceptToolsWeapons() },
                 { NonStackableTypes.ExceptToolsWeaponsEquips, I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_DescExceptToolsWeaponsEquips() },
             };
-            Dictionary<string, NonStackableTypes> nonStackableTypesEnumByDisplayName = nonStackableTypesDisplayNameByEnum.ToDictionary(kv => kv.Value, kv => kv.Key);
+
             api.AddTextOption(
                 mod: modManifest,
-                getValue: () => nonStackableTypesDisplayNameByEnum[config.QuickStack.NonStackableTypesToOverflow],
-                setValue: value =>
-                {
-                    config.QuickStack.NonStackableTypesToOverflow = nonStackableTypesEnumByDisplayName[value];
-                },
-                allowedValues: nonStackableTypesDisplayNameByEnum.Values.ToArray(),
+                getValue: () => config.QuickStack.NonStackableTypesToOverflow.ToString(),
+                setValue: value => config.QuickStack.NonStackableTypesToOverflow = Enum.Parse<NonStackableTypes>(value),
+                allowedValues: NonStackableTypesDisplayNameByEnum().Keys.Select(x => x.ToString()).ToArray(),
+                formatAllowedValue: allowedValue => NonStackableTypesDisplayNameByEnum()[Enum.Parse<NonStackableTypes>(allowedValue)],
                 name: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Name,
                 tooltip: I18n.ModConfigMenu_QuickStackNonStackableTypesToOverflow_Desc);
 
@@ -389,8 +388,8 @@ namespace ConvenientInventory.Integrations
                 name: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Name,
                 tooltip: I18n.ModConfigMenu_PreviewFavoriteItemsHighlightTextureChoice_Desc);
 
-            const string highlightStyleFieldId = "highlightStyle";
-            string[] highlightStyleDescriptions =
+            // Local function to support switching languages after intializing GMCM.
+            static string[] HighlightStyleDescriptions() => new[]
             {
                 $"0: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc0()}",
                 $"1: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc1()}",
@@ -403,6 +402,8 @@ namespace ConvenientInventory.Integrations
                 $"8: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc8()}",
                 $"9: {I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc9()}",
             };
+
+            const string highlightStyleFieldId = "highlightStyle";
             api.AddTextOption(
                 mod: modManifest,
                 getValue: () =>
@@ -411,14 +412,15 @@ namespace ConvenientInventory.Integrations
                     int choiceIndex = config.FavoriteItems.HighlightTextureChoice;
                     highlightStylePreviewTexture.Value = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{choiceIndex}");
 
-                    return highlightStyleDescriptions[choiceIndex];
+                    return choiceIndex.ToString();
                 },
                 setValue: value =>
                 {
                     config.FavoriteItems.HighlightTextureChoice = int.Parse(value[..1]);
                     CachedTextures.FavoriteItemsHighlight = Game1.content.Load<Texture2D>(CachedTextures.ModAssetPrefix + $"favoriteHighlight_{value[0]}");
                 },
-                allowedValues: highlightStyleDescriptions,
+                allowedValues: new string[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+                formatAllowedValue: allowedValue => HighlightStyleDescriptions()[int.Parse(allowedValue[..1])],
                 name: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Name,
                 tooltip: I18n.ModConfigMenu_FavoriteItemsHighlightTextureChoice_Desc,
                 fieldId: highlightStyleFieldId);
