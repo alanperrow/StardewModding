@@ -2,6 +2,9 @@
 
 namespace ConvenientInventory.Integrations
 {
+    /// <summary>
+    /// platinummyr.CustomBackpackFramework API, for version 1.1.0 or later.
+    /// </summary>
     public interface ICustomBackpackApi
     {
         public bool SetPlayerSlots(int slots, bool force);

@@ -5,7 +5,7 @@ using StardewValley.Objects;
 namespace ConvenientInventory.Integrations
 {
     /// <summary>
-    /// SummerFleur.ConvenientChests API, for Version 2.0.2 or later.
+    /// SummerFleur.ConvenientChests API, for version 2.0.2 or later.
     /// </summary>
     public interface IConvenientChests2Api
     {
@@ -29,7 +29,7 @@ namespace ConvenientInventory.Integrations
         /// Get the accepted item lists of the given chest.
         /// </summary>
         /// <returns>
-        /// A list of <see cref="StardewValley.Item.QualifiedItemId"/>.
+        /// A list of <see cref="Item.QualifiedItemId"/>.
         /// </returns>
         public List<string> GetSelectedChestData(Chest chest);
 

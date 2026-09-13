@@ -64,10 +64,10 @@ namespace ConvenientInventory.Integrations
                 }
             }
 
-            var apiCBF = helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
-            if (apiCBF != null)
+            var modCBF = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework");
+            if (modCBF != null)
             {
-                InitializeCBF(apiCBF, helper, monitor);
+                InitializeCBF(modCBF, helper, monitor);
             }
 
             var modCC2 = helper.ModRegistry.Get("SummerFleur.ConvenientChests");
@@ -570,14 +570,11 @@ namespace ConvenientInventory.Integrations
         /// <summary>
         /// Initializes mod integrations with the Custom Backpack Framework mod and API.
         /// </summary>
-        public static void InitializeCBF(ICustomBackpackApi api, IModHelper helper, IMonitor monitor)
+        public static void InitializeCBF(IModInfo cbfModInfo, IModHelper helper, IMonitor monitor)
         {
             try
             {
-                IModInfo cbfModInfo = helper.ModRegistry.Get("platinummyr.CustomBackpackFramework")
-                    ?? throw new InvalidOperationException("Custom Backpack Framework mod not found in mod registry.");
-
-                // Ensure mod version is recent enough where API interface includes `GetScroll()` method.
+                // Ensure mod version is recent enough where API includes `GetScroll()` method.
                 if (cbfModInfo.Manifest.Version.IsOlderThan("1.1.0"))
                 {
                     throw new InvalidOperationException($"Custom Backpack Framework mod version {cbfModInfo.Manifest.Version} is outdated. " +
@@ -594,7 +591,7 @@ namespace ConvenientInventory.Integrations
                 }
 
                 // Initialization successful.
-                customBackpackApi = api;
+                customBackpackApi = helper.ModRegistry.GetApi<ICustomBackpackApi>("platinummyr.CustomBackpackFramework");
             }
             catch (Exception ex)
             {
