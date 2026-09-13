@@ -92,6 +92,21 @@ Right-click (or press [X] on controller) on the Organize button in a chest to to
 
 ### Miscellaneous
  - **IsEnableInventoryPageSideWarp**: If enabled, moving your controller's cursor beyond either side of your inventory menu will warp the cursor to the opposite side.
+ 
+## Translations
+- [x] 🇺🇸 English (default)
+- [x] 🇫🇷 French
+- [x] 🇰🇷 Korean
+- [x] 🇨🇳 Chinese
+- [x] 🇷🇺 Russian
+
+### Contribute
+All translations are provided voluntarily by the community.
+To contribute a translation, create a pull request [here](https://github.com/alanperrow/StardewModding/pulls).
+Alternatively, you can send your translation file to me via private message.
+For more information, see the [Modding Translation Guide](https://stardewvalleywiki.com/Modding:Translations#For_translators) on the Stardew Valley Wiki.
+
+Credit is given in the mod changelog to all users whose translations are accepted.
 
 ## Compatibility
  - Supports single player, split-screen local multiplayer, and online multiplayer.
