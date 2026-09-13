@@ -1,0 +1,183 @@
+{
+  // UI
+  "QuickStackButton.hoverText": "Разложить по ближайшим сундукам", // If this is translated, try to keep the string length as close to the original as possible.
+
+  "AutoOrganizeButton.hoverText": "Авто сортировка ВКЛ",
+  "AutoOrganizeButton.hoverText.disable": "(ПКМ для отключения)",
+  "AutoOrganizeButton.hoverText.disable-gamepad": "(X для отключения)",
+
+  "QuickStackToggleChestButton.hoverText.enabled": "Быстрое распределение включено",
+  "QuickStackToggleChestButton.hoverText.disabled": "Быстрое распределение отключено",
+  "QuickStackToggleChestButton.hoverText.priority1": "+1 приоритет",
+  "QuickStackToggleChestButton.hoverText.priority2": "+2 приоритет",
+  "QuickStackToggleChestButton.hoverText.priority3": "+3 приоритет",
+
+  "FillStacksQuickStackButton.hoverText": "Быстро распределить предметы",
+
+  // ModConfigMenu
+  "ModConfigMenu.Label.QuickStackToNearbyChests": "Распределение по ближайшим сундукам",
+
+  "ModConfigMenu.IsEnableQuickStack.Name": "Включить быстрое распределение?",
+  "ModConfigMenu.IsEnableQuickStack.Desc": "Если включено, добавляет кнопку \"Разложить по ближайшим сундукам\" в меню вашего инвентаря. Нажатие на эту кнопку распределит предметы из вашего инвентаря в любые ближайшие сундуки, которые содержат данный предмет.",
+
+  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "Включить горячие клавиши?",
+  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "Если включено, нажатие любой из горячих клавиш быстрого распределения, указанных ниже, быстро распределит ваши предметы, даже вне меню вашего инвентаря.",
+
+  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "Горячая клавиша (клавиатура)",
+  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "Нажмите эту клавишу для быстрого распределения ваших предметов.",
+
+  "ModConfigMenu.QuickStackControllerHotkey.Name": "Горячая кнопка (контроллер)",
+  "ModConfigMenu.QuickStackControllerHotkey.Desc": "Нажмите эту кнопку для быстрого распределения ваших предметов.",
+
+  "ModConfigMenu.QuickStackRange.Name": "Дальность",
+  "ModConfigMenu.QuickStackRange.Desc": "На сколько клеток от игрока необходимо искать ближайшие сундуки.\n\nЕсли установлено на \"Location\", будут учитываться все сундуки в текущей локации игрока.",
+  "ModConfigMenu.QuickStackRange.Desc-Global": "\n\nЕсли установлено на \"Global\", будут учитываться все сундуки в мире.",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "Значение настройки дальности распределения было \"Global\", но было сброшено на \"Location\". \"Global\" поддерживается только если установлен мод \"Chests Anywhere\".",
+
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "Поместить больше одного стака?",
+  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "Если включено, быстрое распределение разместит столько предметов, сколько возможно, в сундук, который содержит данный предмет, вместо размещения лишь одного стака.",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "Игнорировать качество предметов?",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "(Необходимо, чтобы \"Поместить больше одного стака?\" было включено.)\nЕсли включено, быстрое распределение разместит предметы в сундуки, которые содержат\nЛЮБОЕ качество данного предмета.",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Name": "Игнорировать вариации цветов предмета?",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Desc": "(Необходимо, чтобы \"Поместить больше одного стака?\" было включено.)\nЕсли включено, быстрое распределение разместит предметы в сундуки, которые содержат\nЛЮБУЮ вариацию цвета данного предмета (например цветы разного цвета).",
+
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Name": "Игнорировать вариации названий предмета?",
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Desc": "(Необходимо, чтобы \"Поместить больше одного стака?\" было включено.)\nЕсли включено, быстрое распределение разместит предметы в сундуки, которые содержат\nЛЮБУЮ вариацию названия данного предмета (например ароматный мёд).",
+
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "Переполнение нестакабельных предметов:",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "(Необходимо, чтобы \"Поместить больше одного стака?\" было включено.)\nВыберите, какие нестакабельные типы предметов могут быть быстро распределены, как\nпереполняемые предметы, если сундук содержит данный предмет.\n\nВыберите \"Ничто\" если нестакабельные предметы НЕ должны быть быстро разложены.",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-None":"Ничто",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-All": "Все",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptTools": "Кроме инструментов",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeapons": "Кроме инструментов и оружия",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeaponsEquips": "Кроме инструментов, оружия и одежды",
+
+  "ModConfigMenu.SubHeader.InChestMenu": "В меню сундука",
+
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Name": "Разрешить горячие клавиши в меню сундука?",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "(Необходимо, чтобы \"Включить горячие клавиши?\" было включено.)\nЕсли включено, позволяет горячей клавише быстрого распределения работать внутри меню сундука,\nв случае чего предметы будут распределяться в данный сундук.",
+
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "Заменить кнопку быстрого добавления?",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "Если включено, кнопка \"Добавить в существующие запасы\" в меню сундуков изменится\nна кнопку \"Быстро распределить предметы\", которая быстро распределит предметы\nв данный сундук после нажатия.",
+
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "Иконка быстрого распределения?",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "(Необходимо, чтобы \"Заменить кнопку быстрого добавления?\" было включено.)\nЕсли включено, кнопка \"Быстро распределить предметы\" в меню сундуков\nвизуально переделана на немного другую иконку.",
+
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "Переключатель распределения на каждый сундук?",
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "Если включено, кнопку переключения быстрого распределения в меню сундуков, для определения того, должен ли этот конкретный сундук быть учтён при быстром распределении.",
+
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "Приоритезировать быстрое распределение?",
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "(Необходимо, чтобы \"Переключатель распределения на каждый сундук?\" было включено.)\nЕсли включено, кнопка переключения быстрого распределения также может назначать приоритет для данного сундука.\nСундуки с высшим приоритетом будут рассматриваться первыми для быстрого распределения.",
+
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "Спрятать переключатель?",
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "(Необходимо, чтобы \"Переключатель распределения на каждый сундук?\" было включено.)\nЕсли включено, кнопка переключения быстрого распределения будет спрятана в меню сундуков.\nДаже когда она спрятана, настройки переключения/приоритезации сундуков всё ещё будут использоваться.",
+
+  "ModConfigMenu.SubHeader.OtherInventories": "Другие инвентари",
+
+  "ModConfigMenu.IsQuickStackIntoFridges.Name": "Учитывать холодильники?",
+  "ModConfigMenu.IsQuickStackIntoFridges.Desc": "Если включено, ближайшие холодильники будут учитываться во время быстрого распределения.",
+
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Name": "Учитывать мини-холодильники?",
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Desc": "Если включено, ближайшие мини-холодильники будут учитываться во время быстрого распределения.",
+
+  "ModConfigMenu.IsQuickStackIntoMills.Name": "Учитывать мельницы?",
+  "ModConfigMenu.IsQuickStackIntoMills.Desc": "Если включено, ближайшие мельницы будут учитываться во время быстрого распределения.",
+
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Name": "Учитывать домики Джунимо?",
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Desc": "Если включено, ближайшие домики Джунимо будут учитываться во время быстрого распределения.",
+
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "Учитывать комоды?",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "(Необходимо, чтобы \"Поместить больше одного стака?\" было включено.)\nЕсли включено, ближайшие комоды будут учитываться во время быстрого распределения.",
+
+  "ModConfigMenu.IsQuickStackIntoHoppers.Name": "Учитывать раздатчики?",
+  "ModConfigMenu.IsQuickStackIntoHoppers.Desc": "Если включено, ближайшие раздатчики будут учитываться во время быстрого распределения.",
+
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "Учитывать мини-ящики для отгрузки?",
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "Если включено, ближайшие мини-ящики для отгрузки будут учитываться во время быстрого распределения.",
+
+  "ModConfigMenu.SubHeader.Animation": "Анимации",
+
+  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "Включить анимацию быстрого распределения?",
+  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "Если включено, будет воспроизводиться анимация предметов во время быстрого распределения, для визуального определения того, куда каждый предмет был распределён.",
+
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "Анимация: Скорость предметов",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "Для анимации быстрого распределения:\nРегулирует скорость, с которой предметы двигаются к их сундуку.\n\n0.5x: Наполовину медленнее\n1x: Нормальная скорость\n3x: В три раза быстрее",
+
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "Анимация: Скорость распределения",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "Для анимации быстрого распределения:\nРегулирует скорость, с которой каждые предметы складываются внутрь их сундука.\n\n0.5x: Наполовину медленнее\n1x: Нормальная скорость\n3x: В три раза быстрее",
+
+  "ModConfigMenu.SubHeader.AdditionalSettings": "Дополнительные настройки",
+
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "Ближайшие сундуки во всплывающей подсказке?",
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "Если включено, наведение на кнопку быстрого распределения покажет все ближайшие сундуки, которые учитываются для быстрого распределения, упорядоченные по дистанции.",
+
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Name": "Подавлять звук без сундуков?",
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Desc": "Если включено, нажатие на кнопку быстрого распределения или её горячую клавишу будет проигрывать звук только когда рядом есть сундуки.",
+
+  "ModConfigMenu.Label.FavoriteItems": "Избранные предметы",
+
+  "ModConfigMenu.IsEnableFavoriteItems.Name": "Включить избранные предметы?",
+  "ModConfigMenu.IsEnableFavoriteItems.Desc": "Если включено, предметы в вашем инвентаре могут быть назначены избранными. Избранные предметы будут игнорированы при быстром распределении в сундуки. Их также нельзя выбросить в корзину, выкинуть и продать.",
+
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Горячая клавиша (клавиатура)",
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "Зажмите эту клавишу во время выбора предмета для того, чтобы назначить его избранным.",
+
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Горячая кнопка (контроллер)",
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "Зажмите эту кнопку во время выбора предмета для того, чтобы назначить его избранным.",
+
+  "ModConfigMenu.SubHeader.Customize": "Кастомизация",
+
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "Предпросмотр:",
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "Предпросмотр для выбранного стиля выделения.",
+
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "Стиль выделения",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "Выберите предпочитаемый стиль для выделения избранных предметов в вашем инвентаре.",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0": "Gold dashed",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1": "Clean gold dashed",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2": "Thick gold border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3": "Textured gold inset border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "Gold inset border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "Dark dashed",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "Thick dark border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "Gold decorative border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-8": "Custom thick border",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-9": "Custom dashed border",
+
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Name": "Использовать пользовательский цвет выделения?",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Desc": "Если включено, применяет пользовательский цвет для стиля выделения.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Name": "Пользовательский цвет выделения: R",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Desc": "(Необходимо, чтобы \"Использовать пользовательский цвет выделения?\" было включено.)\nКрасный компонент пользовательского цвета выделения.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Name": "Пользовательский цвет выделения: G",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Desc": "(Необходимо, чтобы \"Использовать пользовательский цвет выделения?\" было включено.)\nЗелёный компонент пользовательского цвета выделения.",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Name": "Пользовательский цвет выделения: B",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Desc": "(Необходимо, чтобы \"Использовать пользовательский цвет выделения?\" было включено.)\nСиний компонент пользовательского цвета выделения.",
+
+  "ModConfigMenu.Label.TakeAllButOne": "Взять все кроме одного",
+
+  "ModConfigMenu.IsEnableTakeAllButOne.Name": "Включить забирание всего кроме одного?",
+  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "Если включено, пока зажата корячая клавиша, моментально забирает все предметы, оставляя один предмет из выбранного стака предметов, вместо того, чтобы забирать один предмет за раз.",
+
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "Горячая клавиша (клавиатура)",
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "Зажмите эту клавишу во время забирания предмета из стака для того, чтобы забрать все кроме одного.",
+
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "Горячая кнопка (контроллер)",
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "Зажмите эту кнопку во время забирания предмета из стака для того, чтобы забрать все кроме одного.",
+
+  "ModConfigMenu.Label.AutoOrganizeChest": "Автоматическая сортировка сундука",
+
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "Включить кнопку автоматической сортировки?",
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "Если включено, нажатие ПКМ по кнопке сортировки сундука (или нажатие (X) на геймпаде) включит/выключит автоматическую сортировку для данного сундука. Если автоматическая сортировка сундука включена, все предметы будут оставаться отсортированными, даже после добавления нового предмета.",
+
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "Инструкции во всплывающей подсказке?",
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "Если включено, во всплывающей подсказке над кнопкой автоматической сортировки будет дополнительно указано, как выключить автоматическую сортировку.",
+
+  "ModConfigMenu.Label.Miscellaneous": "Разное",
+
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "Включить боковое смещение курсора инвентаря?",
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Desc": "Если включено, перемещение курсора вашего контроллера за любую из сторон вашего меню инвентаря переместит ваш курсор на противоположную сторону."
+}
