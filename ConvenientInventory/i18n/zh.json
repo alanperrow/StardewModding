@@ -1,58 +1,183 @@
 ﻿{
-  "QuickStackButton.hoverText": "快速堆叠到附近的箱子", 
+  // UI
+  "QuickStackButton.hoverText": "快速堆叠到附近的箱子", // If this is translated, try to keep the string length as close to the original as possible.
 
+  "AutoOrganizeButton.hoverText": "自动整理已开启",
+  "AutoOrganizeButton.hoverText.disable": "（右键关闭）",
+  "AutoOrganizeButton.hoverText.disable-gamepad": "（按 X 关闭）",
+
+  "QuickStackToggleChestButton.hoverText.enabled": "附近快速堆叠已启用",
+  "QuickStackToggleChestButton.hoverText.disabled": "附近快速堆叠已禁用",
+  "QuickStackToggleChestButton.hoverText.priority1": "优先级 +1",
+  "QuickStackToggleChestButton.hoverText.priority2": "优先级 +2",
+  "QuickStackToggleChestButton.hoverText.priority3": "优先级 +3",
+
+  "FillStacksQuickStackButton.hoverText": "快速堆叠物品",
+
+  // ModConfigMenu
   "ModConfigMenu.Label.QuickStackToNearbyChests": "快速堆叠到附近的箱子",
 
-  "ModConfigMenu.IsEnableQuickStack.Name": "启用快速堆叠?",
-  "ModConfigMenu.IsEnableQuickStack.Desc": "如果启用，将在您的库存菜单中添加\"快速堆叠到附近的箱子\"按钮。按下此按钮将从你的库存物品堆叠到任何附近的箱子，其中包含该物品。",
+  "ModConfigMenu.IsEnableQuickStack.Name": "启用快速堆叠？",
+  "ModConfigMenu.IsEnableQuickStack.Desc": "启用后，会在背包界面中添加一个“快速堆叠到附近的箱子”按钮。按下该按钮，可将背包中的物品堆叠到附近任何存有该物品的箱子中。",
+
+  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "启用快捷键？",
+  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "启用后，按下下方指定的任一快速堆叠快捷键即可快速堆叠物品，无需打开背包界面。",
+
+  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "按键绑定（键盘）",
+  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "按下此键即可快速堆叠物品。",
+
+  "ModConfigMenu.QuickStackControllerHotkey.Name": "按键绑定（手柄）",
+  "ModConfigMenu.QuickStackControllerHotkey.Desc": "按下此键即可快速堆叠物品。",
 
   "ModConfigMenu.QuickStackRange.Name": "范围",
-  "ModConfigMenu.QuickStackRange.Desc": "玩家需要从多少个方格中寻找附近的箱子。",
+  "ModConfigMenu.QuickStackRange.Desc": "以玩家为中心，向外搜索附近箱子的格数。\n\n若设为“Location”，则玩家当前所在场景内的所有箱子都会纳入考虑。",
+  "ModConfigMenu.QuickStackRange.Desc-Global": "\n\n若设为“Global”，则全世界范围内的所有箱子都会纳入考虑。",
+  "ModConfigMenu.QuickStackRange.ChestsAnywhereGlobalWarning": "QuickStackRange 配置项原为“Global”，现已重置为“Location”。只有安装了 Chests Anywhere 模组时才支持“Global”。",
 
-  "ModConfigMenu.IsEnableQuickStackHotkey.Name": "支持热键?",
-  "ModConfigMenu.IsEnableQuickStackHotkey.Desc": "如果启用，按下下面指定的任何一个快速堆叠热键将快速堆叠您的物品，甚至在您的库存菜单之外。",
+  "ModConfigMenu.IsQuickStackOverflowItems.Name": "溢出物品？",
+  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "启用后，快速堆叠会把尽可能多的物品放入存有该物品的箱子中，而不是只放入一组。",
 
-  "ModConfigMenu.QuickStackKeyboardHotkey.Name": "Keybind(键盘)",
-  "ModConfigMenu.QuickStackKeyboardHotkey.Desc": "按此键可以快速堆叠物品。",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "忽略物品品质？",
+  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "（需先启用“溢出物品？”。）\n启用后，快速堆叠会把物品放入存有\n同种物品任意品质的箱子中。",
 
-  "ModConfigMenu.QuickStackControllerHotkey.Name": "Keybind(控制器)",
-  "ModConfigMenu.QuickStackControllerHotkey.Desc": "按这个按钮可以快速堆叠你的物品。",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Name": "忽略物品颜色差异？",
+  "ModConfigMenu.IsQuickStackIgnoreItemColorVariation.Desc": "（需先启用“溢出物品？”。）\n启用后，快速堆叠会把物品放入存有\n同种物品任意颜色变体的箱子中（例如彩色花朵）。",
 
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Name": "快速堆叠成建筑物?",
-  "ModConfigMenu.IsQuickStackIntoBuildingsWithInventories.Desc": "如果启用，附近有库存的建筑(如磨坊或朱尼莫小屋)在快速堆叠时也会被检查。",
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Name": "忽略物品名称差异？",
+  "ModConfigMenu.IsQuickStackIgnoreItemNameVariation.Desc": "（需先启用“溢出物品？”。）\n启用后，快速堆叠会把物品放入存有\n同种物品任意名称变体的箱子中（例如风味蜂蜜）。",
 
-  "ModConfigMenu.IsQuickStackOverflowItems.Name": "快速堆栈溢出项?",
-  "ModConfigMenu.IsQuickStackOverflowItems.Desc": "如果启用，快速堆栈将把尽可能多的物品放入包含该物品的箱子中，而不仅仅是一个堆栈。",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Name": "溢出的不可堆叠物品：",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc": "（需先启用“溢出物品？”。）\n选择哪些类型的不可堆叠物品，可以在箱子存有\n同种物品时作为溢出物品进行快速堆叠。\n\n若不想让不可堆叠物品参与快速堆叠，请选择“无”。",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-None": "无",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-All": "全部",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptTools": "工具除外",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeapons": "工具与武器除外",
+  "ModConfigMenu.QuickStackNonStackableTypesToOverflow.Desc-ExceptToolsWeaponsEquips": "工具、武器与装备除外",
 
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Name": "快速堆叠忽略项目质量?",
-  "ModConfigMenu.IsQuickStackIgnoreItemQuality.Desc": "如果启用，快速堆叠将物品放入箱子中，其中包含同一物品的一个N Y质量。",
+  "ModConfigMenu.SubHeader.InChestMenu": "箱子界面中",
 
-  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "在工具提示中显示附近的箱子?",
-  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "如果启用，将鼠标悬停在快速堆叠按钮上，将显示附近所有箱子的预览，按距离排序。",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Name": "允许在箱子界面使用快捷键？",
+  "ModConfigMenu.IsQuickStackAllowHotkeyInChestMenu.Desc": "（需先启用“启用快捷键？”。）\n启用后，快速堆叠快捷键在箱子界面中也可使用，\n此时物品会被快速堆叠到该箱子中。",
 
-  "ModConfigMenu.Label.FavoriteItems": "收藏",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Name": "用「添加到现有堆叠」快速堆叠？",
+  "ModConfigMenu.IsQuickStackWithFillStacksButton.Desc": "启用后，箱子界面中的「添加到现有堆叠」按钮\n将变为「快速堆叠物品」按钮，按下后会把物品\n快速堆叠到该箱子中。",
 
-  "ModConfigMenu.IsEnableFavoriteItems.Name": "启用收藏项?",
-  "ModConfigMenu.IsEnableFavoriteItems.Desc": "如果启用，库存中的物品可以被收藏。收藏的物品在堆积到箱子时将被忽略。它们也将被防止被丢弃或掉落。",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Name": "为「添加到现有堆叠」更换快速堆叠图标？",
+  "ModConfigMenu.IsQuickStackVisuallyOverrideFillStacksButton.Desc": "（需先启用“用「添加到现有堆叠」快速堆叠？”。）\n启用后，箱子界面中的「快速堆叠物品」按钮\n会换成略有不同的图标。",
 
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "高亮的风格",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "选择你喜欢的纹理样式来突出显示你收藏的物品。",
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Name": "按箱子单独开关快速堆叠？",
+  "ModConfigMenu.IsEnableQuickStackToggleChest.Desc": "启用后，会在箱子界面中添加一个“切换快速堆叠”按钮，用于决定该箱子是否参与快速堆叠。",
+
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Name": "按箱子设置快速堆叠优先级？",
+  "ModConfigMenu.IsEnableQuickStackPrioritizeChest.Desc": "（需先启用“按箱子单独开关快速堆叠？”。）\n启用后，“切换快速堆叠”按钮还可为该箱子指定优先级。\n优先级更高的箱子会在快速堆叠时被优先考虑。",
+
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Name": "隐藏“切换快速堆叠”按钮？",
+  "ModConfigMenu.IsQuickStackToggleChestButtonHidden.Desc": "（需先启用“按箱子单独开关快速堆叠？”。）\n启用后，“切换快速堆叠”按钮将从箱子界面中隐藏。\n即使隐藏，箱子的开关与优先级设置仍然生效。",
+
+  "ModConfigMenu.SubHeader.OtherInventories": "其他容器",
+
+  "ModConfigMenu.IsQuickStackIntoFridges.Name": "放入冰箱？",
+  "ModConfigMenu.IsQuickStackIntoFridges.Desc": "启用后，附近的冰箱也会参与快速堆叠。",
+
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Name": "放入迷你冰箱？",
+  "ModConfigMenu.IsQuickStackIntoMiniFridges.Desc": "启用后，附近的迷你冰箱也会参与快速堆叠。",
+
+  "ModConfigMenu.IsQuickStackIntoMills.Name": "放入磨坊？",
+  "ModConfigMenu.IsQuickStackIntoMills.Desc": "启用后，附近的磨坊也会参与快速堆叠。",
+
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Name": "放入祝尼魔屋？",
+  "ModConfigMenu.IsQuickStackIntoJunimoHuts.Desc": "启用后，附近的祝尼魔屋也会参与快速堆叠。",
+
+  "ModConfigMenu.IsQuickStackIntoDressers.Name": "放入梳妆台？",
+  "ModConfigMenu.IsQuickStackIntoDressers.Desc": "（需先启用“溢出物品？”。）\n启用后，附近的梳妆台也会参与快速堆叠。",
+
+  "ModConfigMenu.IsQuickStackIntoHoppers.Name": "放入加料器？",
+  "ModConfigMenu.IsQuickStackIntoHoppers.Desc": "启用后，附近的加料器也会参与快速堆叠。",
+
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "放入迷你出货箱？",
+  "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "启用后，附近的迷你出货箱也会参与快速堆叠。",
+
+  "ModConfigMenu.SubHeader.Animation": "动画",
+
+  "ModConfigMenu.IsEnableQuickStackAnimation.Name": "启用快速堆叠动画？",
+  "ModConfigMenu.IsEnableQuickStackAnimation.Desc": "启用后，物品被快速堆叠时会播放动画，直观地显示每件物品存入了哪个箱子。",
+
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Name": "动画：物品速度",
+  "ModConfigMenu.QuickStackAnimationItemSpeed.Desc": "用于快速堆叠动画：\n调整被堆叠物品飞向存放箱子的速度。\n\n0.5x：半速\n1x：正常速度\n3x：三倍速",
+
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Name": "动画：堆叠速度",
+  "ModConfigMenu.QuickStackAnimationStackSpeed.Desc": "用于快速堆叠动画：\n调整物品逐个堆叠进存放箱子的速度。\n\n0.5x：半速\n1x：正常速度\n3x：三倍速",
+
+  "ModConfigMenu.SubHeader.AdditionalSettings": "附加设置",
+
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Name": "在提示框中显示附近箱子？",
+  "ModConfigMenu.IsQuickStackTooltipDrawNearbyChests.Desc": "启用后，将鼠标悬停在快速堆叠按钮上时，会按距离排序显示所有参与快速堆叠的附近箱子预览。",
+
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Name": "附近没有箱子时静音？",
+  "ModConfigMenu.IsSuppressSoundWhenNoNearbyChests.Desc": "启用后，按下快速堆叠按钮或快捷键时，只有在附近存在箱子才会播放音效。",
+
+  "ModConfigMenu.Label.FavoriteItems": "收藏物品",
+
+  "ModConfigMenu.IsEnableFavoriteItems.Name": "启用收藏物品？",
+  "ModConfigMenu.IsEnableFavoriteItems.Desc": "启用后，背包中的物品可以设为收藏。收藏的物品在堆叠进箱子时会被忽略，同时不会被丢弃、掉落或出货。",
+
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "按键绑定（键盘）",
+  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "选中物品时按住此键即可将其设为收藏。",
+
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "按键绑定（手柄）",
+  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "选中物品时按住此键即可将其设为收藏。",
+
+  "ModConfigMenu.SubHeader.Customize": "自定义",
+
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Name": "预览：",
+  "ModConfigMenu.PreviewFavoriteItemsHighlightTextureChoice.Desc": "预览当前选中的高亮样式。",
+
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Name": "高亮样式",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc": "选择你喜欢的纹理样式，用于高亮背包中已收藏的物品。",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-0": "金色虚线",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1": "取消金色虚线",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2": "金色粗描边",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3": "纹理金色镶嵌边框",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "镶金边",
-  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "黑色虚线",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-1": "简约金色虚线",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-2": "金色粗边框",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-3": "纹理金色内嵌边框",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-4": "金色内嵌边框",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-5": "深色虚线",
   "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-6": "深色粗边框",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-7": "金色装饰边框",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-8": "自定义粗边框",
+  "ModConfigMenu.FavoriteItemsHighlightTextureChoice.Desc-9": "自定义虚线边框",
 
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Name": "Keybind(键盘)",
-  "ModConfigMenu.FavoriteItemsKeyboardHotkey.Desc": "选择要收藏的物品时，按住此键。",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Name": "使用自定义高亮颜色？",
+  "ModConfigMenu.IsFavoriteItemsUseCustomHighlightColor.Desc": "启用后，会为高亮样式应用自定义颜色。",
 
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Name": "Keybind(控制器)",
-  "ModConfigMenu.FavoriteItemsControllerHotkey.Desc": "当选择要收藏的项目时，按住此按钮。",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Name": "自定义高亮颜色：红",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.R.Desc": "（需先启用“使用自定义高亮颜色？”。）\n自定义高亮颜色的红色分量。",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Name": "自定义高亮颜色：绿",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.G.Desc": "（需先启用“使用自定义高亮颜色？”。）\n自定义高亮颜色的绿色分量。",
+
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Name": "自定义高亮颜色：蓝",
+  "ModConfigMenu.FavoriteItemsCustomHighlightColor.B.Desc": "（需先启用“使用自定义高亮颜色？”。）\n自定义高亮颜色的蓝色分量。",
+
+  "ModConfigMenu.Label.TakeAllButOne": "全部拿取（仅留一个）",
+
+  "ModConfigMenu.IsEnableTakeAllButOne.Name": "启用全部拿取（仅留一个）？",
+  "ModConfigMenu.IsEnableTakeAllButOne.Desc": "启用后，按住下方的按键从物品堆中取货时，会一次性取走该堆中除一个之外的全部物品，而不是每次只取一个。",
+
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Name": "按键绑定（键盘）",
+  "ModConfigMenu.TakeAllButOneKeyboardHotkey.Desc": "从物品堆中取货时按住此键，即可一次性取走该堆中除一个之外的全部物品。",
+
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Name": "按键绑定（手柄）",
+  "ModConfigMenu.TakeAllButOneControllerHotkey.Desc": "从物品堆中取货时按住此键，即可一次性取走该堆中除一个之外的全部物品。",
+
+  "ModConfigMenu.Label.AutoOrganizeChest": "箱子自动整理",
+
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Name": "启用箱子自动整理按钮？",
+  "ModConfigMenu.IsEnableAutoOrganizeChest.Desc": "启用后，右键点击箱子界面的「整理」按钮（或在手柄上按 (X)），即可为该箱子开启或关闭自动整理。开启自动整理后，箱子中的所有物品会始终保持整理状态，即使放入新物品也是如此。",
+
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Name": "在提示文字中显示操作说明？",
+  "ModConfigMenu.IsShowAutoOrganizeButtonInstructions.Desc": "启用后，自动整理按钮的提示文字会额外增加一行，说明如何关闭自动整理。",
 
   "ModConfigMenu.Label.Miscellaneous": "杂项",
 
-  "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "启用库存光标侧翘曲?",
-  "ModConfigMenu.IsEnableInventoryPageSideWarp.Desc": "如果启用，将控制器的光标移动到库存菜单的任何一侧都会使光标弯曲到另一侧。"
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Name": "启用背包光标侧向环绕？",
+  "ModConfigMenu.IsEnableInventoryPageSideWarp.Desc": "启用后，将手柄光标移出背包界面左右任一侧时，光标会绕到另一侧。"
 }
