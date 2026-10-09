@@ -4,11 +4,22 @@
     {
         Normal,
         Stone,
-        Fridge,
+        BigNormal,
+        BigStone,
         MiniFridge,
+        Fridge,
+        IslandFridge,
         Mill,
         JunimoHut,
         Special,
-        Package
+        Package,
+        Dresser,
+        Dungeon,
+        Hopper,
+        MiniShippingBin,
+        Enricher,
+        JunimoChest,
+        NonPlayer,
+        Error,
     }
 }
