@@ -206,6 +206,24 @@ namespace ConvenientInventory
                 set => _config.serialConfig.IsQuickStackIntoMiniShippingBins = value;
             }
 
+            public bool IsDisabledInMines
+            {
+                get => _config.serialConfig.IsQuickStackDisabledInMines;
+                set => _config.serialConfig.IsQuickStackDisabledInMines = value;
+            }
+
+            public bool IsDisabledInSkullCavern
+            {
+                get => _config.serialConfig.IsQuickStackDisabledInSkullCavern;
+                set => _config.serialConfig.IsQuickStackDisabledInSkullCavern = value;
+            }
+
+            public bool IsDisabledInVolcano
+            {
+                get => _config.serialConfig.IsQuickStackDisabledInVolcano;
+                set => _config.serialConfig.IsQuickStackDisabledInVolcano = value;
+            }
+
             public bool IsAnimationEnabled
             {
                 get => _config.serialConfig.IsEnableQuickStackAnimation;

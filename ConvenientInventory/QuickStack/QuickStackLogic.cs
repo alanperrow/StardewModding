@@ -208,10 +208,27 @@ namespace ConvenientInventory.QuickStack
             return movedAtLeastOneTotal;
         }
 
+        /// <summary>
+        /// Whether quick stack is disabled by config in the given location (Mines, Skull Cavern, or Volcano Dungeon).
+        /// </summary>
+        public static bool IsQuickStackDisabledInLocation(GameLocation location)
+        {
+            ModConfig.QuickStackConfig config = ModEntry.Config.QuickStack;
+            return location switch
+            {
+                // Skull Cavern levels are mine levels below the bottom of the Mines, except the Quarry Mine.
+                MineShaft mineShaft when mineShaft.mineLevel > MineShaft.bottomOfMineLevel && mineShaft.mineLevel != MineShaft.quarryMineShaft
+                    => config.IsDisabledInSkullCavern,
+                MineShaft => config.IsDisabledInMines,
+                VolcanoDungeon => config.IsDisabledInVolcano,
+                _ => false,
+            };
+        }
+
         public static List<TypedChest> GetTypedChestsWithinRange(Farmer who, string rangeStr, bool sorted = false)
         {
             List<TypedChest> typedChestsWithinRange = new();
-            if (who is null)
+            if (who is null || IsQuickStackDisabledInLocation(who.currentLocation))
             {
                 return typedChestsWithinRange;
             }

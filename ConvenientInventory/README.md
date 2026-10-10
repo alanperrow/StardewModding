@@ -52,6 +52,7 @@ Right-click (or press [X] on controller) on the Organize button in a chest to to
  - **IsEnableQuickStackHotkey**: If enabled, pressing either of the quick stack hotkeys specified below will quick stack your items, even outside of your inventory menu.
  - **QuickStackKeyboardHotkey**: Press this key to quick stack your items.
  - **QuickStackControllerHotkey**: Press this button to quick stack your items. (For controller support)
+ - **IsQuickStackDisabledInMines** / **IsQuickStackDisabledInSkullCavern** / **IsQuickStackDisabledInVolcano**: If enabled, quick stack does nothing while you are in that location (the Mines include the Quarry Mine).
  - **IsQuickStackIntoBuildingsWithInventories**: If enabled, nearby buildings with inventories (such as Mills or Junimo Huts) will also be checked when quick stacking.
  - **IsQuickStackOverflowItems**: If enabled, quick stack will place as many items as possible into chests which contain that item, rather than just a single stack.
  - **IsQuickStackIgnoreItemQuality**: (Requires IsQuickStackOverflowItems to be enabled.) If enabled, quick stack will place items into chests which contain ANY quality of that same item.

@@ -310,6 +310,31 @@ namespace ConvenientInventory.Integrations
 
             api16?.AddSubHeader(
                 mod: modManifest,
+                text: I18n.ModConfigMenu_SubHeader_DisabledLocations);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsDisabledInMines,
+                setValue: value => config.QuickStack.IsDisabledInMines = value,
+                name: I18n.ModConfigMenu_IsQuickStackDisabledInMines_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackDisabledInMines_Desc);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsDisabledInSkullCavern,
+                setValue: value => config.QuickStack.IsDisabledInSkullCavern = value,
+                name: I18n.ModConfigMenu_IsQuickStackDisabledInSkullCavern_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackDisabledInSkullCavern_Desc);
+
+            api.AddBoolOption(
+                mod: modManifest,
+                getValue: () => config.QuickStack.IsDisabledInVolcano,
+                setValue: value => config.QuickStack.IsDisabledInVolcano = value,
+                name: I18n.ModConfigMenu_IsQuickStackDisabledInVolcano_Name,
+                tooltip: I18n.ModConfigMenu_IsQuickStackDisabledInVolcano_Desc);
+
+            api16?.AddSubHeader(
+                mod: modManifest,
                 text: I18n.ModConfigMenu_SubHeader_Animation);
 
             api.AddBoolOption(
