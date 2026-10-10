@@ -96,6 +96,13 @@
 
   "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Name": "Into Mini-Shipping Bins?",
   "ModConfigMenu.IsQuickStackIntoMiniShippingBins.Desc": "If enabled, nearby Mini-Shipping Bins will be considered when quick stacking.",
+  "ModConfigMenu.SubHeader.DisabledLocations": "Disabled Locations",
+  "ModConfigMenu.IsQuickStackDisabledInMines.Name": "Disable in the Mines?",
+  "ModConfigMenu.IsQuickStackDisabledInMines.Desc": "If enabled, quick stack does nothing while you are in the Mines (including the Quarry Mine).",
+  "ModConfigMenu.IsQuickStackDisabledInSkullCavern.Name": "Disable in Skull Cavern?",
+  "ModConfigMenu.IsQuickStackDisabledInSkullCavern.Desc": "If enabled, quick stack does nothing while you are in Skull Cavern.",
+  "ModConfigMenu.IsQuickStackDisabledInVolcano.Name": "Disable in Volcano Dungeon?",
+  "ModConfigMenu.IsQuickStackDisabledInVolcano.Desc": "If enabled, quick stack does nothing while you are in the Volcano Dungeon.",
 
   "ModConfigMenu.SubHeader.Animation": "Animation",
 

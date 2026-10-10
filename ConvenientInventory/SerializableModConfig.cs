@@ -59,6 +59,12 @@ namespace ConvenientInventory
 
         public bool IsQuickStackIntoMiniShippingBins { get; set; } = false;
 
+        public bool IsQuickStackDisabledInMines { get; set; } = false;
+
+        public bool IsQuickStackDisabledInSkullCavern { get; set; } = false;
+
+        public bool IsQuickStackDisabledInVolcano { get; set; } = false;
+
         public bool IsEnableQuickStackAnimation { get; set; } = true;
 
         public bool IsEnableQuickStackChestAnimation { get; set; } = true;
